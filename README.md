@@ -34,6 +34,7 @@ in quanto si occupano di orchestrare i dati e le operazioni per rispondere alle 
 - ViewModel: Riceve il risultato dal Use Case e lo passa alla View, dove viene visualizzato tramite LiveData o State.
 
 ### Struttura cartelle
+```plaintext
 com.example.app
 ├── data
 │   ├── model
@@ -55,6 +56,7 @@ com.example.app
 │       └── SongViewModel.kt // Gestisce i dati per la UI e interagisce con il Use Case.
 └── di
 └── AppModule.kt
+```
 
 In questa struttura di progetto basata sul pattern MVVM, le cartelle principali che rappresentano View, Model, e ViewModel sono le seguenti:
 - cartella ui -> view
