@@ -1,15 +1,32 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+# Build directory
+/build/
+/out/
+
+# Gradle
+/.gradle/
+/.gradle/
+/build/
+
+# IntelliJ IDEA
+/.idea/
+/*.iml
+
+# macOS
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+
+# Windows
+Thumbs.db
+
+# Log files
+*.log
+
+# Temporary files
+*.swp
+*.swo
+
+# Kotlin specific
+/target/
+/bin/
+
+# VS Code
+.vscode/
