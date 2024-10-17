@@ -27,6 +27,9 @@ local.properties
 # macOS
 .DS_Store
 
+# vscode
+.vscode/
+
 # Windows
 Thumbs.db
 
@@ -35,21 +38,7 @@ Thumbs.db
 *.swo
 
 # Temporary files
-.idea/workspace.xml
-.idea/caches
-.idea/shelf
-.idea/libraries
-.idea/tasks.xml
-.idea/gradle.xml
-.idea/vcs.xml
-.idea/misc.xml
-.idea/compiler.xml
-.idea/.name
-.idea/material_theme_project_new.xml
-.idea/git_toolbox_blame.xml
-.idea/deploymentTargetSelector.xml
-.idea/migrations.xml
-.idea/runConfigurations.xml
+.idea/
 
 # Android Studio auto-generated
 captures/
@@ -64,3 +53,37 @@ gradle-wrapper.jar
 # APK/Bundle files
 *.apk
 *.aab
+
+# Gradle files
+.gradle/
+build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Log/OS Files
+*.log
+
+# Android Studio generated files and folders
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+output.json
+
+# IntelliJ
+*.iml
+.idea/
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml
+
+# Keystore files
+*.jks
+*.keystore
+
+# Google Services (e.g. APIs or Firebase)
+google-services.json
+
+# Android Profiling
+*.hprof
