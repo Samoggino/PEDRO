@@ -1,15 +1,28 @@
-# Build directory
+# Build directories
 /build/
-/out/
+/app/build/
 
 # Gradle
-/.gradle/
-/.gradle/
+.gradle/
+/gradle/
 /build/
 
-# IntelliJ IDEA
-/.idea/
+# Local configuration file (SDK paths, etc.)
+local.properties
+
+# IntelliJ IDEA / Android Studio
+.idea/
 /*.iml
+/*.ipr
+/*.iws
+
+# Kotlin specific
+.kotlinc/
+.kts_cache/
+.kotlinc_cache/
+
+# Log files
+*.log
 
 # macOS
 .DS_Store
@@ -17,16 +30,37 @@
 # Windows
 Thumbs.db
 
-# Log files
-*.log
-
-# Temporary files
+# Linux swap files
 *.swp
 *.swo
 
-# Kotlin specific
-/target/
-/bin/
+# Temporary files
+.idea/workspace.xml
+.idea/caches
+.idea/shelf
+.idea/libraries
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/vcs.xml
+.idea/misc.xml
+.idea/compiler.xml
+.idea/.name
+.idea/material_theme_project_new.xml
+.idea/git_toolbox_blame.xml
+.idea/deploymentTargetSelector.xml
+.idea/migrations.xml
+.idea/runConfigurations.xml
 
-# VS Code
-.vscode/
+# Android Studio auto-generated
+captures/
+.externalNativeBuild/
+
+# Proguard mapping files
+app/proguard-rules.pro
+
+# Gradle wrapper
+gradle-wrapper.jar
+
+# APK/Bundle files
+*.apk
+*.aab
