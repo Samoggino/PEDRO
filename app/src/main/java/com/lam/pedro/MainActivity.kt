@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.lam.pedro.ui.theme.PEDROTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,7 +23,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PEDROTheme {
-                Box(modifier = Modifier.background(color = MaterialTheme.colorScheme.background))
+                Box(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
+                    Text(text = getString(R.string.app_name))
+                }
 
             }
         }
