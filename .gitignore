@@ -20,6 +20,7 @@ local.properties
 .kotlinc/
 .kts_cache/
 .kotlinc_cache/
+.kotlin/
 
 # Log files
 *.log
