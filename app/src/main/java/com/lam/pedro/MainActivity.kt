@@ -20,7 +20,6 @@ class MainActivity : ComponentActivity() {
                 Box(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
                     Text(text = getString(R.string.app_name))
                 }
-
             }
         }
     }

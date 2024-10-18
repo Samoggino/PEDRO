@@ -56,4 +56,13 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Supabase
+    //noinspection UseTomlInstead
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.0.1"))
+    implementation(libs.github.postgrest.kt)
+    implementation(libs.io.github.jan.tennert.supabase.auth.kt)
+    implementation(libs.github.realtime.kt)
+
 }
+
