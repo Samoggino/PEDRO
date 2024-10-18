@@ -1,9 +1,11 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
-
 android {
     namespace = "com.lam.pedro"
     compileSdk = 34
@@ -16,6 +18,19 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // Set value part
+        // Set value part
+        val properties = Properties().apply {
+            load(project.rootProject.file("local.properties").inputStream())
+        }
+
+        buildConfigField(
+            "String",
+            "SUPABASE_ANON_KEY",
+            "\"${properties.getProperty("SUPABASE_ANON_KEY")}\""
+        )
+        buildConfigField("String", "SECRET", "\"${properties.getProperty("SECRET")}\"")
+        buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
     }
 
     buildTypes {
@@ -36,6 +51,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -63,6 +79,11 @@ dependencies {
     implementation(libs.github.postgrest.kt)
     implementation(libs.io.github.jan.tennert.supabase.auth.kt)
     implementation(libs.github.realtime.kt)
+    implementation(libs.ktor.client.core) // Sostituisci con l'ultima versione
+    implementation(libs.ktor.client.okhttp) // Sostituisci con l'ultima versione
+
 
 }
+
+
 

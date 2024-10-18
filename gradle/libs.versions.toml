@@ -7,6 +7,7 @@ coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
+ktorClientCore = "3.0.0"
 ktorClientOkhttp = "2.0.0"
 lifecycleRuntimeKtx = "2.8.6"
 activityCompose = "1.9.3"
@@ -20,6 +21,7 @@ github-bom = { module = "io.github.jan-tennert.supabase:bom", version = "3.0.1" 
 github-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 github-realtime-kt = { module = "io.github.jan-tennert.supabase:realtime-kt" }
 io-github-jan-tennert-supabase-auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
 postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 realtime-kt = { module = "io.github.jan-tennert.supabase:realtime-kt" }
 gotrue-kt = { module = "io.github.jan-tennert.supabase:gotrue-kt" }
@@ -45,3 +47,4 @@ supabase-realtime-kt = { module = "io.github.jan-tennert.supabase:realtime-kt", 
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }  # Corretto qui
