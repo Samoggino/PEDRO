@@ -77,13 +77,16 @@ dependencies {
     //noinspection UseTomlInstead
     implementation(platform("io.github.jan-tennert.supabase:bom:3.0.1"))
     implementation(libs.github.postgrest.kt)
-    implementation(libs.io.github.jan.tennert.supabase.auth.kt)
+    implementation(libs.auth.kt)  // Non è necessario specificare la versione, usa semplicemente libs.auth.kt
     implementation(libs.github.realtime.kt)
-    implementation(libs.ktor.client.core) // Sostituisci con l'ultima versione
-    implementation(libs.ktor.client.okhttp) // Sostituisci con l'ultima versione
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+
+
 
 
 }
+
 
 
 
