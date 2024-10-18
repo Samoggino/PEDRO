@@ -26,11 +26,12 @@ android {
 
         buildConfigField(
             "String",
-            "SUPABASE_ANON_KEY",
-            "\"${properties.getProperty("SUPABASE_ANON_KEY")}\""
+            "SUPABASE_KEY",
+            "\"${properties.getProperty("SUPABASE_KEY")}\""
         )
         buildConfigField("String", "SECRET", "\"${properties.getProperty("SECRET")}\"")
         buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
+
     }
 
     buildTypes {
@@ -81,9 +82,6 @@ dependencies {
     implementation(libs.github.realtime.kt)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
-
-
-
 
 }
 
