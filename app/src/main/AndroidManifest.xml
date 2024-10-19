@@ -2,7 +2,44 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!--Burned Calories-->
+    <uses-permission android:name="android.permission.health.READ_ACTIVE_CALORIES_BURNED"/>
+    <uses-permission android:name="android.permission.health.WRITE_ACTIVE_CALORIES_BURNED"/>
+
+    <!--Cycling Pedaling Cadence-->
+    <uses-permission android:name="android.permission.health.READ_EXERCISE"/>
+    <uses-permission android:name="android.permission.health.WRITE_EXERCISE"/>
+
+    <!--Distance-->
+    <uses-permission android:name="android.permission.health.READ_DISTANCE"/>
+    <uses-permission android:name="android.permission.health.WRITE_DISTANCE"/>
+
+    <!--Floors Climbed-->
+    <uses-permission android:name="android.permission.health.READ_FLOORS_CLIMBED"/>
+    <uses-permission android:name="android.permission.health.WRITE_FLOORS_CLIMBED"/>
+
+    <!--Hydration-->
+    <uses-permission android:name="android.permission.health.READ_HYDRATION"/>
+    <uses-permission android:name="android.permission.health.WRITE_HYDRATION"/>
+
+    <!--Sleep Session-->
+    <uses-permission android:name="android.permission.health.READ_SLEEP"/>
+    <uses-permission android:name="android.permission.health.WRITE_SLEEP"/>
+
+    <!--Speed-->
+    <uses-permission android:name="android.permission.health.READ_SPEED"/>
+    <uses-permission android:name="android.permission.health.WRITE_SPEED"/>
+
+    <!--Steps Cadence-->
+    <uses-permission android:name="android.permission.health.READ_STEPS"/>
+    <uses-permission android:name="android.permission.health.WRITE_STEPS"/>
+
+    <!--Weight-->
+    <uses-permission android:name="android.permission.health.READ_WEIGHT"/>
+    <uses-permission android:name="android.permission.health.WRITE_WEIGHT"/>
+
     <application
+        android:name=".ui.BaseApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -24,5 +61,10 @@
             </intent-filter>
         </activity>
     </application>
+
+    <!-- Check if Health Connect is installed -->
+    <queries>
+        <package android:name="com.google.android.apps.healthdata" />
+    </queries>
 
 </manifest>

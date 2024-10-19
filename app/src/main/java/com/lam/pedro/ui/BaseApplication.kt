@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.healthconnect.codelab.presentation.theme
+package com.lam.pedro.ui
 
-import androidx.compose.ui.graphics.Color
+import android.app.Application
+import com.lam.pedro.model.data.HealthConnectManager
 
-val HealthConnectGreen = Color(0xFF3DDB85)
-val HealthConnectBlue = Color(0xFF4285F4)
+class BaseApplication : Application() {
+  val healthConnectManager by lazy {
+    HealthConnectManager(this)
+  }
+}

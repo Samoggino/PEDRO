@@ -15,7 +15,12 @@
  */
 package com.example.healthconnect.codelab.presentation.theme
 
-import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Shapes
+import androidx.compose.ui.unit.dp
 
-val HealthConnectGreen = Color(0xFF3DDB85)
-val HealthConnectBlue = Color(0xFF4285F4)
+val Shapes: Shapes = Shapes(
+  small = RoundedCornerShape(4.dp),
+  medium = RoundedCornerShape(4.dp),
+  large = RoundedCornerShape(0.dp)
+)

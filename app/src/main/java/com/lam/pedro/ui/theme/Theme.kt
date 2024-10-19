@@ -1,52 +1,56 @@
+/*
+ * Copyright 2022 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.lam.pedro.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color.Companion.Black
-import androidx.compose.ui.graphics.Color.Companion.Blue
-import androidx.compose.ui.graphics.Color.Companion.White
-import androidx.compose.ui.platform.LocalContext
+import com.example.healthconnect.codelab.presentation.theme.HealthConnectBlue
+import com.example.healthconnect.codelab.presentation.theme.HealthConnectGreen
+import com.example.healthconnect.codelab.presentation.theme.Shapes
+import com.example.healthconnect.codelab.presentation.theme.Typography
 
-private val DarkColorScheme = darkColorScheme(
-    background = Black,
-    primary = Blue,
-    error = DarkRed,
-    surface = LightBlack
+private val DarkColorPalette: ColorScheme = darkColorScheme(
+  primary = HealthConnectGreen,
+  secondary = HealthConnectBlue
 )
 
-private val LightColorScheme = lightColorScheme(
-    background = White,
-    primary = Blue,
-    error = LightRed,
-    surface = White
+private val LightColorPalette: ColorScheme = lightColorScheme(
+  primary = HealthConnectBlue,
+  secondary = HealthConnectBlue
 )
 
 @Composable
-fun PEDROTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = false, //to avoid unexpected behavior due to Material You
-    content: @Composable () -> Unit
+fun HealthConnectTheme(
+  darkTheme: Boolean = isSystemInDarkTheme(),
+  content: @Composable () -> Unit,
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+  val colors = if (darkTheme) {
+    DarkColorPalette
+  } else {
+    LightColorPalette
+  }
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+  MaterialTheme(
+    colorScheme = colors,
+    typography = Typography,
+    shapes = Shapes,
+    content = content
+  )
 }
