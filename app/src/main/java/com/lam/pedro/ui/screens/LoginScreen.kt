@@ -1,5 +1,7 @@
 package com.lam.pedro.ui.screens
 
+//import androidx.navigation.NavController
+import SupabaseAuthViewModel
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -24,17 +27,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-//import androidx.navigation.NavController
-import com.lam.pedro.ui.viewmodel.SupabaseAuthViewModel
+import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavController) {
     var emailValue by remember { mutableStateOf("") }
     var passwordValue by remember { mutableStateOf("") }
 
     val viewModel = SupabaseAuthViewModel() // Crea un'istanza del ViewModel
     val coroutineScope = rememberCoroutineScope() // Crea un coroutine scope
+
+    // Stato per mostrare il popup
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") } // Per memorizzare il messaggio di errore
+
+    // Funzione per chiudere il popup
+    fun closeErrorDialog() {
+        showErrorDialog = false
+    }
 
     Column(
         modifier = Modifier
@@ -46,7 +57,6 @@ fun LoginScreen() {
         // Titolo
         Text(
             text = "Accedi",
-//            style = MaterialTheme.typography.h4,
             modifier = Modifier.padding(bottom = 32.dp)
         )
 
@@ -73,28 +83,26 @@ fun LoginScreen() {
                 .padding(top = 16.dp)
         )
 
-
         // Pulsante di accesso
         Button(
             onClick = {
                 coroutineScope.launch {
-                    if (viewModel.logInAuth(emailValue, passwordValue) != null) {
-
-                    // redirect to HomePage
-                    Log.d("Supabase", "LoginScreen: pre-redirect")
-                    try {
-//                        navController.navigate("home")  // Naviga a HomeScreen
-                    } catch (e: Exception) {
-                        Log.e("Supabase", "ERRORE: Failed to redirect to HomePage")
-                    }
-                    Log.d("Supabase", "LoginScreen: post-redirect")
-
+                    val result = viewModel.logInAuth(emailValue, passwordValue)
+                    if (result != null) {
+                        // Redirect to HomePage
+                        Log.d("Supabase", "LoginScreen: pre-redirect")
+                        try {
+                            navController.navigate("home")  // Naviga a HomeScreen
+                        } catch (e: Exception) {
+                            Log.e("Supabase", "ERRORE: Failed to redirect to HomePage")
+                        }
+                        Log.d("Supabase", "LoginScreen: post-redirect")
                     } else {
-                    // Handle login failure
+                        // Crea un messaggio di errore
+                        errorMessage = "Email o password non corretti. Riprova."
+                        showErrorDialog = true
                     }
                 }
-
-
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -108,15 +116,33 @@ fun LoginScreen() {
             Text("Password dimenticata?")
         }
 
-
         // Pulsante Registrati
         TextButton(onClick = {
             coroutineScope.launch {
                 viewModel.signInAuth(emailValue, passwordValue)
-
             }
         }) {
             Text("Non hai un account? Registrati")
+        }
+
+        // Popup di errore
+        if (showErrorDialog) {
+            AlertDialog(
+                onDismissRequest = { closeErrorDialog() }, // Chiudi se clicchi fuori dal popup
+                title = {
+                    Text(text = "Errore di accesso")
+                },
+                text = {
+                    Text(errorMessage) // Mostra il messaggio di errore
+                },
+                confirmButton = {
+                    Button(
+                        onClick = { closeErrorDialog() }  // Chiudi il popup
+                    ) {
+                        Text("OK")
+                    }
+                }
+            )
         }
     }
 }

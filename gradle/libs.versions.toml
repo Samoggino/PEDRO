@@ -12,8 +12,10 @@ activityCompose = "1.9.3"
 composeBom = "2024.10.00"
 materialIconsCore = "1.7.4"
 constraintlayoutCompose = "1.0.1"
+navigationCompose = "2.8.3"
 
 [libraries]
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsCore" }
