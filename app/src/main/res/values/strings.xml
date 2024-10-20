@@ -1,6 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+     Copyright (C) 2022 The Android Open Source Project
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+          http://www.apache.org/licenses/LICENSE-2.0
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
 <resources>
-    <string name="app_name">PEDRO</string>
-
+    <string name="app_name">Pedro</string>
     <string name="menu">menu</string>
 
     <!-- Screen titles -->
@@ -33,11 +44,10 @@
     <string name="health_connect_package">com.google.android.apps.healthdata</string>
     <string name="onboarding_url">healthconnect://onboarding</string>
     <string name="not_installed_description">
-        Health Connect is supported on this device, but is not currently installed.
+        Health Connect is supported on this device, but is either not installed, or requires an update.
     </string>
     <string name="not_installed_link_text">
-        To use this sample, and other apps using Health Connect, please install the Health Connect
-        package from Google Play.
+        To use this sample, please install or update the Health Connect package via Google Play.
     </string>
 
     <!-- Not supported on device -->
@@ -57,7 +67,9 @@
     <!-- Exercise Session screen -->
     <string name="insert_exercise_session">Insert session</string>
     <string name="no_title">[No title]</string>
+    <string name="unknown_app">[Unknown app]</string>
     <string name="delete_button">Delete</string>
+    <string name="details_button">Details</string>
 
     <!-- Exercise Session detail screen -->
     <string name="total_active_duration">Total active duration</string>
@@ -94,7 +106,7 @@
     <string name="add_readings_button">Add</string>
     <string name="previous_readings"> Previous Measurements </string>
     <string name="weekly_avg"> Weekly Average </string>
-    <string name="kilograms">Kg\u0020</string>
+    <string name="kilograms">Kg</string>
     <string name="valid_weight_error_message"> Weight must be between 0 and 1000</string>
 
     <!-- Differential changes screen -->
@@ -108,7 +120,6 @@
     <string name="differential_changes_deleted">Deleted:</string>
 
     <string name="differential_changes_type_exercise_session">Exercise session</string>
-    <string name="differential_changes_type_exercise_event">Exercise event</string>
     <string name="differential_changes_type_speed_series">Speed series</string>
     <string name="differential_changes_type_heart_rate_series">Heart rate series</string>
     <string name="differential_changes_type_total_calories">Total calories</string>
@@ -118,6 +129,13 @@
     <string name="differential_changes_type_distance">Distance</string>
     <string name="differential_changes_type_weight">Weight</string>
 
+    <!-- Record List screen -->
+    <string name="record_list">Record list</string>
+    <string name="exercise_sessions_record_list">Exercise Sessions Record list</string>
+    <string name="sleep_sessions_record_list">Sleep Sessions Record list</string>
+
     <!-- Health Connect settings -->
     <string name="settings">Settings</string>
+    <string name="manage">Manage Health Connect</string>
+    <string name="disconnect">Disconnect Health Connect</string>
 </resources>
