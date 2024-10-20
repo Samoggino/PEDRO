@@ -88,6 +88,7 @@ dependencies {
     implementation(libs.github.realtime.kt)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
+    implementation(libs.androidx.navigation.compose)
 
 }
 
