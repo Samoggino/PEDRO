@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 //import androidx.navigation.NavController
-//import androidx.navigation.NavController
 import com.lam.pedro.ui.viewmodel.SupabaseAuthViewModel
 import kotlinx.coroutines.launch
 
@@ -56,7 +55,7 @@ fun LoginScreen() {
             value = emailValue,
             onValueChange = { emailValue = it },
             label = { Text("Email") },
-            leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+            trailingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
             modifier = Modifier.fillMaxWidth()
         )
 
