@@ -76,6 +76,15 @@ fun HealthConnectNavigation(
                 }
             )
         }
+        composable(Screen.HomeScreen.route) {
+            Screen.HomeScreen
+        }
+        composable(Screen.ActivitiesScreen.route) {
+            Screen.ActivitiesScreen
+        }
+        composable(Screen.MoreScreen.route) {
+            Screen.MoreScreen
+        }
         composable(
             route = Screen.PrivacyPolicy.route,
             deepLinks = listOf(

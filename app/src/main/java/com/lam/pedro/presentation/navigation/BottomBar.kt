@@ -54,43 +54,39 @@ fun BottomBar(
         Screen.entries.filter { it.hasMenuItem }.forEach { item ->
 
             val selected = item.route == currentRoute
-                NavigationBarItem(
-                    icon = {
-                    if (item.titleId == R.string.home_screen)
-                        Icon(Icons.Filled.Home, contentDescription = "Home")
-                    else if (item.titleId == R.string.activity_list)
-                        Icon(Icons.Filled.SpaceDashboard, contentDescription = "Activities")
-                    else if (item.titleId == R.string.more_screen)
-                        Icon(Icons.Filled.MoreHoriz, contentDescription = "More")
+            NavigationBarItem(
+                icon = {
 
-                    },
-                    label = { Text(
+                    when (item.titleId) {
+                        R.string.home_screen -> Icon(
+                            Icons.Filled.Home,
+                            contentDescription = "Home",
+                        )
+
+                        R.string.activity_list -> Icon(
+                            Icons.Filled.SpaceDashboard,
+                            contentDescription = "Activities",
+                        )
+
+                        R.string.more_screen -> Icon(
+                            Icons.Filled.MoreHoriz,
+                            contentDescription = "More",
+                        )
+                    }
+                },
+
+                label = {
+                    Text(
                         text = stringResource(item.titleId),
-                        color = if (selected) {
-                            MaterialTheme.colorScheme.primary // Colore del testo selezionato
+                        fontWeight = if (selected) {
+                            androidx.compose.ui.text.font.FontWeight.Bold
                         } else {
-                            MaterialTheme.colorScheme.onBackground // Colore del testo non selezionato
+                            androidx.compose.ui.text.font.FontWeight.Normal
                         }
-                    ) },
-                    selected = item.route == currentRoute,
-                    onClick = { navController.navigate(item.route) {
-                        // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
-                        navController.graph.startDestinationRoute?.let { route ->
-                            popUpTo(route) {
-                                saveState = true
-                            }
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }} // Chiama la funzione di navigazione per Home
-                )
-            }
-
-/*
-            BottomBarItem(
-                item = item,
+                    )
+                },
                 selected = item.route == currentRoute,
-                onItemClick = {
+                onClick = {
                     navController.navigate(item.route) {
                         // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
                         navController.graph.startDestinationRoute?.let { route ->
@@ -101,10 +97,29 @@ fun BottomBar(
                         launchSingleTop = true
                         restoreState = true
                     }
-                }
+                } // Chiama la funzione di navigazione per Home
             )
-
- */
         }
+
+        /*
+                    BottomBarItem(
+                        item = item,
+                        selected = item.route == currentRoute,
+                        onItemClick = {
+                            navController.navigate(item.route) {
+                                // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
+                                navController.graph.startDestinationRoute?.let { route ->
+                                    popUpTo(route) {
+                                        saveState = true
+                                    }
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    )
+
+         */
+    }
 
 }
