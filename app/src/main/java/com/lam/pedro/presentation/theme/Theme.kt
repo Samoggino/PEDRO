@@ -23,13 +23,13 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
 private val DarkColorPalette: ColorScheme = darkColorScheme(
-    primary = HealthConnectGreen,
-    secondary = HealthConnectBlue
+    primary = PedroYellow,
+    secondary = PedroBlack
 )
 
 private val LightColorPalette: ColorScheme = lightColorScheme(
-    primary = HealthConnectBlue,
-    secondary = HealthConnectBlue
+    primary = PedroBlack,
+    secondary = PedroBlack
 )
 
 @Composable

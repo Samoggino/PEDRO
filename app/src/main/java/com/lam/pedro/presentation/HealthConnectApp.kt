@@ -44,10 +44,10 @@ import androidx.health.connect.client.HealthConnectClient.Companion.SDK_AVAILABL
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.healthconnectsample.data.HealthConnectManager
-import com.lam.pedro.presentation.navigation.Drawer
 import com.lam.pedro.presentation.navigation.HealthConnectNavigation
 import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.R
+import com.lam.pedro.presentation.navigation.BottomBar
 import com.lam.pedro.presentation.theme.HealthConnectTheme
 import kotlinx.coroutines.launch
 
@@ -57,7 +57,6 @@ const val TAG = "Health Connect sample"
 @Composable
 fun HealthConnectApp(healthConnectManager: HealthConnectManager) {
     HealthConnectTheme {
-        val drawerState = rememberDrawerState(DrawerValue.Closed)
         val snackbarHostState = remember { SnackbarHostState() }
         val navController = rememberNavController()
         val scope = rememberCoroutineScope()
@@ -65,20 +64,7 @@ fun HealthConnectApp(healthConnectManager: HealthConnectManager) {
         val currentRoute = navBackStackEntry?.destination?.route
         val availability by healthConnectManager.availability
 
-        ModalNavigationDrawer(
-            drawerState = drawerState,
-            drawerContent = {
-                if (availability == SDK_AVAILABLE) {
-                    ModalDrawerSheet {
-                        Drawer(
-                            scope = scope,
-                            drawerState = drawerState,
-                            navController = navController
-                        )
-                    }
-                }
-            }
-        ) {
+
             Scaffold(
                 topBar = {
                     TopAppBar(
@@ -92,22 +78,6 @@ fun HealthConnectApp(healthConnectManager: HealthConnectManager) {
                             }
                             Text(text = stringResource(titleId))
                         },
-                        navigationIcon = {
-                            IconButton(
-                                onClick = {
-                                    if (availability == SDK_AVAILABLE) {
-                                        scope.launch {
-                                            drawerState.open() // Apri il drawer
-                                        }
-                                    }
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Menu,
-                                    contentDescription = stringResource(id = R.string.menu)
-                                )
-                            }
-                        },
                         colors = TopAppBarDefaults.topAppBarColors(
                             containerColor = MaterialTheme.colorScheme.primary
                         )
@@ -120,6 +90,12 @@ fun HealthConnectApp(healthConnectManager: HealthConnectManager) {
                             actionColor = MaterialTheme.colorScheme.secondary
                         )
                     }
+                },
+                bottomBar = {
+                    BottomBar(
+                        scope = scope,
+                        navController = navController
+                    )
                 }
             ) { paddingValues ->
                 Box(modifier = Modifier.padding(paddingValues)) {
@@ -132,5 +108,5 @@ fun HealthConnectApp(healthConnectManager: HealthConnectManager) {
             }
         }
     }
-}
+
 

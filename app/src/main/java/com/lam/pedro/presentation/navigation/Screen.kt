@@ -32,13 +32,16 @@ const val SERIES_RECORDS_TYPE = "seriesRecordsType"
  */
 enum class Screen(val route: String, val titleId: Int, val hasMenuItem: Boolean = true) {
     WelcomeScreen("welcome_screen", R.string.welcome_screen, false),
-    ExerciseSessions("exercise_sessions", R.string.exercise_sessions),
+    HomeScreen("home_screen", R.string.home_screen),
+    ExerciseSessions("exercise_sessions", R.string.exercise_sessions, false),
     ExerciseSessionDetail("exercise_session_detail", R.string.exercise_session_detail, false),
-    SleepSessions("sleep_sessions", R.string.sleep_sessions),
+    SleepSessions("sleep_sessions", R.string.sleep_sessions, false),
     SleepSessionDetail("sleep_session_detail", R.string.sleep_session_detail, false),
-    InputReadings("input_readings", R.string.input_readings),
-    DifferentialChanges("differential_changes", R.string.differential_changes),
+    InputReadings("input_readings", R.string.input_readings, false),
+    DifferentialChanges("differential_changes", R.string.differential_changes, false),
     PrivacyPolicy("privacy_policy", R.string.privacy_policy, false),
-    SettingsScreen("settings_screen", R.string.settings),
+    SettingsScreen("settings_screen", R.string.settings, false),
+    ActivityListScreen("activity_list", R.string.activity_list),
+    OtherScreen("more_screen", R.string.more_screen),
     RecordListScreen("record_list", R.string.record_list, false),
 }
