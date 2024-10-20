@@ -78,7 +78,7 @@ fun LoginScreen() {
         Button(
             onClick = {
                 coroutineScope.launch {
-//                    if (viewModel.logInAuth(emailValue, passwordValue) != null) {
+                    if (viewModel.logInAuth(emailValue, passwordValue) != null) {
 
                     // redirect to HomePage
                     Log.d("Supabase", "LoginScreen: pre-redirect")
@@ -89,9 +89,9 @@ fun LoginScreen() {
                     }
                     Log.d("Supabase", "LoginScreen: post-redirect")
 
-//                    } else {
+                    } else {
                     // Handle login failure
-//                    }
+                    }
                 }
 
 
