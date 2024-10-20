@@ -1,3 +1,5 @@
+package com.lam.pedro.ui.viewmodel
+
 import android.util.Log
 import com.lam.pedro.data.datasource.SupabaseClientProvider
 import io.github.jan.supabase.auth.auth

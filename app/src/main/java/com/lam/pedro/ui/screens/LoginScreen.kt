@@ -1,7 +1,6 @@
 package com.lam.pedro.ui.screens
 
-//import androidx.navigation.NavController
-import SupabaseAuthViewModel
+
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.lam.pedro.ui.viewmodel.SupabaseAuthViewModel
 import kotlinx.coroutines.launch
 
 @Composable
