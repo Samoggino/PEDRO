@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp() {
     // Crea un NavController da ricordare durante la composizione
-    val navController = rememberNavController()
+   val navController = rememberNavController()
 
     // Avvia il sistema di navigazione
     Navigation(navController)

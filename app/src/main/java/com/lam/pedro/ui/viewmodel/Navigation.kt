@@ -9,8 +9,8 @@ import com.lam.pedro.ui.screens.LoginScreen
 
 @Composable
 fun Navigation(navController: NavHostController) {
-    NavHost(navController, startDestination = "login") {
+    NavHost(navController, startDestination = "home") {
         composable("login") { LoginScreen(navController) }
-        composable("home") { HomeScreen() }
+        composable("home") { HomeScreen(navController) }
     }
 }

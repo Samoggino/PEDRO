@@ -13,3 +13,5 @@ val LightBlack = Color(0xFF3A3B3C) //Dark Surface
 
 val BlueGray = Color(0xFFA0A3BD)
 val WhiteGray = Color(0xFFB0B3B8)
+
+val successGreen = Color(0xFF00C853)

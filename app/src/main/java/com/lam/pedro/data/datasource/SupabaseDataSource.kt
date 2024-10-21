@@ -3,6 +3,7 @@ package com.lam.pedro.data.datasource
 import com.lam.pedro.BuildConfig
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import kotlinx.coroutines.Dispatchers
@@ -32,4 +33,12 @@ object SupabaseClientProvider {
             lazyClient // Questo garantisce che l'inizializzazione avvenga su un thread I/O
         }
     }
+
+    // Funzione sospesa per recuperare l'istanza di Auth in modo asincrono
+    suspend fun getSupabaseAuth(): Auth {
+        return withContext(Dispatchers.IO) {
+            lazyClient.auth
+        }
+    }
+
 }

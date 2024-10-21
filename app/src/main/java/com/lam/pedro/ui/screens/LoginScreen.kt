@@ -7,11 +7,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -24,9 +26,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.lam.pedro.ui.theme.WhiteGray
+import com.lam.pedro.ui.theme.successGreen
 import com.lam.pedro.ui.viewmodel.SupabaseAuthViewModel
 import kotlinx.coroutines.launch
 
@@ -35,10 +41,17 @@ fun LoginScreen(navController: NavController) {
     var emailValue by remember { mutableStateOf("") }
     var passwordValue by remember { mutableStateOf("") }
 
-    val viewModel = SupabaseAuthViewModel() // Crea un'istanza del ViewModel
-    val coroutineScope = rememberCoroutineScope() // Crea un coroutine scope
+    // Crea un coroutine scope
+    val coroutineScope = rememberCoroutineScope()
+
+    // Crea un'istanza del SupabaseAuthViewModel
+    val viewModel = SupabaseAuthViewModel(
+        context = LocalContext.current
+    )
+
 
     // Stato per mostrare il popup
+    var showSuccessDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") } // Per memorizzare il messaggio di errore
 
@@ -88,15 +101,12 @@ fun LoginScreen(navController: NavController) {
             onClick = {
                 coroutineScope.launch {
                     val result = viewModel.logInAuth(emailValue, passwordValue)
+
+                    // Mostra il popup di successo
                     if (result != null) {
-                        // Redirect to HomePage
+                        showSuccessDialog = true
                         Log.d("Supabase", "LoginScreen: pre-redirect")
-                        try {
-                            navController.navigate("home")  // Naviga a HomeScreen
-                        } catch (e: Exception) {
-                            Log.e("Supabase", "ERRORE: Failed to redirect to HomePage")
-                        }
-                        Log.d("Supabase", "LoginScreen: post-redirect")
+
                     } else {
                         // Crea un messaggio di errore
                         errorMessage = "Email o password non corretti. Riprova."
@@ -110,7 +120,6 @@ fun LoginScreen(navController: NavController) {
         ) {
             Text("Accedi")
         }
-
         // Link Password dimenticata
         TextButton(onClick = { /* Handle Forgot Password */ }) {
             Text("Password dimenticata?")
@@ -125,23 +134,66 @@ fun LoginScreen(navController: NavController) {
             Text("Non hai un account? Registrati")
         }
 
+        // Popup di successo
+        if (showSuccessDialog) {
+            AlertDialog(
+                onDismissRequest = { showSuccessDialog = false },
+                title = {
+                    Text(
+                        text = "Login Riuscito",
+                        color = successGreen, // Verde per indicare successo
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                },
+                text = {
+                    Text(
+                        text = "Sei stato autenticato con successo!",
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = { showSuccessDialog = false },
+                        colors = ButtonDefaults.buttonColors(successGreen) // Pulsante verde
+                    ) {
+                        Text("OK", color = WhiteGray)
+
+                        // redirect alla HomePage
+                        navController.navigate("home")
+                    }
+                },
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+
         // Popup di errore
         if (showErrorDialog) {
             AlertDialog(
                 onDismissRequest = { closeErrorDialog() }, // Chiudi se clicchi fuori dal popup
                 title = {
-                    Text(text = "Errore di accesso")
+                    Text(
+                        text = "Errore di accesso",
+                        color = Color.Red, // Rosso per indicare errore
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
                 },
                 text = {
-                    Text(errorMessage) // Mostra il messaggio di errore
+                    Text(
+                        text = errorMessage, // Mostra il messaggio di errore
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
                 },
                 confirmButton = {
                     Button(
-                        onClick = { closeErrorDialog() }  // Chiudi il popup
+                        onClick = { closeErrorDialog() }, // Chiudi il popup
+                        colors = ButtonDefaults.buttonColors(Color.Red) // Pulsante rosso
                     ) {
-                        Text("OK")
+                        Text("OK", color = Color.White)
                     }
-                }
+                },
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.padding(16.dp)
             )
         }
     }
