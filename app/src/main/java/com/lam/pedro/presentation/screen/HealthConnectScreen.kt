@@ -15,14 +15,19 @@
  */
 package com.example.healthconnectsample.presentation.screen
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,11 +36,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.motionEventSpy
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectClient.Companion.SDK_AVAILABLE
 import androidx.health.connect.client.HealthConnectClient.Companion.SDK_UNAVAILABLE
 import androidx.health.connect.client.HealthConnectClient.Companion.SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED
@@ -46,24 +55,24 @@ import com.lam.pedro.R
 import com.lam.pedro.presentation.component.InstalledMessage
 import com.lam.pedro.presentation.component.NotInstalledMessage
 import com.lam.pedro.presentation.component.NotSupportedMessage
-import com.lam.pedro.presentation.theme.HealthConnectTheme
+import com.lam.pedro.presentation.theme.PedroBlack
+import com.lam.pedro.presentation.theme.PedroYellow
 
 /**
- * Welcome screen shown when the app is first launched.
+ * Settings screen for managing Health Connect preferences.
  */
+
 @Composable
-fun WelcomeScreen(
+fun HealthConnectScreen(
     healthConnectAvailability: Int,
     onResumeAvailabilityCheck: () -> Unit,
-    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current
+    lifecycleOwner: LifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current,
+    revokeAllPermissions: () -> Unit
+
 ) {
     val currentOnAvailabilityCheck by rememberUpdatedState(onResumeAvailabilityCheck)
+    val context = LocalContext.current
 
-    // Add a listener to re-check whether Health Connect has been installed each time the Welcome
-    // screen is resumed: This ensures that if the user has been redirected to the Play store and
-    // followed the onboarding flow, then when the app is resumed, instead of showing the message
-    // to ask the user to install Health Connect, the app recognises that Health Connect is now
-    // available and shows the appropriate welcome.
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
@@ -87,11 +96,36 @@ fun WelcomeScreen(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            modifier = Modifier.fillMaxWidth(0.5f),
-            painter = painterResource(id = R.drawable.ic_health_connect_logo),
-            contentDescription = stringResource(id = R.string.health_connect_logo)
-        )
+
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                modifier = Modifier
+                    .weight(1f)
+                    .size(100.dp),
+                painter = painterResource(id = R.drawable.ic_health_connect_logo),
+                contentDescription = stringResource(id = R.string.health_connect_logo)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Image(
+                modifier = Modifier
+                    .weight(1f)
+                    .size(60.dp),
+                painter = painterResource(id = R.drawable.link),
+                contentDescription = stringResource(id = R.string.link_logo)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Image(
+                modifier = Modifier
+                    .weight(1f)
+                    .size(90.dp),
+                painter = painterResource(id = R.drawable.mexican_hat_svgrepo_com),
+                contentDescription = stringResource(id = R.string.app_logo),
+                colorFilter = ColorFilter.tint(PedroYellow) // Applica il colore
+            )
+
+
+        }
+
         Spacer(modifier = Modifier.height(32.dp))
         Text(
             text = stringResource(id = R.string.welcome_message),
@@ -103,38 +137,42 @@ fun WelcomeScreen(
             SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> NotInstalledMessage()
             SDK_UNAVAILABLE -> NotSupportedMessage()
         }
-    }
-}
 
-@Preview
-@Composable
-fun InstalledMessagePreview() {
-    HealthConnectTheme {
-        WelcomeScreen(
-            healthConnectAvailability = SDK_AVAILABLE,
-            onResumeAvailabilityCheck = {}
-        )
-    }
-}
+        Spacer(modifier = Modifier.height(64.dp))
 
-@Preview
-@Composable
-fun NotInstalledMessagePreview() {
-    HealthConnectTheme {
-        WelcomeScreen(
-            healthConnectAvailability = SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED,
-            onResumeAvailabilityCheck = {}
-        )
-    }
-}
 
-@Preview
-@Composable
-fun NotSupportedMessagePreview() {
-    HealthConnectTheme {
-        WelcomeScreen(
-            healthConnectAvailability = SDK_UNAVAILABLE,
-            onResumeAvailabilityCheck = {}
-        )
+        Button(onClick = {
+            val settingsIntent = Intent()
+            settingsIntent.action =
+                HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS
+            context.startActivity(settingsIntent)
+        }
+        ) {
+            Image(
+                modifier = Modifier.size(100.dp, 50.dp),
+                painter = painterResource(id = R.drawable.manage),
+                contentDescription = stringResource(id = R.string.unlink_logo),
+                colorFilter = ColorFilter.tint(PedroBlack)
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(text = stringResource(id = R.string.manage), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(onClick = {
+            revokeAllPermissions()
+        }
+        ) {
+            Image(
+                modifier = Modifier.size(100.dp, 50.dp),
+                painter = painterResource(id = R.drawable.unlink),
+                contentDescription = stringResource(id = R.string.unlink_logo),
+                colorFilter = ColorFilter.tint(PedroBlack)
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(text = stringResource(id = R.string.disconnect), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+        }
     }
+
 }

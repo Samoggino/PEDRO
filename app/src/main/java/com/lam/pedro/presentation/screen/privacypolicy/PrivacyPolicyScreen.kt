@@ -23,23 +23,31 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lam.pedro.R
 import com.lam.pedro.presentation.theme.HealthConnectTheme
+import com.lam.pedro.presentation.theme.PedroBlack
+import com.lam.pedro.presentation.theme.PedroYellow
 
 /**
  * Shows the privacy policy.
  */
 @Composable
 fun PrivacyPolicyScreen() {
+
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -49,16 +57,18 @@ fun PrivacyPolicyScreen() {
     ) {
         Image(
             modifier = Modifier.fillMaxWidth(0.5f),
-            painter = painterResource(id = R.drawable.ic_health_connect_logo),
-            contentDescription = stringResource(id = R.string.health_connect_logo)
+            painter = painterResource(id = R.drawable.privacy_dashboard),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(PedroYellow)
         )
         Spacer(modifier = Modifier.height(32.dp))
-        Text(
-            text = stringResource(id = R.string.privacy_policy),
-            color = MaterialTheme.colorScheme.onBackground
-        )
-        Spacer(modifier = Modifier.height(32.dp))
-        Text(stringResource(R.string.privacy_policy_description))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState) // Rende il testo scrollabile
+        ) {
+            Text(stringResource(R.string.privacy_policy_description))
+        }
     }
 }
 

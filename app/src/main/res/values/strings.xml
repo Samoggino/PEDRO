@@ -24,19 +24,29 @@
     <string name="differential_changes">Changes</string>
 
     <!-- Welcome screen -->
-    <string name="welcome_message">Welcome to Health Connect!</string>
+    <string name="welcome_message">Health Connect integration</string>
     <string name="health_connect_logo">Health Connect logo</string>
     <string name="installed_welcome_message">
-        Health Connect is installed on this device. Use the menu to explore the sample, with each
-        screen demonstrating a different aspect of Health Connect functionality.
+        Health Connect is correctly installed on this device.
     </string>
 
     <!-- Privacy policy screen -->
     <string name="privacy_policy">Privacy policy</string>
     <string name="privacy_policy_description">
-        This is a placeholder example. Your app should display an appropriate privacy policy for how
-        you will handle and use Health Connect data. This sample app does not store or transmit any
-        data outside of Health Connect.
+        Pedro respects your privacy and is committed to protecting your personal data.
+        This privacy policy explains how we collect, use, and protect your information when
+        using our app, which integrates Health Connect and Supabase.
+\n\n
+        We collect health-related data through Health Connect to provide personalized features within the app.
+        This data is stored securely and used only to enhance your experience.
+        Additionally, we use Supabase for secure storage and backend services,
+        ensuring that all personal information is handled with care.
+\n\n
+        We do not share your personal or health data with third parties.
+\n\n
+        You have the right to access, modify, or delete your personal data at any time through the app’s settings.
+\n\n
+        For any questions regarding this policy, please contact us. You wll find our contact information in the "About" section of the app.
     </string>
 
     <!-- Not installed on device -->
@@ -142,4 +152,18 @@
     <string name="home_screen">Home</string>
     <string name="activity_list">Activities</string>
     <string name="more_screen">More</string>
+    <string name="health_connect">Health Connect</string>
+    <string name="link_logo">Link logo\n</string>
+    <string name="app_logo">Pedro app logo</string>
+    <string name="unlink_logo">Unlinlk</string>
+    <string name="about_screen">About screen\n</string>
+
+    <!-- About screen -->
+    <string name="about_title">About</string>
+    <string name="about_app_name">PEDRO</string>
+    <string name="about_app_name_acronym">Personal Exercise Data Recording Organizer</string>
+    <string name="app_version">1.0.0</string>
+    <string name="about_app_developers">by Andrea Serrano and Simone Samoggia</string>
+    <string name="back">back arrow</string>
+
 </resources>

@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -97,7 +98,10 @@ fun BottomBar(
                         launchSingleTop = true
                         restoreState = true
                     }
-                } // Chiama la funzione di navigazione per Home
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = Color(0xE0D0B23A) // Colore della pillola selezionata
+                )// Chiama la funzione di navigazione per Home
             )
         }
 

@@ -16,6 +16,16 @@
 package com.lam.pedro.presentation.navigation
 
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.shrinkOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,12 +36,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import com.example.healthconnectsample.data.HealthConnectManager
-import com.example.healthconnectsample.presentation.screen.SettingsScreen
-import com.example.healthconnectsample.presentation.screen.WelcomeScreen
-import com.lam.pedro.presentation.navigation.RECORD_TYPE
-import com.lam.pedro.presentation.navigation.SERIES_RECORDS_TYPE
-import com.lam.pedro.presentation.navigation.Screen
-import com.lam.pedro.presentation.navigation.UID_NAV_ARGUMENT
+import com.example.healthconnectsample.presentation.screen.HealthConnectScreen
+import com.lam.pedro.presentation.screen.AboutScreen
+import com.lam.pedro.presentation.screen.ActivitiesScreen
+import com.lam.pedro.presentation.screen.HomeScreen
+import com.lam.pedro.presentation.screen.MoreScreen
 import com.lam.pedro.presentation.screen.changes.DifferentialChangesScreen
 import com.lam.pedro.presentation.screen.changes.DifferentialChangesViewModel
 import com.lam.pedro.presentation.screen.changes.DifferentialChangesViewModelFactory
@@ -59,34 +68,81 @@ import kotlinx.coroutines.launch
 /**
  * Provides the navigation in the app.
  */
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun HealthConnectNavigation(
+fun PedroNavigation(
     navController: NavHostController,
     healthConnectManager: HealthConnectManager,
     snackbarHostState: SnackbarHostState
 ) {
+
     val scope = rememberCoroutineScope()
-    NavHost(navController = navController, startDestination = Screen.WelcomeScreen.route) {
+    NavHost(navController = navController,
+        startDestination = Screen.HomeScreen.route,
+        enterTransition = { EnterTransition.None },
+        exitTransition = { ExitTransition.None }) {
         val availability by healthConnectManager.availability
-        composable(Screen.WelcomeScreen.route) {
-            WelcomeScreen(
-                healthConnectAvailability = availability,
-                onResumeAvailabilityCheck = {
-                    healthConnectManager.checkAvailability()
-                }
+        composable(Screen.HomeScreen.route, enterTransition = {
+            fadeIn(
+                animationSpec = tween(700) // Personalizza la durata dell'animazione
             )
+        },
+            exitTransition = {
+                fadeOut(animationSpec = tween(600)) // Aggiungi un'animazione di uscita, se desiderato
+            }) {
+            HomeScreen()
         }
-        composable(Screen.HomeScreen.route) {
-            Screen.HomeScreen
+        composable(Screen.ActivitiesScreen.route, enterTransition = {
+            fadeIn(
+                animationSpec = tween(700) // Personalizza la durata dell'animazione
+            )
+        },
+            exitTransition = {
+                fadeOut(animationSpec = tween(600)) // Aggiungi un'animazione di uscita, se desiderato
+            }) {
+            ActivitiesScreen(navController)
         }
-        composable(Screen.ActivitiesScreen.route) {
-            Screen.ActivitiesScreen
+        composable(Screen.MoreScreen.route, enterTransition = {
+            fadeIn(
+                animationSpec = tween(700) // Personalizza la durata dell'animazione
+            )
+        },
+            exitTransition = {
+                fadeOut(animationSpec = tween(600)) // Aggiungi un'animazione di uscita, se desiderato
+            }) {
+            MoreScreen(navController)
         }
-        composable(Screen.MoreScreen.route) {
-            Screen.MoreScreen
+        composable(
+            Screen.AboutScreen.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth -> fullWidth }, // Entra da destra
+                    animationSpec = tween(700) // Durata dell'animazione
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth -> fullWidth }, // Esce verso destra
+                    animationSpec = tween(600) // Durata dell'uscita
+                )
+            },
+        ) {
+            AboutScreen()
         }
         composable(
             route = Screen.PrivacyPolicy.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth -> fullWidth }, // Entra da destra
+                    animationSpec = tween(700) // Durata dell'animazione
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth -> fullWidth }, // Esce verso destra
+                    animationSpec = tween(600) // Durata dell'uscita
+                )
+            },
             deepLinks = listOf(
                 navDeepLink {
                     action = "androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE"
@@ -95,8 +151,26 @@ fun HealthConnectNavigation(
         ) {
             PrivacyPolicyScreen()
         }
-        composable(Screen.SettingsScreen.route){
-            SettingsScreen { scope.launch { healthConnectManager.revokeAllPermissions() } }
+        composable(Screen.HealthConnectScreen.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth -> fullWidth }, // Entra da destra
+                    animationSpec = tween(700) // Durata dell'animazione
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth -> fullWidth }, // Esce verso destra
+                    animationSpec = tween(600) // Durata dell'uscita
+                )
+            }
+        ) {
+            HealthConnectScreen(
+                healthConnectAvailability = availability,
+                onResumeAvailabilityCheck = {
+                    healthConnectManager.checkAvailability()
+                }
+            ) { scope.launch { healthConnectManager.revokeAllPermissions() } }
         }
         composable(Screen.ExerciseSessions.route) {
             val viewModel: ExerciseSessionViewModel = viewModel(
@@ -107,10 +181,11 @@ fun HealthConnectNavigation(
             val permissionsGranted by viewModel.permissionsGranted
             val sessionsList by viewModel.sessionsList
             val permissions = viewModel.permissions
-            val onPermissionsResult = {viewModel.initialLoad()}
+            val onPermissionsResult = { viewModel.initialLoad() }
             val permissionsLauncher =
                 rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                onPermissionsResult()}
+                    onPermissionsResult()
+                }
             ExerciseSessionScreen(
                 permissionsGranted = permissionsGranted,
                 permissions = permissions,
@@ -132,7 +207,8 @@ fun HealthConnectNavigation(
                     viewModel.initialLoad()
                 },
                 onPermissionsLaunch = { values ->
-                    permissionsLauncher.launch(values)}
+                    permissionsLauncher.launch(values)
+                }
             )
         }
         composable(Screen.ExerciseSessionDetail.route + "/{$UID_NAV_ARGUMENT}") {
@@ -146,17 +222,18 @@ fun HealthConnectNavigation(
             val permissionsGranted by viewModel.permissionsGranted
             val sessionMetrics by viewModel.sessionMetrics
             val permissions = viewModel.permissions
-            val onPermissionsResult = {viewModel.initialLoad()}
+            val onPermissionsResult = { viewModel.initialLoad() }
             val permissionsLauncher =
                 rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                onPermissionsResult()}
+                    onPermissionsResult()
+                }
             ExerciseSessionDetailScreen(
                 permissions = permissions,
                 permissionsGranted = permissionsGranted,
                 sessionMetrics = sessionMetrics,
                 uiState = viewModel.uiState,
                 onDetailsClick = { recordType, uid, seriesRecordsType ->
-                    navController.navigate(Screen.RecordListScreen.route + "/" + recordType + "/"+ uid + "/" + seriesRecordsType)
+                    navController.navigate(Screen.RecordListScreen.route + "/" + recordType + "/" + uid + "/" + seriesRecordsType)
                 },
                 onError = { exception ->
                     showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -165,7 +242,8 @@ fun HealthConnectNavigation(
                     viewModel.initialLoad()
                 },
                 onPermissionsLaunch = { values ->
-                    permissionsLauncher.launch(values)}
+                    permissionsLauncher.launch(values)
+                }
             )
         }
         composable(Screen.RecordListScreen.route + "/{$RECORD_TYPE}" + "/{$UID_NAV_ARGUMENT}" + "/{$SERIES_RECORDS_TYPE}") {
@@ -183,10 +261,11 @@ fun HealthConnectNavigation(
             val permissionsGranted by viewModel.permissionsGranted
             val recordList = viewModel.recordList
             val permissions = viewModel.permissions
-            val onPermissionsResult = {viewModel.initialLoad()}
+            val onPermissionsResult = { viewModel.initialLoad() }
             val permissionsLauncher =
                 rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                    onPermissionsResult()}
+                    onPermissionsResult()
+                }
             RecordListScreen(
                 uid = uid,
                 permissions = permissions,
@@ -199,10 +278,19 @@ fun HealthConnectNavigation(
                     viewModel.initialLoad()
                 },
                 onPermissionsLaunch = { values ->
-                    permissionsLauncher.launch(values)}
+                    permissionsLauncher.launch(values)
+                }
             )
         }
-        composable(Screen.SleepSessions.route) {
+        composable(Screen.SleepSessions.route,
+            enterTransition = {
+                scaleIn(
+                    animationSpec = tween(1000) // Personalizza la durata dell'animazione
+                )
+            },
+            exitTransition = {
+                shrinkOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
+            }) {
             val viewModel: SleepSessionViewModel = viewModel(
                 factory = SleepSessionViewModelFactory(
                     healthConnectManager = healthConnectManager
@@ -211,10 +299,11 @@ fun HealthConnectNavigation(
             val permissionsGranted by viewModel.permissionsGranted
             val sessionsList by viewModel.sessionsList
             val permissions = viewModel.permissions
-            val onPermissionsResult = {viewModel.initialLoad()}
+            val onPermissionsResult = { viewModel.initialLoad() }
             val permissionsLauncher =
                 rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                onPermissionsResult()}
+                    onPermissionsResult()
+                }
             SleepSessionScreen(
                 permissionsGranted = permissionsGranted,
                 permissions = permissions,
@@ -230,7 +319,8 @@ fun HealthConnectNavigation(
                     viewModel.initialLoad()
                 },
                 onPermissionsLaunch = { values ->
-                    permissionsLauncher.launch(values)}
+                    permissionsLauncher.launch(values)
+                }
             )
         }
         composable(Screen.InputReadings.route) {
@@ -243,10 +333,11 @@ fun HealthConnectNavigation(
             val readingsList by viewModel.readingsList
             val permissions = viewModel.permissions
             val weeklyAvg by viewModel.weeklyAvg
-            val onPermissionsResult = {viewModel.initialLoad()}
+            val onPermissionsResult = { viewModel.initialLoad() }
             val permissionsLauncher =
                 rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                onPermissionsResult()}
+                    onPermissionsResult()
+                }
             InputReadingsScreen(
                 permissionsGranted = permissionsGranted,
                 permissions = permissions,
@@ -267,7 +358,8 @@ fun HealthConnectNavigation(
                     viewModel.initialLoad()
                 },
                 onPermissionsLaunch = { values ->
-                    permissionsLauncher.launch(values)}
+                    permissionsLauncher.launch(values)
+                }
             )
         }
         composable(Screen.DifferentialChanges.route) {
@@ -279,10 +371,11 @@ fun HealthConnectNavigation(
             val changesToken by viewModel.changesToken
             val permissionsGranted by viewModel.permissionsGranted
             val permissions = viewModel.permissions
-            val onPermissionsResult = {viewModel.initialLoad()}
+            val onPermissionsResult = { viewModel.initialLoad() }
             val permissionsLauncher =
                 rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                onPermissionsResult()}
+                    onPermissionsResult()
+                }
             DifferentialChangesScreen(
                 permissionsGranted = permissionsGranted,
                 permissions = permissions,

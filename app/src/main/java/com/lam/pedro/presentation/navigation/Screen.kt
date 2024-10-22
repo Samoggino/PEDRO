@@ -40,8 +40,9 @@ enum class Screen(val route: String, val titleId: Int, val hasMenuItem: Boolean 
     InputReadings("input_readings", R.string.input_readings, false),
     DifferentialChanges("differential_changes", R.string.differential_changes, false),
     PrivacyPolicy("privacy_policy", R.string.privacy_policy, false),
-    SettingsScreen("settings_screen", R.string.settings, false),
+    HealthConnectScreen("health_connect_screen", R.string.health_connect, false),
     ActivitiesScreen("activity_list", R.string.activity_list),
     MoreScreen("more_screen", R.string.more_screen),
     RecordListScreen("record_list", R.string.record_list, false),
+    AboutScreen("about_screen", R.string.about_screen, false),
 }

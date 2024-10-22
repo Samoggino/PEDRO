@@ -18,6 +18,7 @@ package com.lam.pedro.presentation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,21 +34,21 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.health.connect.client.HealthConnectClient.Companion.SDK_AVAILABLE
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.healthconnectsample.data.HealthConnectManager
-import com.lam.pedro.presentation.navigation.HealthConnectNavigation
 import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.R
 import com.lam.pedro.presentation.navigation.BottomBar
+import com.lam.pedro.presentation.navigation.PedroNavigation
 import com.lam.pedro.presentation.theme.HealthConnectTheme
 import kotlinx.coroutines.launch
 
@@ -64,49 +65,80 @@ fun HealthConnectApp(healthConnectManager: HealthConnectManager) {
         val currentRoute = navBackStackEntry?.destination?.route
         val availability by healthConnectManager.availability
 
+        // Definire le schermate in cui la BottomBar deve essere visibile
+        val showBottomNotTop = when (currentRoute) {
+            Screen.HomeScreen.route,
+            Screen.MoreScreen.route,
+            Screen.ActivitiesScreen.route -> true
 
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        title = {
-                            val titleId = when (currentRoute) {
-                                Screen.ExerciseSessions.route -> Screen.ExerciseSessions.titleId
-                                Screen.SleepSessions.route -> Screen.SleepSessions.titleId
-                                Screen.InputReadings.route -> Screen.InputReadings.titleId
-                                Screen.DifferentialChanges.route -> Screen.DifferentialChanges.titleId
-                                else -> R.string.app_name
+            else -> false
+        }
+
+        Scaffold(
+            topBar = {if (showBottomNotTop) { //Do nothing
+            } else {
+                TopAppBar(
+                    title = {
+                        val titleId = when (currentRoute) {
+                            Screen.ExerciseSessions.route -> Screen.ExerciseSessions.titleId
+                            Screen.SleepSessions.route -> Screen.SleepSessions.titleId
+                            Screen.InputReadings.route -> Screen.InputReadings.titleId
+                            Screen.DifferentialChanges.route -> Screen.DifferentialChanges.titleId
+                            Screen.HealthConnectScreen.route -> Screen.HealthConnectScreen.titleId
+                            Screen.ActivitiesScreen.route -> Screen.ActivitiesScreen.titleId
+                            Screen.HomeScreen.route -> Screen.HomeScreen.titleId
+                            Screen.MoreScreen.route -> Screen.MoreScreen.titleId
+                            Screen.PrivacyPolicy.route -> Screen.PrivacyPolicy.titleId
+
+                            else -> R.string.app_name
+                        }
+                        Text(
+                            text = stringResource(titleId),
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                    },
+                    navigationIcon = {
+                        // Mostra la freccia indietro nelle schermate dove la BottomBar non è visibile
+                        if (!showBottomNotTop) {
+                            IconButton(onClick = { navController.popBackStack() }) {
+                                Icon(
+                                    imageVector = Icons.Rounded.ArrowBack,
+                                    contentDescription = stringResource(R.string.back)
+                                )
                             }
-                            Text(text = stringResource(titleId))
-                        },
-                        colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.White.copy(alpha = 0f)
                     )
-                },
-                snackbarHost = {
-                    SnackbarHost(hostState = snackbarHostState) { data ->
-                        Snackbar(
-                            snackbarData = data,
-                            actionColor = MaterialTheme.colorScheme.secondary
-                        )
-                    }
-                },
-                bottomBar = {
-                    BottomBar(
-                        scope = scope,
-                        navController = navController
-                    )
-                }
-            ) { paddingValues ->
-                Box(modifier = Modifier.padding(paddingValues)) {
-                    HealthConnectNavigation(
-                        healthConnectManager = healthConnectManager,
-                        navController = navController,
-                        snackbarHostState = snackbarHostState
-                    )
-                }
+                )
             }
+    },
+    snackbarHost = {
+        SnackbarHost(hostState = snackbarHostState) { data ->
+            Snackbar(
+                snackbarData = data,
+                actionColor = MaterialTheme.colorScheme.secondary
+            )
+        }
+    },
+    bottomBar = {
+        // Mostra la BottomBar solo se `showBottomBar` è true
+        if (showBottomNotTop) {
+            BottomBar(
+                scope = scope,
+                navController = navController
+            )
         }
     }
-
-
+    ) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues)) {
+            PedroNavigation(
+                healthConnectManager = healthConnectManager,
+                navController = navController,
+                snackbarHostState = snackbarHostState
+            )
+        }
+    }
+}
+}

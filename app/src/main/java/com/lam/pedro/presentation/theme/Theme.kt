@@ -24,12 +24,14 @@ import androidx.compose.runtime.Composable
 
 private val DarkColorPalette: ColorScheme = darkColorScheme(
     primary = PedroYellow,
-    secondary = PedroBlack
+    secondary = PedroBlack,
+    primaryContainer = PedroDarkGray
 )
 
 private val LightColorPalette: ColorScheme = lightColorScheme(
     primary = PedroBlack,
-    secondary = PedroBlack
+    secondary = PedroBlack,
+    primaryContainer = PedroLightGray
 )
 
 @Composable

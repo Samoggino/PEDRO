@@ -13,6 +13,7 @@
 -->
 <resources>
     <style name="Theme.HealthConnect" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:statusBarColor">@color/health_connect_blue</item>
+        <item name="android:statusBarColor">@android:color/transparent</item> <!-- Barra di stato trasparente -->
+        <item name="android:windowTranslucentStatus">true</item> <!-- Abilita lo stato traslucido -->
     </style>
 </resources>
