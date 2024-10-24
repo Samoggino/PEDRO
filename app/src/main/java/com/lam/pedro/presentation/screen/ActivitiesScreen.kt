@@ -15,9 +15,6 @@
  */
 package com.lam.pedro.presentation.screen
 
-import android.content.Intent
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,46 +33,30 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.Album
-import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Bed
 import androidx.compose.material.icons.filled.ChairAlt
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material.icons.filled.DirectionsWalk
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.SportsGymnastics
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.health.connect.client.HealthConnectClient
 import androidx.navigation.NavHostController
-import com.lam.pedro.R
 import com.lam.pedro.presentation.navigation.Screen
 
 @Composable
 fun ActivitiesScreen(
     navController: NavHostController
 ) {
-    val context = LocalContext.current
+    //val context = LocalContext.current
     val scrollState = rememberScrollState()
 
 
@@ -97,8 +78,8 @@ fun ActivitiesScreen(
         ) {
             Box(
                 modifier = Modifier
-                    .weight(1f)  // Divide equamente lo spazio con altre Box nel Row
-                    .aspectRatio(1f)
+                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
+                    .weight(1f)
                     .clip(RoundedCornerShape(26.dp))
                     .background(Color(0xff74c9c6))
                     .clickable(onClick = {
@@ -137,8 +118,8 @@ fun ActivitiesScreen(
 
             Box(
                 modifier = Modifier
-                    .weight(1f)  // Divide equamente lo spazio con altre Box nel Row
-                    .aspectRatio(1f)
+                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
+                    .weight(1f)
                     .clip(RoundedCornerShape(26.dp))
                     .background(Color(0xFF61a6f1))
                     .clickable(onClick = {
@@ -181,8 +162,8 @@ fun ActivitiesScreen(
         ) {
             Box(
                 modifier = Modifier
-                    .weight(1f)  // Divide equamente lo spazio con altre Box nel Row
-                    .aspectRatio(1f)
+                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
+                    .weight(1f)
                     .clip(RoundedCornerShape(26.dp))
                     .background(Color(0xff71c97b))
                     .clickable(onClick = {
@@ -221,8 +202,8 @@ fun ActivitiesScreen(
 
             Box(
                 modifier = Modifier
-                    .weight(1f)  // Divide equamente lo spazio con altre Box nel Row
-                    .aspectRatio(1f)
+                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
+                    .weight(1f)
                     .clip(RoundedCornerShape(26.dp))
                     .background(Color(0xFF7771C9))
                     .clickable(onClick = {
@@ -271,8 +252,8 @@ fun ActivitiesScreen(
 
             Box(
                 modifier = Modifier
-                    .weight(1f)  // Divide equamente lo spazio con altre Box nel Row
-                    .aspectRatio(1f)  // Mantiene la Box quadrata
+                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
+                    .weight(1f)
                     .clip(RoundedCornerShape(26.dp))
                     .background(Color(0xFFf87757))  // Imposta lo sfondo nero
                     .clickable(onClick = {
@@ -308,8 +289,8 @@ fun ActivitiesScreen(
             Spacer(modifier = Modifier.width(8.dp))
             Box(
                 modifier = Modifier
-                    .weight(1f)  // Divide equamente lo spazio con altre Box nel Row
-                    .aspectRatio(1f)  // Mantiene la Box quadrata
+                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
+                    .weight(1f)
                     .clip(RoundedCornerShape(26.dp))
                     .background(Color(0xFFfaaf5a))
             ) {
@@ -342,8 +323,8 @@ fun ActivitiesScreen(
 
             Box(
                 modifier = Modifier
-                    .weight(1f)  // Divide equamente lo spazio con altre Box nel Row
-                    .aspectRatio(1f)  // Mantiene la Box quadrata
+                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
+                    .weight(1f)
                     .clip(RoundedCornerShape(26.dp))
                     .background(Color(0xFFad71c9))  // Imposta lo sfondo nero
                 /*
