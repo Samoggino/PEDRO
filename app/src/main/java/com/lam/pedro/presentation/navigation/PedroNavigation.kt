@@ -41,6 +41,7 @@ import com.lam.pedro.presentation.screen.AboutScreen
 import com.lam.pedro.presentation.screen.ActivitiesScreen
 import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.MoreScreen
+import com.lam.pedro.presentation.screen.SettingsScreen
 import com.lam.pedro.presentation.screen.changes.DifferentialChangesScreen
 import com.lam.pedro.presentation.screen.changes.DifferentialChangesViewModel
 import com.lam.pedro.presentation.screen.changes.DifferentialChangesViewModelFactory
@@ -73,7 +74,8 @@ import kotlinx.coroutines.launch
 fun PedroNavigation(
     navController: NavHostController,
     healthConnectManager: HealthConnectManager,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    topBarTitle: Int
 ) {
 
     val scope = rememberCoroutineScope()
@@ -127,7 +129,7 @@ fun PedroNavigation(
                 )
             },
         ) {
-            AboutScreen()
+            AboutScreen(navController = navController, titleId = topBarTitle)
         }
         composable(
             route = Screen.PrivacyPolicy.route,
@@ -149,7 +151,7 @@ fun PedroNavigation(
                 }
             )
         ) {
-            PrivacyPolicyScreen()
+            PrivacyPolicyScreen(navController = navController, titleId = topBarTitle)
         }
         composable(Screen.HealthConnectScreen.route,
             enterTransition = {
@@ -169,8 +171,30 @@ fun PedroNavigation(
                 healthConnectAvailability = availability,
                 onResumeAvailabilityCheck = {
                     healthConnectManager.checkAvailability()
-                }
-            ) { scope.launch { healthConnectManager.revokeAllPermissions() } }
+                },
+                navController = navController,
+                titleId = topBarTitle,
+                revokeAllPermissions = { scope.launch { healthConnectManager.revokeAllPermissions() } }
+            )
+        }
+        composable(Screen.SettingScreen.route,
+            enterTransition = {
+                slideInHorizontally(
+                    initialOffsetX = { fullWidth -> fullWidth }, // Entra da destra
+                    animationSpec = tween(700) // Durata dell'animazione
+                )
+            },
+            exitTransition = {
+                slideOutHorizontally(
+                    targetOffsetX = { fullWidth -> fullWidth }, // Esce verso destra
+                    animationSpec = tween(600) // Durata dell'uscita
+                )
+            }
+        ) {
+            SettingsScreen(
+                navController = navController,
+                titleId = topBarTitle
+            )
         }
         composable(Screen.ExerciseSessions.route) {
             val viewModel: ExerciseSessionViewModel = viewModel(

@@ -50,15 +50,16 @@ fun MoreScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 32.dp, vertical = 55.dp),
-        verticalArrangement = Arrangement.Center,
+            .padding(horizontal = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+
+        Spacer(modifier = Modifier.height(85.dp))
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .height(85.dp)
                 .clip(
                     RoundedCornerShape(26.dp)
                 )
@@ -109,7 +110,7 @@ fun MoreScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .height(85.dp)
                 .clip(
                     RoundedCornerShape(26.dp)
                 )
@@ -157,14 +158,14 @@ fun MoreScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .height(85.dp)
                 .clip(
                     RoundedCornerShape(26.dp)
                 )
                 .background(MaterialTheme.colorScheme.primaryContainer)
                 .padding(horizontal = 16.dp)
                 .clickable(onClick = {
-                    navController.navigate(Screen.HealthConnectScreen.route) {
+                    navController.navigate(Screen.SettingScreen.route) {
                         // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
                         navController.graph.startDestinationRoute?.let { route ->
                             popUpTo(route) {
@@ -205,7 +206,7 @@ fun MoreScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .height(85.dp)
                 .clip(
                     RoundedCornerShape(26.dp)
                 )
@@ -253,7 +254,7 @@ fun MoreScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .height(85.dp)
                 .clip(
                     RoundedCornerShape(26.dp)
                 )

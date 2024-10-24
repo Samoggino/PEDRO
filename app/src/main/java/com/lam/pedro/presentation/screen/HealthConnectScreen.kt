@@ -27,9 +27,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -38,7 +46,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -51,10 +58,12 @@ import androidx.health.connect.client.HealthConnectClient.Companion.SDK_UNAVAILA
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.NavHostController
 import com.lam.pedro.R
 import com.lam.pedro.presentation.component.InstalledMessage
 import com.lam.pedro.presentation.component.NotInstalledMessage
 import com.lam.pedro.presentation.component.NotSupportedMessage
+import com.lam.pedro.presentation.navigation.BottomBar
 import com.lam.pedro.presentation.theme.PedroBlack
 import com.lam.pedro.presentation.theme.PedroYellow
 
@@ -62,12 +71,15 @@ import com.lam.pedro.presentation.theme.PedroYellow
  * Settings screen for managing Health Connect preferences.
  */
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HealthConnectScreen(
     healthConnectAvailability: Int,
     onResumeAvailabilityCheck: () -> Unit,
     lifecycleOwner: LifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current,
-    revokeAllPermissions: () -> Unit
+    revokeAllPermissions: () -> Unit,
+    navController: NavHostController,
+    titleId: Int
 
 ) {
     val currentOnAvailabilityCheck by rememberUpdatedState(onResumeAvailabilityCheck)
@@ -89,90 +101,128 @@ fun HealthConnectScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
 
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                modifier = Modifier
-                    .weight(1f)
-                    .size(100.dp),
-                painter = painterResource(id = R.drawable.ic_health_connect_logo),
-                contentDescription = stringResource(id = R.string.health_connect_logo)
+    Scaffold(topBar = {
+        TopAppBar(
+            title = {
+
+                Text(
+                    text = stringResource(titleId),
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            },
+            navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(
+                        imageVector = Icons.Rounded.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
+                    )
+                }
+
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.White.copy(alpha = 0f)
             )
-            Spacer(modifier = Modifier.height(10.dp))
-            Image(
-                modifier = Modifier
-                    .weight(1f)
-                    .size(60.dp),
-                painter = painterResource(id = R.drawable.link),
-                contentDescription = stringResource(id = R.string.link_logo)
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            Image(
-                modifier = Modifier
-                    .weight(1f)
-                    .size(90.dp),
-                painter = painterResource(id = R.drawable.mexican_hat_svgrepo_com),
-                contentDescription = stringResource(id = R.string.app_logo),
-                colorFilter = ColorFilter.tint(PedroYellow) // Applica il colore
-            )
-
-
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-        Text(
-            text = stringResource(id = R.string.welcome_message),
-            color = MaterialTheme.colorScheme.onBackground
         )
-        Spacer(modifier = Modifier.height(32.dp))
-        when (healthConnectAvailability) {
-            SDK_AVAILABLE -> InstalledMessage()
-            SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> NotInstalledMessage()
-            SDK_UNAVAILABLE -> NotSupportedMessage()
-        }
-
-        Spacer(modifier = Modifier.height(64.dp))
-
-
-        Button(onClick = {
-            val settingsIntent = Intent()
-            settingsIntent.action =
-                HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS
-            context.startActivity(settingsIntent)
-        }
+    },
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                modifier = Modifier.size(100.dp, 50.dp),
-                painter = painterResource(id = R.drawable.manage),
-                contentDescription = stringResource(id = R.string.unlink_logo),
-                colorFilter = ColorFilter.tint(PedroBlack)
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-            Text(text = stringResource(id = R.string.manage), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-        }
 
-        Spacer(modifier = Modifier.height(20.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    modifier = Modifier
+                        .weight(1f)
+                        .size(100.dp),
+                    painter = painterResource(id = R.drawable.ic_health_connect_logo),
+                    contentDescription = stringResource(id = R.string.health_connect_logo)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Image(
+                    modifier = Modifier
+                        .weight(1f)
+                        .size(60.dp),
+                    painter = painterResource(id = R.drawable.link),
+                    contentDescription = stringResource(id = R.string.link_logo)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                Image(
+                    modifier = Modifier
+                        .weight(1f)
+                        .size(90.dp),
+                    painter = painterResource(id = R.drawable.mexican_hat_svgrepo_com),
+                    contentDescription = stringResource(id = R.string.app_logo),
+                    colorFilter = ColorFilter.tint(PedroYellow) // Applica il colore
+                )
 
-        Button(onClick = {
-            revokeAllPermissions()
-        }
-        ) {
-            Image(
-                modifier = Modifier.size(100.dp, 50.dp),
-                painter = painterResource(id = R.drawable.unlink),
-                contentDescription = stringResource(id = R.string.unlink_logo),
-                colorFilter = ColorFilter.tint(PedroBlack)
+
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+            Text(
+                text = stringResource(id = R.string.welcome_message),
+                color = MaterialTheme.colorScheme.onBackground
             )
-            Spacer(modifier = Modifier.width(10.dp))
-            Text(text = stringResource(id = R.string.disconnect), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+            Spacer(modifier = Modifier.height(32.dp))
+            when (healthConnectAvailability) {
+                SDK_AVAILABLE -> InstalledMessage()
+                SDK_UNAVAILABLE_PROVIDER_UPDATE_REQUIRED -> NotInstalledMessage()
+                SDK_UNAVAILABLE -> NotSupportedMessage()
+            }
+
+            Spacer(modifier = Modifier.height(64.dp))
+
+
+            Button(onClick = {
+                val settingsIntent = Intent()
+                settingsIntent.action =
+                    HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS
+                context.startActivity(settingsIntent)
+            }
+            ) {
+                Image(
+                    modifier = Modifier.size(100.dp, 50.dp),
+                    painter = painterResource(id = R.drawable.manage),
+                    contentDescription = stringResource(id = R.string.unlink_logo),
+                    colorFilter = ColorFilter.tint(PedroBlack)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = stringResource(id = R.string.manage),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Button(onClick = {
+                revokeAllPermissions()
+            }
+            ) {
+                Image(
+                    modifier = Modifier.size(100.dp, 50.dp),
+                    painter = painterResource(id = R.drawable.unlink),
+                    contentDescription = stringResource(id = R.string.unlink_logo),
+                    colorFilter = ColorFilter.tint(PedroBlack)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = stringResource(id = R.string.disconnect),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         }
     }
+
 
 }

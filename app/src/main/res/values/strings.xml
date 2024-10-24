@@ -156,7 +156,7 @@
     <string name="link_logo">Link logo\n</string>
     <string name="app_logo">Pedro app logo</string>
     <string name="unlink_logo">Unlinlk</string>
-    <string name="about_screen">About screen\n</string>
+    <string name="about_screen">About</string>
 
     <!-- About screen -->
     <string name="about_title">About</string>
@@ -165,5 +165,6 @@
     <string name="app_version">1.0.0</string>
     <string name="about_app_developers">by Andrea Serrano and Simone Samoggia</string>
     <string name="back">back arrow</string>
+    <string name="setting_screen">Settings</string>
 
 </resources>
