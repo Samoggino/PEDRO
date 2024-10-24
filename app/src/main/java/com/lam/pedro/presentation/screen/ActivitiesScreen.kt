@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.lam.pedro.presentation.navigation.Screen
@@ -73,13 +74,15 @@ fun ActivitiesScreen(
             .padding(horizontal = 16.dp)/*.verticalScroll(rememberScrollState())*/
     ) {
         item {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Static Activities", style = MaterialTheme.typography.headlineMedium)
+            Spacer(modifier = Modifier.height(30.dp))
+            Text(text = "Static Activities", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(10.dp))
             ActivitiesGrid(navController, staticActivities)
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(text = "Dynamic Activities", style = MaterialTheme.typography.headlineMedium)
+            Spacer(modifier = Modifier.height(30.dp))
+            Text(text = "Dynamic Activities", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(10.dp))
             ActivitiesGrid(navController, dynamicActivities)
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(30.dp))
         }
     }
 
