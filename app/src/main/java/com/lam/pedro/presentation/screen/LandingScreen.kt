@@ -1,4 +1,4 @@
-package com.lam.pedro.ui.screens
+package com.lam.pedro.presentation.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun HomeScreen() {
+fun LandingScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -21,7 +21,7 @@ fun HomeScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Welcome to the Home Page",
+            text = "Welcome to the Landing Page",
             modifier = Modifier.padding(bottom = 32.dp)
         )
         Button(onClick = { /* Handle button click */ }) {

@@ -166,5 +166,9 @@
     <string name="about_app_developers">by Andrea Serrano and Simone Samoggia</string>
     <string name="back">back arrow</string>
     <string name="setting_screen">Settings</string>
+    <string name="landing_page">Landing page after login</string>
+    <string name="login_page">Login page</string>
+    <string name="landing_screen">Landing screen after login</string>
+    <string name="login_screen">Login screen</string>
 
 </resources>

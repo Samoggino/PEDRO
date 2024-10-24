@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
         val healthConnectManager = (application as BaseApplication).healthConnectManager
 
         setContent {
-            HealthConnectApp(healthConnectManager = healthConnectManager)
+            PedroApp(healthConnectManager = healthConnectManager)
         }
     }
 }

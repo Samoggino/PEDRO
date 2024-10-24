@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.healthconnectsample.data
+package com.lam.pedro.data
 
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length

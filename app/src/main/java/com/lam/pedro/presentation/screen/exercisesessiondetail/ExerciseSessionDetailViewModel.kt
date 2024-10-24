@@ -29,7 +29,7 @@ import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.healthconnectsample.data.ExerciseSessionData
+import com.lam.pedro.data.ExerciseSessionData
 import com.example.healthconnectsample.data.HealthConnectManager
 import kotlinx.coroutines.launch
 import java.io.IOException

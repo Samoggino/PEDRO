@@ -1,4 +1,4 @@
-package com.lam.pedro.ui.screens
+package com.lam.pedro.presentation.screen.loginscreen
 
 
 import android.util.Log
@@ -7,12 +7,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -24,10 +26,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.lam.pedro.ui.viewmodel.SupabaseAuthViewModel
+import com.lam.pedro.presentation.navigation.Screen
 import kotlinx.coroutines.launch
 
 @Composable
@@ -57,7 +60,8 @@ fun LoginScreen(navController: NavController) {
         // Titolo
         Text(
             text = "Accedi",
-            modifier = Modifier.padding(bottom = 32.dp)
+            modifier = Modifier.padding(bottom = 32.dp),
+            style = MaterialTheme.typography.headlineMedium
         )
 
         // Campo Email
@@ -66,7 +70,7 @@ fun LoginScreen(navController: NavController) {
             onValueChange = { emailValue = it },
             label = { Text("Email") },
             trailingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(26.dp))
         )
 
         // Campo Password
@@ -81,6 +85,7 @@ fun LoginScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp)
+                .clip(RoundedCornerShape(26.dp))
         )
 
         // Pulsante di accesso
@@ -92,7 +97,7 @@ fun LoginScreen(navController: NavController) {
                         // Redirect to HomePage
                         Log.d("Supabase", "LoginScreen: pre-redirect")
                         try {
-                            navController.navigate("home")  // Naviga a HomeScreen
+                            navController.navigate(Screen.LandingScreen.route)  // Naviga a HomeScreen
                         } catch (e: Exception) {
                             Log.e("Supabase", "ERRORE: Failed to redirect to HomePage")
                         }

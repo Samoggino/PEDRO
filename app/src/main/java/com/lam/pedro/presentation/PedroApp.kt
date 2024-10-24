@@ -41,7 +41,7 @@ const val TAG = "Health Connect sample"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HealthConnectApp(healthConnectManager: HealthConnectManager) {
+fun PedroApp(healthConnectManager: HealthConnectManager) {
     HealthConnectTheme {
         val snackbarHostState = remember { SnackbarHostState() }
         val navController = rememberNavController()

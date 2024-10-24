@@ -40,6 +40,8 @@ import com.example.healthconnectsample.presentation.screen.HealthConnectScreen
 import com.lam.pedro.presentation.screen.AboutScreen
 import com.lam.pedro.presentation.screen.ActivitiesScreen
 import com.lam.pedro.presentation.screen.HomeScreen
+import com.lam.pedro.presentation.screen.LandingScreen
+import com.lam.pedro.presentation.screen.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.MoreScreen
 import com.lam.pedro.presentation.screen.SettingsScreen
 import com.lam.pedro.presentation.screen.changes.DifferentialChangesScreen
@@ -130,6 +132,12 @@ fun PedroNavigation(
             },
         ) {
             AboutScreen(navController = navController, titleId = topBarTitle)
+        }
+        composable(Screen.LoginScreen.route) {
+            LoginScreen(navController)
+        }
+        composable(Screen.LandingScreen.route) {
+            LandingScreen()
         }
         composable(
             route = Screen.PrivacyPolicy.route,

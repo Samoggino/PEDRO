@@ -55,7 +55,6 @@ import androidx.health.connect.client.units.Mass
 import com.example.healthconnectsample.data.HealthConnectAppInfo
 import com.example.healthconnectsample.data.WeightData
 import com.lam.pedro.presentation.theme.HealthConnectTheme
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.lam.pedro.R
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -172,6 +171,7 @@ fun InputReadingsScreen(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        /*
                         Image(
                             modifier = Modifier
                                 .padding(2.dp, 2.dp)
@@ -180,6 +180,7 @@ fun InputReadingsScreen(
                             painter = rememberDrawablePainter(drawable = reading.sourceAppInfo?.icon),
                             contentDescription = "App Icon"
                         )
+                         */
                         Text(
                             text = "%.1f ${stringResource(id = R.string.kilograms)}"
                                 .format(reading.weight.inKilograms)

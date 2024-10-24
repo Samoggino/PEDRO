@@ -66,8 +66,7 @@ fun MoreScreen(
                 .background(MaterialTheme.colorScheme.primaryContainer)
                 .padding(horizontal = 16.dp)
                 .clickable(onClick = {
-                    /* TODO: Account Screen
-                    navController.navigate(Screen.SettingsScreen.route) {
+                    navController.navigate(Screen.LoginScreen.route) {
                         // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
                         navController.graph.startDestinationRoute?.let { route ->
                             popUpTo(route) {
@@ -76,9 +75,7 @@ fun MoreScreen(
                         }
                         launchSingleTop = true
                         restoreState = true
-                    } // Cambia lo stato del click
-
-                     */
+                    }
                 }),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -174,7 +171,7 @@ fun MoreScreen(
                         }
                         launchSingleTop = true
                         restoreState = true
-                    } // Cambia lo stato del click
+                    }
                 }),
             verticalAlignment = Alignment.CenterVertically
         ) {

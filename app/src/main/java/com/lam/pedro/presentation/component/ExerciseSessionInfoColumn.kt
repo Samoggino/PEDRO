@@ -33,7 +33,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import com.lam.pedro.presentation.theme.HealthConnectTheme
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -65,14 +64,17 @@ fun ExerciseSessionInfoColumn(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
+            /*
             Image(
                 modifier = Modifier
                     .padding(4.dp, 2.dp)
                     .height(16.dp)
                     .width(16.dp),
-                painter = rememberDrawablePainter(drawable = sourceAppIcon),
+                //painter = rememberDrawablePainter(drawable = sourceAppIcon),
                 contentDescription = "App Icon"
             )
+
+             */
             Text(
                 text = sourceAppName,
                 fontStyle = FontStyle.Italic

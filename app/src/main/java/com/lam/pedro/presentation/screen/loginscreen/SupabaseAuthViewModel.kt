@@ -1,4 +1,4 @@
-package com.lam.pedro.ui.viewmodel
+package com.lam.pedro.presentation.screen.loginscreen
 
 import android.util.Log
 import com.lam.pedro.data.datasource.SupabaseClientProvider
