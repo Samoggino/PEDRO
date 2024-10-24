@@ -19,10 +19,8 @@ import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -61,11 +59,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import com.lam.pedro.R
 import com.lam.pedro.presentation.component.InstalledMessage
+import com.lam.pedro.presentation.component.LinkedApp
 import com.lam.pedro.presentation.component.NotInstalledMessage
 import com.lam.pedro.presentation.component.NotSupportedMessage
-import com.lam.pedro.presentation.navigation.BottomBar
 import com.lam.pedro.presentation.theme.PedroBlack
-import com.lam.pedro.presentation.theme.PedroYellow
 
 /**
  * Settings screen for managing Health Connect preferences.
@@ -102,29 +99,30 @@ fun HealthConnectScreen(
     }
 
 
-    Scaffold(topBar = {
-        TopAppBar(
-            title = {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
 
-                Text(
-                    text = stringResource(titleId),
-                    style = MaterialTheme.typography.headlineSmall
-                )
-            },
-            navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.Rounded.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
+                    Text(
+                        text = stringResource(titleId),
+                        style = MaterialTheme.typography.headlineSmall
                     )
-                }
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
+                    }
 
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color.White.copy(alpha = 0f)
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.White.copy(alpha = 0f)
+                )
             )
-        )
-    },
+        },
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -134,37 +132,10 @@ fun HealthConnectScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    modifier = Modifier
-                        .weight(1f)
-                        .size(100.dp),
-                    painter = painterResource(id = R.drawable.ic_health_connect_logo),
-                    contentDescription = stringResource(id = R.string.health_connect_logo)
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Image(
-                    modifier = Modifier
-                        .weight(1f)
-                        .size(60.dp),
-                    painter = painterResource(id = R.drawable.link),
-                    contentDescription = stringResource(id = R.string.link_logo)
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Image(
-                    modifier = Modifier
-                        .weight(1f)
-                        .size(90.dp),
-                    painter = painterResource(id = R.drawable.mexican_hat_svgrepo_com),
-                    contentDescription = stringResource(id = R.string.app_logo),
-                    colorFilter = ColorFilter.tint(PedroYellow) // Applica il colore
-                )
+            LinkedApp(R.drawable.ic_health_connect_logo)
 
 
-            }
+
 
             Spacer(modifier = Modifier.height(32.dp))
             Text(
@@ -223,6 +194,5 @@ fun HealthConnectScreen(
             }
         }
     }
-
-
 }
+
