@@ -2,21 +2,19 @@ package com.lam.pedro.presentation.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AirlineSeatReclineExtra
 import androidx.compose.material.icons.filled.Album
@@ -45,443 +43,116 @@ import com.lam.pedro.presentation.navigation.Screen
 fun ActivitiesScreen(
     navController: NavHostController
 ) {
-    //val context = LocalContext.current
-    val scrollState = rememberScrollState()
+    val staticActivities = listOf(
+        ActivityItem("Sleep", Icons.Filled.Bed, Screen.SleepSessions.route, Color(0xff74c9c6)),
+        ActivityItem("Drive", Icons.Filled.DirectionsCar, Screen.SleepSessions.route, Color(0xFF61a6f1)),
+        ActivityItem("Sit", Icons.Filled.ChairAlt, Screen.SleepSessions.route, Color(0xff71c97b)),
+        ActivityItem("Weight", Icons.Filled.Album, Screen.InputReadings.route, Color(0xFF7771C9)),
+        ActivityItem("Listen", Icons.Filled.Headphones, null, Color(0xFF71C990))
+    )
 
+    val dynamicActivities = listOf(
+        ActivityItem("Run", Icons.Filled.DirectionsRun, Screen.ExerciseSessions.route, Color(0xFFf87757)),
+        ActivityItem("Walk", Icons.Filled.DirectionsWalk, null, Color(0xFFfaaf5a)),
+        ActivityItem("Yoga", Icons.Filled.SportsGymnastics, null, Color(0xFFad71c9)),
+        ActivityItem("Cycling", Icons.Filled.DirectionsBike, null, Color(0xFFad71c9)),
+        ActivityItem("Free Body", Icons.Filled.AirlineSeatReclineExtra, null, Color(0xFFad71c9))
+    )
 
-    //TODO: Cycling, corpo libero (con lista, es stretching, plank, ecc), musica
-    Column(
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2), // Imposta a 2 colonne
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
-            .verticalScroll(scrollState),
-        verticalArrangement = Arrangement.Top
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        item {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "Static activities",
+                    style = MaterialTheme.typography.headlineLarge,
+                    modifier = Modifier.weight(1f).fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+        }
 
-        Text(text = "Static Activities", style = MaterialTheme.typography.headlineLarge)
-        Spacer(modifier = Modifier.height(10.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()  // Imposta l'altezza della Row
-        ) {
-            Box(
-                modifier = Modifier
-                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
-                    .weight(1f)
-                    .clip(RoundedCornerShape(26.dp))
-                    .background(Color(0xff74c9c6))
-                    .clickable(onClick = {
-                        navController.navigate(Screen.SleepSessions.route) {
-                            // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
-                            navController.graph.startDestinationRoute?.let { route ->
-                                popUpTo(route) {
-                                    saveState = true
-                                }
+        items(staticActivities) { activity ->
+            ActivityCard(activity) {
+                if (activity.route != null) {
+                    navController.navigate(activity.route) {
+                        navController.graph.startDestinationRoute?.let { route ->
+                            popUpTo(route) {
+                                saveState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
-                        } // Cambia lo stato del click
-                    })
-            ) {
-                Icon(
-                    Icons.Filled.Bed,
-                    contentDescription = null,
-                    tint = Color(0x80FFFFFF),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(90.dp)
-                )
-                Text(
-                    text = "Sleep",
-                    color = Color.White,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(15.dp)
-                )
-
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
             }
+        }
 
-            Spacer(modifier = Modifier.width(8.dp))
+        item {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.height(30.dp))
+                Text(
+                    text = "Dynamic activities",
+                    style = MaterialTheme.typography.headlineLarge,
+                    modifier = Modifier.weight(1f).fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+        }
 
-            Box(
-                modifier = Modifier
-                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
-                    .weight(1f)
-                    .clip(RoundedCornerShape(26.dp))
-                    .background(Color(0xFF61a6f1))
-                    .clickable(onClick = {
-                        navController.navigate(Screen.SleepSessions.route) {
-                            // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
-                            navController.graph.startDestinationRoute?.let { route ->
-                                popUpTo(route) {
-                                    saveState = true
-                                }
+        items(dynamicActivities) { activity ->
+            ActivityCard(activity) {
+                if (activity.route != null) {
+                    navController.navigate(activity.route) {
+                        navController.graph.startDestinationRoute?.let { route ->
+                            popUpTo(route) {
+                                saveState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
-                        } // Cambia lo stato del click
-                    })
-            ) {
-                Icon(
-                    Icons.Filled.DirectionsCar,
-                    contentDescription = null,
-                    tint = Color(0x80FFFFFF),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(90.dp)
-                )
-                Text(
-                    text = "Drive",
-                    color = Color.White,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(15.dp)
-                )
-
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
             }
-
         }
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()  // Imposta l'altezza della Row
-        ) {
-            Box(
-                modifier = Modifier
-                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
-                    .weight(1f)
-                    .clip(RoundedCornerShape(26.dp))
-                    .background(Color(0xff71c97b))
-                    .clickable(onClick = {
-                        navController.navigate(Screen.SleepSessions.route) {
-                            // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
-                            navController.graph.startDestinationRoute?.let { route ->
-                                popUpTo(route) {
-                                    saveState = true
-                                }
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        } // Cambia lo stato del click
-                    })
-            ) {
-                Icon(
-                    Icons.Filled.ChairAlt,
-                    contentDescription = null,
-                    tint = Color(0x80FFFFFF),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(120.dp)
-                )
-                Text(
-                    text = "Sit",
-                    color = Color.White,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(15.dp)
-                )
-
-            }
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            Box(
-                modifier = Modifier
-                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
-                    .weight(1f)
-                    .clip(RoundedCornerShape(26.dp))
-                    .background(Color(0xFF7771C9))
-                    .clickable(onClick = {
-                        navController.navigate(Screen.InputReadings.route) {
-                            // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
-                            navController.graph.startDestinationRoute?.let { route ->
-                                popUpTo(route) {
-                                    saveState = true
-                                }
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        } // Cambia lo stato del click
-                    })
-            ) {
-                Icon(
-                    Icons.Filled.Album,
-                    contentDescription = null,
-                    tint = Color(0x80FFFFFF),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(120.dp)
-                )
-                Text(
-                    text = "Weight",
-                    color = Color.White,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(15.dp)
-                )
-
-            }
-
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-
-            Box(
-                modifier = Modifier
-                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
-                    .weight(1f)
-                    .clip(RoundedCornerShape(26.dp))
-                    .background(Color(0xFF71C990))  // Imposta lo sfondo nero
-                /*
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(Color(0xFF2D2D2D), Color(0xFF2D2D2D))
-                    )
-                )
-
-                 */
-                // Arrotonda i bordi
-            ) {
-                Icon(
-                    Icons.Filled.Headphones,
-                    contentDescription = null,
-                    tint = Color(0x80FFFFFF),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(90.dp)
-                )
-                Text(
-                    text = "Listen",
-                    color = Color.White,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(15.dp)
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Box(
-                modifier = Modifier
-                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
-                    .weight(1f)
-            ) {
-            }
-
-        }
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        Text(text = "Dynamic Activities", style = MaterialTheme.typography.headlineLarge)
-        Spacer(modifier = Modifier.height(10.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()  // Imposta l'altezza della Row
-        ) {
-
-
-            Box(
-                modifier = Modifier
-                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
-                    .weight(1f)
-                    .clip(RoundedCornerShape(26.dp))
-                    .background(Color(0xFFf87757))  // Imposta lo sfondo nero
-                    .clickable(onClick = {
-                        navController.navigate(Screen.ExerciseSessions.route) {
-                            // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
-                            navController.graph.startDestinationRoute?.let { route ->
-                                popUpTo(route) {
-                                    saveState = true
-                                }
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        } // Cambia lo stato del click
-                    })
-            ) {
-                Icon(
-                    Icons.Filled.DirectionsRun,
-                    contentDescription = null,
-                    tint = Color(0x80FFFFFF),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(90.dp)
-                )
-                Text(
-                    text = "Run",
-                    color = Color.White,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(15.dp)
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Box(
-                modifier = Modifier
-                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
-                    .weight(1f)
-                    .clip(RoundedCornerShape(26.dp))
-                    .background(Color(0xFFfaaf5a))
-            ) {
-                Icon(
-                    Icons.Filled.DirectionsWalk,
-                    contentDescription = null,
-                    tint = Color(0x80FFFFFF),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(90.dp)
-                )
-                Text(
-                    text = "Walk",
-                    color = Color.White,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(15.dp)
-                )
-            }
-
-
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-
-            Box(
-                modifier = Modifier
-                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
-                    .weight(1f)
-                    .clip(RoundedCornerShape(26.dp))
-                    .background(Color(0xFFad71c9))  // Imposta lo sfondo nero
-                /*
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(Color(0xFF2D2D2D), Color(0xFF2D2D2D))
-                    )
-                )
-
-                 */
-                // Arrotonda i bordi
-            ) {
-                Icon(
-                    Icons.Filled.SportsGymnastics,
-                    contentDescription = null,
-                    tint = Color(0x80FFFFFF),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(90.dp)
-                )
-                Text(
-                    text = "Yoga",
-                    color = Color.White,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(15.dp)
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Box(
-                modifier = Modifier
-                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
-                    .weight(1f)
-                    .clip(RoundedCornerShape(26.dp))
-                    .background(Color(0xFFad71c9))  // Imposta lo sfondo nero
-                /*
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(Color(0xFF2D2D2D), Color(0xFF2D2D2D))
-                    )
-                )
-
-                 */
-                // Arrotonda i bordi
-            ) {
-                Icon(
-                    Icons.Filled.DirectionsBike,
-                    contentDescription = null,
-                    tint = Color(0x80FFFFFF),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(90.dp)
-                )
-                Text(
-                    text = "Cycling",
-                    color = Color.White,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(15.dp)
-                )
-            }
-
-
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-
-            Box(
-                modifier = Modifier
-                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
-                    .weight(1f)
-                    .clip(RoundedCornerShape(26.dp))
-                    .background(Color(0xFFad71c9))  // Imposta lo sfondo nero
-                /*
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(Color(0xFF2D2D2D), Color(0xFF2D2D2D))
-                    )
-                )
-
-                 */
-                // Arrotonda i bordi
-            ) {
-                Icon(
-                    Icons.Filled.AirlineSeatReclineExtra,
-                    contentDescription = null,
-                    tint = Color(0x80FFFFFF),
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(90.dp)
-                )
-                Text(
-                    text = "Free body",
-                    color = Color.White,
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(15.dp)
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            Box(
-                modifier = Modifier
-                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
-                    .weight(1f)
-            ) {
-            }
-
-        }
-
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-
     }
 }
 
+@Composable
+fun ActivityCard(activity: ActivityItem, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .height(100.dp)
+            .clip(RoundedCornerShape(26.dp))
+            .background(activity.color)
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.BottomStart
+    ) {
+        Icon(
+            activity.icon,
+            contentDescription = null,
+            tint = Color(0x80FFFFFF),
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .size(90.dp)
+        )
+        Text(
+            text = activity.name,
+            color = Color.White,
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(15.dp)
+        )
+    }
+}
 
-
+data class ActivityItem(
+    val name: String,
+    val icon: ImageVector,
+    val route: String?,
+    val color: Color
+)
