@@ -3,8 +3,10 @@ package com.lam.pedro.presentation.screen.loginscreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -35,6 +37,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.lam.pedro.R
+import com.lam.pedro.presentation.component.LinkedApp
 
 @Composable
 fun LoginScreen(
@@ -50,9 +54,14 @@ fun LoginScreen(
     ) {
         Text(
             text = "Accedi",
-            modifier = Modifier.padding(bottom = 32.dp),
             style = MaterialTheme.typography.headlineMedium
         )
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        LinkedApp(R.drawable.supabase_logo_icon)
+
+        Spacer(modifier = Modifier.height(40.dp))
 
         // Campo Email
         TextField(
