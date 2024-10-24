@@ -1,19 +1,22 @@
 package com.lam.pedro.presentation.screen.loginscreen
 
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -22,34 +25,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.lam.pedro.presentation.navigation.Screen
-import kotlinx.coroutines.launch
 
 @Composable
-fun LoginScreen(navController: NavController) {
-    var emailValue by remember { mutableStateOf("") }
-    var passwordValue by remember { mutableStateOf("") }
-
-    val viewModel = SupabaseAuthViewModel() // Crea un'istanza del ViewModel
-    val coroutineScope = rememberCoroutineScope() // Crea un coroutine scope
-
-    // Stato per mostrare il popup
-    var showErrorDialog by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") } // Per memorizzare il messaggio di errore
-
-    // Funzione per chiudere il popup
-    fun closeErrorDialog() {
-        showErrorDialog = false
-    }
-
+fun LoginScreen(
+    navController: NavController,
+    viewModel: SupabaseAuthViewModel = viewModel() // Utilizza viewModel() di Compose
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,7 +48,6 @@ fun LoginScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Titolo
         Text(
             text = "Accedi",
             modifier = Modifier.padding(bottom = 32.dp),
@@ -66,22 +56,32 @@ fun LoginScreen(navController: NavController) {
 
         // Campo Email
         TextField(
-            value = emailValue,
-            onValueChange = { emailValue = it },
+            value = viewModel.email,
+            onValueChange = { viewModel.email = it },
             label = { Text("Email") },
             trailingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(26.dp))
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(26.dp))
         )
 
-        // Campo Password
+        // Aggiungi uno stato per la visibilità della password
+        var passwordVisible by remember { mutableStateOf(false) }
+
         TextField(
-            value = passwordValue,
-            onValueChange = { passwordValue = it },
+            value = viewModel.password,
+            onValueChange = { viewModel.password = it },
             label = { Text("Password") },
-            visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
-                Icon(Icons.Default.Visibility, contentDescription = "Mostra password")
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(
+                        imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                        contentDescription = if (passwordVisible) "Nascondi password" else "Mostra password"
+                    )
+                }
             },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp)
@@ -90,25 +90,7 @@ fun LoginScreen(navController: NavController) {
 
         // Pulsante di accesso
         Button(
-            onClick = {
-                coroutineScope.launch {
-                    val result = viewModel.logInAuth(emailValue, passwordValue)
-                    if (result != null) {
-                        // Redirect to HomePage
-                        Log.d("Supabase", "LoginScreen: pre-redirect")
-                        try {
-                            navController.navigate(Screen.LandingScreen.route)  // Naviga a HomeScreen
-                        } catch (e: Exception) {
-                            Log.e("Supabase", "ERRORE: Failed to redirect to HomePage")
-                        }
-                        Log.d("Supabase", "LoginScreen: post-redirect")
-                    } else {
-                        // Crea un messaggio di errore
-                        errorMessage = "Email o password non corretti. Riprova."
-                        showErrorDialog = true
-                    }
-                }
-            },
+            onClick = { viewModel.login(navController) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 32.dp)
@@ -116,34 +98,25 @@ fun LoginScreen(navController: NavController) {
             Text("Accedi")
         }
 
-        // Link Password dimenticata
         TextButton(onClick = { /* Handle Forgot Password */ }) {
             Text("Password dimenticata?")
         }
 
-        // Pulsante Registrati
-        TextButton(onClick = {
-            coroutineScope.launch {
-                viewModel.signInAuth(emailValue, passwordValue)
-            }
-        }) {
+        TextButton(onClick = { viewModel.signUp(navController) }) {
             Text("Non hai un account? Registrati")
         }
 
-        // Popup di errore
-        if (showErrorDialog) {
+        if (viewModel.isLoading) {
+            CircularProgressIndicator()
+        }
+
+        if (viewModel.showErrorDialog) {
             AlertDialog(
-                onDismissRequest = { closeErrorDialog() }, // Chiudi se clicchi fuori dal popup
-                title = {
-                    Text(text = "Errore di accesso")
-                },
-                text = {
-                    Text(errorMessage) // Mostra il messaggio di errore
-                },
+                onDismissRequest = { viewModel.showErrorDialog = false },
+                title = { Text("Errore di accesso") },
+                text = { Text(viewModel.errorMessage) },
                 confirmButton = {
-                    Button(
-                        onClick = { closeErrorDialog() }  // Chiudi il popup
-                    ) {
+                    Button(onClick = { viewModel.showErrorDialog = false }) {
                         Text("OK")
                     }
                 }
