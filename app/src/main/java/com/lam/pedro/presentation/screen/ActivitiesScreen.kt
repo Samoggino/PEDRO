@@ -18,12 +18,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AirlineSeatReclineExtra
 import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.Bed
 import androidx.compose.material.icons.filled.ChairAlt
+import androidx.compose.material.icons.filled.DirectionsBike
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material.icons.filled.DirectionsWalk
+import androidx.compose.material.icons.filled.Headphones
 import androidx.compose.material.icons.filled.SportsGymnastics
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -46,11 +49,11 @@ fun ActivitiesScreen(
     val scrollState = rememberScrollState()
 
 
-
+    //TODO: Cycling, corpo libero (con lista, es stretching, plank, ecc), musica
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 10.dp)
+            .padding(horizontal = 16.dp)
             .verticalScroll(scrollState),
         verticalArrangement = Arrangement.Top
     ) {
@@ -87,7 +90,7 @@ fun ActivitiesScreen(
                     tint = Color(0x80FFFFFF),
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .size(120.dp)
+                        .size(90.dp)
                 )
                 Text(
                     text = "Sleep",
@@ -127,7 +130,7 @@ fun ActivitiesScreen(
                     tint = Color(0x80FFFFFF),
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .size(120.dp)
+                        .size(90.dp)
                 )
                 Text(
                     text = "Drive",
@@ -225,6 +228,54 @@ fun ActivitiesScreen(
             }
 
         }
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
+                    .weight(1f)
+                    .clip(RoundedCornerShape(26.dp))
+                    .background(Color(0xFF71C990))  // Imposta lo sfondo nero
+                /*
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(Color(0xFF2D2D2D), Color(0xFF2D2D2D))
+                    )
+                )
+
+                 */
+                // Arrotonda i bordi
+            ) {
+                Icon(
+                    Icons.Filled.Headphones,
+                    contentDescription = null,
+                    tint = Color(0x80FFFFFF),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .size(90.dp)
+                )
+                Text(
+                    text = "Listen",
+                    color = Color.White,
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(15.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Box(
+                modifier = Modifier
+                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
+                    .weight(1f)
+            ) {
+            }
+
+        }
 
         Spacer(modifier = Modifier.height(30.dp))
 
@@ -261,7 +312,7 @@ fun ActivitiesScreen(
                     tint = Color(0x80FFFFFF),
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .size(120.dp)
+                        .size(90.dp)
                 )
                 Text(
                     text = "Run",
@@ -286,7 +337,7 @@ fun ActivitiesScreen(
                     tint = Color(0x80FFFFFF),
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .size(120.dp)
+                        .size(90.dp)
                 )
                 Text(
                     text = "Walk",
@@ -303,8 +354,7 @@ fun ActivitiesScreen(
         Spacer(modifier = Modifier.height(8.dp))
         Row(
             modifier = Modifier
-                .fillMaxWidth()  // La Row riempie tutta la larghezza disponibile
-                .height(200.dp)  // Imposta l'altezza della Row
+                .fillMaxWidth()
         ) {
 
             Box(
@@ -329,7 +379,7 @@ fun ActivitiesScreen(
                     tint = Color(0x80FFFFFF),
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .size(120.dp)
+                        .size(90.dp)
                 )
                 Text(
                     text = "Yoga",
@@ -340,16 +390,93 @@ fun ActivitiesScreen(
                         .padding(15.dp)
                 )
             }
+            Spacer(modifier = Modifier.width(8.dp))
             Box(
                 modifier = Modifier
-                    .weight(1f)  // Divide equamente lo spazio con altre Box nel Row
-                    .aspectRatio(1f)
-            ) {
+                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
+                    .weight(1f)
+                    .clip(RoundedCornerShape(26.dp))
+                    .background(Color(0xFFad71c9))  // Imposta lo sfondo nero
+                /*
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(Color(0xFF2D2D2D), Color(0xFF2D2D2D))
+                    )
+                )
 
+                 */
+                // Arrotonda i bordi
+            ) {
+                Icon(
+                    Icons.Filled.DirectionsBike,
+                    contentDescription = null,
+                    tint = Color(0x80FFFFFF),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .size(90.dp)
+                )
+                Text(
+                    text = "Cycling",
+                    color = Color.White,
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(15.dp)
+                )
             }
 
 
         }
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+
+            Box(
+                modifier = Modifier
+                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
+                    .weight(1f)
+                    .clip(RoundedCornerShape(26.dp))
+                    .background(Color(0xFFad71c9))  // Imposta lo sfondo nero
+                /*
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(Color(0xFF2D2D2D), Color(0xFF2D2D2D))
+                    )
+                )
+
+                 */
+                // Arrotonda i bordi
+            ) {
+                Icon(
+                    Icons.Filled.AirlineSeatReclineExtra,
+                    contentDescription = null,
+                    tint = Color(0x80FFFFFF),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .size(90.dp)
+                )
+                Text(
+                    text = "Free body",
+                    color = Color.White,
+                    style = MaterialTheme.typography.headlineMedium,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(15.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Box(
+                modifier = Modifier
+                    .height(100.dp)  // Divide equamente lo spazio con altre Box nel Row
+                    .weight(1f)
+            ) {
+            }
+
+        }
+
+
         Spacer(modifier = Modifier.height(30.dp))
 
 

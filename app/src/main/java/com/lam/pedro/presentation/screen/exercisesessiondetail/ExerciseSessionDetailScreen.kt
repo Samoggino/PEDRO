@@ -63,6 +63,7 @@ fun ExerciseSessionDetailScreen(
     onPermissionsLaunch: (Set<String>) -> Unit = {}
 ) {
 
+
     // Remember the last error ID, such that it is possible to avoid re-launching the error
     // notification for the same error when the screen is recomposed, or configuration changes etc.
     val errorId = rememberSaveable { mutableStateOf(UUID.randomUUID()) }
