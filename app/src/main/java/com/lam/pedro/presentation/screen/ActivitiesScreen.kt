@@ -152,7 +152,7 @@ fun ActivityCard(
         Icon(
             activity.icon,
             contentDescription = null,
-            tint = Color(0x80FFFFFF),
+            tint = Color(0x33FFFFFF),
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .size(90.dp)
@@ -160,8 +160,8 @@ fun ActivityCard(
         Text(
             text = activity.name,
             color = Color.White,
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(15.dp)
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(10.dp)
         )
     }
 }

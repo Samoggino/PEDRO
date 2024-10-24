@@ -1,11 +1,8 @@
 package com.lam.pedro.presentation.screen
 
-import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,10 +17,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessibilityNew
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowForwardIos
-import androidx.compose.material.icons.filled.Bed
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,7 +30,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -64,7 +58,6 @@ fun MoreScreen(
                     RoundedCornerShape(26.dp)
                 )
                 .background(MaterialTheme.colorScheme.primaryContainer)
-                .padding(horizontal = 16.dp)
                 .clickable(onClick = {
                     navController.navigate(Screen.LoginScreen.route) {
                         // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
@@ -76,7 +69,8 @@ fun MoreScreen(
                         launchSingleTop = true
                         restoreState = true
                     }
-                }),
+                })
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -112,7 +106,6 @@ fun MoreScreen(
                     RoundedCornerShape(26.dp)
                 )
                 .background(MaterialTheme.colorScheme.primaryContainer)
-                .padding(horizontal = 16.dp)
                 .clickable(onClick = {
                     navController.navigate(Screen.HealthConnectScreen.route) {
                         // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
@@ -124,7 +117,8 @@ fun MoreScreen(
                         launchSingleTop = true
                         restoreState = true
                     } // Cambia lo stato del click
-                }),
+                })
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
@@ -160,7 +154,6 @@ fun MoreScreen(
                     RoundedCornerShape(26.dp)
                 )
                 .background(MaterialTheme.colorScheme.primaryContainer)
-                .padding(horizontal = 16.dp)
                 .clickable(onClick = {
                     navController.navigate(Screen.SettingScreen.route) {
                         // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
@@ -172,7 +165,8 @@ fun MoreScreen(
                         launchSingleTop = true
                         restoreState = true
                     }
-                }),
+                })
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -208,7 +202,6 @@ fun MoreScreen(
                     RoundedCornerShape(26.dp)
                 )
                 .background(MaterialTheme.colorScheme.primaryContainer)
-                .padding(horizontal = 16.dp)
                 .clickable(onClick = {
                     navController.navigate(Screen.PrivacyPolicy.route) {
                         // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
@@ -220,7 +213,8 @@ fun MoreScreen(
                         launchSingleTop = true
                         restoreState = true
                     } // Cambia lo stato del click
-                }),
+                })
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -256,7 +250,6 @@ fun MoreScreen(
                     RoundedCornerShape(26.dp)
                 )
                 .background(MaterialTheme.colorScheme.primaryContainer)
-                .padding(horizontal = 16.dp)
                 .clickable(onClick = {
                     navController.navigate(Screen.AboutScreen.route) {
                         // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
@@ -268,7 +261,8 @@ fun MoreScreen(
                         launchSingleTop = true
                         restoreState = true
                     } // Cambia lo stato del click
-                }),
+                })
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
