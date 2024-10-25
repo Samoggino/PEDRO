@@ -61,7 +61,7 @@ fun PedroApp(healthConnectManager: HealthConnectManager) {
         val titleId = when (currentRoute) {
             Screen.ExerciseSessions.route -> Screen.ExerciseSessions.titleId
             Screen.SleepSessions.route -> Screen.SleepSessions.titleId
-            Screen.InputReadings.route -> Screen.InputReadings.titleId
+            Screen.WeightScreen.route -> Screen.WeightScreen.titleId
             Screen.DifferentialChanges.route -> Screen.DifferentialChanges.titleId
             Screen.HealthConnectScreen.route -> Screen.HealthConnectScreen.titleId
             Screen.ActivitiesScreen.route -> Screen.ActivitiesScreen.titleId

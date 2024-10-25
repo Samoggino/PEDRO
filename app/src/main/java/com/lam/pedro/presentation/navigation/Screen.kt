@@ -37,7 +37,7 @@ enum class Screen(val route: String, val titleId: Int, val hasMenuItem: Boolean 
     ExerciseSessionDetail("exercise_session_detail", R.string.exercise_session_detail, false),
     SleepSessions("sleep_sessions", R.string.sleep_sessions, false),
     SleepSessionDetail("sleep_session_detail", R.string.sleep_session_detail, false),
-    InputReadings("input_readings", R.string.input_readings, false),
+    WeightScreen("weight_screen", R.string.input_readings, false),
     DifferentialChanges("differential_changes", R.string.differential_changes, false),
     PrivacyPolicy("privacy_policy", R.string.privacy_policy, false),
     HealthConnectScreen("health_connect_screen", R.string.health_connect, false),

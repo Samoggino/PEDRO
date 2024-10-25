@@ -15,22 +15,21 @@
  */
 package com.lam.pedro.presentation.screen.inputreadings
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -45,6 +44,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -56,6 +57,7 @@ import com.example.healthconnectsample.data.HealthConnectAppInfo
 import com.example.healthconnectsample.data.WeightData
 import com.lam.pedro.presentation.theme.HealthConnectTheme
 import com.lam.pedro.R
+import com.lam.pedro.presentation.component.PermissionRequired
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -114,11 +116,7 @@ fun InputReadingsScreen(
         ) {
             if (!permissionsGranted) {
                 item {
-                    Button(
-                        onClick = { onPermissionsLaunch(permissions) }
-                    ) {
-                        Text(text = stringResource(R.string.permissions_button_label))
-                    }
+                    PermissionRequired(0xFF7771C9) { onPermissionsLaunch(permissions) }
                 }
             } else {
                 item {
@@ -127,13 +125,13 @@ fun InputReadingsScreen(
                         onValueChange = {
                             weightInput = it
                         },
-
                         label = {
                             Text(stringResource(id = R.string.weight_input))
                         },
                         isError = !hasValidDoubleInRange(weightInput),
                         keyboardActions = KeyboardActions { !hasValidDoubleInRange(weightInput) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.clip(RoundedCornerShape(26.dp))
                     )
                     if (!hasValidDoubleInRange(weightInput)) {
                         Text(
@@ -144,6 +142,7 @@ fun InputReadingsScreen(
                         )
                     }
 
+
                     Button(
                         enabled = hasValidDoubleInRange(weightInput),
                         onClick = {
@@ -151,7 +150,10 @@ fun InputReadingsScreen(
                             // clear TextField when new weight is entered
                             weightInput = ""
                         },
-
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF7771C9), // Colore di sfondo
+                            contentColor = Color.White         // Colore del testo
+                        ),
                         modifier = Modifier.fillMaxHeight()
 
                     ) {

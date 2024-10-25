@@ -22,8 +22,6 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.shrinkOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.SnackbarHostState
@@ -41,7 +39,6 @@ import com.lam.pedro.presentation.screen.AboutScreen
 import com.lam.pedro.presentation.screen.ActivitiesScreen
 import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.LandingScreen
-import com.lam.pedro.presentation.screen.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.MoreScreen
 import com.lam.pedro.presentation.screen.SettingsScreen
 import com.lam.pedro.presentation.screen.changes.DifferentialChangesScreen
@@ -56,11 +53,12 @@ import com.lam.pedro.presentation.screen.exercisesessiondetail.ExerciseSessionDe
 import com.lam.pedro.presentation.screen.inputreadings.InputReadingsScreen
 import com.lam.pedro.presentation.screen.inputreadings.InputReadingsViewModel
 import com.lam.pedro.presentation.screen.inputreadings.InputReadingsViewModelFactory
+import com.lam.pedro.presentation.screen.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.privacypolicy.PrivacyPolicyScreen
-import com.lam.pedro.presentation.screen.recordlist.RecordType
 import com.lam.pedro.presentation.screen.recordlist.RecordListScreen
 import com.lam.pedro.presentation.screen.recordlist.RecordListScreenViewModel
 import com.lam.pedro.presentation.screen.recordlist.RecordListViewModelFactory
+import com.lam.pedro.presentation.screen.recordlist.RecordType
 import com.lam.pedro.presentation.screen.recordlist.SeriesRecordsType
 import com.lam.pedro.presentation.screen.sleepsession.SleepSessionScreen
 import com.lam.pedro.presentation.screen.sleepsession.SleepSessionViewModel
@@ -316,12 +314,12 @@ fun PedroNavigation(
         }
         composable(Screen.SleepSessions.route,
             enterTransition = {
-                scaleIn(
+                fadeIn(
                     animationSpec = tween(1000) // Personalizza la durata dell'animazione
                 )
             },
             exitTransition = {
-                shrinkOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
+                fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
             }) {
             val viewModel: SleepSessionViewModel = viewModel(
                 factory = SleepSessionViewModelFactory(
@@ -342,7 +340,7 @@ fun PedroNavigation(
                 sessionsList = sessionsList,
                 uiState = viewModel.uiState,
                 onInsertClick = {
-                    viewModel.generateSleepData()
+                    viewModel.addSleepData()
                 },
                 onError = { exception ->
                     showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -355,7 +353,7 @@ fun PedroNavigation(
                 }
             )
         }
-        composable(Screen.InputReadings.route) {
+        composable(Screen.WeightScreen.route) {
             val viewModel: InputReadingsViewModel = viewModel(
                 factory = InputReadingsViewModelFactory(
                     healthConnectManager = healthConnectManager

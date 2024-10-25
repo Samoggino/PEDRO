@@ -15,7 +15,7 @@
  */
 package com.lam.pedro.presentation.screen.sleepsession
 
-import androidx.compose.foundation.background
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,16 +32,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.SleepSessionRecord
 import com.example.healthconnectsample.data.SleepSessionData
-import com.lam.pedro.R
+import com.lam.pedro.presentation.TAG
+import com.lam.pedro.presentation.component.PermissionRequired
 import com.lam.pedro.presentation.component.SleepSessionRow
 import com.lam.pedro.presentation.theme.HealthConnectTheme
 import java.time.Duration
+import java.time.Instant
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -59,11 +61,12 @@ fun SleepSessionScreen(
     onPermissionsLaunch: (Set<String>) -> Unit = {}
 ) {
 
-
-
     // Remember the last error ID, such that it is possible to avoid re-launching the error
     // notification for the same error when the screen is recomposed, or configuration changes etc.
     val errorId = rememberSaveable { mutableStateOf(UUID.randomUUID()) }
+    // Per memorizzare lo stato del bottone e il tempo di inizio della sessione
+    val isRecording = rememberSaveable { mutableStateOf(false) }
+    val startTime = rememberSaveable { mutableStateOf<Instant?>(null) }
 
     LaunchedEffect(uiState) {
         // If the initial data load has not taken place, attempt to load the data.
@@ -83,19 +86,25 @@ fun SleepSessionScreen(
 
     if (uiState != SleepSessionViewModel.UiState.Uninitialized) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize().background(Color(0xFFF5F5F5)),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             if (!permissionsGranted) {
                 item {
-                    Button(
-                        onClick = { onPermissionsLaunch(permissions) }
-                    ) {
-                        Text(text = stringResource(R.string.permissions_button_label))
-                    }
+                    PermissionRequired(0xff74c9c6) { onPermissionsLaunch(permissions) }
                 }
             } else {
+                // Titolo "Sleep"
+                item {
+                    Text(
+                        text = "Sleep",
+                        modifier = Modifier.padding(16.dp),
+                        style = MaterialTheme.typography.headlineMedium
+                    )
+                }
+
+                // Button per Start/Stop della registrazione
                 item {
                     Button(
                         modifier = Modifier
@@ -103,13 +112,37 @@ fun SleepSessionScreen(
                             .height(48.dp)
                             .padding(4.dp),
                         onClick = {
-                            onInsertClick()
+                            if (isRecording.value) {
+                                // Ferma la registrazione
+                                val endTime = Instant.now()
+                                val newSession = SleepSessionData(
+                                    uid = UUID.randomUUID().toString(),
+                                    title = "Sleep Session",
+                                    notes = "Recorded session",
+                                    startTime = startTime.value!!,
+                                    startZoneOffset = ZoneOffset.UTC,
+                                    endTime = endTime,
+                                    endZoneOffset = ZoneOffset.UTC,
+                                    duration = Duration.between(startTime.value, endTime),
+                                    stages = listOf() // Aggiungi stadi della sessione, se presenti
+                                )
+                                Log.d(TAG, "New session: $newSession")
+                                sessionsList.toMutableList().add(newSession) // Aggiungi la nuova sessione alla lista
+                                Log.d(TAG, "Sessions list: $sessionsList")
+                                onInsertClick() // Salva la nuova sessione
+                                isRecording.value = false // Aggiorna lo stato
+                            } else {
+                                // Avvia la registrazione
+                                startTime.value = Instant.now()
+                                isRecording.value = true
+                            }
                         }
                     ) {
-                        Text(stringResource(id = R.string.generate_sleep_data))
+                        Text(if (isRecording.value) "Stop" else "Start")
                     }
                 }
 
+                // Mostra la lista delle sessioni
                 items(sessionsList) { session ->
                     SleepSessionRow(session)
                 }

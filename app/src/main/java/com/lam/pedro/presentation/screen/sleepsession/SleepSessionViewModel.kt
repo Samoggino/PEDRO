@@ -16,6 +16,7 @@
 package com.lam.pedro.presentation.screen.sleepsession
 
 import android.os.RemoteException
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,12 +59,21 @@ class SleepSessionViewModel(private val healthConnectManager: HealthConnectManag
         }
     }
 
-    fun generateSleepData() {
+    fun saveSession(session: SleepSessionData) {
         viewModelScope.launch {
             tryWithPermissionsCheck {
-                // Delete all existing sleep data before generating new random sleep data.
-                healthConnectManager.deleteAllSleepData()
-                healthConnectManager.generateSleepData()
+                // Aggiorna la lista aggiungendo la nuova sessione
+                sessionsList.value = sessionsList.value + session
+                healthConnectManager.writeSleepSession(session) // salva la sessione su HealthConnect
+                Log.d("SleepSessionViewModel", "Session saved")
+            }
+        }
+    }
+
+
+    fun addSleepData() {
+        viewModelScope.launch {
+            tryWithPermissionsCheck {
                 sessionsList.value = healthConnectManager.readSleepSessions()
             }
         }

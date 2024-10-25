@@ -20,6 +20,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Resources.NotFoundException
 import android.os.Build
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.compose.runtime.mutableStateOf
 import androidx.health.connect.client.HealthConnectClient
@@ -334,6 +335,27 @@ class HealthConnectManager(private val context: Context) {
         }
         return sessions
     }
+
+    suspend fun writeSleepSession(sessionData: SleepSessionData) {
+        val sleepSessionRecord = SleepSessionRecord(
+            startTime = sessionData.startTime,
+            startZoneOffset = sessionData.startZoneOffset,
+            endTime = sessionData.endTime,
+            endZoneOffset = sessionData.endZoneOffset,
+            title = sessionData.title,
+            notes = sessionData.notes,
+            stages = sessionData.stages // Aggiungi gli stadi della sessione, se presenti
+        )
+
+        try {
+            healthConnectClient.insertRecords(listOf(sleepSessionRecord))
+            Log.d("SleepSession", "Sessione di sonno aggiunta con successo!")
+        } catch (e: Exception) {
+            Log.e("SleepSession", "Errore nell'inserimento della sessione di sonno: ${e.message}")
+            throw e
+        }
+    }
+
 
     /**
      * Writes [WeightRecord] to Health Connect.

@@ -14,11 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessibilityNew
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowForwardIos
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,7 +35,7 @@ import com.lam.pedro.presentation.navigation.Screen
 fun MoreScreen(
     navController: NavHostController
 ) {
-    val context = LocalContext.current
+    //val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -73,13 +68,13 @@ fun MoreScreen(
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                Icons.Filled.AccountCircle,
+            Image(
+                painter = painterResource(id = R.drawable.user_icon),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onBackground,
+                colorFilter = ColorFilter.tint(Color.White), // Cambia il colore qui
                 modifier = Modifier.size(40.dp)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = "Account",
                 color = MaterialTheme.colorScheme.onBackground,
@@ -122,12 +117,12 @@ fun MoreScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_health_connect_logo),
+                painter = painterResource(id = R.drawable.health_connect_icon),
                 contentDescription = null,
                 colorFilter = ColorFilter.tint(Color.White), // Cambia il colore qui
                 modifier = Modifier.size(40.dp)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = "Health Connect",
                 color = MaterialTheme.colorScheme.onBackground,
@@ -169,13 +164,13 @@ fun MoreScreen(
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                Icons.Filled.Settings,
+            Image(
+                painter = painterResource(id = R.drawable.settings_icon),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onBackground,
+                colorFilter = ColorFilter.tint(Color.White), // Cambia il colore qui
                 modifier = Modifier.size(40.dp)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = "Settings",
                 color = MaterialTheme.colorScheme.onBackground,
@@ -217,13 +212,13 @@ fun MoreScreen(
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                Icons.Filled.AccessibilityNew,
+            Image(
+                painter = painterResource(id = R.drawable.privacy_policy_icon),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.size(35.dp)
+                colorFilter = ColorFilter.tint(Color.White), // Cambia il colore qui
+                modifier = Modifier.size(40.dp)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = "Privacy policy",
                 color = MaterialTheme.colorScheme.onBackground,
@@ -265,13 +260,13 @@ fun MoreScreen(
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                Icons.Filled.Info,
+            Image(
+                painter = painterResource(id = R.drawable.about_icon),
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onBackground,
+                colorFilter = ColorFilter.tint(Color.White), // Cambia il colore qui
                 modifier = Modifier.size(40.dp)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = "About",
                 color = MaterialTheme.colorScheme.onBackground,

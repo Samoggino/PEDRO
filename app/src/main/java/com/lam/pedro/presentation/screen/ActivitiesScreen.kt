@@ -14,17 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AirlineSeatReclineExtra
-import androidx.compose.material.icons.filled.Album
-import androidx.compose.material.icons.filled.Bed
-import androidx.compose.material.icons.filled.ChairAlt
-import androidx.compose.material.icons.filled.DirectionsBike
-import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.DirectionsRun
-import androidx.compose.material.icons.filled.DirectionsWalk
-import androidx.compose.material.icons.filled.Headphones
-import androidx.compose.material.icons.filled.SportsGymnastics
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -33,53 +23,66 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.lam.pedro.R
 import com.lam.pedro.presentation.navigation.Screen
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivitiesScreen(
     navController: NavHostController
 ) {
     val staticActivities = listOf(
-        ActivityItem("Sleep", Icons.Filled.Bed, Screen.SleepSessions.route, Color(0xff74c9c6)),
+        ActivityItem("Sleep", painterResource(id = R.drawable.sleeping_icon), Screen.SleepSessions.route, Color(0xff74c9c6)),
         ActivityItem(
             "Drive",
-            Icons.Filled.DirectionsCar,
+            painterResource(id = R.drawable.car_icon),
             Screen.SleepSessions.route,
             Color(0xFF61a6f1)
         ),
-        ActivityItem("Sit", Icons.Filled.ChairAlt, Screen.SleepSessions.route, Color(0xff71c97b)),
-        ActivityItem("Weight", Icons.Filled.Album, Screen.InputReadings.route, Color(0xFF7771C9)),
-        ActivityItem("Listen", Icons.Filled.Headphones, null, Color(0xFF71A9C9))
+        ActivityItem("Sit", painterResource(id = R.drawable.armchair_icon), Screen.SleepSessions.route, Color(0xff71c97b)),
+        ActivityItem("Weight", painterResource(id = R.drawable.dumbells_icon), Screen.WeightScreen.route, Color(0xFF7771C9)),
+        ActivityItem("Listen", painterResource(id = R.drawable.headphones_icon), null, Color(0xFF71A9C9))
     )
 
     val dynamicActivities = listOf(
         ActivityItem(
             "Run",
-            Icons.Filled.DirectionsRun,
+            painterResource(id = R.drawable.running_icon),
             Screen.ExerciseSessions.route,
             Color(0xFFf87757)
         ),
-        ActivityItem("Walk", Icons.Filled.DirectionsWalk, null, Color(0xFFfaaf5a)),
-        ActivityItem("Yoga", Icons.Filled.SportsGymnastics, null, Color(0xFFad71c9)),
-        ActivityItem("Cycling", Icons.Filled.DirectionsBike, null, Color(0xFFC2C971)),
-        ActivityItem("Free Body", Icons.Filled.AirlineSeatReclineExtra, null, Color(0xFFC9B471))
+        ActivityItem("Walk", painterResource(id = R.drawable.walking_round_svgrepo_com), null, Color(0xFFfaaf5a)),
+        ActivityItem("Yoga", painterResource(id = R.drawable.yoga_icon), null, Color(0xFFad71c9)),
+        ActivityItem("Cycling", painterResource(id = R.drawable.bicycling_icon), null, Color(0xFFC2C971)),
+        ActivityItem("Free Body", painterResource(id = R.drawable.stretching_icon), null, Color(0xFFC9B471))
     )
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)/*.verticalScroll(rememberScrollState())*/
+
     ) {
         item {
             Spacer(modifier = Modifier.height(30.dp))
-            Text(text = "Static Activities", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            Text(
+                text = "Static Activities",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
             Spacer(modifier = Modifier.height(10.dp))
             ActivitiesGrid(navController, staticActivities)
             Spacer(modifier = Modifier.height(30.dp))
-            Text(text = "Dynamic Activities", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            Text(
+                text = "Dynamic Activities",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
             Spacer(modifier = Modifier.height(10.dp))
             ActivitiesGrid(navController, dynamicActivities)
             Spacer(modifier = Modifier.height(30.dp))
@@ -135,6 +138,7 @@ fun ActivitiesGrid(
     }
 }
 
+
 @Composable
 fun ActivityCard(
     activity: ActivityItem,
@@ -169,7 +173,7 @@ fun ActivityCard(
 
 data class ActivityItem(
     val name: String,
-    val icon: ImageVector,
+    val icon: Painter,
     val route: String?,
     val color: Color
 )
