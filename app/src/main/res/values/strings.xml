@@ -24,7 +24,7 @@
     <string name="differential_changes">Changes</string>
 
     <!-- Welcome screen -->
-    <string name="welcome_message">Health Connect integration</string>
+    <string name="welcome_message">Sync with Health Connect</string>
     <string name="health_connect_logo">Health Connect logo</string>
     <string name="installed_welcome_message">
         Health Connect is correctly installed on this device.
