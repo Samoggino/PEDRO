@@ -1,6 +1,7 @@
 package com.lam.pedro.presentation.screen.loginscreen
 
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,6 +47,13 @@ fun LoginScreen(
     navController: NavController,
     viewModel: SupabaseAuthViewModel = viewModel() // Utilizza viewModel() di Compose
 ) {
+    var isPasswordVisible by remember { mutableStateOf(false) }
+
+    // al lancio fai una stampa
+    LaunchedEffect(true) {
+        Log.i("Supabase", "LaunchedEffect")
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -74,19 +83,17 @@ fun LoginScreen(
                 .clip(RoundedCornerShape(26.dp))
         )
 
-        // Aggiungi uno stato per la visibilità della password
-        var passwordVisible by remember { mutableStateOf(false) }
 
         TextField(
             value = viewModel.password,
             onValueChange = { viewModel.password = it },
             label = { Text("Password") },
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                     Icon(
-                        imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = if (passwordVisible) "Nascondi password" else "Mostra password"
+                        imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                        contentDescription = if (isPasswordVisible) "Nascondi password" else "Mostra password"
                     )
                 }
             },
@@ -131,5 +138,10 @@ fun LoginScreen(
                 }
             )
         }
+        // aggiungi il logout
+        TextButton(onClick = { viewModel.logout(navController) }) {
+            Text("Logout")
+        }
+
     }
 }
