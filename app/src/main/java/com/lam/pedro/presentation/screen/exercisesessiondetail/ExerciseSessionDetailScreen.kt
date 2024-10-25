@@ -38,7 +38,7 @@ import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import com.lam.pedro.data.ExerciseSessionData
-import com.example.healthconnectsample.data.formatTime
+import com.lam.pedro.data.formatTime
 import com.lam.pedro.presentation.component.ExerciseSessionDetailsMinMaxAvg
 import com.lam.pedro.presentation.component.sessionDetailsItem
 import com.lam.pedro.R

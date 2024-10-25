@@ -17,7 +17,7 @@ package com.lam.pedro
 
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import com.example.healthconnectsample.data.dateTimeWithOffsetOrDefault
+import com.lam.pedro.data.dateTimeWithOffsetOrDefault
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.time.Instant

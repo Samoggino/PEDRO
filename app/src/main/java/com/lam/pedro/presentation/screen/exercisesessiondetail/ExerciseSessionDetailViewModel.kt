@@ -30,7 +30,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.ExerciseSessionData
-import com.example.healthconnectsample.data.HealthConnectManager
+import com.lam.pedro.data.HealthConnectManager
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.UUID

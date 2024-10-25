@@ -65,7 +65,7 @@ fun ActivitiesScreen(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)/*.verticalScroll(rememberScrollState())*/
+            .padding(horizontal = 16.dp)
 
     ) {
         item {

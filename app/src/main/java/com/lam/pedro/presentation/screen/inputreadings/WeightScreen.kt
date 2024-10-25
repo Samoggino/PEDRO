@@ -53,8 +53,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.health.connect.client.units.Mass
-import com.example.healthconnectsample.data.HealthConnectAppInfo
-import com.example.healthconnectsample.data.WeightData
+import com.lam.pedro.data.HealthConnectAppInfo
+import com.lam.pedro.data.WeightData
 import com.lam.pedro.presentation.theme.HealthConnectTheme
 import com.lam.pedro.R
 import com.lam.pedro.presentation.component.PermissionRequired

@@ -26,7 +26,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.healthconnectsample.data.MIN_SUPPORTED_SDK
+import com.lam.pedro.data.MIN_SUPPORTED_SDK
 import com.lam.pedro.R
 import com.lam.pedro.presentation.theme.HealthConnectTheme
 

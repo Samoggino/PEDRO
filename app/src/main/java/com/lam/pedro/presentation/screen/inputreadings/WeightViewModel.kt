@@ -26,9 +26,9 @@ import androidx.health.connect.client.units.Mass
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.healthconnectsample.data.HealthConnectManager
-import com.example.healthconnectsample.data.WeightData
-import com.example.healthconnectsample.data.dateTimeWithOffsetOrDefault
+import com.lam.pedro.data.HealthConnectManager
+import com.lam.pedro.data.WeightData
+import com.lam.pedro.data.dateTimeWithOffsetOrDefault
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.time.Instant

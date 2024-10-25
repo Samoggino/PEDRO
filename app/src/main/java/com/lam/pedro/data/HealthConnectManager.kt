@@ -1,19 +1,4 @@
-/*
- * Copyright 2022 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package com.example.healthconnectsample.data
+package com.lam.pedro.data
 
 import android.content.Context
 import android.content.Intent
@@ -45,7 +30,6 @@ import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import androidx.health.connect.client.units.Mass
 import com.lam.pedro.R
-import com.lam.pedro.data.ExerciseSessionData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
@@ -505,6 +489,30 @@ class HealthConnectManager(private val context: Context) {
             endTime = sessionEndTime.toInstant(),
             endZoneOffset = sessionEndTime.offset,
             samples = samples)
+    }
+
+    suspend fun writeRunInput(distanceRecord: DistanceRecord) {
+        try {
+            // Scrive il record di distanza nel database di Health Connect
+            healthConnectClient.insertRecords(listOf(distanceRecord))
+
+            // Gestisci eventuali ulteriori logiche dopo la scrittura, come l'aggiornamento dello stato dell'UI o notifiche
+        } catch (e: Exception) {
+
+            throw e // Rilancia l'eccezione se necessario
+        }
+    }
+
+    suspend fun writeStepsInput(stepsRecord: StepsRecord) {
+        try {
+            // Scrive il record di distanza nel database di Health Connect
+            healthConnectClient.insertRecords(listOf(stepsRecord))
+
+            // Gestisci eventuali ulteriori logiche dopo la scrittura, come l'aggiornamento dello stato dell'UI o notifiche
+        } catch (e: Exception) {
+
+            throw e // Rilancia l'eccezione se necessario
+        }
     }
 
     // Represents the two types of messages that can be sent in a Changes flow.

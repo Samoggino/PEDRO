@@ -26,7 +26,7 @@ import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.records.WeightRecord
-import com.example.healthconnectsample.data.dateTimeWithOffsetOrDefault
+import com.lam.pedro.data.dateTimeWithOffsetOrDefault
 import com.lam.pedro.R
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.theme.HealthConnectTheme

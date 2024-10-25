@@ -16,7 +16,7 @@
 package com.lam.pedro.presentation
 
 import android.app.Application
-import com.example.healthconnectsample.data.HealthConnectManager
+import com.lam.pedro.data.HealthConnectManager
 
 class BaseApplication : Application() {
     val healthConnectManager by lazy {

@@ -35,7 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.SleepSessionRecord
-import com.example.healthconnectsample.data.SleepSessionData
+import com.lam.pedro.data.SleepSessionData
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.component.PermissionRequired
 import com.lam.pedro.presentation.component.SleepSessionRow

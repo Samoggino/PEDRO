@@ -1,18 +1,3 @@
-/*
- * Copyright 2022 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.lam.pedro.presentation.screen.exercisesession
 
 import androidx.compose.foundation.layout.Arrangement
@@ -30,17 +15,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.ExerciseSessionRecord
-import com.example.healthconnectsample.data.ExerciseSession
-import com.example.healthconnectsample.data.HealthConnectAppInfo
-import com.lam.pedro.presentation.component.ExerciseSessionRow
+import com.lam.pedro.data.ExerciseSession
 import com.lam.pedro.R
-import com.lam.pedro.presentation.theme.HealthConnectTheme
-import java.time.ZonedDateTime
+import com.lam.pedro.presentation.component.ExerciseSessionRow
 import java.util.UUID
 
 /**
@@ -130,45 +110,5 @@ fun ExerciseSessionScreen(
                 }
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun ExerciseSessionScreenPreview() {
-    val context = LocalContext.current
-    HealthConnectTheme {
-        val runningStartTime = ZonedDateTime.now()
-        val runningEndTime = runningStartTime.plusMinutes(30)
-        val walkingStartTime = ZonedDateTime.now().minusMinutes(120)
-        val walkingEndTime = walkingStartTime.plusMinutes(30)
-
-        val appInfo = HealthConnectAppInfo(
-            packageName = "com.example.myfitnessapp",
-            appLabel = "My Fitness App",
-            icon = context.getDrawable(R.drawable.ic_launcher_foreground)!!
-        )
-
-        ExerciseSessionScreen(
-            permissions = setOf(),
-            permissionsGranted = true,
-            sessionsList = listOf(
-                ExerciseSession(
-                    title = "Running",
-                    startTime = runningStartTime,
-                    endTime = runningEndTime,
-                    id = UUID.randomUUID().toString(),
-                    sourceAppInfo = appInfo
-                ),
-                ExerciseSession(
-                    title = "Walking",
-                    startTime = walkingStartTime,
-                    endTime = walkingEndTime,
-                    id = UUID.randomUUID().toString(),
-                    sourceAppInfo = appInfo
-                )
-            ),
-            uiState = ExerciseSessionViewModel.UiState.Done
-        )
     }
 }

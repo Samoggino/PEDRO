@@ -30,7 +30,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.healthconnectsample.data.HealthConnectManager
+import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.R
 import com.lam.pedro.presentation.navigation.BottomBar

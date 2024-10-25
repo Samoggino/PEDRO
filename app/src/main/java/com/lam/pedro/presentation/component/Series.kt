@@ -33,7 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.SpeedRecord
-import com.example.healthconnectsample.data.dateTimeWithOffsetOrDefault
+import com.lam.pedro.data.dateTimeWithOffsetOrDefault
 import com.lam.pedro.R
 import com.lam.pedro.presentation.theme.HealthConnectTheme
 import java.time.Instant

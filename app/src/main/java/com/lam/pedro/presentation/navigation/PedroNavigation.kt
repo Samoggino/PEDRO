@@ -33,7 +33,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
-import com.example.healthconnectsample.data.HealthConnectManager
+import com.lam.pedro.data.HealthConnectManager
 import com.example.healthconnectsample.presentation.screen.HealthConnectScreen
 import com.lam.pedro.presentation.screen.AboutScreen
 import com.lam.pedro.presentation.screen.ActivitiesScreen
