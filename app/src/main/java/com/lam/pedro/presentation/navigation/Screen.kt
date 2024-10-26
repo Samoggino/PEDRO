@@ -47,5 +47,6 @@ enum class Screen(val route: String, val titleId: Int, val hasMenuItem: Boolean 
     AboutScreen("about_screen", R.string.about_screen, false),
     SettingScreen("setting_screen", R.string.setting_screen, false),
     LandingScreen("landing_screen", R.string.landing_screen, false),
-    LoginScreen("login_screen", R.string.login_screen, false)
+    LoginScreen("login_screen", R.string.login_screen, false),
+    ReadHealthConnectData("read_health_connect_data", R.string.read_health_connect_data, false),
 }

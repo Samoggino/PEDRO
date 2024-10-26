@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lam.pedro.R
+import com.lam.pedro.data.datasource.SupabaseClientProvider
 import com.lam.pedro.presentation.component.LinkedApp
 
 @Composable
@@ -52,6 +53,9 @@ fun LoginScreen(
     // al lancio fai una stampa
     LaunchedEffect(true) {
         Log.i("Supabase", "LaunchedEffect")
+
+        // controlla al mount che l'utente sia loggato o abbia un token
+       viewModel.checkUserLoggedIn(navController)
     }
 
     Column(

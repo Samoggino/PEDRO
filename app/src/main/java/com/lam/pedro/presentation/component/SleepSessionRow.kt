@@ -36,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.SleepSessionRecord
 import com.example.healthconnectsample.data.SleepSessionData
@@ -44,8 +43,9 @@ import com.example.healthconnectsample.data.dateTimeWithOffsetOrDefault
 import com.example.healthconnectsample.data.formatHoursMinutes
 import com.lam.pedro.R
 import com.lam.pedro.formatDisplayTimeStartEnd
-import com.lam.pedro.presentation.theme.HealthConnectTheme
 import java.time.Duration
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -58,88 +58,100 @@ fun SleepSessionRow(
     sessionData: SleepSessionData,
     startExpanded: Boolean = false
 ) {
+    val startZonedDateTime = ZonedDateTime.parse(sessionData.startTime)
+    val endZonedDateTime = ZonedDateTime.parse(sessionData.endTime)
+    val endZonedOffset = endZonedDateTime.offset
+    val sessionToDuration = Duration.between(startZonedDateTime.toInstant(), endZonedDateTime.toInstant())
+
+
     var expanded by remember { mutableStateOf(startExpanded) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 4.dp, vertical = 4.dp)
-            .clickable {
-                expanded = !expanded
-            },
+            .clickable { expanded = !expanded },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         val formatter = DateTimeFormatter.ofPattern("eee, d LLL")
         val startDateTime =
-            dateTimeWithOffsetOrDefault(sessionData.startTime, sessionData.startZoneOffset)
+            dateTimeWithOffsetOrDefault(startZonedDateTime.toInstant(), endZonedOffset)
         Text(
-            modifier = Modifier
-                .weight(0.4f),
+            modifier = Modifier.weight(0.4f),
             color = MaterialTheme.colorScheme.primary,
             text = startDateTime.format(formatter)
         )
         if (!expanded) {
             Text(
-                modifier = Modifier
-                    .weight(0.4f),
-                text = sessionData.duration?.formatHoursMinutes()
+                modifier = Modifier.weight(0.4f),
+                text = sessionToDuration?.formatHoursMinutes()
                     ?: stringResource(id = R.string.not_available_abbrev)
             )
         }
-        IconButton(
-            onClick = { expanded = !expanded }
-        ) {
+        IconButton(onClick = { expanded = !expanded }) {
             val icon = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown
-            Icon(icon, stringResource(R.string.delete_button))
+            Icon(icon, contentDescription = stringResource(R.string.delete_button))
         }
     }
     if (expanded) {
+        val startZonedDateTime = ZonedDateTime.parse(sessionData.startTime)
+        val endZonedDateTime = ZonedDateTime.parse(sessionData.endTime)
+
         val startEndLabel = formatDisplayTimeStartEnd(
-            sessionData.startTime,
-            sessionData.startZoneOffset,
-            sessionData.endTime,
-            sessionData.endZoneOffset
+            startZonedDateTime,
+            endZonedDateTime
         )
         SleepSessionDetailRow(labelId = R.string.sleep_time, item = startEndLabel)
         SleepSessionDetailRow(
             labelId = R.string.sleep_duration,
-            item = sessionData.duration?.formatHoursMinutes()
+            item = sessionToDuration?.formatHoursMinutes()
         )
         SleepSessionDetailRow(labelId = R.string.sleep_notes, item = sessionData.notes)
         if (sessionData.stages.isNotEmpty()) {
             SleepSessionDetailRow(labelId = R.string.sleep_stages, item = "")
-            SleepStagesDetail(sessionData.stages)
+            SleepStagesDetail(sessionData.toDisplayStages())
+        }
+    }
+
+
+}
+
+data class StageDisplay(
+    val stageType: String,
+    val startTime: String,
+    val endTime: String
+)
+
+fun SleepSessionData.toDisplayStages(): List<StageDisplay> {
+    return stages.map {
+        StageDisplay(
+            stageType = when (it.stage) {
+                SleepSessionRecord.STAGE_TYPE_DEEP -> "Deep"
+                SleepSessionRecord.STAGE_TYPE_LIGHT -> "Light"
+                SleepSessionRecord.STAGE_TYPE_REM -> "REM"
+                else -> "Unknown"
+            },
+            startTime = it.startTime.toString(),
+            endTime = it.endTime.toString()
+        )
+    }
+}
+
+@Composable
+fun SleepStagesDetail(stages: List<StageDisplay>) {
+    Column {
+        stages.forEach { stage ->
+            Row {
+                Text(text = "Stage: ${stage.stageType}")
+                Text(text = "Start: ${stage.startTime}")
+                Text(text = "End: ${stage.endTime}")
+            }
         }
     }
 }
 
-@Preview
-@Composable
-fun SleepSessionRowPreview() {
-    HealthConnectTheme {
-        val end = ZonedDateTime.now()
-        val start = end.minusHours(1)
-        Column {
-            SleepSessionRow(
-                SleepSessionData(
-                    uid = "123",
-                    title = "My sleep",
-                    notes = "Slept well",
-                    startTime = start.toInstant(),
-                    startZoneOffset = start.offset,
-                    endTime = end.toInstant(),
-                    endZoneOffset = end.offset,
-                    duration = Duration.between(start, end),
-                    stages = listOf(
-                        SleepSessionRecord.Stage(
-                            stage = SleepSessionRecord.STAGE_TYPE_DEEP,
-                            startTime = start.toInstant(),
-                            endTime = end.toInstant(),
-                        )
-                    )
-                ),
-                startExpanded = true
-            )
-        }
-    }
+fun formatDisplayTimeStartEnd(start: ZonedDateTime, end: ZonedDateTime): String {
+    val formatter = DateTimeFormatter.ofPattern("dd MMM yyyy, HH:mm z")
+    return "${start.format(formatter)} - ${end.format(formatter)}"
 }
+

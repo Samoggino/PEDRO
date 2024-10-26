@@ -16,6 +16,7 @@
 package com.example.healthconnectsample.data
 
 import androidx.health.connect.client.records.SleepSessionRecord
+import kotlinx.serialization.Serializable
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset
@@ -23,14 +24,51 @@ import java.time.ZoneOffset
 /**
  * Represents sleep data, raw, aggregated and sleep stages, for a given [SleepSessionRecord].
  */
+@Serializable
 data class SleepSessionData(
     val uid: String,
     val title: String?,
     val notes: String?,
-    val startTime: Instant,
-    val startZoneOffset: ZoneOffset?,
-    val endTime: Instant,
-    val endZoneOffset: ZoneOffset?,
-    val duration: Duration?,
-    val stages: List<SleepSessionRecord.Stage> = listOf()
+    val startTime: String,
+    val startZoneOffset: String?,
+    val endTime: String,
+    val endZoneOffset: String?,
+    val duration: Long?,
+    val stages: List<StageSerializable> = listOf()
 )
+
+@Serializable
+data class StageSerializable(
+    val stage: Int,
+    val startTime: String,
+    val endTime: String
+)
+
+fun SleepSessionData(
+    uid: String,
+    title: String?,
+    notes: String?,
+    startTime: Instant,
+    startZoneOffset: ZoneOffset?,
+    endTime: Instant,
+    endZoneOffset: ZoneOffset?,
+    duration: Duration?,
+    stages: List<SleepSessionRecord.Stage>
+) = SleepSessionData(
+    uid,
+    title,
+    notes,
+    startTime.toString(),
+    startZoneOffset?.id,
+    endTime.toString(),
+    endZoneOffset?.id,
+    duration?.toMillis(),
+    stages.map {
+        StageSerializable(
+            it.stage,
+            it.startTime.toString(),
+            it.endTime.toString()
+        )
+    }
+)
+

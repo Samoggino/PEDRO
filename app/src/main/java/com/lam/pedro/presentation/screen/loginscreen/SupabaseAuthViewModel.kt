@@ -197,6 +197,22 @@ class SupabaseAuthViewModel : ViewModel() {
         }
     }
 
+
+    // controlla che l'utente sia già loggato e abbia una session
+    fun checkUserLoggedIn(navController: NavController) {
+        viewModelScope.launch {
+            val session = SupabaseClientProvider.getSupabaseClient().auth.currentSessionOrNull()
+
+
+            if (session != null) {
+                Log.d("Supabase", "Utente già loggato")
+                navController.navigate(Screen.LandingScreen.route)
+            } else {
+                Log.d("Supabase", "Utente non loggato")
+            }
+        }
+    }
+
 }
 
 

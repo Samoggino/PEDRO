@@ -170,5 +170,6 @@
     <string name="login_page">Login page</string>
     <string name="landing_screen">Landing screen after login</string>
     <string name="login_screen">Login screen</string>
+    <string name="read_health_connect_data">prova con health connect</string>
 
 </resources>
