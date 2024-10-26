@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen
+package com.lam.pedro.presentation.screen.more.loginscreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

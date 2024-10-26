@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lam.pedro.presentation.screen.privacypolicy
+package com.lam.pedro.presentation.screen.more
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -42,12 +42,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.lam.pedro.R
-import com.lam.pedro.presentation.theme.HealthConnectTheme
-import com.lam.pedro.presentation.theme.PedroBlack
 import com.lam.pedro.presentation.theme.PedroYellow
 
 /**

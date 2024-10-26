@@ -15,6 +15,7 @@
  */
 package com.lam.pedro.presentation.navigation
 
+import androidx.compose.ui.graphics.Color
 import com.lam.pedro.R
 
 
@@ -30,22 +31,30 @@ const val SERIES_RECORDS_TYPE = "seriesRecordsType"
  * @param hasMenuItem Whether this Screen should be shown as a menu item in the left-hand menu (not
  *     all screens in the navigation graph are intended to be directly reached from the menu).
  */
-enum class Screen(val route: String, val titleId: Int, val hasMenuItem: Boolean = true) {
-    WelcomeScreen("welcome_screen", R.string.welcome_screen, false),
-    HomeScreen("home_screen", R.string.home_screen),
-    ExerciseSessions("exercise_sessions", R.string.exercise_sessions, false),
-    ExerciseSessionDetail("exercise_session_detail", R.string.exercise_session_detail, false),
-    SleepSessions("sleep_sessions", R.string.sleep_sessions, false),
-    SleepSessionDetail("sleep_session_detail", R.string.sleep_session_detail, false),
-    WeightScreen("weight_screen", R.string.input_readings, false),
-    DifferentialChanges("differential_changes", R.string.differential_changes, false),
-    PrivacyPolicy("privacy_policy", R.string.privacy_policy, false),
-    HealthConnectScreen("health_connect_screen", R.string.health_connect, false),
-    ActivitiesScreen("activity_list", R.string.activity_list),
-    MoreScreen("more_screen", R.string.more_screen),
-    RecordListScreen("record_list", R.string.record_list, false),
-    AboutScreen("about_screen", R.string.about_screen, false),
-    SettingScreen("setting_screen", R.string.setting_screen, false),
-    LandingScreen("landing_screen", R.string.landing_screen, false),
-    LoginScreen("login_screen", R.string.login_screen, false)
+enum class Screen(val route: String, val titleId: Int, val color: Color, val hasMenuItem: Boolean = true) {
+    WelcomeScreen("welcome_screen", R.string.welcome_screen, Color(0xFFfaaf5a), false),
+    HomeScreen("home_screen", R.string.home_screen, Color(0xFFfaaf5a)),
+    ExerciseSessions("exercise_sessions", R.string.exercise_sessions, Color(0xFFfaaf5a), false),
+    ExerciseSessionDetail("exercise_session_detail", R.string.exercise_session_detail, Color(0xFFfaaf5a), false),
+    SleepSessions("sleep_sessions", R.string.sleep_sessions, Color(0xff74c9c6), false),
+    SleepSessionDetail("sleep_session_detail", R.string.sleep_session_detail, Color(0xff74c9c6), false),
+    WeightScreen("weight_screen", R.string.input_readings, Color(0xFF7771C9), false),
+    DriveSessionScreen("drive_screen", R.string.drive_screen, Color(0xFF61a6f1), false),
+    DifferentialChanges("differential_changes", R.string.differential_changes, Color(0xFFfaaf5a), false),
+    PrivacyPolicy("privacy_policy", R.string.privacy_policy, Color(0xFFfaaf5a), false),
+    HealthConnectScreen("health_connect_screen", R.string.health_connect, Color(0xFFfaaf5a), false),
+    ActivitiesScreen("activity_list", R.string.activity_list, Color(0xFFfaaf5a)),
+    MoreScreen("more_screen", R.string.more_screen, Color(0xFFfaaf5a)),
+    RecordListScreen("record_list", R.string.record_list, Color(0xFFfaaf5a), false),
+    AboutScreen("about_screen", R.string.about_screen, Color(0xFFfaaf5a), false),
+    SettingScreen("setting_screen", R.string.setting_screen, Color(0xFFfaaf5a), false),
+    LandingScreen("landing_screen", R.string.landing_screen, Color(0xFFfaaf5a), false),
+    LoginScreen("login_screen", R.string.login_screen, Color(0xFFfaaf5a), false),
+    WalkSessionScreen("walk_session_screen", R.string.walk_session_screen, Color(0xFFfaaf5a), false),
+    RunSessionScreen("run_session_screen", R.string.run_session_screen, Color(0xFFf87757), false),
+    SitSessionScreen("sit_session_screen", R.string.sit_session_screen, Color(0xff71c97b), false),
+    ListenSessionScreen("listen_session_screen", R.string.listen_session_screen, Color(0xFF7199C9), false),
+    YogaSessionScreen("yoga_session_screen", R.string.yoga_session_screen, Color(0xFFad71c9), false),
+    CycleSessionScreen("cycle_session_screen", R.string.cycle_session_screen, Color(0xFFC9B271), false),
+    TrainSessionScreen("train_session_screen", R.string.train_session_screen, Color(0xFFC97187), false)
 }

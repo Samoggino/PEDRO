@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen
+package com.lam.pedro.presentation.screen.more
 
 import com.lam.pedro.presentation.theme.PedroYellow
 import androidx.compose.foundation.Image

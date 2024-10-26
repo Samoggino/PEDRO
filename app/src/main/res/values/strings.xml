@@ -19,7 +19,7 @@
     <string name="home">Home</string>
     <string name="exercise_sessions">Exercise sessions</string>
     <string name="exercise_session_detail">Exercise session detail</string>
-    <string name="sleep_sessions">Sleep sessions</string>
+    <string name="sleep_sessions">Sleeping</string>
     <string name="sleep_session_detail">Sleep session detail</string>
     <string name="differential_changes">Changes</string>
 
@@ -111,8 +111,8 @@
     <string name="sleep_stages">Sleep stages:</string>
 
     <!-- Input Readings detail screen -->
-    <string name="input_readings">Record weight</string>
-    <string name="delete_button_readings">Delete</string>
+    <string name="input_readings">Lifting</string>
+    <string name="delete_button_readings">Delete</string>F
     <string name="weight_input">New Record (Kg)</string>
     <string name="add_readings_button">Add</string>
     <string name="previous_readings"> Previous Measurements </string>
@@ -171,5 +171,13 @@
     <string name="landing_screen">Landing screen after login</string>
     <string name="login_screen">Login screen</string>
     <string name="permissions_required">Permission required</string>
+    <string name="walk_session_screen">Walking</string>
+    <string name="drive_screen">Driving</string>
+    <string name="run_session_screen">Running</string>
+    <string name="sit_session_screen">Sitting</string>
+    <string name="listen_session_screen">Listening</string>
+    <string name="yoga_session_screen">Yoga</string>
+    <string name="cycle_session_screen">Cycling</string>
+    <string name="train_session_screen">Training</string>
 
 </resources>

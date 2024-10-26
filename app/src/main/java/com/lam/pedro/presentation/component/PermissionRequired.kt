@@ -18,11 +18,11 @@ import androidx.compose.ui.unit.dp
 import com.lam.pedro.R
 
 @Composable
-fun PermissionRequired(color: Long, onPermissionLaunch: () -> Unit) {
+fun PermissionRequired(color: Color, onPermissionLaunch: () -> Unit) {
     Spacer(modifier = Modifier.height(32.dp))
     Text(
         text = stringResource(R.string.permissions_required),
-        style = MaterialTheme.typography.headlineMedium
+        style = MaterialTheme.typography.headlineSmall
     )
     Spacer(modifier = Modifier.height(32.dp))
     Image(
@@ -30,13 +30,13 @@ fun PermissionRequired(color: Long, onPermissionLaunch: () -> Unit) {
             .size(90.dp),
         painter = painterResource(id = R.drawable.permission_icon),
         contentDescription = stringResource(id = R.string.app_logo),
-        colorFilter = ColorFilter.tint(Color(color)) // Applica il colore
+        colorFilter = ColorFilter.tint(color) // Applica il colore
     )
     Spacer(modifier = Modifier.height(32.dp))
     Button(
         onClick = { onPermissionLaunch() },
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(color), // Colore di sfondo
+            containerColor = color, // Colore di sfondo
             contentColor = Color.White         // Colore del testo
         )
     ) {

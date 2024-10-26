@@ -59,17 +59,29 @@ fun PedroApp(healthConnectManager: HealthConnectManager) {
             else -> false
         }
         val titleId = when (currentRoute) {
-            Screen.ExerciseSessions.route -> Screen.ExerciseSessions.titleId
-            Screen.SleepSessions.route -> Screen.SleepSessions.titleId
-            Screen.WeightScreen.route -> Screen.WeightScreen.titleId
-            Screen.DifferentialChanges.route -> Screen.DifferentialChanges.titleId
-            Screen.HealthConnectScreen.route -> Screen.HealthConnectScreen.titleId
-            Screen.ActivitiesScreen.route -> Screen.ActivitiesScreen.titleId
+            /* BottomBar */
             Screen.HomeScreen.route -> Screen.HomeScreen.titleId
+            Screen.ActivitiesScreen.route -> Screen.ActivitiesScreen.titleId
             Screen.MoreScreen.route -> Screen.MoreScreen.titleId
+
+            /* Activities */
+            Screen.SleepSessions.route -> Screen.SleepSessions.titleId
+            Screen.DriveSessionScreen.route -> Screen.DriveSessionScreen.titleId
+            Screen.SitSessionScreen.route -> Screen.SitSessionScreen.titleId
+            Screen.WeightScreen.route -> Screen.WeightScreen.titleId
+            Screen.ListenSessionScreen.route -> Screen.ListenSessionScreen.titleId
+
+            Screen.RunSessionScreen.route -> Screen.RunSessionScreen.titleId
+            Screen.WalkSessionScreen.route -> Screen.WalkSessionScreen.titleId
+            Screen.YogaSessionScreen.route -> Screen.YogaSessionScreen.titleId
+            Screen.CycleSessionScreen.route -> Screen.CycleSessionScreen.titleId
+            Screen.TrainSessionScreen.route -> Screen.TrainSessionScreen.titleId
+
+            /* More */
+            Screen.HealthConnectScreen.route -> Screen.HealthConnectScreen.titleId
+            Screen.SettingScreen.route -> Screen.SettingScreen.titleId
             Screen.PrivacyPolicy.route -> Screen.PrivacyPolicy.titleId
             Screen.AboutScreen.route -> Screen.AboutScreen.titleId
-            Screen.SettingScreen.route -> Screen.SettingScreen.titleId
 
             else -> R.string.app_name
         }

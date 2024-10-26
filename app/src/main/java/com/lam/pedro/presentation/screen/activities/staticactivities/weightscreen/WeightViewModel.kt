@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lam.pedro.presentation.screen.exercisesession
+package com.lam.pedro.presentation.screen.activities.staticactivities.weightscreen
 
 import android.os.RemoteException
 import androidx.compose.runtime.MutableState
@@ -21,45 +21,36 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.health.connect.client.permission.HealthPermission
-import androidx.health.connect.client.records.DistanceRecord
-import androidx.health.connect.client.records.ExerciseSessionRecord
-import androidx.health.connect.client.records.HeartRateRecord
-import androidx.health.connect.client.records.SpeedRecord
-import androidx.health.connect.client.records.StepsRecord
-import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
+import androidx.health.connect.client.records.WeightRecord
+import androidx.health.connect.client.units.Mass
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.lam.pedro.data.ExerciseSession
 import com.lam.pedro.data.HealthConnectManager
+import com.lam.pedro.data.WeightData
 import com.lam.pedro.data.dateTimeWithOffsetOrDefault
 import kotlinx.coroutines.launch
 import java.io.IOException
-import java.time.Duration
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.UUID
-import kotlin.random.Random
 
-class ExerciseSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+class InputReadingsViewModel(private val healthConnectManager: HealthConnectManager) :
     ViewModel() {
     private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
     val permissions = setOf(
-        HealthPermission.getWritePermission(ExerciseSessionRecord::class),
-        HealthPermission.getReadPermission(ExerciseSessionRecord::class),
-        HealthPermission.getWritePermission(StepsRecord::class),
-        HealthPermission.getWritePermission(SpeedRecord::class),
-        HealthPermission.getWritePermission(DistanceRecord::class),
-        HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
-        HealthPermission.getWritePermission(HeartRateRecord::class)
+        HealthPermission.getReadPermission(WeightRecord::class),
+        HealthPermission.getWritePermission(WeightRecord::class),
     )
+    var weeklyAvg: MutableState<Mass?> = mutableStateOf(Mass.kilograms(0.0))
+        private set
 
     var permissionsGranted = mutableStateOf(false)
         private set
 
-    var sessionsList: MutableState<List<ExerciseSession>> = mutableStateOf(listOf())
+    var readingsList: MutableState<List<WeightData>> = mutableStateOf(listOf())
         private set
 
     var uiState: UiState by mutableStateOf(UiState.Uninitialized)
@@ -70,55 +61,52 @@ class ExerciseSessionViewModel(private val healthConnectManager: HealthConnectMa
     fun initialLoad() {
         viewModelScope.launch {
             tryWithPermissionsCheck {
-                readExerciseSessions()
+                readWeightInputs()
             }
         }
     }
 
-    fun insertExerciseSession() {
+    fun inputReadings(inputValue: Double) {
         viewModelScope.launch {
             tryWithPermissionsCheck {
-                val startOfDay = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)
-                val latestStartOfSession = ZonedDateTime.now().minusMinutes(30)
-                val offset = Random.nextDouble()
-
-                // Generate random start time between the start of the day and (now - 30mins).
-                val startOfSession = startOfDay.plusSeconds(
-                    (Duration.between(startOfDay, latestStartOfSession).seconds * offset).toLong()
+                val time = ZonedDateTime.now().withNano(0)
+                val weight = WeightRecord(
+                    weight = Mass.kilograms(inputValue),
+                    time = time.toInstant(),
+                    zoneOffset = time.offset
                 )
-                val endOfSession = startOfSession.plusMinutes(30)
-
-                healthConnectManager.writeExerciseSession(startOfSession, endOfSession)
-                readExerciseSessions()
+                healthConnectManager.writeWeightInput(weight)
+                readWeightInputs()
             }
         }
     }
 
-    fun deleteExerciseSession(uid: String) {
+    fun deleteWeightInput(uid: String) {
         viewModelScope.launch {
             tryWithPermissionsCheck {
-                healthConnectManager.deleteExerciseSession(uid)
-                readExerciseSessions()
+                healthConnectManager.deleteWeightInput(uid)
+                readWeightInputs()
             }
         }
     }
 
-    private suspend fun readExerciseSessions() {
+    private suspend fun readWeightInputs() {
         val startOfDay = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)
         val now = Instant.now()
-
-        sessionsList.value = healthConnectManager
-            .readExerciseSessions(startOfDay.toInstant(), now)
+        val endofWeek = startOfDay.toInstant().plus(7, ChronoUnit.DAYS)
+        readingsList.value = healthConnectManager
+            .readWeightInputs(startOfDay.toInstant(), now)
             .map { record ->
                 val packageName = record.metadata.dataOrigin.packageName
-                ExerciseSession(
-                    startTime = dateTimeWithOffsetOrDefault(record.startTime, record.startZoneOffset),
-                    endTime = dateTimeWithOffsetOrDefault(record.startTime, record.startZoneOffset),
+                WeightData(
+                    weight = record.weight,
                     id = record.metadata.id,
-                    sourceAppInfo = healthConnectCompatibleApps[packageName],
-                    title = record.title
+                    time = dateTimeWithOffsetOrDefault(record.time, record.zoneOffset),
+                    sourceAppInfo = healthConnectCompatibleApps[packageName]
                 )
             }
+        weeklyAvg.value =
+            healthConnectManager.computeWeeklyAverage(startOfDay.toInstant(), endofWeek)
     }
 
     /**
@@ -159,13 +147,13 @@ class ExerciseSessionViewModel(private val healthConnectManager: HealthConnectMa
     }
 }
 
-class ExerciseSessionViewModelFactory(
+class InputReadingsViewModelFactory(
     private val healthConnectManager: HealthConnectManager
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ExerciseSessionViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(InputReadingsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return ExerciseSessionViewModel(
+            return InputReadingsViewModel(
                 healthConnectManager = healthConnectManager
             ) as T
         }

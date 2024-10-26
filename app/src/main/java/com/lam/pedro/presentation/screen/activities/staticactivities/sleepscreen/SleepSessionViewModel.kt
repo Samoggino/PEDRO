@@ -13,57 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lam.pedro.presentation.screen.changes
+package com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen
 
-import android.content.ContentValues.TAG
 import android.os.RemoteException
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.health.connect.client.changes.Change
 import androidx.health.connect.client.permission.HealthPermission
-import androidx.health.connect.client.records.DistanceRecord
-import androidx.health.connect.client.records.ExerciseSessionRecord
-import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.SleepSessionRecord
-import androidx.health.connect.client.records.SpeedRecord
-import androidx.health.connect.client.records.StepsRecord
-import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
-import androidx.health.connect.client.records.WeightRecord
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.HealthConnectManager
+import com.lam.pedro.data.SleepSessionData
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.UUID
 
-class DifferentialChangesViewModel(private val healthConnectManager: HealthConnectManager) :
+class SleepSessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ViewModel() {
 
-    private val changesDataTypes = setOf(
-        ExerciseSessionRecord::class,
-        StepsRecord::class,
-        SpeedRecord::class,
-        DistanceRecord::class,
-        TotalCaloriesBurnedRecord::class,
-        HeartRateRecord::class,
-        SleepSessionRecord::class,
-        WeightRecord::class
+    val permissions = setOf(
+        HealthPermission.getReadPermission(SleepSessionRecord::class),
+        HealthPermission.getWritePermission(SleepSessionRecord::class)
     )
-
-    val permissions = changesDataTypes.map { HealthPermission.getReadPermission(it) }.toSet()
 
     var permissionsGranted = mutableStateOf(false)
         private set
 
-    var changesToken: MutableState<String?> = mutableStateOf(null)
-        private set
-
-    var changes = mutableStateListOf<Change>()
+    var sessionsList: MutableState<List<SleepSessionData>> = mutableStateOf(listOf())
         private set
 
     var uiState: UiState by mutableStateOf(UiState.Uninitialized)
@@ -73,41 +53,28 @@ class DifferentialChangesViewModel(private val healthConnectManager: HealthConne
 
     fun initialLoad() {
         viewModelScope.launch {
-            permissionsGranted.value = healthConnectManager.hasAllPermissions(permissions)
-            uiState = UiState.Done
-        }
-    }
-
-    fun enableOrDisableChanges(enable: Boolean) {
-        if (enable) {
-            viewModelScope.launch {
-                tryWithPermissionsCheck {
-                    changesToken.value = healthConnectManager.getChangesToken(changesDataTypes)
-                    Log.i(TAG, "Token: ${changesToken.value}")
-                }
+            tryWithPermissionsCheck {
+                sessionsList.value = healthConnectManager.readSleepSessions()
             }
-        } else {
-            changesToken.value = null
         }
     }
 
-    fun getChanges() {
+    fun saveSession(session: SleepSessionData) {
         viewModelScope.launch {
             tryWithPermissionsCheck {
-                changesToken.value?.let { token ->
-                    changes.clear()
-                    healthConnectManager.getChanges(token).collect { message ->
-                        when (message) {
-                            is HealthConnectManager.ChangesMessage.ChangeList -> {
-                                changes.addAll(message.changes)
-                            }
-                            is HealthConnectManager.ChangesMessage.NoMoreChanges -> {
-                                changesToken.value = message.nextChangesToken
-                                Log.i(TAG, "Updating changes token: ${changesToken.value}")
-                            }
-                        }
-                    }
-                }
+                // Aggiorna la lista aggiungendo la nuova sessione
+                sessionsList.value = sessionsList.value + session
+                healthConnectManager.writeSleepSession(session) // salva la sessione su HealthConnect
+                Log.d("SleepSessionViewModel", "Session saved")
+            }
+        }
+    }
+
+
+    fun addSleepData() {
+        viewModelScope.launch {
+            tryWithPermissionsCheck {
+                sessionsList.value = healthConnectManager.readSleepSessions()
             }
         }
     }
@@ -150,13 +117,13 @@ class DifferentialChangesViewModel(private val healthConnectManager: HealthConne
     }
 }
 
-class DifferentialChangesViewModelFactory(
+class SleepSessionViewModelFactory(
     private val healthConnectManager: HealthConnectManager
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(DifferentialChangesViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(SleepSessionViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return DifferentialChangesViewModel(
+            return SleepSessionViewModel(
                 healthConnectManager = healthConnectManager
             ) as T
         }

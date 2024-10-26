@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.lam.pedro.presentation.screen.sleepsession
+package com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,23 +33,35 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.health.connect.client.records.SleepSessionRecord
 import com.lam.pedro.data.SleepSessionData
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.component.PermissionRequired
 import com.lam.pedro.presentation.component.SleepSessionRow
-import com.lam.pedro.presentation.theme.HealthConnectTheme
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset
-import java.time.ZonedDateTime
 import java.util.UUID
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBar
+import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavController
+import com.lam.pedro.R
 
 /**
  * Shows a week's worth of sleep data.
  */
+@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SleepSessionScreen(
     permissions: Set<String>,
@@ -58,7 +71,10 @@ fun SleepSessionScreen(
     onInsertClick: () -> Unit = {},
     onError: (Throwable?) -> Unit = {},
     onPermissionsResult: () -> Unit = {},
-    onPermissionsLaunch: (Set<String>) -> Unit = {}
+    onPermissionsLaunch: (Set<String>) -> Unit = {},
+    navController: NavController,
+    titleId: Int,
+    color: Color
 ) {
 
     // Remember the last error ID, such that it is possible to avoid re-launching the error
@@ -84,25 +100,53 @@ fun SleepSessionScreen(
         }
     }
 
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxHeight()
+                    ) {
+                        Text(
+                            text = stringResource(titleId),
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                    }
+                },
+                navigationIcon = {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxHeight()
+                    ) {
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                imageVector = Icons.Rounded.ArrowBack,
+                                contentDescription = stringResource(R.string.back)
+                            )
+                        }
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
     if (uiState != SleepSessionViewModel.UiState.Uninitialized) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().padding(paddingValues),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+
+
             if (!permissionsGranted) {
                 item {
-                    PermissionRequired(0xff74c9c6) { onPermissionsLaunch(permissions) }
+                    Spacer(modifier = Modifier.height(30.dp))
+                }
+
+                item {
+                    PermissionRequired(color) { onPermissionsLaunch(permissions) }
                 }
             } else {
-                // Titolo "Sleep"
-                item {
-                    Text(
-                        text = "Sleep",
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                }
 
                 // Button per Start/Stop della registrazione
                 item {
@@ -147,58 +191,6 @@ fun SleepSessionScreen(
                     SleepSessionRow(session)
                 }
             }
-        }
-    }
-}
-
-@Preview
-@Composable
-fun SleepSessionScreenPreview() {
-    HealthConnectTheme {
-        val end2 = ZonedDateTime.now()
-        val start2 = end2.minusHours(5)
-        val end1 = end2.minusDays(1)
-        val start1 = end1.minusHours(5)
-        SleepSessionScreen(
-            permissions = setOf(),
-            permissionsGranted = true,
-            sessionsList = listOf(
-                SleepSessionData(
-                    uid = "123",
-                    title = "My sleep",
-                    notes = "Slept well",
-                    startTime = start1.toInstant(),
-                    startZoneOffset = start1.offset,
-                    endTime = end1.toInstant(),
-                    endZoneOffset = end1.offset,
-                    duration = Duration.between(start1, end1),
-                    stages = listOf(
-                        SleepSessionRecord.Stage(
-                            stage = SleepSessionRecord.STAGE_TYPE_DEEP,
-                            startTime = start1.toInstant(),
-                            endTime = end1.toInstant()
-                        )
-                    )
-                ),
-                SleepSessionData(
-                    uid = "123",
-                    title = "My sleep",
-                    notes = "Slept well",
-                    startTime = start2.toInstant(),
-                    startZoneOffset = start2.offset,
-                    endTime = end2.toInstant(),
-                    endZoneOffset = end2.offset,
-                    duration = Duration.between(start2, end2),
-                    stages = listOf(
-                        SleepSessionRecord.Stage(
-                            stage = SleepSessionRecord.STAGE_TYPE_DEEP,
-                            startTime = start2.toInstant(),
-                            endTime = end2.toInstant()
-                        )
-                    )
-                )
-            ),
-            uiState = SleepSessionViewModel.UiState.Done
-        )
+        }}
     }
 }

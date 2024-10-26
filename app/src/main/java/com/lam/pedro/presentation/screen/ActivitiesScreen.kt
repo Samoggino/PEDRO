@@ -37,36 +37,25 @@ fun ActivitiesScreen(
     navController: NavHostController
 ) {
     val staticActivities = listOf(
-        ActivityItem("Sleep", painterResource(id = R.drawable.sleeping_icon), Screen.SleepSessions.route, Color(0xff74c9c6)),
-        ActivityItem(
-            "Drive",
-            painterResource(id = R.drawable.car_icon),
-            Screen.SleepSessions.route,
-            Color(0xFF61a6f1)
-        ),
-        ActivityItem("Sit", painterResource(id = R.drawable.armchair_icon), Screen.SleepSessions.route, Color(0xff71c97b)),
-        ActivityItem("Weight", painterResource(id = R.drawable.dumbells_icon), Screen.WeightScreen.route, Color(0xFF7771C9)),
-        ActivityItem("Listen", painterResource(id = R.drawable.headphones_icon), null, Color(0xFF71A9C9))
+        ActivityItem("Sleeping", painterResource(id = R.drawable.sleeping_icon), Screen.SleepSessions.route, Screen.SleepSessions.color),
+        ActivityItem("Driving", painterResource(id = R.drawable.car_icon), Screen.DriveSessionScreen.route, Screen.DriveSessionScreen.color),
+        ActivityItem("Sitting", painterResource(id = R.drawable.armchair_icon), Screen.SitSessionScreen.route, Screen.SitSessionScreen.color),
+        ActivityItem("Lifting", painterResource(id = R.drawable.dumbells_icon), Screen.WeightScreen.route, Screen.WeightScreen.color),
+        ActivityItem("Listening", painterResource(id = R.drawable.headphones_icon), Screen.ListenSessionScreen.route, Screen.ListenSessionScreen.color)
     )
 
     val dynamicActivities = listOf(
-        ActivityItem(
-            "Run",
-            painterResource(id = R.drawable.running_icon),
-            Screen.ExerciseSessions.route,
-            Color(0xFFf87757)
-        ),
-        ActivityItem("Walk", painterResource(id = R.drawable.walking_round_svgrepo_com), null, Color(0xFFfaaf5a)),
-        ActivityItem("Yoga", painterResource(id = R.drawable.yoga_icon), null, Color(0xFFad71c9)),
-        ActivityItem("Cycling", painterResource(id = R.drawable.bicycling_icon), null, Color(0xFFC2C971)),
-        ActivityItem("Free Body", painterResource(id = R.drawable.stretching_icon), null, Color(0xFFC9B471))
+        ActivityItem("Running", painterResource(id = R.drawable.running_icon), Screen.RunSessionScreen.route, Screen.RunSessionScreen.color),
+        ActivityItem("Walking", painterResource(id = R.drawable.walking_round_svgrepo_com), Screen.WalkSessionScreen.route, Screen.WalkSessionScreen.color),
+        ActivityItem("Yoga", painterResource(id = R.drawable.yoga_icon), Screen.YogaSessionScreen.route, Screen.YogaSessionScreen.color),
+        ActivityItem("Cycling", painterResource(id = R.drawable.bicycling_icon), Screen.CycleSessionScreen.route, Screen.CycleSessionScreen.color),
+        ActivityItem("Training", painterResource(id = R.drawable.stretching_icon), Screen.TrainSessionScreen.route, Screen.TrainSessionScreen.color)
     )
 
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
-
     ) {
         item {
             Spacer(modifier = Modifier.height(30.dp))
