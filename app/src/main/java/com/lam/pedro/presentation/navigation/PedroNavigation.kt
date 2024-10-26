@@ -43,6 +43,7 @@ import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.LandingScreen
 import com.lam.pedro.presentation.screen.MoreScreen
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionScreen
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionScreen
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.trainscreen.TrainSessionScreen
 import com.lam.pedro.presentation.screen.more.SettingsScreen
 import com.lam.pedro.presentation.screen.activities.staticactivities.weightscreen.InputReadingsViewModel
@@ -53,6 +54,8 @@ import com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen
 import com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen.SleepSessionViewModel
 import com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen.SleepSessionViewModelFactory
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.walkscreen.WalkSessionScreen
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.walkscreen.WalkSessionViewModel
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.walkscreen.WalkSessionViewModelFactory
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.yogascreen.YogaSessionScreen
 import com.lam.pedro.presentation.screen.activities.staticactivities.drivescreen.DriveSessionScreen
 import com.lam.pedro.presentation.screen.activities.staticactivities.listenscreen.ListenSessionScreen
@@ -253,8 +256,8 @@ fun PedroNavigation(
                 exitTransition = {
                     fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
-                val viewModel: SleepSessionViewModel = viewModel(
-                    factory = SleepSessionViewModelFactory(
+                val viewModel: WalkSessionViewModel = viewModel(
+                    factory = WalkSessionViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -311,7 +314,7 @@ fun PedroNavigation(
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
                     }
-                WalkSessionScreen(
+                RunSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
                     //sessionsList = sessionsList,

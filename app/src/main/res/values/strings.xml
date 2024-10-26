@@ -179,5 +179,6 @@
     <string name="yoga_session_screen">Yoga</string>
     <string name="cycle_session_screen">Cycling</string>
     <string name="train_session_screen">Training</string>
+    <string name="login">Login</string>
 
 </resources>
