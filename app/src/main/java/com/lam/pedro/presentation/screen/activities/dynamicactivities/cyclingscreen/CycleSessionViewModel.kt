@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen.activities.dynamicactivities.walkscreen
+package com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen
 
 import android.os.RemoteException
 import android.util.Log
@@ -8,11 +8,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
+import androidx.health.connect.client.records.CyclingPedalingCadenceRecord
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ElevationGainedRecord
 import androidx.health.connect.client.records.SpeedRecord
-import androidx.health.connect.client.records.StepsCadenceRecord
-import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -23,7 +22,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.UUID
 
-class WalkSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+class CycleSessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ViewModel() {
 
     /*Define here the required permissions for the Health Connect usage*/
@@ -51,22 +50,16 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
         * */
 
         /*
+        * CyclingPedalingCadenceRecord
+        * */
+        HealthPermission.getReadPermission(CyclingPedalingCadenceRecord::class),
+        HealthPermission.getWritePermission(CyclingPedalingCadenceRecord::class),
+
+        /*
         * SpeedRecord
         * */
         HealthPermission.getReadPermission(SpeedRecord::class),
         HealthPermission.getWritePermission(SpeedRecord::class),
-
-        /*
-        * StepsCadenceRecord
-        * */
-        HealthPermission.getReadPermission(StepsCadenceRecord::class),
-        HealthPermission.getWritePermission(StepsCadenceRecord::class),
-
-        /*
-        * StepsRecord
-        * */
-        HealthPermission.getReadPermission(StepsRecord::class),
-        HealthPermission.getWritePermission(StepsRecord::class),
 
         /*
         * TotalCaloriesBurnedRecord
@@ -75,7 +68,7 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
         HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
 
 
-    )
+        )
 
     var permissionsGranted = mutableStateOf(false)
         private set
@@ -154,13 +147,13 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
     }
 }
 
-class WalkSessionViewModelFactory(
+class CycleSessionViewModelFactory(
     private val healthConnectManager: HealthConnectManager
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(WalkSessionViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(CycleSessionViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return WalkSessionViewModel(
+            return CycleSessionViewModel(
                 healthConnectManager = healthConnectManager
             ) as T
         }

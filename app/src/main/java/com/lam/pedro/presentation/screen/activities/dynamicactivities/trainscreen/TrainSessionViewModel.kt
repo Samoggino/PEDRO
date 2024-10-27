@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen.activities.dynamicactivities.walkscreen
+package com.lam.pedro.presentation.screen.activities.dynamicactivities.trainscreen
 
 import android.os.RemoteException
 import android.util.Log
@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.UUID
 
-class WalkSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+class TrainSessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ViewModel() {
 
     /*Define here the required permissions for the Health Connect usage*/
@@ -35,45 +35,22 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
         HealthPermission.getWritePermission(ActiveCaloriesBurnedRecord::class),
 
         /*
-        * DistanceRecord
-        * */
-        HealthPermission.getReadPermission(DistanceRecord::class),
-        HealthPermission.getWritePermission(DistanceRecord::class),
-
-        /*
-        * ElevationGainedRecord
-        * */
-        HealthPermission.getReadPermission(ElevationGainedRecord::class),
-        HealthPermission.getWritePermission(ElevationGainedRecord::class),
-
-        /*
-        * ExerciseRoute - it isn't a record, it uses GPS so it requires manifest permissions
+        * ExerciseCompletionGoal.RepetitionsGoal - permissions not needed, it doesn't use any sensors or personal data
         * */
 
         /*
-        * SpeedRecord
+        *ExerciseCompletionGoal.DurationGoal - permissions not needed, it doesn't use any sensors or personal data
         * */
-        HealthPermission.getReadPermission(SpeedRecord::class),
-        HealthPermission.getWritePermission(SpeedRecord::class),
 
         /*
-        * StepsCadenceRecord
+        * ExerciseLap - no permissions needed, it split exercise sessions into segments such as laps or exercise series
         * */
-        HealthPermission.getReadPermission(StepsCadenceRecord::class),
-        HealthPermission.getWritePermission(StepsCadenceRecord::class),
-
-        /*
-        * StepsRecord
-        * */
-        HealthPermission.getReadPermission(StepsRecord::class),
-        HealthPermission.getWritePermission(StepsRecord::class),
 
         /*
         * TotalCaloriesBurnedRecord
         * */
         HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
         HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
-
 
     )
 
@@ -154,13 +131,13 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
     }
 }
 
-class WalkSessionViewModelFactory(
+class TrainSessionViewModelFactory(
     private val healthConnectManager: HealthConnectManager
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(WalkSessionViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(TrainSessionViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return WalkSessionViewModel(
+            return TrainSessionViewModel(
                 healthConnectManager = healthConnectManager
             ) as T
         }

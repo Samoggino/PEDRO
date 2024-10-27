@@ -40,7 +40,7 @@ fun CycleSessionScreen(
     permissions: Set<String>,
     permissionsGranted: Boolean,
     //sessionsList: List<WalkSessionData>,
-    uiState: SleepSessionViewModel.UiState,
+    uiState: CycleSessionViewModel.UiState,
     onInsertClick: () -> Unit = {},
     onError: (Throwable?) -> Unit = {},
     onPermissionsResult: () -> Unit = {},
@@ -59,7 +59,7 @@ fun CycleSessionScreen(
 
     LaunchedEffect(uiState) {
         // If the initial data load has not taken place, attempt to load the data.
-        if (uiState is SleepSessionViewModel.UiState.Uninitialized) {
+        if (uiState is CycleSessionViewModel.UiState.Uninitialized) {
             onPermissionsResult()
         }
 
@@ -67,7 +67,7 @@ fun CycleSessionScreen(
         // success or resulted in an error. Where an error occurred, for example in reading and
         // writing to Health Connect, the user is notified, and where the error is one that can be
         // recovered from, an attempt to do so is made.
-        if (uiState is SleepSessionViewModel.UiState.Error && errorId.value != uiState.uuid) {
+        if (uiState is CycleSessionViewModel.UiState.Error && errorId.value != uiState.uuid) {
             onError(uiState.exception)
             errorId.value = uiState.uuid
         }
@@ -104,7 +104,7 @@ fun CycleSessionScreen(
         }
 
     ) { paddingValues ->
-        if (uiState != SleepSessionViewModel.UiState.Uninitialized) {
+        if (uiState != CycleSessionViewModel.UiState.Uninitialized) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()

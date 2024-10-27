@@ -15,6 +15,7 @@
  */
 package com.lam.pedro.presentation.navigation
 
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -29,6 +30,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -43,8 +46,14 @@ import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.LandingScreen
 import com.lam.pedro.presentation.screen.MoreScreen
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionScreen
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionViewModel
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionViewModelFactory
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionScreen
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionViewModel
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionViewModelFactory
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.trainscreen.TrainSessionScreen
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.trainscreen.TrainSessionViewModel
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.trainscreen.TrainSessionViewModelFactory
 import com.lam.pedro.presentation.screen.more.SettingsScreen
 import com.lam.pedro.presentation.screen.activities.staticactivities.weightscreen.InputReadingsViewModel
 import com.lam.pedro.presentation.screen.activities.staticactivities.weightscreen.InputReadingsViewModelFactory
@@ -57,6 +66,8 @@ import com.lam.pedro.presentation.screen.activities.dynamicactivities.walkscreen
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.walkscreen.WalkSessionViewModel
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.walkscreen.WalkSessionViewModelFactory
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.yogascreen.YogaSessionScreen
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.yogascreen.YogaSessionViewModel
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.yogascreen.YogaSessionViewModelFactory
 import com.lam.pedro.presentation.screen.activities.staticactivities.drivescreen.DriveSessionScreen
 import com.lam.pedro.presentation.screen.activities.staticactivities.listenscreen.ListenSessionScreen
 import com.lam.pedro.presentation.screen.activities.staticactivities.sitscreen.SitSessionScreen
@@ -77,6 +88,15 @@ fun PedroNavigation(
 ) {
 
     val scope = rememberCoroutineScope()
+
+    // Stack per tenere traccia delle schermate aperte
+    val screenStack = remember { mutableStateListOf<String>() }
+
+    // Funzione per loggare le schermate attive
+    fun logScreenStack() {
+        Log.d("PedroNavigation", "Current screen stack: $screenStack")
+    }
+
     SharedTransitionLayout {
         NavHost(navController = navController,
             startDestination = Screen.HomeScreen.route,
@@ -91,6 +111,8 @@ fun PedroNavigation(
                 exitTransition = {
                     fadeOut(animationSpec = tween(600)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
+                screenStack.add(Screen.HomeScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 HomeScreen()
             }
             composable(Screen.ActivitiesScreen.route, enterTransition = {
@@ -101,6 +123,8 @@ fun PedroNavigation(
                 exitTransition = {
                     fadeOut(animationSpec = tween(600)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
+                screenStack.add(Screen.ActivitiesScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 ActivitiesScreen(navController)
             }
             composable(Screen.MoreScreen.route, enterTransition = {
@@ -111,6 +135,8 @@ fun PedroNavigation(
                 exitTransition = {
                     fadeOut(animationSpec = tween(600)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
+                screenStack.add(Screen.MoreScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 MoreScreen(navController)
             }
             composable(
@@ -128,12 +154,18 @@ fun PedroNavigation(
                     )
                 },
             ) {
+                screenStack.add(Screen.AboutScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 AboutScreen(navController = navController, titleId = topBarTitle)
             }
             composable(Screen.LoginScreen.route) {
+                screenStack.add(Screen.LoginScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 LoginScreen(navController)
             }
             composable(Screen.LandingScreen.route) {
+                screenStack.add(Screen.LandingScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 LandingScreen()
             }
             composable(
@@ -156,6 +188,8 @@ fun PedroNavigation(
                     }
                 )
             ) {
+                screenStack.add(Screen.HealthConnectScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 PrivacyPolicyScreen(navController = navController, titleId = topBarTitle)
             }
             composable(Screen.HealthConnectScreen.route,
@@ -172,6 +206,8 @@ fun PedroNavigation(
                     )
                 }
             ) {
+                screenStack.add(Screen.HealthConnectScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 HealthConnectScreen(
                     healthConnectAvailability = availability,
                     onResumeAvailabilityCheck = {
@@ -196,6 +232,8 @@ fun PedroNavigation(
                     )
                 }
             ) {
+                screenStack.add(Screen.SettingScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 SettingsScreen(
                     navController = navController,
                     titleId = topBarTitle
@@ -224,6 +262,8 @@ fun PedroNavigation(
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
                     }
+                screenStack.add(Screen.SleepSessions.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 SleepSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
@@ -269,6 +309,8 @@ fun PedroNavigation(
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
                     }
+                screenStack.add(Screen.WalkSessionScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 WalkSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
@@ -301,8 +343,8 @@ fun PedroNavigation(
                 exitTransition = {
                     fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
-                val viewModel: SleepSessionViewModel = viewModel(
-                    factory = SleepSessionViewModelFactory(
+                val viewModel: RunSessionViewModel = viewModel(
+                    factory = RunSessionViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -314,6 +356,8 @@ fun PedroNavigation(
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
                     }
+                screenStack.add(Screen.RunSessionScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 RunSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
@@ -359,6 +403,8 @@ fun PedroNavigation(
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
                     }
+                screenStack.add(Screen.DriveSessionScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 DriveSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
@@ -404,6 +450,8 @@ fun PedroNavigation(
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
                     }
+                screenStack.add(Screen.SitSessionScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 SitSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
@@ -449,6 +497,8 @@ fun PedroNavigation(
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
                     }
+                screenStack.add(Screen.ListenSessionScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 ListenSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
@@ -487,6 +537,8 @@ fun PedroNavigation(
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
                     }
+                screenStack.add(Screen.WeightScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 WeightSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
@@ -524,8 +576,8 @@ fun PedroNavigation(
                 exitTransition = {
                     fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
-                val viewModel: SleepSessionViewModel = viewModel(
-                    factory = SleepSessionViewModelFactory(
+                val viewModel: YogaSessionViewModel = viewModel(
+                    factory = YogaSessionViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -537,6 +589,8 @@ fun PedroNavigation(
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
                     }
+                screenStack.add(Screen.YogaSessionScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 YogaSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
@@ -570,8 +624,8 @@ fun PedroNavigation(
                 exitTransition = {
                     fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
-                val viewModel: SleepSessionViewModel = viewModel(
-                    factory = SleepSessionViewModelFactory(
+                val viewModel: CycleSessionViewModel = viewModel(
+                    factory = CycleSessionViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -583,6 +637,8 @@ fun PedroNavigation(
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
                     }
+                screenStack.add(Screen.CycleSessionScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 CycleSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
@@ -615,8 +671,8 @@ fun PedroNavigation(
                 exitTransition = {
                     fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
-                val viewModel: SleepSessionViewModel = viewModel(
-                    factory = SleepSessionViewModelFactory(
+                val viewModel: TrainSessionViewModel = viewModel(
+                    factory = TrainSessionViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -628,6 +684,8 @@ fun PedroNavigation(
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
                     }
+                screenStack.add(Screen.TrainSessionScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
                 TrainSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,

@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen.activities.dynamicactivities.walkscreen
+package com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen
 
 import android.os.RemoteException
 import android.util.Log
@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.UUID
 
-class WalkSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+class RunSessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ViewModel() {
 
     /*Define here the required permissions for the Health Connect usage*/
@@ -75,7 +75,7 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
         HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
 
 
-    )
+        )
 
     var permissionsGranted = mutableStateOf(false)
         private set
@@ -154,13 +154,13 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
     }
 }
 
-class WalkSessionViewModelFactory(
+class RunSessionViewModelFactory(
     private val healthConnectManager: HealthConnectManager
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(WalkSessionViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(RunSessionViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return WalkSessionViewModel(
+            return RunSessionViewModel(
                 healthConnectManager = healthConnectManager
             ) as T
         }
