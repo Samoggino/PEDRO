@@ -364,7 +364,7 @@ fun PedroNavigation(
                     //sessionsList = sessionsList,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.addSleepData()
+                        //viewModel.addSleepData()
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)

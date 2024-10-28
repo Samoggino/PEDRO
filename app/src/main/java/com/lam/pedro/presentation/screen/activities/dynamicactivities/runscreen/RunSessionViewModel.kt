@@ -10,6 +10,7 @@ import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ElevationGainedRecord
+import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.StepsCadenceRecord
 import androidx.health.connect.client.records.StepsRecord
@@ -17,17 +18,31 @@ import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.lam.pedro.data.ExerciseSessionData
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.SleepSessionData
+import com.lam.pedro.data.dateTimeWithOffsetOrDefault
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.time.Duration
+import java.time.Instant
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.UUID
+import kotlin.random.Random
 
 class RunSessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ViewModel() {
 
     /*Define here the required permissions for the Health Connect usage*/
     val permissions = setOf(
+
+        /*
+        * ExerciseSessionRecord
+        * */
+        HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+        HealthPermission.getWritePermission(ExerciseSessionRecord::class),
+
         /*
         * ActiveCaloriesBurnedRecord
         * */
@@ -74,13 +89,12 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
         HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
         HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
 
-
-        )
+    )
 
     var permissionsGranted = mutableStateOf(false)
         private set
 
-    var sessionsList: MutableState<List<SleepSessionData>> = mutableStateOf(listOf())
+    var sessionsList: MutableState<List<ExerciseSessionData>> = mutableStateOf(listOf())
         private set
 
     var uiState: UiState by mutableStateOf(UiState.Uninitialized)
@@ -91,30 +105,59 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
     fun initialLoad() {
         viewModelScope.launch {
             tryWithPermissionsCheck {
-                sessionsList.value = healthConnectManager.readSleepSessions()
+                //readExerciseSessions()
             }
         }
     }
 
-    fun saveSession(session: SleepSessionData) {
+    /*
+    fun insertExerciseSession() {
         viewModelScope.launch {
             tryWithPermissionsCheck {
-                // Aggiorna la lista aggiungendo la nuova sessione
-                sessionsList.value += session
-                healthConnectManager.writeSleepSession(session) // salva la sessione su HealthConnect
-                Log.d("SleepSessionViewModel", "Session saved")
+                val startOfDay = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)
+                val latestStartOfSession = ZonedDateTime.now().minusMinutes(30)
+                val offset = Random.nextDouble()
+
+                // Generate random start time between the start of the day and (now - 30mins).
+                val startOfSession = startOfDay.plusSeconds(
+                    (Duration.between(startOfDay, latestStartOfSession).seconds * offset).toLong()
+                )
+                val endOfSession = startOfSession.plusMinutes(30)
+
+                healthConnectManager.writeExerciseSession(startOfSession, endOfSession)
+                readExerciseSessions()
             }
         }
     }
 
-
-    fun addSleepData() {
+    fun deleteExerciseSession(uid: String) {
         viewModelScope.launch {
             tryWithPermissionsCheck {
-                sessionsList.value = healthConnectManager.readSleepSessions()
+                healthConnectManager.deleteExerciseSession(uid)
+                readExerciseSessions()
             }
         }
     }
+
+    private suspend fun readExerciseSessions() {
+        val startOfDay = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)
+        val now = Instant.now()
+
+        sessionsList.value = healthConnectManager
+            .readExerciseSessions(startOfDay.toInstant(), now)
+            .map { record ->
+                val packageName = record.metadata.dataOrigin.packageName
+                ExerciseSession(
+                    startTime = dateTimeWithOffsetOrDefault(record.startTime, record.startZoneOffset),
+                    endTime = dateTimeWithOffsetOrDefault(record.startTime, record.startZoneOffset),
+                    id = record.metadata.id,
+                    sourceAppInfo = healthConnectCompatibleApps[packageName],
+                    title = record.title
+                )
+            }
+    }
+
+     */
 
     /**
      * Provides permission check and error handling for Health Connect suspend function calls.
@@ -152,6 +195,7 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
         // and recomposition won't result in multiple snackbars.
         data class Error(val exception: Throwable, val uuid: UUID = UUID.randomUUID()) : UiState()
     }
+
 }
 
 class RunSessionViewModelFactory(

@@ -40,12 +40,6 @@ class CycleSessionViewModel(private val healthConnectManager: HealthConnectManag
         HealthPermission.getWritePermission(DistanceRecord::class),
 
         /*
-        * ElevationGainedRecord
-        * */
-        HealthPermission.getReadPermission(ElevationGainedRecord::class),
-        HealthPermission.getWritePermission(ElevationGainedRecord::class),
-
-        /*
         * ExerciseRoute - it isn't a record, it uses GPS so it requires manifest permissions
         * */
 
