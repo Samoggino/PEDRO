@@ -1,50 +1,29 @@
 package com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Easing
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Stop
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -63,21 +42,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.BeyondBoundsLayout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.navigation.NavController
 import com.lam.pedro.R
 import com.lam.pedro.presentation.component.PermissionRequired
-import com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen.SleepSessionViewModel
 import kotlinx.coroutines.delay
-import java.time.Instant
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -151,8 +124,8 @@ fun RunSessionScreen(
                         modifier = Modifier.fillMaxHeight()
                     ) {
                         IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(
-                                imageVector = Icons.Rounded.ArrowBack,
+                            Image(
+                                painter = painterResource(id = R.drawable.arrow_left_icon),
                                 contentDescription = stringResource(R.string.back)
                             )
                         }
@@ -202,7 +175,7 @@ fun TimerComponent(color: Color) {
         var showDialog by remember { mutableStateOf(false) }
         var isStopAction by remember { mutableStateOf(false) }
         var visible by remember { mutableStateOf(false) }
-        var isPaused by remember { mutableStateOf(false) }
+        var isPaused by remember { mutableStateOf(true) }
 
         // Variabili per il timer
         var timerRunning by remember { mutableStateOf(false) }
@@ -211,37 +184,34 @@ fun TimerComponent(color: Color) {
         // Lista dei risultati dei timer
         val timerResults = remember { mutableStateListOf<String>() }
 
-        // Animazione per offsetX
-        val offsetX by animateDpAsState(
-            targetValue = if (visible) (-20).dp else 0.dp,
-            animationSpec = tween(durationMillis = 500, easing = LinearOutSlowInEasing)
-        )
-
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
             // Pulsante Pausa/Play
-            IconButton(
-                onClick = {
-                    if (visible) {
-                        isPaused = !isPaused
-                    } else {
-                        isStopAction = false
-                        showDialog = true
-                    }
-                },
+            Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(26.dp))
                     .size(70.dp)
                     .background(color)
-                    .offset(x = offsetX)
             ) {
-                Image(
-                    painter = painterResource(id = if (visible) R.drawable.pause_icon else if (isPaused) R.drawable.play_icon else R.drawable.play_icon),
-                    contentDescription = if (visible) "Pause" else "Play",
-                    modifier = Modifier.size(48.dp)
-                )
+                IconButton(
+                    onClick = {
+                        if (visible) {
+                            isPaused = !isPaused
+                        } else {
+                            isStopAction = false
+                            showDialog = true
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize() // Assicura che l'IconButton riempia il Box
+                ) {
+                    Image(
+                        painter = painterResource(id = if (!isPaused) R.drawable.pause_icon else R.drawable.play_icon),
+                        contentDescription = if (visible) "Pause" else "Play",
+                        modifier = Modifier.size(40.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(20.dp))
@@ -252,6 +222,7 @@ fun TimerComponent(color: Color) {
                 enter = slideInHorizontally { with(density) { -40.dp.roundToPx() } } + fadeIn(),
                 exit = slideOutHorizontally { with(density) { -40.dp.roundToPx() } } + fadeOut()
             ) {
+
                 IconButton(
                     onClick = {
                         isStopAction = true
@@ -265,7 +236,7 @@ fun TimerComponent(color: Color) {
                     Image(
                         painter = painterResource(id = R.drawable.stop_icon),
                         contentDescription = "Stop",
-                        modifier = Modifier.size(48.dp)
+                        modifier = Modifier.size(40.dp)
                     )
                 }
             }
@@ -287,6 +258,7 @@ fun TimerComponent(color: Color) {
                             if (isStopAction) {
                                 timerRunning = false // Ferma il timer
                                 visible = false // Nascondi il pulsante di pausa
+                                isPaused = true // Imposta il timer in pausa
                                 // Aggiungi il tempo finale alla lista dei risultati
                                 val minutes = (elapsedTime / 60000) % 60
                                 val seconds = (elapsedTime / 1000) % 60
@@ -295,9 +267,11 @@ fun TimerComponent(color: Color) {
 
                                 elapsedTime = 0 // Resetta il tempo
                             } else {
-                                visible = !visible // Alterna il valore di visible
+                                // Alterna il valore di visible
+                                visible = !visible
+
                                 if (visible) {
-                                    // Avvia il timer quando visibile
+                                    isPaused = false // Avvia il timer
                                     timerRunning = true
                                 }
                             }
@@ -328,7 +302,7 @@ fun TimerComponent(color: Color) {
         }
 
         // Mostra il timer con animazione AnimatedVisibility
-        AnimatedVisibility(visible = timerRunning || isPaused) {
+        AnimatedVisibility(visible = timerRunning || !isPaused) {
             // Calcolo del tempo
             val minutes = (elapsedTime / 60000) % 60
             val seconds = (elapsedTime / 1000) % 60
@@ -336,7 +310,7 @@ fun TimerComponent(color: Color) {
 
             Text(
                 String.format("%02d:%02d:%02d", minutes, seconds, centiseconds),
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineLarge,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
@@ -344,6 +318,7 @@ fun TimerComponent(color: Color) {
             )
         }
 
+        /*
         // Mostra la lista dei risultati in LazyColumn
         if (timerResults.isNotEmpty()) {
             Spacer(modifier = Modifier.height(16.dp)) // Spazio tra il timer e la lista
@@ -362,8 +337,11 @@ fun TimerComponent(color: Color) {
                 }
             }
         }
+
+         */
     }
 }
+
 
 
 
