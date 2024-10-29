@@ -127,18 +127,16 @@ fun RunSessionScreen(
                         PermissionRequired(color) { onPermissionsLaunch(permissions) }
                     }
                 } else {
-
                     // Interfaccia per avviare e fermare l'attività
                     item {
                         TimerComponent(color)
-
+                    }
                 }
             }
+
         }
 
     }
-
-}
 }
 
 

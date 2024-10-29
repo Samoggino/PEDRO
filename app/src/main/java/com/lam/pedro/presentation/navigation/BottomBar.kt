@@ -97,7 +97,7 @@ fun BottomBar(
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = Color(0xE0D0B23A) // Colore della pillola selezionata
+                    indicatorColor = MaterialTheme.colorScheme.primary
                 )// Chiama la funzione di navigazione per Home
             )
         }

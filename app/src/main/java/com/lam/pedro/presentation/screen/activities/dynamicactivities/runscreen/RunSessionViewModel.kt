@@ -105,7 +105,7 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
     fun initialLoad() {
         viewModelScope.launch {
             tryWithPermissionsCheck {
-                //readExerciseSessions()
+
             }
         }
     }
@@ -138,6 +138,7 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
             }
         }
     }
+
 
     private suspend fun readExerciseSessions() {
         val startOfDay = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)

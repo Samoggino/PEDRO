@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen.activities.staticactivities.weightscreen
+package com.lam.pedro.presentation.screen.activities.staticactivities.liftscreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -56,7 +56,7 @@ fun WeightSessionScreen(
     permissions: Set<String>,
     permissionsGranted: Boolean,
     readingsList: List<WeightData>,
-    uiState: InputReadingsViewModel.UiState,
+    uiState: LiftSessionViewModel.UiState,
     onInsertClick: (Double) -> Unit = {},
     onDeleteClick: (String) -> Unit = {},
     onError: (Throwable?) -> Unit = {},
@@ -74,7 +74,7 @@ fun WeightSessionScreen(
 
     LaunchedEffect(uiState) {
         // If the initial data load has not taken place, attempt to load the data.
-        if (uiState is InputReadingsViewModel.UiState.Uninitialized) {
+        if (uiState is LiftSessionViewModel.UiState.Uninitialized) {
             onPermissionsResult()
         }
 
@@ -82,7 +82,7 @@ fun WeightSessionScreen(
         // was a success or resulted in an error. Where an error occurred, for example in reading
         // and writing to Health Connect, the user is notified, and where the error is one that can
         // be recovered from, an attempt to do so is made.
-        if (uiState is InputReadingsViewModel.UiState.Error && errorId.value != uiState.uuid) {
+        if (uiState is LiftSessionViewModel.UiState.Error && errorId.value != uiState.uuid) {
             onError(uiState.exception)
             errorId.value = uiState.uuid
         }
@@ -123,7 +123,7 @@ fun WeightSessionScreen(
             )
         }
     ) { paddingValues ->
-        if (uiState != InputReadingsViewModel.UiState.Uninitialized) {
+        if (uiState != LiftSessionViewModel.UiState.Uninitialized) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()

@@ -55,8 +55,6 @@ import com.lam.pedro.presentation.screen.activities.dynamicactivities.trainscree
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.trainscreen.TrainSessionViewModel
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.trainscreen.TrainSessionViewModelFactory
 import com.lam.pedro.presentation.screen.more.SettingsScreen
-import com.lam.pedro.presentation.screen.activities.staticactivities.weightscreen.InputReadingsViewModel
-import com.lam.pedro.presentation.screen.activities.staticactivities.weightscreen.InputReadingsViewModelFactory
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.more.PrivacyPolicyScreen
 import com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen.SleepSessionScreen
@@ -69,9 +67,17 @@ import com.lam.pedro.presentation.screen.activities.dynamicactivities.yogascreen
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.yogascreen.YogaSessionViewModel
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.yogascreen.YogaSessionViewModelFactory
 import com.lam.pedro.presentation.screen.activities.staticactivities.drivescreen.DriveSessionScreen
+import com.lam.pedro.presentation.screen.activities.staticactivities.drivescreen.DriveSessionViewModel
+import com.lam.pedro.presentation.screen.activities.staticactivities.drivescreen.DriveSessionViewModelFactory
 import com.lam.pedro.presentation.screen.activities.staticactivities.listenscreen.ListenSessionScreen
 import com.lam.pedro.presentation.screen.activities.staticactivities.sitscreen.SitSessionScreen
-import com.lam.pedro.presentation.screen.activities.staticactivities.weightscreen.WeightSessionScreen
+import com.lam.pedro.presentation.screen.activities.staticactivities.liftscreen.LiftSessionViewModel
+import com.lam.pedro.presentation.screen.activities.staticactivities.liftscreen.LiftSessionViewModelFactory
+import com.lam.pedro.presentation.screen.activities.staticactivities.liftscreen.WeightSessionScreen
+import com.lam.pedro.presentation.screen.activities.staticactivities.listenscreen.ListenSessionViewModel
+import com.lam.pedro.presentation.screen.activities.staticactivities.listenscreen.ListenSessionViewModelFactory
+import com.lam.pedro.presentation.screen.activities.staticactivities.sitscreen.SitSessionViewModel
+import com.lam.pedro.presentation.screen.activities.staticactivities.sitscreen.SitSessionViewModelFactory
 import com.lam.pedro.showExceptionSnackbar
 import kotlinx.coroutines.launch
 
@@ -390,8 +396,8 @@ fun PedroNavigation(
                 exitTransition = {
                     fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
-                val viewModel: SleepSessionViewModel = viewModel(
-                    factory = SleepSessionViewModelFactory(
+                val viewModel: DriveSessionViewModel = viewModel(
+                    factory = DriveSessionViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -411,7 +417,7 @@ fun PedroNavigation(
                     //sessionsList = sessionsList,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.addSleepData()
+                        //viewModel.addSleepData()
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -437,8 +443,8 @@ fun PedroNavigation(
                 exitTransition = {
                     fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
-                val viewModel: SleepSessionViewModel = viewModel(
-                    factory = SleepSessionViewModelFactory(
+                val viewModel: SitSessionViewModel = viewModel(
+                    factory = SitSessionViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -458,7 +464,7 @@ fun PedroNavigation(
                     //sessionsList = sessionsList,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.addSleepData()
+                        //viewModel.addSleepData()
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -484,8 +490,8 @@ fun PedroNavigation(
                 exitTransition = {
                     fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
-                val viewModel: SleepSessionViewModel = viewModel(
-                    factory = SleepSessionViewModelFactory(
+                val viewModel: ListenSessionViewModel = viewModel(
+                    factory = ListenSessionViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -505,7 +511,7 @@ fun PedroNavigation(
                     //sessionsList = sessionsList,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.addSleepData()
+                        //viewModel.addSleepData()
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -523,8 +529,8 @@ fun PedroNavigation(
             }
 
             composable(Screen.WeightScreen.route) {
-                val viewModel: InputReadingsViewModel = viewModel(
-                    factory = InputReadingsViewModelFactory(
+                val viewModel: LiftSessionViewModel = viewModel(
+                    factory = LiftSessionViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -545,11 +551,11 @@ fun PedroNavigation(
 
                     uiState = viewModel.uiState,
                     onInsertClick = { weightInput ->
-                        viewModel.inputReadings(weightInput)
+                        //viewModel.addSleepData()
                     },
                     weeklyAvg = weeklyAvg,
                     onDeleteClick = { uid ->
-                        viewModel.deleteWeightInput(uid)
+                        //viewModel.deleteSleepData(uid)
                     },
                     readingsList = readingsList,
                     onError = { exception ->

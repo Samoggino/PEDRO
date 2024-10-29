@@ -27,7 +27,6 @@ import androidx.navigation.NavController
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.PermissionRequired
 import com.lam.pedro.presentation.component.TimerComponent
-import com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen.SleepSessionViewModel
 import java.time.Instant
 import java.util.UUID
 
@@ -37,7 +36,7 @@ fun SitSessionScreen(
     permissions: Set<String>,
     permissionsGranted: Boolean,
     //sessionsList: List<WalkSessionData>,
-    uiState: SleepSessionViewModel.UiState,
+    uiState: SitSessionViewModel.UiState,
     onInsertClick: () -> Unit = {},
     onError: (Throwable?) -> Unit = {},
     onPermissionsResult: () -> Unit = {},
@@ -56,7 +55,7 @@ fun SitSessionScreen(
 
     LaunchedEffect(uiState) {
         // If the initial data load has not taken place, attempt to load the data.
-        if (uiState is SleepSessionViewModel.UiState.Uninitialized) {
+        if (uiState is SitSessionViewModel.UiState.Uninitialized) {
             onPermissionsResult()
         }
 
@@ -64,7 +63,7 @@ fun SitSessionScreen(
         // success or resulted in an error. Where an error occurred, for example in reading and
         // writing to Health Connect, the user is notified, and where the error is one that can be
         // recovered from, an attempt to do so is made.
-        if (uiState is SleepSessionViewModel.UiState.Error && errorId.value != uiState.uuid) {
+        if (uiState is SitSessionViewModel.UiState.Error && errorId.value != uiState.uuid) {
             onError(uiState.exception)
             errorId.value = uiState.uuid
         }
@@ -96,7 +95,7 @@ fun SitSessionScreen(
         }
 
     ) { paddingValues ->
-        if (uiState != SleepSessionViewModel.UiState.Uninitialized) {
+        if (uiState != SitSessionViewModel.UiState.Uninitialized) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()

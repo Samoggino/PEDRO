@@ -1,19 +1,4 @@
-/*
- * Copyright 2022 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-package com.lam.pedro.presentation.screen.activities.staticactivities.weightscreen
+package com.lam.pedro.presentation.screen.activities.staticactivities.liftscreen
 
 import android.os.RemoteException
 import androidx.compose.runtime.MutableState
@@ -21,28 +6,49 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.health.connect.client.permission.HealthPermission
-import androidx.health.connect.client.records.WeightRecord
+import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
+import androidx.health.connect.client.records.ExerciseSessionRecord
+import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.units.Mass
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.WeightData
-import com.lam.pedro.data.dateTimeWithOffsetOrDefault
 import kotlinx.coroutines.launch
 import java.io.IOException
-import java.time.Instant
-import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-class InputReadingsViewModel(private val healthConnectManager: HealthConnectManager) :
+class LiftSessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ViewModel() {
     private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
     val permissions = setOf(
-        HealthPermission.getReadPermission(WeightRecord::class),
-        HealthPermission.getWritePermission(WeightRecord::class),
+        /*
+       * ExerciseSessionRecord
+       * */
+        HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+        HealthPermission.getWritePermission(ExerciseSessionRecord::class),
+
+        /*
+        * ExerciseCompletionGoal.RepetitionsGoal
+        * */
+
+        /*
+        * ExercisePerformanceTarget.WeightTarget
+        * */
+
+        /*
+        * TotalCaloriesBurnedRecord
+        * */
+        HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
+        HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
+
+        /*
+        * ActiveCaloriesBurnedRecord
+        * */
+        HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class),
+        HealthPermission.getWritePermission(ActiveCaloriesBurnedRecord::class),
     )
     var weeklyAvg: MutableState<Mass?> = mutableStateOf(Mass.kilograms(0.0))
         private set
@@ -61,53 +67,12 @@ class InputReadingsViewModel(private val healthConnectManager: HealthConnectMana
     fun initialLoad() {
         viewModelScope.launch {
             tryWithPermissionsCheck {
-                readWeightInputs()
+                //TODO: initial load of the data
             }
         }
     }
 
-    fun inputReadings(inputValue: Double) {
-        viewModelScope.launch {
-            tryWithPermissionsCheck {
-                val time = ZonedDateTime.now().withNano(0)
-                val weight = WeightRecord(
-                    weight = Mass.kilograms(inputValue),
-                    time = time.toInstant(),
-                    zoneOffset = time.offset
-                )
-                healthConnectManager.writeWeightInput(weight)
-                readWeightInputs()
-            }
-        }
-    }
 
-    fun deleteWeightInput(uid: String) {
-        viewModelScope.launch {
-            tryWithPermissionsCheck {
-                healthConnectManager.deleteWeightInput(uid)
-                readWeightInputs()
-            }
-        }
-    }
-
-    private suspend fun readWeightInputs() {
-        val startOfDay = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)
-        val now = Instant.now()
-        val endofWeek = startOfDay.toInstant().plus(7, ChronoUnit.DAYS)
-        readingsList.value = healthConnectManager
-            .readWeightInputs(startOfDay.toInstant(), now)
-            .map { record ->
-                val packageName = record.metadata.dataOrigin.packageName
-                WeightData(
-                    weight = record.weight,
-                    id = record.metadata.id,
-                    time = dateTimeWithOffsetOrDefault(record.time, record.zoneOffset),
-                    sourceAppInfo = healthConnectCompatibleApps[packageName]
-                )
-            }
-        weeklyAvg.value =
-            healthConnectManager.computeWeeklyAverage(startOfDay.toInstant(), endofWeek)
-    }
 
     /**
      * Provides permission check and error handling for Health Connect suspend function calls.
@@ -147,13 +112,13 @@ class InputReadingsViewModel(private val healthConnectManager: HealthConnectMana
     }
 }
 
-class InputReadingsViewModelFactory(
+class LiftSessionViewModelFactory(
     private val healthConnectManager: HealthConnectManager
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(InputReadingsViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(LiftSessionViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return InputReadingsViewModel(
+            return LiftSessionViewModel(
                 healthConnectManager = healthConnectManager
             ) as T
         }
