@@ -9,11 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,9 +24,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.lam.pedro.R
+import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.PermissionRequired
-import com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen.SleepSessionViewModel
+import com.lam.pedro.presentation.component.TimerComponent
 import java.time.Instant
 import java.util.UUID
 
@@ -92,12 +88,7 @@ fun CycleSessionScreen(
                         verticalArrangement = Arrangement.Center,
                         modifier = Modifier.fillMaxHeight()
                     ) {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(
-                                imageVector = Icons.Rounded.ArrowBack,
-                                contentDescription = stringResource(R.string.back)
-                            )
-                        }
+                        BackButton(navController)
                     }
                 }
             )
@@ -122,6 +113,9 @@ fun CycleSessionScreen(
                     }
                 } else {
 //TODO: implementare la registrazione e la visualizzazione delle sessioni
+                    item {
+                        TimerComponent(color)
+                    }
                 }
             }
         }

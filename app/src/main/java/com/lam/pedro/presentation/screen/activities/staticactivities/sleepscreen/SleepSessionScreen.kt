@@ -15,18 +15,21 @@
  */
 package com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen
 
-import android.util.Log
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -34,29 +37,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import com.lam.pedro.data.SleepSessionData
-import com.lam.pedro.presentation.TAG
-import com.lam.pedro.presentation.component.PermissionRequired
-import com.lam.pedro.presentation.component.SleepSessionRow
-import java.time.Duration
-import java.time.Instant
-import java.time.ZoneOffset
-import java.util.UUID
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.lam.pedro.R
+import com.lam.pedro.data.SleepSessionData
+import com.lam.pedro.presentation.component.BackButton
+import com.lam.pedro.presentation.component.PermissionRequired
+import com.lam.pedro.presentation.component.TimerComponent
+import java.time.Instant
+import java.util.UUID
 
 /**
  * Shows a week's worth of sleep data.
@@ -119,12 +108,7 @@ fun SleepSessionScreen(
                         verticalArrangement = Arrangement.Center,
                         modifier = Modifier.fillMaxHeight()
                     ) {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(
-                                imageVector = Icons.Rounded.ArrowBack,
-                                contentDescription = stringResource(R.string.back)
-                            )
-                        }
+                        BackButton(navController)
                     }
                 }
             )
@@ -150,47 +134,10 @@ fun SleepSessionScreen(
 
                 // Button per Start/Stop della registrazione
                 item {
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp)
-                            .padding(4.dp),
-                        onClick = {
-                            if (isRecording.value) {
-                                // Ferma la registrazione
-                                val endTime = Instant.now()
-                                val newSession = SleepSessionData(
-                                    uid = UUID.randomUUID().toString(),
-                                    title = "Sleep Session",
-                                    notes = "Recorded session",
-                                    startTime = startTime.value!!,
-                                    startZoneOffset = ZoneOffset.UTC,
-                                    endTime = endTime,
-                                    endZoneOffset = ZoneOffset.UTC,
-                                    duration = Duration.between(startTime.value, endTime),
-                                    stages = listOf() // Aggiungi stadi della sessione, se presenti
-                                )
-                                Log.d(TAG, "New session: $newSession")
-                                sessionsList.toMutableList().add(newSession) // Aggiungi la nuova sessione alla lista
-                                Log.d(TAG, "Sessions list: $sessionsList")
-                                onInsertClick() // Salva la nuova sessione
-                                isRecording.value = false // Aggiorna lo stato
-                            } else {
-                                // Avvia la registrazione
-                                startTime.value = Instant.now()
-                                isRecording.value = true
-                            }
-                        }
-                    ) {
-                        Text(if (isRecording.value) "Stop" else "Start")
-                    }
-                }
-
-                // Mostra la lista delle sessioni
-                items(sessionsList) { session ->
-                    SleepSessionRow(session)
+                    TimerComponent(color)
                 }
             }
-        }}
+        }
+    }
     }
 }

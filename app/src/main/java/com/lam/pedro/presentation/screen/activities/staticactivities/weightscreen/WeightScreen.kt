@@ -1,13 +1,11 @@
 package com.lam.pedro.presentation.screen.activities.staticactivities.weightscreen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,7 +14,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,9 +41,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.health.connect.client.units.Mass
 import androidx.navigation.NavHostController
-import com.lam.pedro.data.WeightData
 import com.lam.pedro.R
+import com.lam.pedro.data.WeightData
+import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.PermissionRequired
+import com.lam.pedro.presentation.component.TimerComponent
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.UUID
@@ -118,12 +117,7 @@ fun WeightSessionScreen(
                         verticalArrangement = Arrangement.Center,
                         modifier = Modifier.fillMaxHeight()
                     ) {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(
-                                imageVector = Icons.Rounded.ArrowBack,
-                                contentDescription = stringResource(R.string.back)
-                            )
-                        }
+                        BackButton(navController)
                     }
                 }
             )
@@ -142,6 +136,7 @@ fun WeightSessionScreen(
                     }
                 } else {
                     item {
+                        TimerComponent(color)
                         OutlinedTextField(
                             value = weightInput,
                             onValueChange = {
