@@ -1,6 +1,7 @@
 package com.lam.pedro.presentation.screen.loginscreen
 
 
+import android.app.Application
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -40,14 +42,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lam.pedro.R
-import com.lam.pedro.data.datasource.SupabaseClientProvider
 import com.lam.pedro.presentation.component.LinkedApp
 
 @Composable
 fun LoginScreen(
-    navController: NavController,
-    viewModel: SupabaseAuthViewModel = viewModel() // Utilizza viewModel() di Compose
+    navController: NavController
 ) {
+    val context = LocalContext.current
+    val viewModel: SupabaseAuthViewModel =
+        viewModel(factory = SupabaseAuthViewModelFactory(context.applicationContext as Application))
     var isPasswordVisible by remember { mutableStateOf(false) }
 
     // al lancio fai una stampa
@@ -55,7 +58,7 @@ fun LoginScreen(
         Log.i("Supabase", "LaunchedEffect")
 
         // controlla al mount che l'utente sia loggato o abbia un token
-       viewModel.checkUserLoggedIn(navController)
+        viewModel.checkUserLoggedIn(navController, context)
     }
 
     Column(
@@ -110,7 +113,7 @@ fun LoginScreen(
 
         // Pulsante di accesso
         Button(
-            onClick = { viewModel.login(navController) },
+            onClick = { viewModel.login(navController, context) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 32.dp)

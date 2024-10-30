@@ -1,5 +1,6 @@
 package com.lam.pedro.presentation
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,7 +43,7 @@ import java.util.UUID
 fun ReadDataScreen(
     healthConnectManager: HealthConnectManager,
     navController: NavController,
-    viewModel: ModelReadHealthConnect = ModelReadHealthConnect()
+    viewModel: ViewModelInsertSleepSessionData = ViewModelInsertSleepSessionData()
 ) {
     var sleepSessions by remember { mutableStateOf(emptyList<SleepSessionData>()) }
     val coroutineScope = rememberCoroutineScope()
@@ -63,6 +64,7 @@ fun ReadDataScreen(
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = {
+            Log.i("Supabase-HealthConnect", "Aggiornamento dati")
             isRefreshing = true
             coroutineScope.launch {
                 sleepSessions = viewModel.getSleepSessions()
