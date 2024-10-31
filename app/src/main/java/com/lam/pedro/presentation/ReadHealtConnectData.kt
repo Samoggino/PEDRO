@@ -28,11 +28,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.SleepSessionRecord
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.healthconnectsample.data.HealthConnectManager
-import com.example.healthconnectsample.data.SleepSessionData
+import com.lam.pedro.data.SleepSessionData
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.ZonedDateTime
@@ -43,12 +45,15 @@ import java.util.UUID
 fun ReadDataScreen(
     healthConnectManager: HealthConnectManager,
     navController: NavController,
-    viewModel: ViewModelInsertSleepSessionData = ViewModelInsertSleepSessionData()
 ) {
+
     var sleepSessions by remember { mutableStateOf(emptyList<SleepSessionData>()) }
     val coroutineScope = rememberCoroutineScope()
     var isRefreshing by remember { mutableStateOf(false) }
     val scrollState = rememberLazyListState()
+    val context = LocalContext.current
+    val viewModel: ViewModelSleepData =
+        viewModel(factory = ViewModelSleepDataFactory())
 
     val end2 = ZonedDateTime.now()
     val end1 = end2.minusDays(1)
@@ -85,7 +90,10 @@ fun ReadDataScreen(
                 Row(
                     modifier = Modifier
                         .padding(16.dp)
-                        .background(Color(0xFF113E5C), shape = RoundedCornerShape(26.dp)) // Bordi arrotondati
+                        .background(
+                            Color(0xFF113E5C),
+                            shape = RoundedCornerShape(26.dp)
+                        ) // Bordi arrotondati
                         .padding(16.dp)
                 ) {
                     Text(
@@ -117,7 +125,8 @@ fun ReadDataScreen(
                                                 endTime = end1.toInstant()
                                             )
                                         )
-                                    )
+                                    ),
+                                    context = context
                                 )
                                 sleepSessions = viewModel.getSleepSessions()
                             }

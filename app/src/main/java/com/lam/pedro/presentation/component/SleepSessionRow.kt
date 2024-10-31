@@ -38,14 +38,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.SleepSessionRecord
-import com.example.healthconnectsample.data.SleepSessionData
+import com.lam.pedro.data.SleepSessionData
 import com.example.healthconnectsample.data.dateTimeWithOffsetOrDefault
 import com.example.healthconnectsample.data.formatHoursMinutes
 import com.lam.pedro.R
-import com.lam.pedro.formatDisplayTimeStartEnd
 import java.time.Duration
-import java.time.ZoneId
-import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 

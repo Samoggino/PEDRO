@@ -1,7 +1,5 @@
 package com.lam.pedro.presentation.screen.loginscreen
 
-
-import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -11,9 +9,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.lam.pedro.data.datasource.SupabaseClientProvider
+import com.lam.pedro.data.datasource.SecurePreferencesManager.clearSecurePrefs
+import com.lam.pedro.data.datasource.SecurePreferencesManager.saveTokens
+import com.lam.pedro.data.datasource.SupabaseClientProvider.supabase
+import com.lam.pedro.data.datasource.SupabaseClientProvider.userSession
 import com.lam.pedro.presentation.navigation.Screen
-import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -22,7 +22,7 @@ import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.launch
 
-class SupabaseAuthViewModel(application: Application) : ViewModel() {
+class SupabaseAuthViewModel : ViewModel() {
 
     var email by mutableStateOf("")
     var password by mutableStateOf("")
@@ -31,15 +31,24 @@ class SupabaseAuthViewModel(application: Application) : ViewModel() {
     var showErrorDialog by mutableStateOf(false)
     var isLoading by mutableStateOf(false)
 
-
-    // Sigillo di risposta per il risultato della registrazione
+    /**
+     * Sigillo di risposta per il risultato della registrazione.
+     */
     sealed class SignUpResult {
         data class Success(val session: UserSession?) : SignUpResult()
         data object UserAlreadyExists : SignUpResult()
         data class Error(val message: String) : SignUpResult()
     }
 
-    // Funzione per il login
+    /**
+     * Funzione per il login.
+     *
+     * Questa funzione verifica le credenziali dell'utente e, in caso di successo,
+     * naviga verso la schermata di lettura dei dati di Health Connect.
+     *
+     * @param navController Il controller di navigazione.
+     * @param context Il contesto dell'applicazione.
+     */
     fun login(navController: NavController, context: Context) {
         if (!checkCredentials(email, password)) {
             errorMessage = "Credenziali non valide"
@@ -60,11 +69,18 @@ class SupabaseAuthViewModel(application: Application) : ViewModel() {
         }
     }
 
-    // Funzione per la registrazione
-    fun signUp(navController: NavController) {
+    /**
+     * Funzione per la registrazione.
+     *
+     * Questa funzione registra un nuovo utente e, in caso di successo,
+     * naviga verso la schermata di lettura dei dati di Health Connect.
+     *
+     * @param navController Il controller di navigazione.
+     */
+    fun signUp(navController: NavController, context: Context) {
         viewModelScope.launch {
             isLoading = true
-            when (val result = signUpAuth(email, password)) {
+            when (val result = signUpAuth(email, password, context)) {
                 is SignUpResult.Success -> navController.navigate(Screen.ReadHealthConnectData.route)
                 is SignUpResult.UserAlreadyExists -> {
                     errorMessage = "Utente già registrato"
@@ -80,9 +96,14 @@ class SupabaseAuthViewModel(application: Application) : ViewModel() {
         }
     }
 
-    // Logica per il controllo delle credenziali
+    /**
+     * Logica per il controllo delle credenziali.
+     *
+     * @param email L'email dell'utente.
+     * @param password La password dell'utente.
+     * @return True se le credenziali sono valide, altrimenti False.
+     */
     private fun checkCredentials(email: String, password: String): Boolean {
-
         if (email.isEmpty() || !email.contains("@") || !email.contains(".")) {
             Log.e("Supabase-Auth", "ERRORE: signInAuth: Email non valida")
             return false
@@ -94,20 +115,28 @@ class SupabaseAuthViewModel(application: Application) : ViewModel() {
         return true
     }
 
-    // Funzione per il login con Supabase
+    /**
+     * Funzione per il login con Supabase.
+     *
+     * Questa funzione tenta di autenticare l'utente utilizzando le credenziali fornite.
+     *
+     * @param email L'email dell'utente.
+     * @param password La password dell'utente.
+     * @param context Il contesto dell'applicazione.
+     * @return La sessione utente se il login ha successo, altrimenti null.
+     */
     private suspend fun logInAuth(email: String, password: String, context: Context): UserSession? {
         if (!checkCredentials(email, password)) return null
         if (!userExists(email)) return null
 
         return try {
-            val response = SupabaseClientProvider.getSupabaseClient().auth.signInWith(Email) {
+            supabase().auth.signInWith(Email) {
                 this.email = email
                 this.password = password
             }
 
             // Carica la sessione
-            val session =
-                SupabaseClientProvider.getSupabaseClient().auth.sessionManager.loadSession()
+            val session = supabase().auth.sessionManager.loadSession()
 
             // Salva il token di accesso e il refresh token
             if (session != null) {
@@ -126,62 +155,29 @@ class SupabaseAuthViewModel(application: Application) : ViewModel() {
         }
     }
 
-    // Funzione per salvare i token
-    private fun saveTokens(accessToken: String, refreshToken: String, context: Context) {
-        val prefs = context.getSharedPreferences("your_prefs", Context.MODE_PRIVATE)
-        with(prefs.edit()) {
-            putString("ACCESS_TOKEN", accessToken)
-            putString("REFRESH_TOKEN", refreshToken)
-            apply()
-        }
-    }
-
-    private suspend fun refreshAccessToken(context: Context): String? {
-        val refreshToken =
-            getRefreshToken(context) // Funzione per recuperare il refresh token salvato
-        return if (refreshToken != null) {
-            try {
-                val session =
-                    SupabaseClientProvider.getSupabaseClient().auth.refreshSession(refreshToken)
-
-                // Salva i nuovi token
-                saveTokens(session.accessToken, session.refreshToken, context)
-                session.accessToken // Ritorna il nuovo access token
-            } catch (e: Exception) {
-                Log.e("Supabase", "Errore nel refresh del token: ${e.message}")
-                null
-            }
-        } else {
-            Log.e("Supabase", "Nessun refresh token trovato")
-            null
-        }
-    }
-
-    private fun getRefreshToken(context: Context): String? {
-        val prefs = context.getSharedPreferences("your_prefs", Context.MODE_PRIVATE)
-        return prefs.getString("REFRESH_TOKEN", null)
-    }
-
-
-    // Funzione per la registrazione con Supabase
-    private suspend fun signUpAuth(email: String, password: String): SignUpResult {
-
+    /**
+     * Funzione per la registrazione con Supabase.
+     *
+     * @param email L'email dell'utente.
+     * @param password La password dell'utente.
+     * @return Il risultato della registrazione.
+     */
+    private suspend fun signUpAuth(
+        email: String,
+        password: String,
+        context: Context
+    ): SignUpResult {
         if (!checkCredentials(email, password)) return SignUpResult.Error("Credenziali non valide")
         if (userExists(email)) return SignUpResult.UserAlreadyExists
 
-
         return try {
+            supabase().auth.signUpWith(Email) {
+                this.email = email
+                this.password = password
+            }
 
-            SupabaseClientProvider.getSupabaseClient()
-                .auth
-                .signUpWith(Email) {
-                    this.email = email
-                    this.password = password
-                }
-
-            val session = SupabaseClientProvider.getSupabaseClient()
-                .auth
-                .currentSessionOrNull()
+            val session = userSession()
+            saveTokens(session?.accessToken ?: "", session?.refreshToken ?: "", context)
 
             Log.d("Supabase", "Registrazione avvenuta: ${session?.accessToken}")
             SignUpResult.Success(session)
@@ -195,15 +191,22 @@ class SupabaseAuthViewModel(application: Application) : ViewModel() {
         }
     }
 
+    /**
+     * Funzione per il logout dell'utente.
+     *
+     * Questa funzione pulisce la sessione e reindirizza l'utente alla schermata di login.
+     *
+     * @param navController Il controller di navigazione.
+     */
     fun logout(navController: NavController) {
         viewModelScope.launch {
             try {
-                val supabaseClient = SupabaseClientProvider.getSupabaseClient()
+                val supabase = supabase()
 
                 // pulisci la sessione
-                supabaseClient.auth.sessionManager.deleteSession()
-                supabaseClient.auth.signOut()
-
+                supabase.auth.sessionManager.deleteSession()
+                supabase.auth.signOut()
+                clearSecurePrefs(navController.context)
 
                 Log.d("Supabase", "Logout avvenuto con successo")
 
@@ -214,9 +217,15 @@ class SupabaseAuthViewModel(application: Application) : ViewModel() {
         }
     }
 
+    /**
+     * Verifica se l'utente esiste nel database.
+     *
+     * @param email L'email dell'utente da controllare.
+     * @return True se l'utente esiste, altrimenti False.
+     */
     private suspend fun userExists(email: String): Boolean {
         return try {
-            val userList = SupabaseClientProvider.getSupabaseClient()
+            val userList = supabase()
                 .from("users")
                 .select(columns = Columns.list("id", "email")) {
                     filter {
@@ -227,63 +236,38 @@ class SupabaseAuthViewModel(application: Application) : ViewModel() {
             val userExists = userList.isNotEmpty()
             Log.d(
                 "Supabase",
-                "L'utente con email: $email ${if (userExists) "esiste" else "non esiste"}. ${userList.count()}"
+                "L'utente con email: $email esiste: $userExists"
             )
             userExists
-
         } catch (e: Exception) {
-            Log.e(
-                "Supabase",
-                "Errore durante il controllo dell'esistenza dell'utente: ${e.message}"
-            )
+            Log.e("Supabase", "Errore nel controllo dell'utente: ${e.message}")
             false
         }
     }
 
-
-    // controlla che l'utente sia già loggato e abbia una session
-    @OptIn(SupabaseInternal::class)
     fun checkUserLoggedIn(navController: NavController, context: Context) {
-
         viewModelScope.launch {
-            val supabase = SupabaseClientProvider.getSupabaseClient()
-            val session = supabase.auth.currentSessionOrNull()
-
-
+            val session = userSession()
             if (session != null) {
-                if (supabase.accessToken != null) {
-                    val newAccessToken = refreshAccessToken(context)
-                    if (newAccessToken != null) {
-                        Log.d("Supabase", "Token rinfrescato con successo")
-                        navController.navigate(Screen.LandingScreen.route)
-                    } else {
-                        Log.e("Supabase", "Errore nel refresh del token, esegui logout")
-                        logout(navController)
-                        navController.navigate(Screen.LoginScreen.route)
-                    }
-                } else {
-                    Log.e("Supabase", "Errore: Token non valido")
-                    logout(navController)
-                    navController.navigate(Screen.LoginScreen.route)
-                }
+                navController.navigate(Screen.ReadHealthConnectData.route)
             } else {
-                Log.d("Supabase", "Utente non loggato")
+                navController.navigate(Screen.LoginScreen.route)
             }
-
         }
     }
-
 }
 
-@Suppress("UNCHECKED_CAST")
-class SupabaseAuthViewModelFactory(private val application: Application) :
-    ViewModelProvider.Factory {
+/**
+ * Factory per la creazione di un [SupabaseAuthViewModel].
+ *
+ * @return Un'istanza di [SupabaseAuthViewModel].
+ */
+class SupabaseAuthViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SupabaseAuthViewModel::class.java)) {
-            return SupabaseAuthViewModel(application) as T
+            @Suppress("UNCHECKED_CAST")
+            return SupabaseAuthViewModel() as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
-
-

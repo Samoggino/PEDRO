@@ -1,12 +1,15 @@
 package com.lam.pedro.presentation
 
+import android.content.Context
 import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import com.example.healthconnectsample.data.HealthConnectManager
-import com.example.healthconnectsample.data.SleepSessionData
-import com.lam.pedro.data.datasource.SupabaseClientProvider
+import com.lam.pedro.data.SleepSessionData
+import com.lam.pedro.data.datasource.SecurePreferencesManager
+import com.lam.pedro.data.datasource.SupabaseClientProvider.supabase
 import com.lam.pedro.presentation.navigation.Screen
-import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.serialization.json.Json
@@ -14,25 +17,23 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
 
-class ViewModelInsertSleepSessionData {
+class ViewModelSleepData : ViewModel() {
 
     // Funzione aggiornata
-    @OptIn(SupabaseInternal::class)
     suspend fun uploadSleepSession(
         navController: NavController,
         healthConnectManager: HealthConnectManager,
-        sleepSessionData: SleepSessionData
+        sleepSessionData: SleepSessionData,
+        context: Context
     ) {
 
         try {
+            // logga il token dell'utente dalle sharedprefs
+            // leggi il file di sharedprefs e printa l'accessToken e il refreshToken
 
-            // logga il token dell'utente
-            Log.i("Supabase", "Token dell'utente: ${SupabaseClientProvider.getSupabaseClient().accessToken}")
-
-            if (SupabaseClientProvider.getSupabaseClient().accessToken == null) {
-               navController.navigate(Screen.LoginScreen.route)
+            if (SecurePreferencesManager.getAccessToken(context) == null) {
+                navController.navigate(Screen.LoginScreen.route)
             }
-
 
 
             // Crea un oggetto JSON completo con i dati della sessione di sonno e l'UUID dell'utente
@@ -47,7 +48,7 @@ class ViewModelInsertSleepSessionData {
             Log.d("Supabase", "Dati della sessione di sonno: $jsonFinal")
 
             // Esegui la chiamata RPC su Supabase
-            val response = SupabaseClientProvider.getSupabaseClient()
+            val response = supabase()
                 .postgrest
                 .rpc("insert_sleep_session", jsonFinal)
 
@@ -69,16 +70,23 @@ class ViewModelInsertSleepSessionData {
 
     }
 
-
-    // fai la get dei dati
     suspend fun getSleepSessions(): List<SleepSessionData> {
-        val response = SupabaseClientProvider.getSupabaseClient()
+        val response = supabase()
             .from("sleep_sessions")
             .select()
             .decodeList<SleepSessionData>()
 
         return response ?: emptyList()
     }
+}
 
-
+@Suppress("UNCHECKED_CAST")
+class ViewModelSleepDataFactory :
+    ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ViewModelSleepData::class.java)) {
+            return ViewModelSleepData() as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
 }

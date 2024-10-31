@@ -1,7 +1,6 @@
 package com.lam.pedro.presentation.screen.loginscreen
 
 
-import android.app.Application
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -49,8 +48,7 @@ fun LoginScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
-    val viewModel: SupabaseAuthViewModel =
-        viewModel(factory = SupabaseAuthViewModelFactory(context.applicationContext as Application))
+    val viewModel: SupabaseAuthViewModel = viewModel(factory = SupabaseAuthViewModelFactory())
     var isPasswordVisible by remember { mutableStateOf(false) }
 
     // al lancio fai una stampa
@@ -125,7 +123,7 @@ fun LoginScreen(
             Text("Password dimenticata?")
         }
 
-        TextButton(onClick = { viewModel.signUp(navController) }) {
+        TextButton(onClick = { viewModel.signUp(navController, context) }) {
             Text("Non hai un account? Registrati")
         }
 

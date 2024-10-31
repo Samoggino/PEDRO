@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.healthconnectsample.data.SleepSessionData
+import com.lam.pedro.data.SleepSessionData
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes@Composable
 fun SleepSessionItem(sleepSession: SleepSessionData) {
