@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.UUID
 
-class DriveSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+class DriveSessionViewModel(val healthConnectManager: HealthConnectManager) :
     ViewModel() {
     private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 

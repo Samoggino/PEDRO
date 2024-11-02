@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.UUID
 
-class WalkSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+class WalkSessionViewModel(val healthConnectManager: HealthConnectManager) :
     ViewModel() {
 
     /*Define here the required permissions for the Health Connect usage*/

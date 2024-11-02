@@ -130,8 +130,10 @@ class HealthConnectManager(private val context: Context) {
      */
     suspend fun writeExerciseSession(
         start: ZonedDateTime,
-        end: ZonedDateTime
+        end: ZonedDateTime,
+        title: String = "My Run #${Random.nextInt(0, 60)}"
     ): InsertRecordsResponse {
+
         return healthConnectClient.insertRecords(
             listOf(
                 ExerciseSessionRecord(
@@ -140,7 +142,7 @@ class HealthConnectManager(private val context: Context) {
                     endTime = end.toInstant(),
                     endZoneOffset = end.offset,
                     exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_RUNNING,
-                    title = "My Run #${Random.nextInt(0, 60)}"
+                    title = title
                 ),
                 StepsRecord(
                     startTime = start.toInstant(),
@@ -163,7 +165,7 @@ class HealthConnectManager(private val context: Context) {
                     endZoneOffset = end.offset,
                     energy = Energy.calories(140 + (Random.nextInt(20)) * 0.01)
                 )
-            ) + buildHeartRateSeries(start, end)
+            )
         )
     }
 

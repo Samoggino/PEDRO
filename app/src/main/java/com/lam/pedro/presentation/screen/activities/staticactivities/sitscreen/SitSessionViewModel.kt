@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.UUID
 
-class SitSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+class SitSessionViewModel(val healthConnectManager: HealthConnectManager) :
     ViewModel() {
     private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 

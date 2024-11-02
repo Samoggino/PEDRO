@@ -45,7 +45,8 @@ import com.lam.pedro.R
 import com.lam.pedro.data.WeightData
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.PermissionRequired
-import com.lam.pedro.presentation.component.TimerComponent
+import com.lam.pedro.presentation.component.StartActivityComponent
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionViewModel
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.UUID
@@ -63,9 +64,11 @@ fun WeightSessionScreen(
     onPermissionsResult: () -> Unit = {},
     weeklyAvg: Mass?,
     onPermissionsLaunch: (Set<String>) -> Unit = {},
+    onStartRecording: () -> Unit = {},
     navController: NavHostController,
     titleId: Int,
-    color: Color
+    color: Color,
+    viewModel: LiftSessionViewModel
 ) {
 
     // Remember the last error ID, such that it is possible to avoid re-launching the error
@@ -132,11 +135,17 @@ fun WeightSessionScreen(
             ) {
                 if (!permissionsGranted) {
                     item {
-                        PermissionRequired(color) { onPermissionsLaunch(permissions) }
+                        PermissionRequired(
+                            color = color,
+                            permissions = permissions,
+                            onPermissionLaunch = onPermissionsLaunch
+                        )
                     }
                 } else {
                     item {
-                        TimerComponent(color)
+                        val healthConnectManager = viewModel.healthConnectManager
+                        val runViewModel = RunSessionViewModel(healthConnectManager)
+                        StartActivityComponent(color, runViewModel)
                         OutlinedTextField(
                             value = weightInput,
                             onValueChange = {

@@ -28,26 +28,30 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.navigation.NavController
+import com.lam.pedro.data.ExerciseSession
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.PermissionRequired
-import com.lam.pedro.presentation.component.TimerComponent
+import com.lam.pedro.presentation.component.StartActivityComponent
 import kotlinx.coroutines.delay
 import java.util.UUID
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RunSessionScreen(
     permissions: Set<String>,
     permissionsGranted: Boolean,
-    //sessionsList: List<WalkSessionData>,
+    sessionsList: List<ExerciseSession>,
     uiState: RunSessionViewModel.UiState,
     onInsertClick: () -> Unit = {},
     onError: (Throwable?) -> Unit = {},
     onPermissionsResult: () -> Unit = {},
     onPermissionsLaunch: (Set<String>) -> Unit = {},
+    onStartRecording: () -> Unit = {},
     navController: NavController,
     titleId: Int,
-    color: Color
+    color: Color,
+    viewModel: RunSessionViewModel
 ) {
 
     // Remember the last error ID, such that it is possible to avoid re-launching the error
@@ -124,12 +128,16 @@ fun RunSessionScreen(
                     }
 
                     item {
-                        PermissionRequired(color) { onPermissionsLaunch(permissions) }
+                        PermissionRequired(
+                            color = color,
+                            permissions = permissions,
+                            onPermissionLaunch = onPermissionsLaunch
+                        )
                     }
                 } else {
                     // Interfaccia per avviare e fermare l'attività
                     item {
-                        TimerComponent(color)
+                        StartActivityComponent(color, viewModel)
                     }
                 }
             }
@@ -138,11 +146,3 @@ fun RunSessionScreen(
 
     }
 }
-
-
-
-
-
-
-
-

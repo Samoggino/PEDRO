@@ -1,5 +1,6 @@
 package com.lam.pedro.presentation.component
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -16,9 +17,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.lam.pedro.R
+import com.lam.pedro.presentation.TAG
 
 @Composable
-fun PermissionRequired(color: Color, onPermissionLaunch: () -> Unit) {
+fun PermissionRequired(color: Color, onPermissionLaunch: (Set<String>) -> Unit, permissions: Set<String>) {
     Spacer(modifier = Modifier.height(32.dp))
     Text(
         text = stringResource(R.string.permissions_required),
@@ -34,7 +36,8 @@ fun PermissionRequired(color: Color, onPermissionLaunch: () -> Unit) {
     )
     Spacer(modifier = Modifier.height(32.dp))
     Button(
-        onClick = { onPermissionLaunch() },
+        onClick = {
+            onPermissionLaunch(permissions)},
         colors = ButtonDefaults.buttonColors(
             containerColor = color, // Colore di sfondo
             contentColor = Color.White         // Colore del testo

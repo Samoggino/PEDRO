@@ -1,18 +1,3 @@
-/*
- * Copyright 2022 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.lam.pedro.presentation.navigation
 
 import android.util.Log
@@ -164,7 +149,19 @@ fun PedroNavigation(
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 AboutScreen(navController = navController, titleId = topBarTitle)
             }
-            composable(Screen.LoginScreen.route) {
+            composable(Screen.LoginScreen.route,
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { fullWidth -> fullWidth }, // Entra da destra
+                        animationSpec = tween(700) // Durata dell'animazione
+                    )
+                },
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { fullWidth -> fullWidth }, // Esce verso destra
+                        animationSpec = tween(600) // Durata dell'uscita
+                    )
+                }) {
                 screenStack.add(Screen.LoginScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 LoginScreen(navController)
@@ -289,7 +286,8 @@ fun PedroNavigation(
                     },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.SleepSessions.color
+                    color = Screen.SleepSessions.color,
+                    viewModel = viewModel
                 )
             }
 
@@ -336,7 +334,8 @@ fun PedroNavigation(
                     },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.WalkSessionScreen.color
+                    color = Screen.WalkSessionScreen.color,
+                    viewModel = viewModel
                 )
             }
 
@@ -355,7 +354,7 @@ fun PedroNavigation(
                     )
                 )
                 val permissionsGranted by viewModel.permissionsGranted
-                //val sessionsList by viewModel.sessionsList
+                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = { viewModel.initialLoad() }
                 val permissionsLauncher =
@@ -367,10 +366,10 @@ fun PedroNavigation(
                 RunSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    //sessionsList = sessionsList,
+                    sessionsList = sessionsList,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        //viewModel.addSleepData()
+                        viewModel.startRecording()
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -383,7 +382,8 @@ fun PedroNavigation(
                     },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.RunSessionScreen.color
+                    color = Screen.RunSessionScreen.color,
+                    viewModel = viewModel
                 )
             }
 
@@ -430,7 +430,8 @@ fun PedroNavigation(
                     },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.DriveSessionScreen.color
+                    color = Screen.DriveSessionScreen.color,
+                    viewModel = viewModel
                 )
             }
 
@@ -477,7 +478,8 @@ fun PedroNavigation(
                     },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.SitSessionScreen.color
+                    color = Screen.SitSessionScreen.color,
+                    viewModel = viewModel
                 )
             }
 
@@ -524,7 +526,8 @@ fun PedroNavigation(
                     },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.ListenSessionScreen.color
+                    color = Screen.ListenSessionScreen.color,
+                    viewModel = viewModel
                 )
             }
 
@@ -569,7 +572,8 @@ fun PedroNavigation(
                     },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.WeightScreen.color
+                    color = Screen.WeightScreen.color,
+                    viewModel = viewModel
                 )
             }
 
@@ -616,7 +620,8 @@ fun PedroNavigation(
                     },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.YogaSessionScreen.color
+                    color = Screen.YogaSessionScreen.color,
+                    viewModel = viewModel
                 )
             }
 
@@ -664,7 +669,8 @@ fun PedroNavigation(
                     },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.CycleSessionScreen.color
+                    color = Screen.CycleSessionScreen.color,
+                    viewModel = viewModel
                 )
             }
 
@@ -711,7 +717,8 @@ fun PedroNavigation(
                     },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.TrainSessionScreen.color
+                    color = Screen.TrainSessionScreen.color,
+                    viewModel = viewModel
                 )
             }
 

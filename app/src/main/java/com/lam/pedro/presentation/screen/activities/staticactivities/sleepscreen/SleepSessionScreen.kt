@@ -1,18 +1,3 @@
-/*
- * Copyright 2022 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -43,7 +28,8 @@ import androidx.navigation.NavController
 import com.lam.pedro.data.SleepSessionData
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.PermissionRequired
-import com.lam.pedro.presentation.component.TimerComponent
+import com.lam.pedro.presentation.component.StartActivityComponent
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionViewModel
 import java.time.Instant
 import java.util.UUID
 
@@ -61,9 +47,11 @@ fun SleepSessionScreen(
     onError: (Throwable?) -> Unit = {},
     onPermissionsResult: () -> Unit = {},
     onPermissionsLaunch: (Set<String>) -> Unit = {},
+    onStartRecording: () -> Unit = {},
     navController: NavController,
     titleId: Int,
-    color: Color
+    color: Color,
+    viewModel: SleepSessionViewModel
 ) {
 
     // Remember the last error ID, such that it is possible to avoid re-launching the error
@@ -121,20 +109,25 @@ fun SleepSessionScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
-
             if (!permissionsGranted) {
                 item {
                     Spacer(modifier = Modifier.height(30.dp))
                 }
 
                 item {
-                    PermissionRequired(color) { onPermissionsLaunch(permissions) }
+                    PermissionRequired(
+                        color = color,
+                        permissions = permissions,
+                        onPermissionLaunch = onPermissionsLaunch
+                    )
                 }
             } else {
 
                 // Button per Start/Stop della registrazione
                 item {
-                    TimerComponent(color)
+                    val healthConnectManager = viewModel.healthConnectManager
+                    val runViewModel = RunSessionViewModel(healthConnectManager)
+                    StartActivityComponent(color, runViewModel)
                 }
             }
         }

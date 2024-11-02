@@ -45,6 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.lam.pedro.R
+import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.theme.PedroYellow
 
 /**
@@ -62,20 +63,13 @@ fun PrivacyPolicyScreen(
     Scaffold(topBar = {
         TopAppBar(
             title = {
-
                 Text(
                     text = stringResource(titleId),
                     style = MaterialTheme.typography.headlineSmall
                 )
             },
             navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.Rounded.ArrowBack,
-                        contentDescription = stringResource(R.string.back)
-                    )
-                }
-
+                BackButton(navController)
             },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.White.copy(alpha = 0f)

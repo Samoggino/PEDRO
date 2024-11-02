@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.PermissionRequired
-import com.lam.pedro.presentation.component.TimerComponent
-import com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen.SleepSessionViewModel
+import com.lam.pedro.presentation.component.StartActivityComponent
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionViewModel
 import java.time.Instant
 import java.util.UUID
 
@@ -42,9 +42,11 @@ fun DriveSessionScreen(
     onError: (Throwable?) -> Unit = {},
     onPermissionsResult: () -> Unit = {},
     onPermissionsLaunch: (Set<String>) -> Unit = {},
+    onStartRecording: () -> Unit = {},
     navController: NavController,
     titleId: Int,
-    color: Color
+    color: Color,
+    viewModel: DriveSessionViewModel
 ) {
 
     // Remember the last error ID, such that it is possible to avoid re-launching the error
@@ -110,11 +112,17 @@ fun DriveSessionScreen(
                     }
 
                     item {
-                        PermissionRequired(color) { onPermissionsLaunch(permissions) }
+                        PermissionRequired(
+                            color = color,
+                            permissions = permissions,
+                            onPermissionLaunch = onPermissionsLaunch
+                        )
                     }
                 } else {
                     item {
-                        TimerComponent(color)
+                        val healthConnectManager = viewModel.healthConnectManager
+                        val runViewModel = RunSessionViewModel(healthConnectManager)
+                        StartActivityComponent(color, runViewModel)
                     }
 
 //TODO: implementare la registrazione e la visualizzazione delle sessioni

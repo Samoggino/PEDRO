@@ -58,6 +58,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavHostController
 import com.lam.pedro.R
+import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.InstalledMessage
 import com.lam.pedro.presentation.component.LinkedApp
 import com.lam.pedro.presentation.component.NotInstalledMessage
@@ -110,13 +111,7 @@ fun HealthConnectScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Rounded.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
-                    }
-
+                    BackButton(navController)
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White.copy(alpha = 0f)
