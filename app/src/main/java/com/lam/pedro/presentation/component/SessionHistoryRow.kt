@@ -22,14 +22,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.lam.pedro.R
 import com.lam.pedro.data.ExerciseSession
+import com.lam.pedro.presentation.navigation.Screen
+import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 import com.lam.pedro.presentation.theme.PedroYellow
 
 @Composable
-fun SessionHistoryRow(color: Color, session: ExerciseSession) {
+fun SessionHistoryRow(color: Color, image: Int, session: ExerciseSession, navController: NavController, viewModel: ActivitySessionViewModel) {
 
-    Box(modifier = Modifier.clickable {}) {
+    Box(modifier = Modifier.clickable {
+        navController.navigate(Screen.ExerciseSessionDetail.route) {
+            viewModel.selectSession(session)
+            navController.graph.startDestinationRoute?.let { route ->
+                popUpTo(route) {
+                    saveState = true
+                }
+            }
+            launchSingleTop = true
+            restoreState = true
+        }
+    }) {
         Row(
             modifier = Modifier
                 .height(70.dp)
@@ -39,7 +53,7 @@ fun SessionHistoryRow(color: Color, session: ExerciseSession) {
         ) {
 
             Image(
-                painter = painterResource(id = R.drawable.running_icon),
+                painter = painterResource(id = image),
                 contentDescription = "Stop",
                 modifier = Modifier.size(40.dp),
                 colorFilter = ColorFilter.tint(color)

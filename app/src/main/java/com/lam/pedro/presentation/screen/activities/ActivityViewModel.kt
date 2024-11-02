@@ -5,6 +5,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.ExerciseSession
@@ -51,6 +53,13 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
     private val _sessionState = MutableStateFlow(SessionState.IDLE)
     private var timerJob: Job? = null
     val sessionState: StateFlow<SessionState> get() = _sessionState
+
+    private val _selectedSession = MutableLiveData<ExerciseSession>()
+    val selectedSession: LiveData<ExerciseSession> = _selectedSession
+
+    fun selectSession(session: ExerciseSession) {
+        _selectedSession.value = session
+    }
 
 
     private val _elapsedTime = MutableStateFlow(0) // Tempo in millisecondi

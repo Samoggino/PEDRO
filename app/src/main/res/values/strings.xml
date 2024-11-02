@@ -180,5 +180,6 @@
     <string name="cycle_session_screen">Cycling</string>
     <string name="train_session_screen">Training</string>
     <string name="login">Login</string>
+    <string name="activity_history">History</string>
 
 </resources>

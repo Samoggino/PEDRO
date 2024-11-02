@@ -14,7 +14,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 
-
 class RunSessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ActivitySessionViewModel(healthConnectManager) {
 

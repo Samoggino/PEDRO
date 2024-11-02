@@ -10,6 +10,7 @@ import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ElevationGainedRecord
+import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.StepsCadenceRecord
 import androidx.health.connect.client.records.StepsRecord
@@ -19,15 +20,24 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.SleepSessionData
+import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.UUID
 
+/*
 class WalkSessionViewModel(val healthConnectManager: HealthConnectManager) :
     ViewModel() {
 
     /*Define here the required permissions for the Health Connect usage*/
     val permissions = setOf(
+
+        /*
+        * ExerciseSessionRecord
+        * */
+        HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+        HealthPermission.getWritePermission(ExerciseSessionRecord::class),
+
         /*
         * ActiveCaloriesBurnedRecord
         * */
@@ -73,7 +83,6 @@ class WalkSessionViewModel(val healthConnectManager: HealthConnectManager) :
         * */
         HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
         HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
-
 
     )
 
@@ -153,6 +162,68 @@ class WalkSessionViewModel(val healthConnectManager: HealthConnectManager) :
         data class Error(val exception: Throwable, val uuid: UUID = UUID.randomUUID()) : UiState()
     }
 }
+
+ */
+
+class WalkSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+    ActivitySessionViewModel(healthConnectManager) {
+    /*Define here the required permissions for the Health Connect usage*/
+    override val permissions = setOf(
+
+        /*
+        * ExerciseSessionRecord
+        * */
+        HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+        HealthPermission.getWritePermission(ExerciseSessionRecord::class),
+
+        /*
+        * ActiveCaloriesBurnedRecord
+        * */
+        HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class),
+        HealthPermission.getWritePermission(ActiveCaloriesBurnedRecord::class),
+
+        /*
+        * DistanceRecord
+        * */
+        HealthPermission.getReadPermission(DistanceRecord::class),
+        HealthPermission.getWritePermission(DistanceRecord::class),
+
+        /*
+        * ElevationGainedRecord
+        * */
+        HealthPermission.getReadPermission(ElevationGainedRecord::class),
+        HealthPermission.getWritePermission(ElevationGainedRecord::class),
+
+        /*
+        * ExerciseRoute - it isn't a record, it uses GPS so it requires manifest permissions
+        * */
+
+        /*
+        * SpeedRecord
+        * */
+        HealthPermission.getReadPermission(SpeedRecord::class),
+        HealthPermission.getWritePermission(SpeedRecord::class),
+
+        /*
+        * StepsCadenceRecord
+        * */
+        HealthPermission.getReadPermission(StepsCadenceRecord::class),
+        HealthPermission.getWritePermission(StepsCadenceRecord::class),
+
+        /*
+        * StepsRecord
+        * */
+        HealthPermission.getReadPermission(StepsRecord::class),
+        HealthPermission.getWritePermission(StepsRecord::class),
+
+        /*
+        * TotalCaloriesBurnedRecord
+        * */
+        HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
+        HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
+
+        )
+    }
 
 class WalkSessionViewModelFactory(
     private val healthConnectManager: HealthConnectManager

@@ -46,6 +46,7 @@ fun YogaSessionScreen(
     navController: NavController,
     titleId: Int,
     color: Color,
+    image: Int,
     viewModel: YogaSessionViewModel
 ) {
 
@@ -123,7 +124,7 @@ fun YogaSessionScreen(
                     item {
                         val healthConnectManager = viewModel.healthConnectManager
                         val runViewModel = RunSessionViewModel(healthConnectManager)
-                        StartActivityComponent(color, runViewModel)
+                        StartActivityComponent(color, image, runViewModel, navController)
                     }
                 }
             }

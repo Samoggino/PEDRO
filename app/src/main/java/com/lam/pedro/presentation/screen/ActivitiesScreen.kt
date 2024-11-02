@@ -36,19 +36,19 @@ fun ActivitiesScreen(
     navController: NavHostController
 ) {
     val staticActivities = listOf(
-        ActivityItem("Sleeping", painterResource(id = R.drawable.sleeping_icon), 90.dp, Screen.SleepSessions.route, Screen.SleepSessions.color),
-        ActivityItem("Driving", painterResource(id = R.drawable.car_icon), 100.dp, Screen.DriveSessionScreen.route, Screen.DriveSessionScreen.color),
-        ActivityItem("Sitting", painterResource(id = R.drawable.armchair_icon), 90.dp, Screen.SitSessionScreen.route, Screen.SitSessionScreen.color),
-        ActivityItem("Lifting", painterResource(id = R.drawable.dumbells_icon), 90.dp, Screen.WeightScreen.route, Screen.WeightScreen.color),
-        ActivityItem("Listening", painterResource(id = R.drawable.headphones_icon), 90.dp, Screen.ListenSessionScreen.route, Screen.ListenSessionScreen.color)
+        ActivityItem("Sleeping", painterResource(id = Screen.SleepSessions.image), 90.dp, Screen.SleepSessions.route, Screen.SleepSessions.color),
+        ActivityItem("Driving", painterResource(id = Screen.DriveSessionScreen.image), 100.dp, Screen.DriveSessionScreen.route, Screen.DriveSessionScreen.color),
+        ActivityItem("Sitting", painterResource(id = Screen.SitSessionScreen.image), 90.dp, Screen.SitSessionScreen.route, Screen.SitSessionScreen.color),
+        ActivityItem("Lifting", painterResource(id = Screen.WeightScreen.image), 90.dp, Screen.WeightScreen.route, Screen.WeightScreen.color),
+        ActivityItem("Listening", painterResource(id = Screen.ListenSessionScreen.image), 90.dp, Screen.ListenSessionScreen.route, Screen.ListenSessionScreen.color)
     )
 
     val dynamicActivities = listOf(
-        ActivityItem("Running", painterResource(id = R.drawable.running_icon), 90.dp, Screen.RunSessionScreen.route, Screen.RunSessionScreen.color),
-        ActivityItem("Walking", painterResource(id = R.drawable.walking_round_svgrepo_com), 90.dp, Screen.WalkSessionScreen.route, Screen.WalkSessionScreen.color),
-        ActivityItem("Yoga", painterResource(id = R.drawable.yoga_icon), 90.dp, Screen.YogaSessionScreen.route, Screen.YogaSessionScreen.color),
-        ActivityItem("Cycling", painterResource(id = R.drawable.bicycling_icon), 90.dp, Screen.CycleSessionScreen.route, Screen.CycleSessionScreen.color),
-        ActivityItem("Training", painterResource(id = R.drawable.stretching_icon), 90.dp, Screen.TrainSessionScreen.route, Screen.TrainSessionScreen.color)
+        ActivityItem("Running", painterResource(id = Screen.RunSessionScreen.image), 90.dp, Screen.RunSessionScreen.route, Screen.RunSessionScreen.color),
+        ActivityItem("Walking", painterResource(id = Screen.WalkSessionScreen.image), 90.dp, Screen.WalkSessionScreen.route, Screen.WalkSessionScreen.color),
+        ActivityItem("Yoga", painterResource(id = Screen.YogaSessionScreen.image), 90.dp, Screen.YogaSessionScreen.route, Screen.YogaSessionScreen.color),
+        ActivityItem("Cycling", painterResource(id = Screen.CycleSessionScreen.image), 90.dp, Screen.CycleSessionScreen.route, Screen.CycleSessionScreen.color),
+        ActivityItem("Training", painterResource(id = Screen.TrainSessionScreen.image), 90.dp, Screen.TrainSessionScreen.route, Screen.TrainSessionScreen.color)
     )
 
     LazyColumn(

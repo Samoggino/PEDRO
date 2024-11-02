@@ -52,6 +52,7 @@ fun RunSessionScreen(
     navController: NavController,
     titleId: Int,
     color: Color,
+    image: Int,
     viewModel: RunSessionViewModel
 ) {
 
@@ -138,7 +139,7 @@ fun RunSessionScreen(
                 } else {
                     // Interfaccia per avviare e fermare l'attività
                     item {
-                        StartActivityComponent(color, viewModel)
+                        StartActivityComponent(color, image, viewModel, navController)
                     }
                 }
             }

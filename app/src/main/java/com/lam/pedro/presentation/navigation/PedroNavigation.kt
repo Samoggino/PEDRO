@@ -30,6 +30,7 @@ import com.lam.pedro.presentation.screen.ActivitiesScreen
 import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.LandingScreen
 import com.lam.pedro.presentation.screen.MoreScreen
+import com.lam.pedro.presentation.screen.activities.ExerciseSessionDetailScreen
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionScreen
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionViewModel
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionViewModelFactory
@@ -243,6 +244,26 @@ fun PedroNavigation(
                 )
             }
 
+            composable(
+                Screen.ExerciseSessionDetail.route,
+                enterTransition = {
+                    slideInHorizontally(
+                        initialOffsetX = { fullWidth -> fullWidth }, // Entra da destra
+                        animationSpec = tween(700) // Durata dell'animazione
+                    )
+                },
+                exitTransition = {
+                    slideOutHorizontally(
+                        targetOffsetX = { fullWidth -> fullWidth }, // Esce verso destra
+                        animationSpec = tween(600) // Durata dell'uscita
+                    )
+                },
+            ) {
+                screenStack.add(Screen.ExerciseSessionDetail.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
+                ExerciseSessionDetailScreen(viewModel = viewModel(), navController = navController)
+            }
+
             composable(Screen.SleepSessions.route,
                 enterTransition = {
                     fadeIn(
@@ -287,6 +308,7 @@ fun PedroNavigation(
                     navController = navController,
                     titleId = topBarTitle,
                     color = Screen.SleepSessions.color,
+                    image = Screen.SleepSessions.image,
                     viewModel = viewModel
                 )
             }
@@ -306,7 +328,7 @@ fun PedroNavigation(
                     )
                 )
                 val permissionsGranted by viewModel.permissionsGranted
-                //val sessionsList by viewModel.sessionsList
+                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = { viewModel.initialLoad() }
                 val permissionsLauncher =
@@ -318,10 +340,10 @@ fun PedroNavigation(
                 WalkSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    //sessionsList = sessionsList,
+                    sessionsList = sessionsList,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.addSleepData()
+                        viewModel.startRecording()
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -335,6 +357,7 @@ fun PedroNavigation(
                     navController = navController,
                     titleId = topBarTitle,
                     color = Screen.WalkSessionScreen.color,
+                    image = Screen.WalkSessionScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -383,6 +406,7 @@ fun PedroNavigation(
                     navController = navController,
                     titleId = topBarTitle,
                     color = Screen.RunSessionScreen.color,
+                    image = Screen.RunSessionScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -431,6 +455,7 @@ fun PedroNavigation(
                     navController = navController,
                     titleId = topBarTitle,
                     color = Screen.DriveSessionScreen.color,
+                    image = Screen.DriveSessionScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -479,6 +504,7 @@ fun PedroNavigation(
                     navController = navController,
                     titleId = topBarTitle,
                     color = Screen.SitSessionScreen.color,
+                    image = Screen.SitSessionScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -527,6 +553,7 @@ fun PedroNavigation(
                     navController = navController,
                     titleId = topBarTitle,
                     color = Screen.ListenSessionScreen.color,
+                    image = Screen.ListenSessionScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -573,6 +600,7 @@ fun PedroNavigation(
                     navController = navController,
                     titleId = topBarTitle,
                     color = Screen.WeightScreen.color,
+                    image = Screen.WeightScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -621,6 +649,7 @@ fun PedroNavigation(
                     navController = navController,
                     titleId = topBarTitle,
                     color = Screen.YogaSessionScreen.color,
+                    image = Screen.YogaSessionScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -670,6 +699,7 @@ fun PedroNavigation(
                     navController = navController,
                     titleId = topBarTitle,
                     color = Screen.CycleSessionScreen.color,
+                    image = Screen.CycleSessionScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -718,6 +748,7 @@ fun PedroNavigation(
                     navController = navController,
                     titleId = topBarTitle,
                     color = Screen.TrainSessionScreen.color,
+                    image = Screen.TrainSessionScreen.image,
                     viewModel = viewModel
                 )
             }

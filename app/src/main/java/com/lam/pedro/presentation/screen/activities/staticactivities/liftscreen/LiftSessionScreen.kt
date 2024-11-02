@@ -68,6 +68,7 @@ fun WeightSessionScreen(
     navController: NavHostController,
     titleId: Int,
     color: Color,
+    image: Int,
     viewModel: LiftSessionViewModel
 ) {
 
@@ -145,7 +146,7 @@ fun WeightSessionScreen(
                     item {
                         val healthConnectManager = viewModel.healthConnectManager
                         val runViewModel = RunSessionViewModel(healthConnectManager)
-                        StartActivityComponent(color, runViewModel)
+                        StartActivityComponent(color, image, runViewModel, navController)
                         OutlinedTextField(
                             value = weightInput,
                             onValueChange = {

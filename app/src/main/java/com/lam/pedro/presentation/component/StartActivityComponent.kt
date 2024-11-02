@@ -43,7 +43,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.lam.pedro.R
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
@@ -53,7 +55,7 @@ import java.time.ZonedDateTime
 
 
 @Composable
-fun StartActivityComponent(color: Color, viewModel: ActivitySessionViewModel) {
+fun StartActivityComponent(color: Color, image: Int, viewModel: ActivitySessionViewModel, navController: NavController) {
     // Osserva sessionList dal ViewModel
     val sessionList by viewModel.sessionsList
     Column(
@@ -235,6 +237,15 @@ fun StartActivityComponent(color: Color, viewModel: ActivitySessionViewModel) {
     }
     Spacer(modifier = Modifier.height(30.dp))
 
+
+    Text(
+        text = stringResource(R.string.activity_history),
+        style = MaterialTheme.typography.headlineSmall
+    )
+
+
+    Spacer(modifier = Modifier.height(10.dp))
+
     LazyColumn(
         modifier = Modifier
             .clip(RoundedCornerShape(26.dp))
@@ -242,7 +253,7 @@ fun StartActivityComponent(color: Color, viewModel: ActivitySessionViewModel) {
             .background(MaterialTheme.colorScheme.primaryContainer)
     ) {
         items(sessionList) { session ->
-            SessionHistoryRow(color, session)
+            SessionHistoryRow(color, image, session, navController, viewModel)
             HorizontalDivider(
                 thickness = 1.dp, // Spessore della linea
                 color = Color(0xFF606060) // Colore della linea

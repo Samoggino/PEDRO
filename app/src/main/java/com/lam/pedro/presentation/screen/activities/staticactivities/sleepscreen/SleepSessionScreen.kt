@@ -51,6 +51,7 @@ fun SleepSessionScreen(
     navController: NavController,
     titleId: Int,
     color: Color,
+    image: Int,
     viewModel: SleepSessionViewModel
 ) {
 
@@ -127,7 +128,7 @@ fun SleepSessionScreen(
                 item {
                     val healthConnectManager = viewModel.healthConnectManager
                     val runViewModel = RunSessionViewModel(healthConnectManager)
-                    StartActivityComponent(color, runViewModel)
+                    StartActivityComponent(color, image, runViewModel, navController)
                 }
             }
         }

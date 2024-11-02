@@ -46,6 +46,7 @@ fun CycleSessionScreen(
     navController: NavController,
     titleId: Int,
     color: Color,
+    image: Int,
     viewModel: CycleSessionViewModel
 ) {
 
@@ -125,7 +126,7 @@ fun CycleSessionScreen(
                         // inizializza un RunSessionViewModel
                         val healthConnectManager = viewModel.healthConnectManager
                         val runViewModel = RunSessionViewModel(healthConnectManager)
-                        StartActivityComponent(color, runViewModel)
+                        StartActivityComponent(color, image, runViewModel, navController)
                     }
                 }
             }

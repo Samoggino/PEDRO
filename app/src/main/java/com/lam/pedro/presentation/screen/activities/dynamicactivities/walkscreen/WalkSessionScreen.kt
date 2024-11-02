@@ -24,9 +24,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.lam.pedro.data.ExerciseSession
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.PermissionRequired
 import com.lam.pedro.presentation.component.StartActivityComponent
+import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionViewModel
 import java.time.Instant
 import java.util.UUID
@@ -36,8 +38,8 @@ import java.util.UUID
 fun WalkSessionScreen(
     permissions: Set<String>,
     permissionsGranted: Boolean,
-    //sessionsList: List<WalkSessionData>,
-    uiState: WalkSessionViewModel.UiState,
+    sessionsList: List<ExerciseSession>,
+    uiState: ActivitySessionViewModel.UiState,
     onInsertClick: () -> Unit = {},
     onError: (Throwable?) -> Unit = {},
     onPermissionsResult: () -> Unit = {},
@@ -46,6 +48,7 @@ fun WalkSessionScreen(
     navController: NavController,
     titleId: Int,
     color: Color,
+    image: Int,
     viewModel: WalkSessionViewModel
 ) {
 
@@ -58,7 +61,7 @@ fun WalkSessionScreen(
 
     LaunchedEffect(uiState) {
         // If the initial data load has not taken place, attempt to load the data.
-        if (uiState is WalkSessionViewModel.UiState.Uninitialized) {
+        if (uiState is ActivitySessionViewModel.UiState.Uninitialized) {
             onPermissionsResult()
         }
 
@@ -66,7 +69,7 @@ fun WalkSessionScreen(
         // success or resulted in an error. Where an error occurred, for example in reading and
         // writing to Health Connect, the user is notified, and where the error is one that can be
         // recovered from, an attempt to do so is made.
-        if (uiState is WalkSessionViewModel.UiState.Error && errorId.value != uiState.uuid) {
+        if (uiState is ActivitySessionViewModel.UiState.Error && errorId.value != uiState.uuid) {
             onError(uiState.exception)
             errorId.value = uiState.uuid
         }
@@ -98,7 +101,7 @@ fun WalkSessionScreen(
         }
 
     ) { paddingValues ->
-        if (uiState != WalkSessionViewModel.UiState.Uninitialized) {
+        if (uiState != ActivitySessionViewModel.UiState.Uninitialized) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -121,9 +124,7 @@ fun WalkSessionScreen(
                 } else {
 //TODO: implementare la registrazione e la visualizzazione delle sessioni
                     item {
-                        val healthConnectManager = viewModel.healthConnectManager
-                        val runViewModel = RunSessionViewModel(healthConnectManager)
-                        StartActivityComponent(color, runViewModel)
+                        StartActivityComponent(color, image, viewModel, navController)
                     }
                 }
             }

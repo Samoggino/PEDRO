@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.HydrationRecord
 import androidx.health.connect.client.units.Mass
 import androidx.lifecycle.ViewModel
@@ -22,6 +23,13 @@ class SitSessionViewModel(val healthConnectManager: HealthConnectManager) :
     private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
     val permissions = setOf(
+
+        /*
+        * ExerciseSessionRecord
+        * */
+        HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+        HealthPermission.getWritePermission(ExerciseSessionRecord::class),
+
         /*
         * HydrationRecord
         * */

@@ -46,6 +46,7 @@ fun TrainSessionScreen(
     navController: NavController,
     titleId: Int,
     color: Color,
+    image: Int,
     viewModel: TrainSessionViewModel
 ) {
 
@@ -123,7 +124,7 @@ fun TrainSessionScreen(
                     item {
                         val healthConnectManager = viewModel.healthConnectManager
                         val runViewModel = RunSessionViewModel(healthConnectManager)
-                        StartActivityComponent(color, runViewModel)
+                        StartActivityComponent(color, image, runViewModel, navController)
                     }
                 }
             }

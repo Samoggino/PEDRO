@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ElevationGainedRecord
+import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.units.Mass
 import androidx.lifecycle.ViewModel
@@ -24,6 +25,13 @@ class DriveSessionViewModel(val healthConnectManager: HealthConnectManager) :
     private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
     val permissions = setOf(
+
+        /*
+        * ExerciseSessionRecord
+        * */
+        HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+        HealthPermission.getWritePermission(ExerciseSessionRecord::class),
+
         /*
         * DistanceRecord
         * */

@@ -46,6 +46,7 @@ fun DriveSessionScreen(
     navController: NavController,
     titleId: Int,
     color: Color,
+    image: Int,
     viewModel: DriveSessionViewModel
 ) {
 
@@ -122,7 +123,7 @@ fun DriveSessionScreen(
                     item {
                         val healthConnectManager = viewModel.healthConnectManager
                         val runViewModel = RunSessionViewModel(healthConnectManager)
-                        StartActivityComponent(color, runViewModel)
+                        StartActivityComponent(color, image, runViewModel, navController)
                     }
 
 //TODO: implementare la registrazione e la visualizzazione delle sessioni
