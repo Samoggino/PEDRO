@@ -32,6 +32,7 @@ import com.lam.pedro.data.ExerciseSession
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.PermissionRequired
 import com.lam.pedro.presentation.component.StartActivityComponent
+import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 import kotlinx.coroutines.delay
 import java.util.UUID
 
@@ -42,7 +43,7 @@ fun RunSessionScreen(
     permissions: Set<String>,
     permissionsGranted: Boolean,
     sessionsList: List<ExerciseSession>,
-    uiState: RunSessionViewModel.UiState,
+    uiState: ActivitySessionViewModel.UiState,
     onInsertClick: () -> Unit = {},
     onError: (Throwable?) -> Unit = {},
     onPermissionsResult: () -> Unit = {},
@@ -64,7 +65,7 @@ fun RunSessionScreen(
 
     LaunchedEffect(uiState) {
         // If the initial data load has not taken place, attempt to load the data.
-        if (uiState is RunSessionViewModel.UiState.Uninitialized) {
+        if (uiState is ActivitySessionViewModel.UiState.Uninitialized) {
             onPermissionsResult()
         }
 
@@ -72,7 +73,7 @@ fun RunSessionScreen(
         // success or resulted in an error. Where an error occurred, for example in reading and
         // writing to Health Connect, the user is notified, and where the error is one that can be
         // recovered from, an attempt to do so is made.
-        if (uiState is RunSessionViewModel.UiState.Error && errorId.value != uiState.uuid) {
+        if (uiState is ActivitySessionViewModel.UiState.Error && errorId.value != uiState.uuid) {
             onError(uiState.exception)
             errorId.value = uiState.uuid
         }
@@ -114,7 +115,7 @@ fun RunSessionScreen(
             )
         }
     ) { paddingValues ->
-        if (uiState != RunSessionViewModel.UiState.Uninitialized) {
+        if (uiState != ActivitySessionViewModel.UiState.Uninitialized) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()

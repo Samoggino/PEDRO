@@ -1,11 +1,5 @@
 package com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen
 
-import android.os.RemoteException
-import android.util.Log
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.DistanceRecord
@@ -17,33 +11,17 @@ import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
-import com.lam.pedro.data.ExerciseSession
 import com.lam.pedro.data.HealthConnectManager
-import com.lam.pedro.data.SessionState
-import com.lam.pedro.data.dateTimeWithOffsetOrDefault
-import com.lam.pedro.presentation.TAG
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
-import java.io.IOException
-import java.time.Duration
-import java.time.Instant
-import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
-import java.util.UUID
+import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 
 
 class RunSessionViewModel(private val healthConnectManager: HealthConnectManager) :
-    ViewModel() {
+    ActivitySessionViewModel(healthConnectManager) {
 
-    private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
+    //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
     /*Define here the required permissions for the Health Connect usage*/
-    val permissions = setOf(
+    override val permissions = setOf(
 
         /*
         * ExerciseSessionRecord
@@ -99,6 +77,7 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
 
         )
 
+    /*
     var permissionsGranted = mutableStateOf(false)
         private set
 
@@ -311,7 +290,7 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
         // and recomposition won't result in multiple snackbars.
         data class Error(val exception: Throwable, val uuid: UUID = UUID.randomUUID()) : UiState()
     }
-
+*/
 }
 
 class RunSessionViewModelFactory(
@@ -327,57 +306,3 @@ class RunSessionViewModelFactory(
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
-
-
-/*
-class RunSessionViewModel(
-    healthConnectManager: HealthConnectManager
-) : ActivityViewModel(healthConnectManager) {
-
-    override val permissions = setOf(
-        HealthPermission.getReadPermission(ExerciseSessionRecord::class),
-        HealthPermission.getWritePermission(ExerciseSessionRecord::class),
-        HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class),
-        HealthPermission.getWritePermission(ActiveCaloriesBurnedRecord::class),
-        HealthPermission.getReadPermission(DistanceRecord::class),
-        HealthPermission.getWritePermission(DistanceRecord::class),
-        HealthPermission.getReadPermission(ElevationGainedRecord::class),
-        HealthPermission.getWritePermission(ElevationGainedRecord::class),
-        HealthPermission.getReadPermission(SpeedRecord::class),
-        HealthPermission.getWritePermission(SpeedRecord::class),
-        HealthPermission.getReadPermission(StepsCadenceRecord::class),
-        HealthPermission.getWritePermission(StepsCadenceRecord::class),
-        HealthPermission.getReadPermission(StepsRecord::class),
-        HealthPermission.getWritePermission(StepsRecord::class),
-        HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
-        HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class)
-    )
-
-    fun initialLoad() {
-        viewModelScope.launch {
-            tryWithPermissionsCheck(permissions) {
-                readExerciseSessions()
-            }
-        }
-    }
-
-    private suspend fun readExerciseSessions() {
-        // Implementazione specifica per leggere le sessioni di corsa
-    }
-}
-
-class RunSessionViewModelFactory(
-    private val healthConnectManager: HealthConnectManager
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(RunSessionViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return RunSessionViewModel(
-                healthConnectManager = healthConnectManager
-            ) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
-
- */

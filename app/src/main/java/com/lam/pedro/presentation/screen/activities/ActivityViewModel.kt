@@ -5,13 +5,12 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.health.connect.client.permission.HealthPermission
-import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.ExerciseSession
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.SessionState
+import com.lam.pedro.data.dateTimeWithOffsetOrDefault
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,40 +19,43 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.time.Duration
+import java.time.Instant
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-open class ActivityViewModel(
-    private val healthConnectManager: HealthConnectManager
-) : ViewModel() {
 
-    /*
-    // Funzionalità di base per la gestione del timer e stato della sessione
+abstract class ActivitySessionViewModel(private val healthConnectManager: HealthConnectManager) :
+    ViewModel() {
+
+    private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
+
+    /*Define here the required permissions for the Health Connect usage*/
+    abstract val permissions: Set<String>
+
     var permissionsGranted = mutableStateOf(false)
-        protected set
+        private set
 
     var sessionsList: MutableState<List<ExerciseSession>> = mutableStateOf(listOf())
-        protected set
+        private set
 
     var uiState: UiState by mutableStateOf(UiState.Uninitialized)
-        protected set
+        private set
 
-    open val permissions = setOf{
-        HealthPermission.getReadPermission(ExerciseSessionRecord::class)
-        HealthPermission.getWritePermission(ExerciseSessionRecord::class)
-    }
+    val permissionsLauncher = healthConnectManager.requestPermissionsActivityContract()
 
     private var startTime: ZonedDateTime? = null
+    private var endTime: ZonedDateTime? = null
     private var pausedTime: Duration = Duration.ZERO
     private var lastPauseTime: ZonedDateTime? = null
     private val _sessionState = MutableStateFlow(SessionState.IDLE)
     private var timerJob: Job? = null
     val sessionState: StateFlow<SessionState> get() = _sessionState
 
-    private val _elapsedTime = MutableStateFlow(0)
+
+    private val _elapsedTime = MutableStateFlow(0) // Tempo in millisecondi
     val elapsedTime: StateFlow<Int> get() = _elapsedTime
 
-    // Avvio della sessione
     fun startSession() {
         startTime = ZonedDateTime.now()
         _sessionState.value = SessionState.RUNNING
@@ -98,15 +100,74 @@ open class ActivityViewModel(
         timerJob = null
     }
 
-    protected open suspend fun saveExerciseRecord() {
-        // Implementazione generica per salvare il record
+    private suspend fun saveExerciseRecord() {
         startTime?.let { start ->
-            val adjustedEnd = ZonedDateTime.now() - pausedTime
-            healthConnectManager.writeExerciseSession(start, adjustedEnd)
+            endTime?.let { end ->
+                val adjustedEnd = end - pausedTime // Sottrae il tempo totale in pausa
+                // Registra la sessione tramite Health Connect
+                healthConnectManager.writeExerciseSession(start, adjustedEnd)
+            }
         }
     }
 
-    suspend fun tryWithPermissionsCheck(block: suspend () -> Unit) {
+    suspend fun saveExerciseTest(start: ZonedDateTime, finish: ZonedDateTime) {
+        healthConnectManager.writeExerciseSession(start, finish)
+    }
+
+
+    fun initialLoad() {
+        viewModelScope.launch {
+            tryWithPermissionsCheck {
+                readExerciseSessions()
+            }
+        }
+    }
+
+    fun startRecording() {
+        viewModelScope.launch {
+            tryWithPermissionsCheck {
+                val startOfSession = ZonedDateTime.now()
+                val endOfSession = startOfSession.plusMinutes(30) // imposta un esempio di durata
+
+                // Avvia la sessione di esercizio e registra i dati necessari
+                healthConnectManager.writeExerciseSession(startOfSession, endOfSession)
+                readExerciseSessions()  // aggiorna la lista delle sessioni
+            }
+        }
+    }
+
+    suspend fun readExerciseSessions() {
+        val startOfDay = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)
+        val now = Instant.now()
+
+        sessionsList.value = healthConnectManager
+            .readExerciseSessions(startOfDay.toInstant(), now)
+            .map { record ->
+                val packageName = record.metadata.dataOrigin.packageName
+                ExerciseSession(
+                    startTime = dateTimeWithOffsetOrDefault(
+                        record.startTime,
+                        record.startZoneOffset
+                    ),
+                    endTime = dateTimeWithOffsetOrDefault(record.startTime, record.startZoneOffset),
+                    id = record.metadata.id,
+                    sourceAppInfo = healthConnectCompatibleApps[packageName],
+                    title = record.title
+                )
+            }
+    }
+
+    /**
+     * Provides permission check and error handling for Health Connect suspend function calls.
+     *
+     * Permissions are checked prior to execution of [block], and if all permissions aren't granted
+     * the [block] won't be executed, and [permissionsGranted] will be set to false, which will
+     * result in the UI showing the permissions button.
+     *
+     * Where an error is caught, of the type Health Connect is known to throw, [uiState] is set to
+     * [UiState.Error], which results in the snackbar being used to show the error message.
+     */
+    private suspend fun tryWithPermissionsCheck(block: suspend () -> Unit) {
         permissionsGranted.value = healthConnectManager.hasAllPermissions(permissions)
         uiState = try {
             if (permissionsGranted.value) {
@@ -133,5 +194,4 @@ open class ActivityViewModel(
         data class Error(val exception: Throwable, val uuid: UUID = UUID.randomUUID()) : UiState()
     }
 
-     */
 }
