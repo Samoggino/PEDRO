@@ -24,6 +24,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -56,6 +58,8 @@ import java.time.ZonedDateTime
 
 @Composable
 fun StartActivityComponent(color: Color, viewModel: RunSessionViewModel) {
+    // Osserva sessionList dal ViewModel
+    val sessionList by viewModel.sessionsList
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -79,9 +83,6 @@ fun StartActivityComponent(color: Color, viewModel: RunSessionViewModel) {
 
         // Lista dei risultati dei timer
         val timerResults = remember { mutableStateListOf<String>() }
-
-        // Osserva sessionList dal ViewModel
-        val sessionList by viewModel.sessionsList
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -235,15 +236,22 @@ fun StartActivityComponent(color: Color, viewModel: RunSessionViewModel) {
             )
         }
 
-        LazyColumn(modifier = Modifier.height(200.dp)) {
-            items(sessionList) { session ->
-                Text(
-                    text = session.toString(),
-                    modifier = Modifier.padding(8.dp)
-                )
-            }
-        }
+    }
+    Spacer(modifier = Modifier.height(30.dp))
 
+    LazyColumn(
+        modifier = Modifier
+            .clip(RoundedCornerShape(26.dp))
+            .height(600.dp)
+            .background(MaterialTheme.colorScheme.primaryContainer)
+    ) {
+        items(sessionList) { session ->
+            SessionHistoryRow(color, session)
+            HorizontalDivider(
+                thickness = 1.dp, // Spessore della linea
+                color = Color(0xFF606060) // Colore della linea
+            )
+        }
     }
 }
 
