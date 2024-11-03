@@ -133,7 +133,7 @@ class TrainSessionViewModel(val healthConnectManager: HealthConnectManager) :
         data class Error(val exception: Throwable, val uuid: UUID = UUID.randomUUID()) : UiState()
     }
 }
-
+/*
 class TrainSessionViewModelFactory(
     private val healthConnectManager: HealthConnectManager
 ) : ViewModelProvider.Factory {
@@ -147,3 +147,5 @@ class TrainSessionViewModelFactory(
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+
+ */

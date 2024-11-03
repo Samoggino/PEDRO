@@ -30,40 +30,32 @@ import com.lam.pedro.presentation.screen.ActivitiesScreen
 import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.LandingScreen
 import com.lam.pedro.presentation.screen.MoreScreen
+import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.ExerciseSessionDetailScreen
+import com.lam.pedro.presentation.screen.activities.GeneralActivityViewModelFactory
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionScreen
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionViewModel
-import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionViewModelFactory
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionScreen
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionViewModel
-import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionViewModelFactory
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.trainscreen.TrainSessionScreen
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.trainscreen.TrainSessionViewModel
-import com.lam.pedro.presentation.screen.activities.dynamicactivities.trainscreen.TrainSessionViewModelFactory
 import com.lam.pedro.presentation.screen.more.SettingsScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.more.PrivacyPolicyScreen
 import com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen.SleepSessionScreen
 import com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen.SleepSessionViewModel
-import com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen.SleepSessionViewModelFactory
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.walkscreen.WalkSessionScreen
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.walkscreen.WalkSessionViewModel
-import com.lam.pedro.presentation.screen.activities.dynamicactivities.walkscreen.WalkSessionViewModelFactory
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.yogascreen.YogaSessionScreen
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.yogascreen.YogaSessionViewModel
-import com.lam.pedro.presentation.screen.activities.dynamicactivities.yogascreen.YogaSessionViewModelFactory
 import com.lam.pedro.presentation.screen.activities.staticactivities.drivescreen.DriveSessionScreen
 import com.lam.pedro.presentation.screen.activities.staticactivities.drivescreen.DriveSessionViewModel
-import com.lam.pedro.presentation.screen.activities.staticactivities.drivescreen.DriveSessionViewModelFactory
 import com.lam.pedro.presentation.screen.activities.staticactivities.listenscreen.ListenSessionScreen
 import com.lam.pedro.presentation.screen.activities.staticactivities.sitscreen.SitSessionScreen
 import com.lam.pedro.presentation.screen.activities.staticactivities.liftscreen.LiftSessionViewModel
-import com.lam.pedro.presentation.screen.activities.staticactivities.liftscreen.LiftSessionViewModelFactory
 import com.lam.pedro.presentation.screen.activities.staticactivities.liftscreen.WeightSessionScreen
 import com.lam.pedro.presentation.screen.activities.staticactivities.listenscreen.ListenSessionViewModel
-import com.lam.pedro.presentation.screen.activities.staticactivities.listenscreen.ListenSessionViewModelFactory
 import com.lam.pedro.presentation.screen.activities.staticactivities.sitscreen.SitSessionViewModel
-import com.lam.pedro.presentation.screen.activities.staticactivities.sitscreen.SitSessionViewModelFactory
 import com.lam.pedro.showExceptionSnackbar
 import kotlinx.coroutines.launch
 
@@ -274,7 +266,7 @@ fun PedroNavigation(
                     fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
                 val viewModel: SleepSessionViewModel = viewModel(
-                    factory = SleepSessionViewModelFactory(
+                    factory = GeneralActivityViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -323,7 +315,7 @@ fun PedroNavigation(
                     fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
                 val viewModel: WalkSessionViewModel = viewModel(
-                    factory = WalkSessionViewModelFactory(
+                    factory = GeneralActivityViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -364,28 +356,29 @@ fun PedroNavigation(
 
             composable(Screen.RunSessionScreen.route,
                 enterTransition = {
-                    fadeIn(
-                        animationSpec = tween(1000) // Personalizza la durata dell'animazione
-                    )
+                    fadeIn(animationSpec = tween(1000))
                 },
                 exitTransition = {
-                    fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
+                    fadeOut(animationSpec = tween(1000))
                 }) {
                 val viewModel: RunSessionViewModel = viewModel(
-                    factory = RunSessionViewModelFactory(
+                    factory = GeneralActivityViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
+
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = { viewModel.initialLoad() }
-                val permissionsLauncher =
-                    rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                        onPermissionsResult()
-                    }
+
+                val permissionsLauncher = rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
+                    onPermissionsResult()
+                }
+
                 screenStack.add(Screen.RunSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
+
                 RunSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
@@ -411,6 +404,7 @@ fun PedroNavigation(
                 )
             }
 
+
             composable(Screen.DriveSessionScreen.route,
                 enterTransition = {
                     fadeIn(
@@ -421,7 +415,7 @@ fun PedroNavigation(
                     fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
                 val viewModel: DriveSessionViewModel = viewModel(
-                    factory = DriveSessionViewModelFactory(
+                    factory = GeneralActivityViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -470,7 +464,7 @@ fun PedroNavigation(
                     fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
                 val viewModel: SitSessionViewModel = viewModel(
-                    factory = SitSessionViewModelFactory(
+                    factory = GeneralActivityViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -519,7 +513,7 @@ fun PedroNavigation(
                     fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
                 val viewModel: ListenSessionViewModel = viewModel(
-                    factory = ListenSessionViewModelFactory(
+                    factory = GeneralActivityViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -560,7 +554,7 @@ fun PedroNavigation(
 
             composable(Screen.WeightScreen.route) {
                 val viewModel: LiftSessionViewModel = viewModel(
-                    factory = LiftSessionViewModelFactory(
+                    factory = GeneralActivityViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -615,7 +609,7 @@ fun PedroNavigation(
                     fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
                 val viewModel: YogaSessionViewModel = viewModel(
-                    factory = YogaSessionViewModelFactory(
+                    factory = GeneralActivityViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -665,7 +659,7 @@ fun PedroNavigation(
                     fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
                 val viewModel: CycleSessionViewModel = viewModel(
-                    factory = CycleSessionViewModelFactory(
+                    factory = GeneralActivityViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )
@@ -714,7 +708,7 @@ fun PedroNavigation(
                     fadeOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
                 }) {
                 val viewModel: TrainSessionViewModel = viewModel(
-                    factory = TrainSessionViewModelFactory(
+                    factory = GeneralActivityViewModelFactory(
                         healthConnectManager = healthConnectManager
                     )
                 )

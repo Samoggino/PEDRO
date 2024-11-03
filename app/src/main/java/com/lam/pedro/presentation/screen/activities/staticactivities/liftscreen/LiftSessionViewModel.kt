@@ -111,7 +111,7 @@ class LiftSessionViewModel(val healthConnectManager: HealthConnectManager) :
         data class Error(val exception: Throwable, val uuid: UUID = UUID.randomUUID()) : UiState()
     }
 }
-
+/*
 class LiftSessionViewModelFactory(
     private val healthConnectManager: HealthConnectManager
 ) : ViewModelProvider.Factory {
@@ -125,3 +125,5 @@ class LiftSessionViewModelFactory(
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+
+ */

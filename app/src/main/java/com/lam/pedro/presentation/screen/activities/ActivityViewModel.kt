@@ -8,11 +8,22 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.ExerciseSession
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.SessionState
 import com.lam.pedro.data.dateTimeWithOffsetOrDefault
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionViewModel
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionViewModel
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.trainscreen.TrainSessionViewModel
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.walkscreen.WalkSessionViewModel
+import com.lam.pedro.presentation.screen.activities.dynamicactivities.yogascreen.YogaSessionViewModel
+import com.lam.pedro.presentation.screen.activities.staticactivities.drivescreen.DriveSessionViewModel
+import com.lam.pedro.presentation.screen.activities.staticactivities.liftscreen.LiftSessionViewModel
+import com.lam.pedro.presentation.screen.activities.staticactivities.listenscreen.ListenSessionViewModel
+import com.lam.pedro.presentation.screen.activities.staticactivities.sitscreen.SitSessionViewModel
+import com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen.SleepSessionViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +36,7 @@ import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.UUID
+import kotlin.reflect.KClass
 
 
 abstract class ActivitySessionViewModel(private val healthConnectManager: HealthConnectManager) :
@@ -204,3 +216,58 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
     }
 
 }
+
+class GeneralActivityViewModelFactory(
+    private val healthConnectManager: HealthConnectManager
+) : ViewModelProvider.Factory {
+
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return when {
+            // Dynamic activities
+            modelClass.isAssignableFrom(CycleSessionViewModel::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                CycleSessionViewModel(healthConnectManager) as T
+            }
+            modelClass.isAssignableFrom(RunSessionViewModel::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                RunSessionViewModel(healthConnectManager) as T
+            }
+            modelClass.isAssignableFrom(TrainSessionViewModel::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                TrainSessionViewModel(healthConnectManager) as T
+            }
+            modelClass.isAssignableFrom(WalkSessionViewModel::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                WalkSessionViewModel(healthConnectManager) as T
+            }
+            modelClass.isAssignableFrom(YogaSessionViewModel::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                YogaSessionViewModel(healthConnectManager) as T
+            }
+
+            // Static activities
+            modelClass.isAssignableFrom(DriveSessionViewModel::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                DriveSessionViewModel(healthConnectManager) as T
+            }
+            modelClass.isAssignableFrom(LiftSessionViewModel::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                LiftSessionViewModel(healthConnectManager) as T
+            }
+            modelClass.isAssignableFrom(ListenSessionViewModel::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                ListenSessionViewModel(healthConnectManager) as T
+            }
+            modelClass.isAssignableFrom(SitSessionViewModel::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                SitSessionViewModel(healthConnectManager) as T
+            }
+            modelClass.isAssignableFrom(SleepSessionViewModel::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                SleepSessionViewModel(healthConnectManager) as T
+            }
+            else -> throw IllegalArgumentException("Unknown ViewModel class")
+        }
+    }
+}
+

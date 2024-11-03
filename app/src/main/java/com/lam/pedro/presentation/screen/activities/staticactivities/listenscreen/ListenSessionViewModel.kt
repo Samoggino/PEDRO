@@ -89,7 +89,7 @@ class ListenSessionViewModel(val healthConnectManager: HealthConnectManager) :
         data class Error(val exception: Throwable, val uuid: UUID = UUID.randomUUID()) : UiState()
     }
 }
-
+/*
 class ListenSessionViewModelFactory(
     private val healthConnectManager: HealthConnectManager
 ) : ViewModelProvider.Factory {
@@ -103,3 +103,5 @@ class ListenSessionViewModelFactory(
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+
+ */

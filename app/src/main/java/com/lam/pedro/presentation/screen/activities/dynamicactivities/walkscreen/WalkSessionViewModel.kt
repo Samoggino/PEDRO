@@ -224,7 +224,7 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
 
         )
     }
-
+/*
 class WalkSessionViewModelFactory(
     private val healthConnectManager: HealthConnectManager
 ) : ViewModelProvider.Factory {
@@ -238,3 +238,5 @@ class WalkSessionViewModelFactory(
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+
+ */

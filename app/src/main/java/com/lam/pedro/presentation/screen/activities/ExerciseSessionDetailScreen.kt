@@ -36,13 +36,10 @@ fun ExerciseSessionDetailScreen(
 ) {
     val session by viewModel.selectedSession.observeAsState()
 
-
-
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-
                     Text(
                         text = "${session?.title} detail" ?: "Session detail",
                         style = MaterialTheme.typography.headlineSmall
