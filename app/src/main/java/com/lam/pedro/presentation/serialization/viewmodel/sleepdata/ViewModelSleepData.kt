@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation
+package com.lam.pedro.presentation.serialization.viewmodel.sleepdata
 
 import android.content.Context
 import android.util.Log
@@ -7,7 +7,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import com.example.healthconnectsample.data.HealthConnectManager
 import com.lam.pedro.data.SleepSessionData
-import com.lam.pedro.data.datasource.SecurePreferencesManager
+import com.lam.pedro.data.datasource.SecurePreferencesManager.getAccessToken
+import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.SupabaseClientProvider.supabase
 import com.lam.pedro.presentation.navigation.Screen
 import io.github.jan.supabase.postgrest.from
@@ -15,7 +16,6 @@ import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
-import kotlinx.serialization.json.put
 
 class ViewModelSleepData : ViewModel() {
 
@@ -31,16 +31,21 @@ class ViewModelSleepData : ViewModel() {
             // logga il token dell'utente dalle sharedprefs
             // leggi il file di sharedprefs e printa l'accessToken e il refreshToken
 
-            if (SecurePreferencesManager.getAccessToken(context) == null) {
+            if (getAccessToken(context) == null) {
                 navController.navigate(Screen.LoginScreen.route)
             }
+
+
+            val uuid = getUUID(context)
+
+
 
 
             // Crea un oggetto JSON completo con i dati della sessione di sonno e l'UUID dell'utente
             val jsonFinal = buildJsonObject {
                 put("input_data", buildJsonObject {
                     put("data", Json.encodeToJsonElement(sleepSessionData))
-                    put("user_UUID", "0539f7b7-ec21-4bd1-a8fe-bc8deb5e5260")
+                    put("user_UUID", Json.encodeToJsonElement(uuid))
                 })
             }
 

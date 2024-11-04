@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation
+package com.lam.pedro.presentation.serialization.screen.sleepdata
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

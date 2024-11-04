@@ -37,7 +37,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import com.example.healthconnectsample.data.HealthConnectManager
 import com.example.healthconnectsample.presentation.screen.HealthConnectScreen
-import com.lam.pedro.presentation.ReadDataScreen
+import com.lam.pedro.presentation.serialization.screen.exercisedata.ReadDataScreen
 import com.lam.pedro.presentation.screen.AboutScreen
 import com.lam.pedro.presentation.screen.ActivitiesScreen
 import com.lam.pedro.presentation.screen.HomeScreen
@@ -83,7 +83,7 @@ fun PedroNavigation(
 
     val scope = rememberCoroutineScope()
     NavHost(navController = navController,
-        startDestination = Screen.ReadHealthConnectData.route,
+        startDestination = Screen.LoginScreen.route,
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None }) {
         val availability by healthConnectManager.availability

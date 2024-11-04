@@ -140,7 +140,7 @@ class SupabaseAuthViewModel : ViewModel() {
 
             // Salva il token di accesso e il refresh token
             if (session != null) {
-                saveTokens(session.accessToken, session.refreshToken, context)
+                saveTokens(session.accessToken, session.refreshToken, context, session?.user?.id)
                 Log.d("Supabase", "Login success: ${session.accessToken}")
             }
 
@@ -177,7 +177,7 @@ class SupabaseAuthViewModel : ViewModel() {
             }
 
             val session = userSession()
-            saveTokens(session?.accessToken ?: "", session?.refreshToken ?: "", context)
+            saveTokens(session?.accessToken ?: "", session?.refreshToken ?: "", context, session?.user?.id)
 
             Log.d("Supabase", "Registrazione avvenuta: ${session?.accessToken}")
             SignUpResult.Success(session)
@@ -251,7 +251,7 @@ class SupabaseAuthViewModel : ViewModel() {
             if (session != null) {
                 navController.navigate(Screen.ReadHealthConnectData.route)
             } else {
-                navController.navigate(Screen.LoginScreen.route)
+//                navController.navigate(Screen.LoginScreen.route)
             }
         }
     }

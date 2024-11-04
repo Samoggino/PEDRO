@@ -15,6 +15,7 @@
  */
 package com.lam.pedro.presentation.screen.exercisesessiondetail
 
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,11 +38,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
-import com.lam.pedro.data.ExerciseSessionData
 import com.example.healthconnectsample.data.formatTime
 import com.lam.pedro.presentation.component.ExerciseSessionDetailsMinMaxAvg
 import com.lam.pedro.presentation.component.sessionDetailsItem
 import com.lam.pedro.R
+import com.lam.pedro.data.ExerciseSessionData
 import com.lam.pedro.presentation.screen.recordlist.RecordType
 import com.lam.pedro.presentation.screen.recordlist.SeriesRecordsType
 import com.lam.pedro.presentation.theme.HealthConnectTheme

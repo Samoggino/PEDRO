@@ -28,6 +28,7 @@ object SupabaseClientProvider {
                 e.printStackTrace()
             }
         }
+
     }
 
     /**

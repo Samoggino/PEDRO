@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation
+package com.lam.pedro.presentation.serialization.screen.sleepdata
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -35,6 +35,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.healthconnectsample.data.HealthConnectManager
 import com.lam.pedro.data.SleepSessionData
+import com.lam.pedro.presentation.serialization.viewmodel.sleepdata.ViewModelSleepData
+import com.lam.pedro.presentation.serialization.viewmodel.sleepdata.ViewModelSleepDataFactory
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.ZonedDateTime
@@ -69,7 +71,7 @@ fun ReadDataScreen(
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = {
-            Log.i("Supabase-HealthConnect", "Aggiornamento dati")
+            Log.i("Supabase-HealthConnect", "Aggiornamento dati SleepDataScreen")
             isRefreshing = true
             coroutineScope.launch {
                 sleepSessions = viewModel.getSleepSessions()
@@ -148,7 +150,7 @@ fun ReadDataScreen(
                                 .padding(16.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            IndeterminateCircularIndicator()
+                            com.lam.pedro.presentation.serialization.screen.exercisedata.IndeterminateCircularIndicator()
                         }
                     } else {
                         Text(

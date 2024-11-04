@@ -13,6 +13,7 @@ object SecurePreferencesManager {
     private const val PREFS_NAME = "secure_prefs"
     private const val ACCESS_TOKEN_KEY = "ACCESS_TOKEN"
     private const val REFRESH_TOKEN_KEY = "REFRESH_TOKEN"
+    private const val UUID = "UUID"
 
     private var encryptedPrefs: SharedPreferences? = null
 
@@ -46,10 +47,13 @@ object SecurePreferencesManager {
      * @param refreshToken Il token di aggiornamento da salvare.
      * @param context Il contesto dell'applicazione.
      */
-    fun saveTokens(accessToken: String, refreshToken: String, context: Context) {
+    fun saveTokens(accessToken: String, refreshToken: String, context: Context, id: String?) {
         with(getPrefs(context).edit()) {
             putString(ACCESS_TOKEN_KEY, accessToken)
             putString(REFRESH_TOKEN_KEY, refreshToken)
+            if (id != null) {
+                putString(UUID, id)
+            }
             apply()
         }
     }
@@ -105,15 +109,15 @@ object SecurePreferencesManager {
      * @see UserSession
      */
     suspend fun refreshSession(context: Context): UserSession? {
-        val refreshToken =
-            getRefreshToken(context) // Funzione per recuperare il refresh token salvato
+        // Funzione per recuperare il refresh token salvato
+        val refreshToken = getRefreshToken(context)
         return if (refreshToken != null) {
             try {
 
                 val session = supabase().auth.refreshSession(refreshToken)
 
                 // Salva i nuovi token
-                saveTokens(session.accessToken, session.refreshToken, context)
+                saveTokens(session.accessToken, session.refreshToken, context, session.user?.id)
                 session.accessToken // Ritorna il nuovo access token
 
             } catch (e: Exception) {
@@ -124,6 +128,10 @@ object SecurePreferencesManager {
             Log.e("Supabase", "Nessun refresh token trovato")
             null
         }
+    }
+
+    fun getUUID(context: Context): String? {
+        return getPrefs(context).getString(UUID, null)
     }
 
 
