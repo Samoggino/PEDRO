@@ -56,7 +56,7 @@ fun LoginScreen(
         Log.i("Supabase", "LaunchedEffect")
 
         // controlla al mount che l'utente sia loggato o abbia un token
-        viewModel.checkUserLoggedIn(navController, context)
+        viewModel.checkUserLoggedIn(navController, true)
 
     }
 

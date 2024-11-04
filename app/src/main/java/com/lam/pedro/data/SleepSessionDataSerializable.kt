@@ -25,7 +25,7 @@ import java.time.ZoneOffset
  * Represents sleep data, raw, aggregated and sleep stages, for a given [SleepSessionRecord].
  */
 @Serializable
-data class SleepSessionData(
+data class SleepSessionDataSerializable(
     val uid: String,
     val title: String?,
     val notes: String?,
@@ -44,31 +44,36 @@ data class StageSerializable(
     val endTime: String
 )
 
-fun SleepSessionData(
-    uid: String,
-    title: String?,
-    notes: String?,
-    startTime: Instant,
-    startZoneOffset: ZoneOffset?,
-    endTime: Instant,
-    endZoneOffset: ZoneOffset?,
-    duration: Duration?,
-    stages: List<SleepSessionRecord.Stage>
-) = SleepSessionData(
-    uid,
-    title,
-    notes,
-    startTime.toString(),
-    startZoneOffset?.id,
-    endTime.toString(),
-    endZoneOffset?.id,
-    duration?.toMillis(),
-    stages.map {
-        StageSerializable(
-            it.stage,
-            it.startTime.toString(),
-            it.endTime.toString()
-        )
-    }
-)
+data class SleepSessionData(
+    val uid: String,
+    val title: String?,
+    val notes: String?,
+    val startTime: Instant,
+    val startZoneOffset: ZoneOffset?,
+    val endTime: Instant,
+    val endZoneOffset: ZoneOffset?,
+    val duration: Duration?,
+    val stages: List<SleepSessionRecord.Stage>
+) {
+    // Conversione per serializzare nel database
+    fun toSerializable() = SleepSessionDataSerializable(
+        uid = uid,
+        title = title,
+        notes = notes,
+        startTime.toString(),
+        startZoneOffset?.id,
+        endTime.toString(),
+        endZoneOffset?.id,
+        duration?.toMillis(),
+        stages.map {
+            StageSerializable(
+                it.stage,
+                it.startTime.toString(),
+                it.endTime.toString()
+            )
+        }
+    )
+
+}
+
 

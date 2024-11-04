@@ -26,7 +26,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.healthconnectsample.data.HealthConnectManager
-import com.lam.pedro.data.SleepSessionData
+import com.lam.pedro.data.SleepSessionDataSerializable
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.UUID
@@ -42,7 +42,7 @@ class SleepSessionViewModel(private val healthConnectManager: HealthConnectManag
     var permissionsGranted = mutableStateOf(false)
         private set
 
-    var sessionsList: MutableState<List<SleepSessionData>> = mutableStateOf(listOf())
+    var sessionsList: MutableState<List<SleepSessionDataSerializable>> = mutableStateOf(listOf())
         private set
 
     var uiState: UiState by mutableStateOf(UiState.Uninitialized)

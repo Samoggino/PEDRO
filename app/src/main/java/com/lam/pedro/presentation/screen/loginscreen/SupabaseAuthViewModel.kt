@@ -60,7 +60,7 @@ class SupabaseAuthViewModel : ViewModel() {
             isLoading = true
             val session = logInAuth(email, password, context)
             if (session != null) {
-                navController.navigate(Screen.ReadHealthConnectData.route)
+                navController.navigate(Screen.SleepSessionData.route)
             } else {
                 errorMessage = "Email o password errati."
                 showErrorDialog = true
@@ -81,7 +81,7 @@ class SupabaseAuthViewModel : ViewModel() {
         viewModelScope.launch {
             isLoading = true
             when (val result = signUpAuth(email, password, context)) {
-                is SignUpResult.Success -> navController.navigate(Screen.ReadHealthConnectData.route)
+                is SignUpResult.Success -> navController.navigate(Screen.SleepSessionData.route)
                 is SignUpResult.UserAlreadyExists -> {
                     errorMessage = "Utente già registrato"
                     showErrorDialog = true
@@ -140,7 +140,7 @@ class SupabaseAuthViewModel : ViewModel() {
 
             // Salva il token di accesso e il refresh token
             if (session != null) {
-                saveTokens(session.accessToken, session.refreshToken, context, session?.user?.id)
+                saveTokens(session.accessToken, session.refreshToken, context, session.user?.id)
                 Log.d("Supabase", "Login success: ${session.accessToken}")
             }
 
@@ -177,7 +177,12 @@ class SupabaseAuthViewModel : ViewModel() {
             }
 
             val session = userSession()
-            saveTokens(session?.accessToken ?: "", session?.refreshToken ?: "", context, session?.user?.id)
+            saveTokens(
+                session?.accessToken ?: "",
+                session?.refreshToken ?: "",
+                context,
+                session?.user?.id
+            )
 
             Log.d("Supabase", "Registrazione avvenuta: ${session?.accessToken}")
             SignUpResult.Success(session)
@@ -245,13 +250,18 @@ class SupabaseAuthViewModel : ViewModel() {
         }
     }
 
-    fun checkUserLoggedIn(navController: NavController, context: Context) {
+    fun checkUserLoggedIn(navController: NavController, fromLogin: Boolean) {
         viewModelScope.launch {
             val session = userSession()
             if (session != null) {
-                navController.navigate(Screen.ReadHealthConnectData.route)
+//                navController.navigate(Screen.ExerciseSessionData.route)
             } else {
-//                navController.navigate(Screen.LoginScreen.route)
+                if (!fromLogin) {
+                    errorMessage = "Effettua il login per accedere"
+                    showErrorDialog = true
+                } else {
+                    navController.navigate(Screen.LoginScreen.route)
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
-package com.lam.pedro.presentation.serialization.screen.sleepdata
+package com.lam.pedro.presentation.serialization.screen.exercisedata
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,12 +14,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.lam.pedro.data.SleepSessionDataSerializable
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes@Composable
-fun SleepSessionItem(sleepSession: SleepSessionDataSerializable) {
-    val (hours, minutes) = remember(sleepSession.duration) {
-        Pair(sleepSession.duration?.hours, sleepSession.duration?.minutes)
+import com.lam.pedro.data.ExerciseSessionData
+
+@Composable
+fun ExerciseDataItem(exerciseSession: ExerciseSessionData) {
+
+    Log.i("ExerciseDataItem", "ExerciseDataItem $exerciseSession")
+
+    val (hours, minutes) = remember(exerciseSession.totalActiveTime) {
+        Pair(
+            exerciseSession.totalActiveTime?.toHours(),
+            exerciseSession.totalActiveTime?.toMinutes()
+        )
     }
 
     Card(
@@ -35,25 +42,34 @@ fun SleepSessionItem(sleepSession: SleepSessionDataSerializable) {
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = "Durata: ${hours ?: 0} ore e ${minutes ?: 0} minuti",
+                text = "Durata: $hours ore e $minutes minuti",
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
-                text = "Note: ${sleepSession.notes ?: "Nessuna"}",
+                text = "Passi: ${exerciseSession.totalSteps}",
                 style = MaterialTheme.typography.bodySmall
             )
             Text(
-                text = "Data: ${sleepSession.startTime}",
+                text = "Distanza: ${exerciseSession.totalDistance} metri",
                 style = MaterialTheme.typography.bodySmall
             )
             Text(
-                text = "Finisce: ${sleepSession.endTime}",
+                text = "Calorie bruciate: ${exerciseSession.totalEnergyBurned} kcal",
                 style = MaterialTheme.typography.bodySmall
             )
-//            Text(
-//                text = "Stadi: ${sleepSession.stages}",
-//                style = MaterialTheme.typography.bodySmall
-//            )
+            Text(
+                text = "Frequenza cardiaca minima: ${exerciseSession.minHeartRate}",
+                style = MaterialTheme.typography.bodySmall
+            )
+            Text(
+                text = "Frequenza cardiaca massima: ${exerciseSession.maxHeartRate}",
+                style = MaterialTheme.typography.bodySmall
+            )
+            Text(
+                text = "Frequenza cardiaca media: ${exerciseSession.avgHeartRate}",
+                style = MaterialTheme.typography.bodySmall
+            )
+
         }
     }
 }

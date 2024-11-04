@@ -38,7 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.SleepSessionRecord
-import com.lam.pedro.data.SleepSessionData
+import com.lam.pedro.data.SleepSessionDataSerializable
 import com.example.healthconnectsample.data.dateTimeWithOffsetOrDefault
 import com.example.healthconnectsample.data.formatHoursMinutes
 import com.lam.pedro.R
@@ -47,12 +47,12 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 /**
- * Creates a row to represent a [SleepSessionData], which encompasses data for both the sleep
+ * Creates a row to represent a [SleepSessionDataSerializable], which encompasses data for both the sleep
  * session and any fine-grained sleep stages.
  */
 @Composable
 fun SleepSessionRow(
-    sessionData: SleepSessionData,
+    sessionData: SleepSessionDataSerializable,
     startExpanded: Boolean = false
 ) {
     val startZonedDateTime = ZonedDateTime.parse(sessionData.startTime)
@@ -119,7 +119,7 @@ data class StageDisplay(
     val endTime: String
 )
 
-fun SleepSessionData.toDisplayStages(): List<StageDisplay> {
+fun SleepSessionDataSerializable.toDisplayStages(): List<StageDisplay> {
     return stages.map {
         StageDisplay(
             stageType = when (it.stage) {
@@ -128,8 +128,8 @@ fun SleepSessionData.toDisplayStages(): List<StageDisplay> {
                 SleepSessionRecord.STAGE_TYPE_REM -> "REM"
                 else -> "Unknown"
             },
-            startTime = it.startTime.toString(),
-            endTime = it.endTime.toString()
+            startTime = it.startTime,
+            endTime = it.endTime
         )
     }
 }
