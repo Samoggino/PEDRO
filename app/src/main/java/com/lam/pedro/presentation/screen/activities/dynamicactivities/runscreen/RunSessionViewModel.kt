@@ -1,5 +1,6 @@
 package com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen
 
+import androidx.compose.runtime.MutableState
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.DistanceRecord
@@ -15,7 +16,7 @@ import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 
 class RunSessionViewModel(private val healthConnectManager: HealthConnectManager) :
-    ActivitySessionViewModel(healthConnectManager) {
+    ActivitySessionViewModel(healthConnectManager), MutableState<ActivitySessionViewModel?> {
 
     //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
@@ -75,6 +76,17 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
         HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
 
         )
+    override var value: ActivitySessionViewModel?
+        get() = TODO("Not yet implemented")
+        set(value) {}
+
+    override fun component1(): ActivitySessionViewModel? {
+        TODO("Not yet implemented")
+    }
+
+    override fun component2(): (ActivitySessionViewModel?) -> Unit {
+        TODO("Not yet implemented")
+    }
 
     /*
     var permissionsGranted = mutableStateOf(false)

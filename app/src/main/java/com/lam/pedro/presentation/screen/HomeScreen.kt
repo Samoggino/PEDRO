@@ -1,44 +1,93 @@
 package com.lam.pedro.presentation.screen
 
-import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.health.connect.client.HealthConnectClient
-import com.lam.pedro.R
 
 @Composable
-fun HomeScreen(
-
-) {
+fun HomeScreen() {
     val context = LocalContext.current
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(32.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.Top
     ) {
-
-        Box(modifier = Modifier.size(128.dp).background(Color.Black)) {
-
-            Text(text = "HOME")
-
+        item {
+            Spacer(modifier = Modifier.height(30.dp))
+            Text(
+                text = "¡Welcome back, gringo!",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(30.dp))
+            Text(
+                text = "Statistics",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(26.dp))
+                    .height(180.dp)
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+            ) {
+                // TODO: graph
+            }
+            Spacer(modifier = Modifier.height(30.dp))
+            Text(
+                text = "Something else",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(26.dp))
+                    .height(180.dp)
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+            ) {
+                // TODO: graph
+            }
+            Spacer(modifier = Modifier.height(30.dp))
+            Text(
+                text = "Booooooooh",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(26.dp))
+                    .height(180.dp)
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+            ) {
+                // TODO: graph
+            }
+            Spacer(modifier = Modifier.height(30.dp))
         }
-
     }
-
 }

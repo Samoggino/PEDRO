@@ -16,8 +16,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -30,8 +32,8 @@ import com.lam.pedro.presentation.screen.ActivitiesScreen
 import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.LandingScreen
 import com.lam.pedro.presentation.screen.MoreScreen
+import com.lam.pedro.presentation.screen.ExerciseSessionDetailScreen
 import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
-import com.lam.pedro.presentation.screen.activities.ExerciseSessionDetailScreen
 import com.lam.pedro.presentation.screen.activities.GeneralActivityViewModelFactory
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionScreen
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionViewModel
@@ -75,6 +77,13 @@ fun PedroNavigation(
 
     // Stack per tenere traccia delle schermate aperte
     val screenStack = remember { mutableStateListOf<String>() }
+
+    //viewModel condiviso tra l'attivita' ed i dettagli della sessione
+    // Dichiarazione nullable, così può essere inizializzata a null
+    //var sharedViewModel: ActivitySessionViewModel? = null
+
+    var sharedViewModel: ActivitySessionViewModel? by remember { mutableStateOf(null) }
+
 
     // Funzione per loggare le schermate attive
     fun logScreenStack() {
@@ -253,7 +262,68 @@ fun PedroNavigation(
             ) {
                 screenStack.add(Screen.ExerciseSessionDetail.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                ExerciseSessionDetailScreen(viewModel = viewModel(), navController = navController)
+                sharedViewModel?.let { it1 ->
+                    ExerciseSessionDetailScreen(
+                        viewModel = it1,
+                        navController = navController
+                    )
+                }
+            }
+
+            composable(Screen.RunSessionScreen.route,
+                enterTransition = {
+                    fadeIn(animationSpec = tween(1000))
+                },
+                exitTransition = {
+                    fadeOut(animationSpec = tween(1000))
+                }) {
+                val viewModel: RunSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory(
+                        healthConnectManager = healthConnectManager
+                    )
+                )
+                Log.d("RunSessionScreen", "VIEWMODEL DI RUN - $viewModel")
+
+                sharedViewModel = viewModel
+
+                Log.d("RunSessionScreen", "SHARED VIEW MODEL - $sharedViewModel")
+
+                val permissionsGranted by viewModel.permissionsGranted
+                val sessionsList by viewModel.sessionsList
+                val permissions = viewModel.permissions
+                val onPermissionsResult = { viewModel.initialLoad() }
+
+                val permissionsLauncher =
+                    rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
+                        onPermissionsResult()
+                    }
+
+                screenStack.add(Screen.RunSessionScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
+
+                RunSessionScreen(
+                    permissionsGranted = permissionsGranted,
+                    permissions = permissions,
+                    sessionsList = sessionsList,
+                    uiState = viewModel.uiState,
+                    onInsertClick = {
+                        viewModel.startRecording()
+                    },
+                    onError = { exception ->
+                        showExceptionSnackbar(snackbarHostState, scope, exception)
+                    },
+                    onPermissionsResult = {
+                        viewModel.initialLoad()
+                    },
+                    onPermissionsLaunch = { values ->
+                        permissionsLauncher.launch(values)
+                    },
+                    navController = navController,
+                    titleId = topBarTitle,
+                    color = Screen.RunSessionScreen.color,
+                    image = Screen.RunSessionScreen.image,
+                    viewModel = viewModel
+                )
             }
 
             composable(Screen.SleepSessions.route,
@@ -353,57 +423,6 @@ fun PedroNavigation(
                     viewModel = viewModel
                 )
             }
-
-            composable(Screen.RunSessionScreen.route,
-                enterTransition = {
-                    fadeIn(animationSpec = tween(1000))
-                },
-                exitTransition = {
-                    fadeOut(animationSpec = tween(1000))
-                }) {
-                val viewModel: RunSessionViewModel = viewModel(
-                    factory = GeneralActivityViewModelFactory(
-                        healthConnectManager = healthConnectManager
-                    )
-                )
-
-                val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
-                val permissions = viewModel.permissions
-                val onPermissionsResult = { viewModel.initialLoad() }
-
-                val permissionsLauncher = rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                    onPermissionsResult()
-                }
-
-                screenStack.add(Screen.RunSessionScreen.route)
-                logScreenStack() // Log dello stack dopo aver aperto la schermata
-
-                RunSessionScreen(
-                    permissionsGranted = permissionsGranted,
-                    permissions = permissions,
-                    sessionsList = sessionsList,
-                    uiState = viewModel.uiState,
-                    onInsertClick = {
-                        viewModel.startRecording()
-                    },
-                    onError = { exception ->
-                        showExceptionSnackbar(snackbarHostState, scope, exception)
-                    },
-                    onPermissionsResult = {
-                        viewModel.initialLoad()
-                    },
-                    onPermissionsLaunch = { values ->
-                        permissionsLauncher.launch(values)
-                    },
-                    navController = navController,
-                    titleId = topBarTitle,
-                    color = Screen.RunSessionScreen.color,
-                    image = Screen.RunSessionScreen.image,
-                    viewModel = viewModel
-                )
-            }
-
 
             composable(Screen.DriveSessionScreen.route,
                 enterTransition = {

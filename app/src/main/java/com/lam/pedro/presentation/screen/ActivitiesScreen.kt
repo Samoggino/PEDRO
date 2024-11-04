@@ -165,6 +165,4 @@ data class ActivityItem(
     val iconSize: Dp,
     val route: String?,
     val color: Color
-
-
 )

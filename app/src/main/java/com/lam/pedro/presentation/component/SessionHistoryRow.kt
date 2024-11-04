@@ -33,8 +33,9 @@ import com.lam.pedro.presentation.theme.PedroYellow
 fun SessionHistoryRow(color: Color, image: Int, session: ExerciseSession, navController: NavController, viewModel: ActivitySessionViewModel) {
 
     Box(modifier = Modifier.clickable {
+        viewModel.selectSession(session)
         navController.navigate(Screen.ExerciseSessionDetail.route) {
-            viewModel.selectSession(session)
+
             navController.graph.startDestinationRoute?.let { route ->
                 popUpTo(route) {
                     saveState = true
