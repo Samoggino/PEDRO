@@ -21,17 +21,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
 private val DarkColorPalette: ColorScheme = darkColorScheme(
     primary = PedroYellow,
     secondary = PedroBlack,
-    primaryContainer = PedroDarkGray
+    primaryContainer = PedroDarkGray,
+    secondaryContainer = PedroDark
 )
 
 private val LightColorPalette: ColorScheme = lightColorScheme(
     primary = PedroBlack,
     secondary = PedroBlack,
-    primaryContainer = PedroLightGray
+    primaryContainer = PedroLightGray,
+    secondaryContainer = PedroLight
 )
 
 @Composable

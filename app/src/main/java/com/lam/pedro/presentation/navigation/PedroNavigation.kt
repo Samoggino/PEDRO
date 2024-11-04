@@ -32,7 +32,6 @@ import com.lam.pedro.presentation.screen.ActivitiesScreen
 import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.LandingScreen
 import com.lam.pedro.presentation.screen.MoreScreen
-import com.lam.pedro.presentation.screen.ExerciseSessionDetailScreen
 import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.GeneralActivityViewModelFactory
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionScreen
@@ -77,13 +76,6 @@ fun PedroNavigation(
 
     // Stack per tenere traccia delle schermate aperte
     val screenStack = remember { mutableStateListOf<String>() }
-
-    //viewModel condiviso tra l'attivita' ed i dettagli della sessione
-    // Dichiarazione nullable, così può essere inizializzata a null
-    //var sharedViewModel: ActivitySessionViewModel? = null
-
-    var sharedViewModel: ActivitySessionViewModel? by remember { mutableStateOf(null) }
-
 
     // Funzione per loggare le schermate attive
     fun logScreenStack() {
@@ -245,31 +237,6 @@ fun PedroNavigation(
                 )
             }
 
-            composable(
-                Screen.ExerciseSessionDetail.route,
-                enterTransition = {
-                    slideInHorizontally(
-                        initialOffsetX = { fullWidth -> fullWidth }, // Entra da destra
-                        animationSpec = tween(700) // Durata dell'animazione
-                    )
-                },
-                exitTransition = {
-                    slideOutHorizontally(
-                        targetOffsetX = { fullWidth -> fullWidth }, // Esce verso destra
-                        animationSpec = tween(600) // Durata dell'uscita
-                    )
-                },
-            ) {
-                screenStack.add(Screen.ExerciseSessionDetail.route)
-                logScreenStack() // Log dello stack dopo aver aperto la schermata
-                sharedViewModel?.let { it1 ->
-                    ExerciseSessionDetailScreen(
-                        viewModel = it1,
-                        navController = navController
-                    )
-                }
-            }
-
             composable(Screen.RunSessionScreen.route,
                 enterTransition = {
                     fadeIn(animationSpec = tween(1000))
@@ -282,11 +249,6 @@ fun PedroNavigation(
                         healthConnectManager = healthConnectManager
                     )
                 )
-                Log.d("RunSessionScreen", "VIEWMODEL DI RUN - $viewModel")
-
-                sharedViewModel = viewModel
-
-                Log.d("RunSessionScreen", "SHARED VIEW MODEL - $sharedViewModel")
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList

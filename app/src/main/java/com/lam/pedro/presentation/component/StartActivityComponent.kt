@@ -253,7 +253,7 @@ fun StartActivityComponent(color: Color, image: Int, viewModel: ActivitySessionV
             .background(MaterialTheme.colorScheme.primaryContainer)
     ) {
         items(sessionList) { session ->
-            SessionHistoryRow(color, image, session, navController, viewModel)
+            SessionHistoryRow(color, image, session, viewModel)
             HorizontalDivider(
                 thickness = 1.dp, // Spessore della linea
                 color = Color(0xFF606060) // Colore della linea
