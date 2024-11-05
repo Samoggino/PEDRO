@@ -29,7 +29,7 @@ import androidx.health.connect.client.records.WeightRecord
 import com.lam.pedro.data.dateTimeWithOffsetOrDefault
 import com.lam.pedro.R
 import com.lam.pedro.presentation.TAG
-import com.lam.pedro.presentation.theme.HealthConnectTheme
+import com.lam.pedro.presentation.theme.PedroTheme
 import java.time.ZonedDateTime
 
 /**
@@ -194,7 +194,7 @@ fun FormattedChangeRow(
 @Preview
 @Composable
 fun FormattedChangeRowPreview() {
-    HealthConnectTheme {
+    PedroTheme {
         FormattedChangeRow(
             startTime = ZonedDateTime.now().withNano(0),
             recordType = stringResource(id = R.string.differential_changes_type_exercise_session),

@@ -94,6 +94,9 @@ dependencies {
     implementation("androidx.health.connect:connect-client:1.1.0-alpha10")
     implementation(libs.androidx.compose.animation)
 
+    implementation("androidx.compose.ui:ui:1.7.0-alpha07")
+    implementation("androidx.compose.animation:animation:1.7.0-alpha07")
+
 
 }
 

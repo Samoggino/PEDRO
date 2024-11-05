@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
+import com.lam.pedro.presentation.theme.PedroTheme
 
 /**
  * The entry point into the sample.
@@ -17,7 +17,9 @@ class MainActivity : ComponentActivity() {
         val healthConnectManager = (application as BaseApplication).healthConnectManager
 
         setContent {
-            PedroApp(healthConnectManager = healthConnectManager)
+            PedroTheme {
+                PedroApp(healthConnectManager = healthConnectManager)
+            }
         }
     }
 }

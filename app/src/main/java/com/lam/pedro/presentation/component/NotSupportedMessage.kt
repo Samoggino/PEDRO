@@ -28,7 +28,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import com.lam.pedro.data.MIN_SUPPORTED_SDK
 import com.lam.pedro.R
-import com.lam.pedro.presentation.theme.HealthConnectTheme
+import com.lam.pedro.presentation.theme.PedroTheme
 
 /**
  * Welcome text shown when the app first starts, where the device is not running a sufficient
@@ -70,7 +70,7 @@ fun NotSupportedMessage() {
 @Preview
 @Composable
 fun NotSupportedMessagePreview() {
-    HealthConnectTheme {
+    PedroTheme {
         NotSupportedMessage()
     }
 }

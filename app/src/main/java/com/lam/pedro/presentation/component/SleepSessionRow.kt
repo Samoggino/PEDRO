@@ -44,7 +44,7 @@ import com.lam.pedro.data.dateTimeWithOffsetOrDefault
 import com.lam.pedro.data.formatHoursMinutes
 import com.lam.pedro.R
 import com.lam.pedro.formatDisplayTimeStartEnd
-import com.lam.pedro.presentation.theme.HealthConnectTheme
+import com.lam.pedro.presentation.theme.PedroTheme
 import java.time.Duration
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -116,7 +116,7 @@ fun SleepSessionRow(
 @Preview
 @Composable
 fun SleepSessionRowPreview() {
-    HealthConnectTheme {
+    PedroTheme {
         val end = ZonedDateTime.now()
         val start = end.minusHours(1)
         Column {

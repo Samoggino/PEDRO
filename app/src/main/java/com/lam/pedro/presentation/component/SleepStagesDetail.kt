@@ -28,7 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.SleepSessionRecord
 import com.lam.pedro.formatDisplayTimeStartEnd
-import com.lam.pedro.presentation.theme.HealthConnectTheme
+import com.lam.pedro.presentation.theme.PedroTheme
 import java.time.ZonedDateTime
 
 @Composable
@@ -61,7 +61,7 @@ fun SleepStagesDetail(sleepStages: List<SleepSessionRecord.Stage>) {
 @Preview
 @Composable
 fun SleepStagesDetailPreview() {
-    HealthConnectTheme {
+    PedroTheme {
         val end2 = ZonedDateTime.now()
         val start2 = end2.minusHours(1)
         val start1 = start2.minusHours(1)

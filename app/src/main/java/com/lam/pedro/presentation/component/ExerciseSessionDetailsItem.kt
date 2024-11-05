@@ -24,7 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.lam.pedro.R
-import com.lam.pedro.presentation.theme.HealthConnectTheme
+import com.lam.pedro.presentation.theme.PedroTheme
 
 /**
  * Displays a title and content, for use in conveying session details.
@@ -46,7 +46,7 @@ fun LazyListScope.sessionDetailsItem(
 @Preview
 @Composable
 fun SessionDetailsItemPreview() {
-    HealthConnectTheme {
+    PedroTheme {
         LazyColumn {
             sessionDetailsItem(R.string.total_steps) {
                 Text(text = "12345")

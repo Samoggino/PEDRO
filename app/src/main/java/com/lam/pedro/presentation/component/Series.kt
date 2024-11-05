@@ -35,7 +35,7 @@ import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.SpeedRecord
 import com.lam.pedro.data.dateTimeWithOffsetOrDefault
 import com.lam.pedro.R
-import com.lam.pedro.presentation.theme.HealthConnectTheme
+import com.lam.pedro.presentation.theme.PedroTheme
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -134,7 +134,7 @@ fun SeriesRow(value: String) {
 @Preview
 @Composable
 fun HeartRateSeriesPreview() {
-    HealthConnectTheme {
+    PedroTheme {
         LazyColumn {
             val time1 = Instant.now()
             val time2 = time1.minusSeconds(60)

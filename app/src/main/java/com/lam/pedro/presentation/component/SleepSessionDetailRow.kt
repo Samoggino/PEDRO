@@ -31,7 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lam.pedro.R
-import com.lam.pedro.presentation.theme.HealthConnectTheme
+import com.lam.pedro.presentation.theme.PedroTheme
 
 @Composable
 fun SleepSessionDetailRow(
@@ -63,7 +63,7 @@ fun SleepSessionDetailRow(
 @Preview
 @Composable
 fun SleepSessionDetailRowPreview() {
-    HealthConnectTheme {
+    PedroTheme {
         Column {
             SleepSessionDetailRow(
                 labelId = R.string.sleep_notes,

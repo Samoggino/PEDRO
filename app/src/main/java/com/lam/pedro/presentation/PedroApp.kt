@@ -45,14 +45,14 @@ import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.R
 import com.lam.pedro.presentation.navigation.BottomBar
 import com.lam.pedro.presentation.navigation.PedroNavigation
-import com.lam.pedro.presentation.theme.HealthConnectTheme
+import com.lam.pedro.presentation.theme.PedroTheme
 
 const val TAG = "Health Connect sample"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PedroApp(healthConnectManager: HealthConnectManager) {
-    HealthConnectTheme {
+    PedroTheme {
         val snackbarHostState = remember { SnackbarHostState() }
         val navController = rememberNavController()
         val scope = rememberCoroutineScope()
@@ -108,8 +108,6 @@ fun PedroApp(healthConnectManager: HealthConnectManager) {
             else -> R.string.app_name
         }
         Scaffold(
-            topBar = {
-            },
             floatingActionButton = {
                 if (currentRoute == Screen.ActivitiesScreen.route)
                     ExtendedFloatingActionButton(

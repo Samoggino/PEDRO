@@ -21,7 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.lam.pedro.R
-import com.lam.pedro.presentation.theme.HealthConnectTheme
+import com.lam.pedro.presentation.theme.PedroTheme
 
 /**
  * Welcome text shown when the app first starts, where the Healthcore APK is already installed.
@@ -37,7 +37,7 @@ fun InstalledMessage() {
 @Preview
 @Composable
 fun InstalledMessagePreview() {
-    HealthConnectTheme {
+    PedroTheme {
         InstalledMessage()
     }
 }

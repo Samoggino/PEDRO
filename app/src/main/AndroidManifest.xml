@@ -56,11 +56,11 @@
         android:name="com.lam.pedro.presentation.BaseApplication"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.HealthConnect">
+        android:theme="@style/Theme.Pedro">
         <activity
             android:name="com.lam.pedro.presentation.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.HealthConnect">
+            android:theme="@style/Theme.Pedro">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

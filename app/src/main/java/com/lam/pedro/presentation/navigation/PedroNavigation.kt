@@ -295,7 +295,6 @@ fun PedroNavigation(
 
                 screenStack.add(Screen.RunSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-
                 RunSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,

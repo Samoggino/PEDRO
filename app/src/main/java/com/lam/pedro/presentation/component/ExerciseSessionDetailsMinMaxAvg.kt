@@ -23,7 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.lam.pedro.R
-import com.lam.pedro.presentation.theme.HealthConnectTheme
+import com.lam.pedro.presentation.theme.PedroTheme
 
 /**
  * Shows the statistical min, max and average values, as can be returned from Health Platform.
@@ -71,7 +71,7 @@ fun ExerciseSessionDetailsMinMaxAvg(
 @Preview
 @Composable
 fun ExerciseSessionDetailsMinMaxAvgPreview() {
-    HealthConnectTheme {
+    PedroTheme {
         ExerciseSessionDetailsMinMaxAvg(minimum = "10", maximum = "100", average = "55")
     }
 }

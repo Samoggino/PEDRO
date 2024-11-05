@@ -1,5 +1,7 @@
 package com.lam.pedro.presentation.screen
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -95,10 +98,10 @@ fun ActivitiesGrid(
         rows.forEach { rowActivities ->
             Row(modifier = Modifier.fillMaxWidth()) {
                 rowActivities.forEach { activity ->
-                    ActivityCard(
-                        activity = activity,
-                        onClick = {
-                            if (activity.route != null) {
+                    activity.route?.let {
+                        ActivityCard(
+                            activity = activity,
+                            onClick = {
                                 navController.navigate(activity.route) {
                                     navController.graph.startDestinationRoute?.let { route ->
                                         popUpTo(route) {
@@ -108,10 +111,11 @@ fun ActivitiesGrid(
                                     launchSingleTop = true
                                     restoreState = true
                                 }
-                            }
-                        },
-                        modifier = Modifier.weight(1f) // Assegna il peso a ciascun elemento in una riga
-                    )
+
+                            },
+                            modifier = Modifier.weight(1f) // Assegna il peso a ciascun elemento in una riga
+                        )
+                    }
                     Spacer(modifier = Modifier.width(8.dp))
                 }
                 // Aggiungi un Box vuoto se ci sono colonne vuote

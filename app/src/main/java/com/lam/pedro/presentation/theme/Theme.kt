@@ -38,7 +38,7 @@ private val LightColorPalette: ColorScheme = lightColorScheme(
 )
 
 @Composable
-fun HealthConnectTheme(
+fun PedroTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
