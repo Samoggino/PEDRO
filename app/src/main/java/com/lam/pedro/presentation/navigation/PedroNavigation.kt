@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -34,6 +35,7 @@ import com.lam.pedro.presentation.screen.more.loginscreen.LandingScreen
 import com.lam.pedro.presentation.screen.MoreScreen
 import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.GeneralActivityViewModelFactory
+import com.lam.pedro.presentation.screen.activities.NewActivityScreen
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionScreen
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionViewModel
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionScreen
@@ -76,6 +78,10 @@ fun PedroNavigation(
 
     // Stack per tenere traccia delle schermate aperte
     val screenStack = remember { mutableStateListOf<String>() }
+
+    var sharedViewModel: ActivitySessionViewModel? by remember { mutableStateOf(null) }
+    var sharedColor: Color? by remember { mutableStateOf(null) }
+    var sharedTitle: Int? by remember { mutableStateOf(null) }
 
     // Funzione per loggare le schermate attive
     fun logScreenStack() {
@@ -237,6 +243,29 @@ fun PedroNavigation(
                 )
             }
 
+            composable(Screen.NewActivityScreen.route,
+                enterTransition = {
+                    fadeIn(animationSpec = tween(1000))
+                },
+                exitTransition = {
+                    fadeOut(animationSpec = tween(1000))
+                }) {
+                screenStack.add(Screen.NewActivityScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
+                sharedViewModel?.let { it1 ->
+                    sharedColor?.let { it2 ->
+                        sharedTitle?.let { it3 ->
+                            NewActivityScreen(
+                                navController = navController,
+                                titleId = it3,
+                                color = it2,
+                                viewModel = it1
+                            )
+                        }
+                    }
+                }
+            }
+
             composable(Screen.RunSessionScreen.route,
                 enterTransition = {
                     fadeIn(animationSpec = tween(1000))
@@ -249,6 +278,10 @@ fun PedroNavigation(
                         healthConnectManager = healthConnectManager
                     )
                 )
+
+                sharedViewModel = viewModel
+                sharedColor = Screen.RunSessionScreen.color
+                sharedTitle = Screen.RunSessionScreen.titleId
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
@@ -302,6 +335,11 @@ fun PedroNavigation(
                         healthConnectManager = healthConnectManager
                     )
                 )
+
+                sharedViewModel = viewModel
+                sharedColor = Screen.SleepSessions.color
+                sharedTitle = Screen.SleepSessions.titleId
+
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
@@ -318,7 +356,7 @@ fun PedroNavigation(
                     sessionsList = sessionsList,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.addSleepData()
+                        viewModel.startRecording()
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -351,6 +389,11 @@ fun PedroNavigation(
                         healthConnectManager = healthConnectManager
                     )
                 )
+
+                sharedViewModel = viewModel
+                sharedColor = Screen.WalkSessionScreen.color
+                sharedTitle = Screen.WalkSessionScreen.titleId
+
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
@@ -400,8 +443,13 @@ fun PedroNavigation(
                         healthConnectManager = healthConnectManager
                     )
                 )
+
+                sharedViewModel = viewModel
+                sharedColor = Screen.DriveSessionScreen.color
+                sharedTitle = Screen.DriveSessionScreen.titleId
+
                 val permissionsGranted by viewModel.permissionsGranted
-                //val sessionsList by viewModel.sessionsList
+                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = { viewModel.initialLoad() }
                 val permissionsLauncher =
@@ -413,10 +461,10 @@ fun PedroNavigation(
                 DriveSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    //sessionsList = sessionsList,
+                    sessionsList = sessionsList,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        //viewModel.addSleepData()
+                        viewModel.startRecording()
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -449,8 +497,13 @@ fun PedroNavigation(
                         healthConnectManager = healthConnectManager
                     )
                 )
+
+                sharedViewModel = viewModel
+                sharedColor = Screen.SitSessionScreen.color
+                sharedTitle = Screen.SitSessionScreen.titleId
+
                 val permissionsGranted by viewModel.permissionsGranted
-                //val sessionsList by viewModel.sessionsList
+                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = { viewModel.initialLoad() }
                 val permissionsLauncher =
@@ -462,10 +515,10 @@ fun PedroNavigation(
                 SitSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    //sessionsList = sessionsList,
+                    sessionsList = sessionsList,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        //viewModel.addSleepData()
+                        viewModel.startRecording()
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -498,8 +551,13 @@ fun PedroNavigation(
                         healthConnectManager = healthConnectManager
                     )
                 )
+
+                sharedViewModel = viewModel
+                sharedColor = Screen.ListenSessionScreen.color
+                sharedTitle = Screen.ListenSessionScreen.titleId
+
                 val permissionsGranted by viewModel.permissionsGranted
-                //val sessionsList by viewModel.sessionsList
+                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = { viewModel.initialLoad() }
                 val permissionsLauncher =
@@ -511,10 +569,10 @@ fun PedroNavigation(
                 ListenSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    //sessionsList = sessionsList,
+                    sessionsList = sessionsList,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        //viewModel.addSleepData()
+                        viewModel.startRecording()
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -539,10 +597,15 @@ fun PedroNavigation(
                         healthConnectManager = healthConnectManager
                     )
                 )
+
+                sharedViewModel = viewModel
+                sharedColor = Screen.WeightScreen.color
+                sharedTitle = Screen.WeightScreen.titleId
+
                 val permissionsGranted by viewModel.permissionsGranted
-                val readingsList by viewModel.readingsList
                 val permissions = viewModel.permissions
-                val weeklyAvg by viewModel.weeklyAvg
+                val sessionsList by viewModel.sessionsList
+
                 val onPermissionsResult = { viewModel.initialLoad() }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
@@ -553,16 +616,14 @@ fun PedroNavigation(
                 WeightSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
-
+                    sessionsList = sessionsList,
                     uiState = viewModel.uiState,
                     onInsertClick = { weightInput ->
-                        //viewModel.addSleepData()
+                        viewModel.startRecording()
                     },
-                    weeklyAvg = weeklyAvg,
                     onDeleteClick = { uid ->
                         //viewModel.deleteSleepData(uid)
                     },
-                    readingsList = readingsList,
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
                     },
@@ -594,8 +655,13 @@ fun PedroNavigation(
                         healthConnectManager = healthConnectManager
                     )
                 )
+
+                sharedViewModel = viewModel
+                sharedColor = Screen.YogaSessionScreen.color
+                sharedTitle = Screen.YogaSessionScreen.titleId
+
                 val permissionsGranted by viewModel.permissionsGranted
-                //val sessionsList by viewModel.sessionsList
+                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = { viewModel.initialLoad() }
                 val permissionsLauncher =
@@ -607,10 +673,10 @@ fun PedroNavigation(
                 YogaSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    //sessionsList = sessionsList,
+                    sessionsList = sessionsList,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.addSleepData()
+                        viewModel.startRecording()
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -644,8 +710,13 @@ fun PedroNavigation(
                         healthConnectManager = healthConnectManager
                     )
                 )
+
+                sharedViewModel = viewModel
+                sharedColor = Screen.CycleSessionScreen.color
+                sharedTitle = Screen.CycleSessionScreen.titleId
+
                 val permissionsGranted by viewModel.permissionsGranted
-                //val sessionsList by viewModel.sessionsList
+                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = { viewModel.initialLoad() }
                 val permissionsLauncher =
@@ -657,10 +728,10 @@ fun PedroNavigation(
                 CycleSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    //sessionsList = sessionsList,
+                    sessionsList = sessionsList,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.addSleepData()
+                        viewModel.startRecording()
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -693,8 +764,13 @@ fun PedroNavigation(
                         healthConnectManager = healthConnectManager
                     )
                 )
+
+                sharedViewModel = viewModel
+                sharedColor = Screen.TrainSessionScreen.color
+                sharedTitle = Screen.TrainSessionScreen.titleId
+
                 val permissionsGranted by viewModel.permissionsGranted
-                //val sessionsList by viewModel.sessionsList
+                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = { viewModel.initialLoad() }
                 val permissionsLauncher =
@@ -706,10 +782,10 @@ fun PedroNavigation(
                 TrainSessionScreen(
                     permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    //sessionsList = sessionsList,
+                    sessionsList = sessionsList,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.addSleepData()
+                        viewModel.startRecording()
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)

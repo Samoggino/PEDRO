@@ -1,23 +1,48 @@
 package com.lam.pedro.presentation.screen.activities.staticactivities.sitscreen
 
-import android.os.RemoteException
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.HydrationRecord
-import androidx.health.connect.client.units.Mass
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.HealthConnectManager
-import com.lam.pedro.data.WeightData
-import kotlinx.coroutines.launch
-import java.io.IOException
-import java.util.UUID
+import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 
+class SitSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+    ActivitySessionViewModel(healthConnectManager), MutableState<ActivitySessionViewModel?> {
+
+    //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
+
+    /*Define here the required permissions for the Health Connect usage*/
+    override val permissions = setOf(
+
+        /*
+        * ExerciseSessionRecord
+        * */
+        HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+        HealthPermission.getWritePermission(ExerciseSessionRecord::class),
+
+        /*
+        * HydrationRecord
+        * */
+        HealthPermission.getReadPermission(HydrationRecord::class),
+        HealthPermission.getWritePermission(HydrationRecord::class),
+
+        )
+    override var value: ActivitySessionViewModel?
+        get() = TODO("Not yet implemented")
+        set(value) {}
+
+    override fun component1(): ActivitySessionViewModel? {
+        TODO("Not yet implemented")
+    }
+
+    override fun component2(): (ActivitySessionViewModel?) -> Unit {
+        TODO("Not yet implemented")
+    }
+
+}
+
+/*
 class SitSessionViewModel(val healthConnectManager: HealthConnectManager) :
     ViewModel() {
     private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
@@ -97,6 +122,8 @@ class SitSessionViewModel(val healthConnectManager: HealthConnectManager) :
         data class Error(val exception: Throwable, val uuid: UUID = UUID.randomUUID()) : UiState()
     }
 }
+
+ */
 /*
 class SitSessionViewModelFactory(
     private val healthConnectManager: HealthConnectManager

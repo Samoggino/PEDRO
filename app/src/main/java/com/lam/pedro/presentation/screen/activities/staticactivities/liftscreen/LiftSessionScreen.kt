@@ -1,11 +1,15 @@
 package com.lam.pedro.presentation.screen.activities.staticactivities.liftscreen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,10 +17,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,16 +43,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.health.connect.client.units.Mass
 import androidx.navigation.NavHostController
 import com.lam.pedro.R
+import com.lam.pedro.data.ExerciseSession
 import com.lam.pedro.data.WeightData
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.PermissionRequired
-import com.lam.pedro.presentation.component.StartActivityComponent
+import com.lam.pedro.presentation.component.SessionHistoryRow
+import com.lam.pedro.presentation.navigation.Screen
+import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionViewModel
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -56,13 +67,12 @@ import java.util.UUID
 fun WeightSessionScreen(
     permissions: Set<String>,
     permissionsGranted: Boolean,
-    readingsList: List<WeightData>,
-    uiState: LiftSessionViewModel.UiState,
+    uiState: ActivitySessionViewModel.UiState,
+    sessionsList: List<ExerciseSession>,
     onInsertClick: (Double) -> Unit = {},
     onDeleteClick: (String) -> Unit = {},
     onError: (Throwable?) -> Unit = {},
     onPermissionsResult: () -> Unit = {},
-    weeklyAvg: Mass?,
     onPermissionsLaunch: (Set<String>) -> Unit = {},
     onStartRecording: () -> Unit = {},
     navController: NavHostController,
@@ -75,10 +85,11 @@ fun WeightSessionScreen(
     // Remember the last error ID, such that it is possible to avoid re-launching the error
     // notification for the same error when the screen is recomposed, or configuration changes etc.
     val errorId = rememberSaveable { mutableStateOf(UUID.randomUUID()) }
+    val sessionList by viewModel.sessionsList
 
     LaunchedEffect(uiState) {
         // If the initial data load has not taken place, attempt to load the data.
-        if (uiState is LiftSessionViewModel.UiState.Uninitialized) {
+        if (uiState is ActivitySessionViewModel.UiState.Uninitialized) {
             onPermissionsResult()
         }
 
@@ -86,13 +97,13 @@ fun WeightSessionScreen(
         // was a success or resulted in an error. Where an error occurred, for example in reading
         // and writing to Health Connect, the user is notified, and where the error is one that can
         // be recovered from, an attempt to do so is made.
-        if (uiState is LiftSessionViewModel.UiState.Error && errorId.value != uiState.uuid) {
+        if (uiState is ActivitySessionViewModel.UiState.Error && errorId.value != uiState.uuid) {
             onError(uiState.exception)
             errorId.value = uiState.uuid
         }
     }
 
-    var weightInput by remember { mutableStateOf("") }
+    //var weightInput by remember { mutableStateOf("") }
 
     // Check if the input value is a valid weight
     fun hasValidDoubleInRange(weight: String): Boolean {
@@ -116,6 +127,7 @@ fun WeightSessionScreen(
                         )
                     }
                 },
+                /*
                 navigationIcon = {
                     Column(
                         verticalArrangement = Arrangement.Center,
@@ -124,10 +136,35 @@ fun WeightSessionScreen(
                         BackButton(navController)
                     }
                 }
+
+                 */
             )
+        },
+        floatingActionButton = {
+            if (permissionsGranted) {
+                ExtendedFloatingActionButton(
+                    onClick = {
+                        navController.navigate(Screen.NewActivityScreen.route) {
+                            navController.graph.startDestinationRoute?.let { route ->
+                                popUpTo(route) {
+                                    saveState = true
+                                }
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    icon = { Icon(Icons.Filled.Add, contentDescription = "Add Activity") },
+                    text =
+                    { Text("Start Session") },
+                    shape = RoundedCornerShape(26.dp),
+                    containerColor = color, // Colore del bottone
+                    contentColor = Color.White // Colore del contenuto (testo e icona)
+                )
+            }
         }
     ) { paddingValues ->
-        if (uiState != LiftSessionViewModel.UiState.Uninitialized) {
+        if (uiState != ActivitySessionViewModel.UiState.Uninitialized) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -144,9 +181,51 @@ fun WeightSessionScreen(
                     }
                 } else {
                     item {
-                        val healthConnectManager = viewModel.healthConnectManager
-                        val runViewModel = RunSessionViewModel(healthConnectManager)
-                        StartActivityComponent(color, image, runViewModel, navController)
+
+                        Spacer(modifier = Modifier.height(30.dp))
+                        Text(
+                            text = "Statistics",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(26.dp))
+                                .height(180.dp)
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                        ) {
+                            // TODO: graph
+                        }
+                        Spacer(modifier = Modifier.height(30.dp))
+
+                        Text(
+                            text = stringResource(R.string.activity_history),
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        LazyColumn(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(26.dp))
+                                .height(350.dp)
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                        ) {
+                            items(sessionList) { session ->
+                                SessionHistoryRow(color, image, session, viewModel)
+                                HorizontalDivider(
+                                    thickness = 1.dp, // Spessore della linea
+                                    color = Color(0xFF606060) // Colore della linea
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(30.dp))
+                    }
+
+                        /*
                         OutlinedTextField(
                             value = weightInput,
                             onValueChange = {
@@ -240,10 +319,13 @@ fun WeightSessionScreen(
                             )
                         }
                     }
+
+                         */
+                    }
                 }
             }
         }
     }
-}
+
 
 

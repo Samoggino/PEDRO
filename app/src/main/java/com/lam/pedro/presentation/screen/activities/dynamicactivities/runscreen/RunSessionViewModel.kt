@@ -88,6 +88,8 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
         TODO("Not yet implemented")
     }
 
+}
+
     /*
     var permissionsGranted = mutableStateOf(false)
         private set
@@ -302,7 +304,7 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
         data class Error(val exception: Throwable, val uuid: UUID = UUID.randomUUID()) : UiState()
     }
 */
-}
+
 
 /*
 class RunSessionViewModelFactory(

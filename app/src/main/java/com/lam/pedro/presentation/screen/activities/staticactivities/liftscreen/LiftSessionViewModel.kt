@@ -15,10 +15,61 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.WeightData
+import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.UUID
 
+class LiftSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+    ActivitySessionViewModel(healthConnectManager), MutableState<ActivitySessionViewModel?> {
+
+    //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
+
+    /*Define here the required permissions for the Health Connect usage*/
+    override val permissions = setOf(
+
+        /*
+       * ExerciseSessionRecord
+       * */
+        HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+        HealthPermission.getWritePermission(ExerciseSessionRecord::class),
+
+        /*
+        * ExerciseCompletionGoal.RepetitionsGoal
+        * */
+
+        /*
+        * ExercisePerformanceTarget.WeightTarget
+        * */
+
+        /*
+        * TotalCaloriesBurnedRecord
+        * */
+        HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
+        HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
+
+        /*
+        * ActiveCaloriesBurnedRecord
+        * */
+        HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class),
+        HealthPermission.getWritePermission(ActiveCaloriesBurnedRecord::class),
+
+    )
+    override var value: ActivitySessionViewModel?
+        get() = TODO("Not yet implemented")
+        set(value) {}
+
+    override fun component1(): ActivitySessionViewModel? {
+        TODO("Not yet implemented")
+    }
+
+    override fun component2(): (ActivitySessionViewModel?) -> Unit {
+        TODO("Not yet implemented")
+    }
+
+}
+
+/*
 class LiftSessionViewModel(val healthConnectManager: HealthConnectManager) :
     ViewModel() {
     private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
@@ -111,6 +162,9 @@ class LiftSessionViewModel(val healthConnectManager: HealthConnectManager) :
         data class Error(val exception: Throwable, val uuid: UUID = UUID.randomUUID()) : UiState()
     }
 }
+
+ */
+
 /*
 class LiftSessionViewModelFactory(
     private val healthConnectManager: HealthConnectManager

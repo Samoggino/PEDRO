@@ -1,32 +1,49 @@
 package com.lam.pedro.presentation.screen.activities.staticactivities.sitscreen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.lam.pedro.R
+import com.lam.pedro.data.ExerciseSession
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.PermissionRequired
-import com.lam.pedro.presentation.component.StartActivityComponent
+import com.lam.pedro.presentation.component.SessionHistoryRow
+import com.lam.pedro.presentation.navigation.Screen
+import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionViewModel
 import java.time.Instant
 import java.util.UUID
@@ -36,8 +53,8 @@ import java.util.UUID
 fun SitSessionScreen(
     permissions: Set<String>,
     permissionsGranted: Boolean,
-    //sessionsList: List<WalkSessionData>,
-    uiState: SitSessionViewModel.UiState,
+    sessionsList: List<ExerciseSession>,
+    uiState: ActivitySessionViewModel.UiState,
     onInsertClick: () -> Unit = {},
     onError: (Throwable?) -> Unit = {},
     onPermissionsResult: () -> Unit = {},
@@ -56,10 +73,11 @@ fun SitSessionScreen(
     // Per memorizzare lo stato del bottone e il tempo di inizio della sessione
     val isRecording = rememberSaveable { mutableStateOf(false) }
     val startTime = rememberSaveable { mutableStateOf<Instant?>(null) }
+    val sessionList by viewModel.sessionsList
 
     LaunchedEffect(uiState) {
         // If the initial data load has not taken place, attempt to load the data.
-        if (uiState is SitSessionViewModel.UiState.Uninitialized) {
+        if (uiState is ActivitySessionViewModel.UiState.Uninitialized) {
             onPermissionsResult()
         }
 
@@ -67,7 +85,7 @@ fun SitSessionScreen(
         // success or resulted in an error. Where an error occurred, for example in reading and
         // writing to Health Connect, the user is notified, and where the error is one that can be
         // recovered from, an attempt to do so is made.
-        if (uiState is SitSessionViewModel.UiState.Error && errorId.value != uiState.uuid) {
+        if (uiState is ActivitySessionViewModel.UiState.Error && errorId.value != uiState.uuid) {
             onError(uiState.exception)
             errorId.value = uiState.uuid
         }
@@ -87,6 +105,7 @@ fun SitSessionScreen(
                         )
                     }
                 },
+                /*
                 navigationIcon = {
                     Column(
                         verticalArrangement = Arrangement.Center,
@@ -95,11 +114,35 @@ fun SitSessionScreen(
                         BackButton(navController)
                     }
                 }
-            )
-        }
 
+                 */
+            )
+        },
+        floatingActionButton = {
+            if (permissionsGranted) {
+                ExtendedFloatingActionButton(
+                    onClick = {
+                        navController.navigate(Screen.NewActivityScreen.route) {
+                            navController.graph.startDestinationRoute?.let { route ->
+                                popUpTo(route) {
+                                    saveState = true
+                                }
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    icon = { Icon(Icons.Filled.Add, contentDescription = "Add Activity") },
+                    text =
+                    { Text("Start Session") },
+                    shape = RoundedCornerShape(26.dp),
+                    containerColor = color, // Colore del bottone
+                    contentColor = Color.White // Colore del contenuto (testo e icona)
+                )
+            }
+        }
     ) { paddingValues ->
-        if (uiState != SitSessionViewModel.UiState.Uninitialized) {
+        if (uiState != ActivitySessionViewModel.UiState.Uninitialized) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -121,9 +164,47 @@ fun SitSessionScreen(
                     }
                 } else {
                     item {
-                        val healthConnectManager = viewModel.healthConnectManager
-                        val runViewModel = RunSessionViewModel(healthConnectManager)
-                        StartActivityComponent(color, image, runViewModel, navController)
+                        Spacer(modifier = Modifier.height(30.dp))
+                        Text(
+                            text = "Statistics",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(26.dp))
+                                .height(180.dp)
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                        ) {
+                            // TODO: graph
+                        }
+                        Spacer(modifier = Modifier.height(30.dp))
+
+                        Text(
+                            text = stringResource(R.string.activity_history),
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        LazyColumn(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(26.dp))
+                                .height(350.dp)
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                        ) {
+                            items(sessionList) { session ->
+                                SessionHistoryRow(color, image, session, viewModel)
+                                HorizontalDivider(
+                                    thickness = 1.dp, // Spessore della linea
+                                    color = Color(0xFF606060) // Colore della linea
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(30.dp))
                     }
 //TODO: implementare la registrazione e la visualizzazione delle sessioni
                 }

@@ -7,17 +7,56 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SleepSessionRecord
+import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.SleepSessionData
+import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.UUID
 
+class SleepSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+    ActivitySessionViewModel(healthConnectManager), MutableState<ActivitySessionViewModel?> {
+
+    //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
+
+    /*Define here the required permissions for the Health Connect usage*/
+    override val permissions = setOf(
+
+        /*
+        * ExerciseSessionRecord
+        * */
+        HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+        HealthPermission.getWritePermission(ExerciseSessionRecord::class),
+
+        /*
+        * SleepSessionRecord
+        * */
+        HealthPermission.getReadPermission(SleepSessionRecord::class),
+        HealthPermission.getWritePermission(SleepSessionRecord::class)
+
+        )
+    override var value: ActivitySessionViewModel?
+        get() = TODO("Not yet implemented")
+        set(value) {}
+
+    override fun component1(): ActivitySessionViewModel? {
+        TODO("Not yet implemented")
+    }
+
+    override fun component2(): (ActivitySessionViewModel?) -> Unit {
+        TODO("Not yet implemented")
+    }
+
+}
+
+/*
 class SleepSessionViewModel(val healthConnectManager: HealthConnectManager) :
     ViewModel() {
 
@@ -112,6 +151,8 @@ class SleepSessionViewModel(val healthConnectManager: HealthConnectManager) :
         data class Error(val exception: Throwable, val uuid: UUID = UUID.randomUUID()) : UiState()
     }
 }
+
+ */
 /*
 class SleepSessionViewModelFactory(
     private val healthConnectManager: HealthConnectManager

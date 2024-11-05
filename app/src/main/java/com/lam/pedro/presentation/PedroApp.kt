@@ -64,7 +64,19 @@ fun PedroApp(healthConnectManager: HealthConnectManager) {
         val showBottomNotTop = when (currentRoute) {
             Screen.HomeScreen.route,
             Screen.MoreScreen.route,
-            Screen.ActivitiesScreen.route -> true
+            Screen.ActivitiesScreen.route,
+
+            Screen.SleepSessions.route,
+            Screen.DriveSessionScreen.route,
+            Screen.SitSessionScreen.route,
+            Screen.WeightScreen.route,
+            Screen.ListenSessionScreen.route,
+
+            Screen.RunSessionScreen.route,
+            Screen.WalkSessionScreen.route,
+            Screen.YogaSessionScreen.route,
+            Screen.CycleSessionScreen.route,
+            Screen.TrainSessionScreen.route -> true
 
             else -> false
         }

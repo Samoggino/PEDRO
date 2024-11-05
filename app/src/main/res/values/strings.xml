@@ -181,5 +181,6 @@
     <string name="train_session_screen">Training</string>
     <string name="login">Login</string>
     <string name="activity_history">History</string>
+    <string name="new_activity_screen">New activity</string>
 
 </resources>

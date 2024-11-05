@@ -6,20 +6,70 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ElevationGainedRecord
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
+import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.units.Mass
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.WeightData
+import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.UUID
 
+class DriveSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+    ActivitySessionViewModel(healthConnectManager), MutableState<ActivitySessionViewModel?> {
+
+    //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
+
+    /*Define here the required permissions for the Health Connect usage*/
+    override val permissions = setOf(
+
+        /*
+        * ExerciseSessionRecord
+        * */
+        HealthPermission.getReadPermission(ExerciseSessionRecord::class),
+        HealthPermission.getWritePermission(ExerciseSessionRecord::class),
+
+        /*
+        * DistanceRecord
+        * */
+        HealthPermission.getReadPermission(DistanceRecord::class),
+        HealthPermission.getWritePermission(DistanceRecord::class),
+
+        /*
+        * SpeedRecord
+        * */
+        HealthPermission.getReadPermission(SpeedRecord::class),
+        HealthPermission.getWritePermission(SpeedRecord::class),
+
+        /*
+        * ElevationGainedRecord
+        * */
+        HealthPermission.getReadPermission(ElevationGainedRecord::class),
+        HealthPermission.getWritePermission(ElevationGainedRecord::class),
+
+    )
+    override var value: ActivitySessionViewModel?
+        get() = TODO("Not yet implemented")
+        set(value) {}
+
+    override fun component1(): ActivitySessionViewModel? {
+        TODO("Not yet implemented")
+    }
+
+    override fun component2(): (ActivitySessionViewModel?) -> Unit {
+        TODO("Not yet implemented")
+    }
+
+}
+/*
 class DriveSessionViewModel(val healthConnectManager: HealthConnectManager) :
     ViewModel() {
     private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
@@ -112,6 +162,8 @@ class DriveSessionViewModel(val healthConnectManager: HealthConnectManager) :
         data class Error(val exception: Throwable, val uuid: UUID = UUID.randomUUID()) : UiState()
     }
 }
+
+ */
 /*
 class DriveSessionViewModelFactory(
     private val healthConnectManager: HealthConnectManager

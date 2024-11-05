@@ -158,11 +158,12 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
     }
 
     suspend fun readExerciseSessions() {
-        val startOfDay = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)
+        val start = Instant.EPOCH // 1st January 1970
+
         val now = Instant.now()
 
         sessionsList.value = healthConnectManager
-            .readExerciseSessions(startOfDay.toInstant(), now)
+            .readExerciseSessions(start, now)
             .map { record ->
                 val packageName = record.metadata.dataOrigin.packageName
                 ExerciseSession(
