@@ -22,12 +22,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -65,7 +61,8 @@ fun NewActivityScreen(
     navController: NavController,
     titleId: Int,
     color: Color,
-    viewModel: ActivitySessionViewModel
+    viewModel: ActivitySessionViewModel,
+    activityType: Int
 ) {
 
     Scaffold(
@@ -211,8 +208,8 @@ fun NewActivityScreen(
 
 
                                         endTime = ZonedDateTime.now()
-                                        viewModel.saveExerciseTest(startTime, endTime)
-                                        viewModel.fetchExerciseSessions()
+                                        viewModel.saveExerciseTest(startTime, endTime, activityType, "My Run", "Notes")
+                                        viewModel.fetchExerciseSessions(activityType)
 
 
 

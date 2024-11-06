@@ -239,8 +239,8 @@ class HealthConnectManager(private val context: Context) {
         }
     }
 
-    // Funzione per leggere le sessioni di esercizio
-    suspend fun readExerciseSessions(start: Instant, end: Instant): List<ExerciseSessionRecord> {
+    // Funzione per leggere le sessioni di esercizio, con un filtro per exerciseType
+    suspend fun readExerciseSessions(start: Instant, end: Instant, exerciseType: Int): List<ExerciseSessionRecord> {
         val request = ReadRecordsRequest(
             recordType = ExerciseSessionRecord::class,
             timeRangeFilter = TimeRangeFilter.between(start, end)
@@ -248,8 +248,13 @@ class HealthConnectManager(private val context: Context) {
 
         // Leggi i record dalle API
         val response = healthConnectClient.readRecords(request)
-        return response.records
+
+        // Filtra i record in base all'exerciseType
+        return response.records.filter { record ->
+            record.exerciseType == exerciseType
+        }
     }
+
 
     /**
      * Reads aggregated data and raw data for selected data types, for a given [ExerciseSessionRecord].

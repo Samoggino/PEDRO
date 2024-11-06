@@ -140,43 +140,43 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
         }
     }
 
-    suspend fun saveExerciseTest(start: ZonedDateTime, finish: ZonedDateTime) {
+    suspend fun saveExerciseTest(start: ZonedDateTime, finish: ZonedDateTime, exerciseType: Int, title: String, notes: String) {
         healthConnectManager.insertExerciseSession(
             start.toInstant(),
             finish.toInstant(),
-            ExerciseSessionRecord.EXERCISE_TYPE_RUNNING,
-            "My Run",
-            "Notes"
+            exerciseType,
+            title,
+            notes
         )
     }
 
-    fun initialLoad() {
+    fun initialLoad(exerciseType: Int) {
         viewModelScope.launch {
             tryWithPermissionsCheck {
-                fetchExerciseSessions()
+                fetchExerciseSessions(exerciseType)
             }
         }
     }
 
-    fun startRecording() {
+    fun startRecording(exerciseType: Int, title: String, notes: String) {
         viewModelScope.launch {
             tryWithPermissionsCheck {
                 val startOfSession = ZonedDateTime.now()
                 val endOfSession = startOfSession.plusMinutes(30) // imposta un esempio di durata
 
                 // Avvia la sessione di esercizio e registra i dati necessari
-                healthConnectManager.insertExerciseSession(startOfSession.toInstant(), endOfSession.toInstant(), ExerciseSessionRecord.EXERCISE_TYPE_RUNNING, "My Run", "Notes")
-                fetchExerciseSessions()  // aggiorna la lista delle sessioni
+                healthConnectManager.insertExerciseSession(startOfSession.toInstant(), endOfSession.toInstant(), exerciseType, title, notes)
+                fetchExerciseSessions(exerciseType)  // aggiorna la lista delle sessioni
             }
         }
     }
 
-    suspend fun fetchExerciseSessions() {
+    suspend fun fetchExerciseSessions(exerciseType: Int) {
         val start = Instant.EPOCH // 1st January 1970
         val now = Instant.now()
 
         // Chiamata al metodo del manager per leggere i dati da Health Connect
-        val records = healthConnectManager.readExerciseSessions(start, now)
+        val records = healthConnectManager.readExerciseSessions(start, now, exerciseType)
 
         // Mappa i record letti in un formato desiderato, se necessario
         sessionsList.value = records.map { record ->
