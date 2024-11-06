@@ -17,11 +17,11 @@ import java.time.ZoneOffset
 object TotalCaloriesBurnedRecordSerializer : KSerializer<TotalCaloriesBurnedRecord> {
     override val descriptor: SerialDescriptor =
         buildClassSerialDescriptor("TotalCaloriesBurnedRecord") {
-            element<String>("startTime")
-            element<String>("startZoneOffset")
-            element<String>("endTime")
-            element<String>("endZoneOffset")
-            element<Energy>("energy")
+            element("startTime", InstantSerializer.descriptor)
+            element("startZoneOffset", ZoneOffsetSerializer.descriptor, isOptional = true)
+            element("endTime", InstantSerializer.descriptor)
+            element("endZoneOffset", ZoneOffsetSerializer.descriptor, isOptional = true)
+            element("energy", EnergySerializer.descriptor)
         }
 
     override fun serialize(encoder: Encoder, value: TotalCaloriesBurnedRecord) {

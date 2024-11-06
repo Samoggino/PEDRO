@@ -1,36 +1,60 @@
 package com.lam.pedro.data.serializers
 
+import android.util.Log
 import androidx.health.connect.client.records.ExerciseLap
 import androidx.health.connect.client.units.Length
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
-import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.decodeStructure
-import kotlinx.serialization.encoding.encodeStructure
 import java.time.Instant
 
 object ExerciseLapSerializer : KSerializer<ExerciseLap> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("ExerciseLap") {
-        element<Instant>("startTime") // startTime come Instant
-        element<Instant>("endTime")   // endTime come Instant
-        element("length", LengthSerializer.descriptor) // length come oggetto Length
+        element("startTime", InstantSerializer.descriptor)
+        element("endTime", InstantSerializer.descriptor)
+        element("length", LengthSerializer.descriptor, isOptional = true)
     }
 
     override fun serialize(encoder: Encoder, value: ExerciseLap) {
-        encoder.encodeStructure(descriptor) {
-            // Serializziamo startTime e endTime come oggetti Instant
-            encodeSerializableElement(descriptor, 0, InstantSerializer, value.startTime)
-            encodeSerializableElement(descriptor, 1, InstantSerializer, value.endTime)
+        try {
+            // Iniziamo la struttura
+            val compositeEncoder = encoder.beginStructure(descriptor)
 
-            // Se length è presente, serializziamo usando il serializzatore di Length
+            // Serializziamo ogni campo, verificando se è presente o nullo
+            compositeEncoder.encodeSerializableElement(
+                descriptor,
+                0,
+                InstantSerializer,
+                value.startTime
+            )
+
+            compositeEncoder.encodeSerializableElement(
+                descriptor,
+                1,
+                InstantSerializer,
+                value.endTime
+            )
+
             value.length?.let {
-                encodeSerializableElement(descriptor, 2, LengthSerializer, it)
+                compositeEncoder.encodeSerializableElement(
+                    descriptor,
+                    2,
+                    LengthSerializer,
+                    it
+                )
             }
+
+            compositeEncoder.endStructure(descriptor)
+
+
+        } catch (e: Exception) {
+            Log.e("ExerciseLapSerializer", "Error serializing ExerciseLap", e)
         }
+
     }
 
     override fun deserialize(decoder: Decoder): ExerciseLap {
@@ -45,17 +69,20 @@ object ExerciseLapSerializer : KSerializer<ExerciseLap> {
                         descriptor,
                         index,
                         InstantSerializer
-                    ) // Deserializziamo startTime come Instant
+                    )
+
                     1 -> endTime = decodeSerializableElement(
                         descriptor,
                         index,
                         InstantSerializer
-                    )   // Deserializziamo endTime come Instant
+                    )
+
                     2 -> length = decodeSerializableElement(
                         descriptor,
                         index,
                         LengthSerializer
-                    )     // Deserializziamo length come oggetto Length
+                    )
+
                     CompositeDecoder.DECODE_DONE -> break@loop
                     else -> throw IllegalStateException("Unexpected index: $index")
                 }

@@ -143,7 +143,7 @@ class ViewModelRecords : ViewModel() {
             val yogaRecord = YogaRecord(
                 calories = activeCaloriesBurnedRecord,
                 durationGoal = durationGoal,
-//                totalCaloriesBurned = totalCaloriesBurnedRecord,
+                totalCaloriesBurned = totalCaloriesBurnedRecord,
 //                exerciseLap = exerciseLap
             )
 
@@ -152,7 +152,6 @@ class ViewModelRecords : ViewModel() {
 
             Log.d("Supabase", "YogaRecord serializzato: $serialized")
             // verifica se sono uguali
-
 
             val deserialized = Json.decodeFromString<YogaRecord>(serialized)
             Log.d(

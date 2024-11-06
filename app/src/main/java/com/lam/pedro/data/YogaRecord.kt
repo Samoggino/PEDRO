@@ -9,6 +9,7 @@ package com.lam.pedro.data
 
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.ExerciseCompletionGoal
+import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import com.lam.pedro.data.serializers.ActiveCaloriesBurnedRecordSerializer
 import com.lam.pedro.data.serializers.DurationGoalSerializer
 import com.lam.pedro.data.serializers.ExerciseLapSerializer
@@ -22,10 +23,10 @@ data class YogaRecord(
     val uuidRecord: String? = UUID.randomUUID().toString(),
     @Serializable(with = ActiveCaloriesBurnedRecordSerializer::class) val calories: ActiveCaloriesBurnedRecord,
     @Serializable(with = DurationGoalSerializer::class) val durationGoal: ExerciseCompletionGoal.DurationGoal?,
+    @Serializable(with = TotalCaloriesBurnedRecordSerializer::class) val totalCaloriesBurned: TotalCaloriesBurnedRecord?,
 
     // FIXME: Funziona la serializzazione e deserializzazione dei parametri sopra, ma non quelli sotto
 
-//    @Serializable(with = TotalCaloriesBurnedRecordSerializer::class) val totalCaloriesBurned: TotalCaloriesBurnedRecord?,
     //    val totalCaloriesBurned: TotalCaloriesBurnedRecord?,
 //    @Serializable(with = ExerciseLapSerializer::class) val exerciseLap: ExerciseLap
     //    val exerciseLap: ExerciseLap
