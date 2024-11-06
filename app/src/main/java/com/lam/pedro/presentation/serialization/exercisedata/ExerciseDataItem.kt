@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.serialization.screen.exercisedata
+package com.lam.pedro.presentation.serialization.exercisedata
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement

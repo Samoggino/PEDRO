@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.serialization.screen.exercisedata
+package com.lam.pedro.presentation.serialization.sleepdata
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -7,13 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,14 +28,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.health.connect.client.units.Energy
-import androidx.health.connect.client.units.Length
+import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.healthconnectsample.data.HealthConnectManager
-import com.lam.pedro.data.ExerciseSessionData
-import com.lam.pedro.presentation.serialization.viewmodel.exercisedata.ViewModelExerciseData
-import com.lam.pedro.presentation.serialization.viewmodel.exercisedata.ViewModelExerciseDataFactory
+import com.lam.pedro.data.SleepSessionData
+import com.lam.pedro.presentation.serialization.exercisedata.IndeterminateCircularIndicator
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.ZonedDateTime
@@ -45,17 +40,17 @@ import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExerciseScreen(
-    healthConnectManager: HealthConnectManager,
+fun SleepScreen(
     navController: NavController,
 ) {
 
-    var exerciseSession by remember { mutableStateOf(emptyList<ExerciseSessionData>()) }
+    var sleepSessions by remember { mutableStateOf(emptyList<SleepSessionData>()) }
     val coroutineScope = rememberCoroutineScope()
     var isRefreshing by remember { mutableStateOf(false) }
     val scrollState = rememberLazyListState()
     val context = LocalContext.current
-    val viewModel: ViewModelExerciseData = viewModel(factory = ViewModelExerciseDataFactory())
+    val viewModel: ViewModelSleepData =
+        viewModel(factory = ViewModelSleepDataFactory())
 
     val end2 = ZonedDateTime.now()
     val end1 = end2.minusDays(1)
@@ -64,23 +59,23 @@ fun ExerciseScreen(
     // Carica i dati di HealthConnect
     LaunchedEffect(Unit) {
         isRefreshing = true
-        exerciseSession = viewModel.getExerciseSessions()
+        sleepSessions = viewModel.getSleepSessions()
         isRefreshing = false
     }
 
     PullToRefreshBox(
         isRefreshing = isRefreshing,
         onRefresh = {
-            Log.i("Supabase-HealthConnect", "Aggiornamento dati ExerciseDataScreen")
+            Log.i("Supabase-HealthConnect", "Aggiornamento dati SleepDataScreen")
             isRefreshing = true
             coroutineScope.launch {
-                exerciseSession = viewModel.getExerciseSessions()
+                sleepSessions = viewModel.getSleepSessions()
                 isRefreshing = false
             }
         },
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF033766)) // Colore di sfondo chiaro
+            .background(Color(0xFF1B94F3)) // Colore di sfondo chiaro
     ) {
         LazyColumn(
             state = scrollState,
@@ -99,45 +94,49 @@ fun ExerciseScreen(
                         .padding(16.dp)
                 ) {
                     Text(
-                        text = "Sessioni di Esercizio",
+                        text = "Sessioni di Sonno",
                         style = MaterialTheme.typography.headlineMedium,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
-                    // Pulsante per aggiungere una nuova sessione di esercizio
+                    // Pulsante per aggiungere una nuova sessione di sonno
                     Button(
                         onClick = {
                             coroutineScope.launch {
-                                viewModel.uploadExerciseSession(
+                                viewModel.uploadSleepSession(
                                     navController,
-                                    ExerciseSessionData(
+                                    SleepSessionData(
                                         uid = UUID.randomUUID().toString(),
-                                        totalActiveTime = Duration.between(
-                                            start1,
-                                            end1
-                                        ), // Esempio: 90 minuti di attività
-                                        totalSteps = 12500,
-                                        totalDistance = Length.kilometers(10.3), // Distanza percorsa di 8 km
-                                        totalEnergyBurned = Energy.calories(100.1), // Energia bruciata in kcal
-                                        minHeartRate = 60, // Frequenza cardiaca minima di 60 bpm
-                                        maxHeartRate = 145, // Frequenza cardiaca massima di 145 bpm
-                                        avgHeartRate = 115 // Frequenza cardiaca media di 115 bpm
+                                        title = "New Sleep",
+                                        notes = "Another good sleep",
+                                        startTime = start1.toInstant(),
+                                        startZoneOffset = start1.offset,
+                                        endTime = end1.toInstant(),
+                                        endZoneOffset = end1.offset,
+                                        duration = Duration.between(start1, end1),
+                                        stages = listOf(
+                                            SleepSessionRecord.Stage(
+                                                startTime = start1.toInstant(),
+                                                endTime = end1.toInstant(),
+                                                stage = SleepSessionRecord.STAGE_TYPE_DEEP
+                                            )
+                                        )
                                     ),
                                     context = context
                                 )
-                                exerciseSession = viewModel.getExerciseSessions()
+                                sleepSessions = viewModel.getSleepSessions()
                             }
                         },
                         shape = RoundedCornerShape(26.dp) // Bordi arrotondati
                     ) {
-                        Text("Aggiungi sessione di esercizio")
+                        Text("Aggiungi sessione di sonno")
                     }
                 }
             }
 
-            if (exerciseSession.isEmpty()) {
+            if (sleepSessions.isEmpty()) {
                 item {
-                    // Indicatore di caricamento se non ci sono sessioni di esercizio
+                    // Indicatore di caricamento se non ci sono sessioni di sonno
                     if (isRefreshing) {
                         Box(
                             modifier = Modifier
@@ -149,27 +148,27 @@ fun ExerciseScreen(
                         }
                     } else {
                         Text(
-                            text = "Nessuna sessione di esercizio trovata",
+                            text = "Nessuna sessione di sonno trovata",
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(16.dp)
                         )
                     }
                 }
             } else {
-                items(exerciseSession, key = { it.uid }) { exerciseSession ->
-                    ExerciseDataItem(exerciseSession)
+                items(sleepSessions, key = { it.uid }) { sleepSession ->
+                    SleepSessionItem(sleepSession)
                 }
             }
         }
     }
 }
 
-@Composable
-fun IndeterminateCircularIndicator() {
-    CircularProgressIndicator(
-        modifier = Modifier.width(64.dp),
-        color = MaterialTheme.colorScheme.secondary,
-        trackColor = MaterialTheme.colorScheme.surfaceVariant,
-    )
-}
+//@Composable
+//fun IndeterminateCircularIndicator() {
+//    CircularProgressIndicator(
+//        modifier = Modifier.width(64.dp),
+//        color = MaterialTheme.colorScheme.secondary,
+//        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+//    )
+//}
 

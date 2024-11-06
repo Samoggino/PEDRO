@@ -1,14 +1,16 @@
-package com.lam.pedro.presentation.serialization.viewmodel.sleepdata
+package com.lam.pedro.presentation.serialization.exercisedata
 
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
-import com.lam.pedro.data.SleepSessionDataSerializable
+import com.lam.pedro.data.ExerciseSessionData
+import com.lam.pedro.data.ExerciseSessionDataSerializable
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getAccessToken
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.SupabaseClientProvider.supabase
+import com.lam.pedro.data.deserialized
 import com.lam.pedro.presentation.navigation.Screen
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
@@ -16,78 +18,75 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 
-class ViewModelSleepData : ViewModel() {
+class ViewModelExerciseData : ViewModel() {
 
-    suspend fun uploadSleepSession(
+    suspend fun uploadExerciseSession(
         navController: NavController,
-        sleepSessionData: SleepSessionDataSerializable,
+        exerciseSessionData: ExerciseSessionData,
         context: Context
     ) {
-
         try {
-            // logga il token dell'utente dalle sharedprefs
-            // leggi il file di sharedprefs e printa l'accessToken e il refreshToken
+
 
             if (getAccessToken(context) == null) {
                 navController.navigate(Screen.LoginScreen.route)
             }
 
-
             val uuid = getUUID(context)
-
-
-
 
             // Crea un oggetto JSON completo con i dati della sessione di sonno e l'UUID dell'utente
             val jsonFinal = buildJsonObject {
                 put("input_data", buildJsonObject {
-                    put("data", Json.encodeToJsonElement(sleepSessionData))
+                    put("data", Json.encodeToJsonElement(exerciseSessionData.toSerializable()))
                     put("user_UUID", Json.encodeToJsonElement(uuid))
                 })
             }
 
-            // Logga i dati della sessione di sonno
-            Log.d("Supabase", "Dati della sessione di sonno: $jsonFinal")
+            Log.d("Supabase-HealthConnect", "Dati di esercizio da caricare $jsonFinal")
 
             // Esegui la chiamata RPC su Supabase
             supabase()
                 .postgrest
-                .rpc("insert_sleep_session", jsonFinal)
+                .rpc("insert_exercise_session", jsonFinal)
 
-
-            Log.i("Supabase", "Dati della sessione di sonno caricati in Supabase")
-
-            Log.i(
-                "Supabase-HealthConnect",
-                "Dati della sessione di sonno caricati in ReadDataScreen"
-            )
         } catch (e: Exception) {
             Log.e(
                 "Supabase-HealthConnect",
-                "Errore: ${e.message}",
+                "Errore durante l'upload dei dati di esercizio ${e.message}"
+            )
+            Log.e("Supabase-HealthConnect", "Dati di esercizio da caricare $exerciseSessionData")
+        }
+    }
 
-                )
+
+    suspend fun getExerciseSessions(): List<ExerciseSessionData> {
+
+        try {
+            val response = supabase()
+                .from("exercise_sessions")
+                .select()
+                .decodeList<ExerciseSessionDataSerializable>()
+
+            return response.listIterator().asSequence().map { it.deserialized() }.toList()
+
+        } catch (e: Exception) {
+            Log.e(
+                "Supabase-HealthConnect",
+                "Errore durante il recupero dei dati di esercizio ${e.message}"
+            )
         }
 
-
+        return emptyList()
     }
 
-    suspend fun getSleepSessions(): List<SleepSessionDataSerializable> {
-        val response = supabase()
-            .from("sleep_sessions")
-            .select()
-            .decodeList<SleepSessionDataSerializable>()
-
-        return response
-    }
 }
 
 @Suppress("UNCHECKED_CAST")
-class ViewModelSleepDataFactory :
+class ViewModelExerciseDataFactory :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ViewModelSleepData::class.java)) {
-            return ViewModelSleepData() as T
+        if (modelClass.isAssignableFrom(ViewModelExerciseData::class.java)) {
+            return ViewModelExerciseData() as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

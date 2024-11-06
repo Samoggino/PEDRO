@@ -171,5 +171,6 @@
     <string name="landing_screen">Landing screen after login</string>
     <string name="login_screen">Login screen</string>
     <string name="read_health_connect_data">prova con health connect</string>
+    <string name="my_screen_records">pagina per testare la serializzazione</string>
 
 </resources>

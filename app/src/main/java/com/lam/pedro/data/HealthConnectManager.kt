@@ -46,7 +46,6 @@ import androidx.health.connect.client.units.Mass
 import com.lam.pedro.R
 import com.lam.pedro.data.ExerciseSessionData
 import com.lam.pedro.data.SleepSessionData
-import com.lam.pedro.data.SleepSessionDataSerializable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
@@ -299,14 +298,14 @@ class HealthConnectManager(private val context: Context) {
      * In addition to reading [SleepSessionRecord]s, for each session, the duration is calculated to
      * demonstrate aggregation, and the underlying [SleepSessionRecord.Stage] data is also read.
      */
-    suspend fun readSleepSessions(): List<SleepSessionDataSerializable> {
+    suspend fun readSleepSessions(): List<SleepSessionData> {
         val lastDay = ZonedDateTime.now().truncatedTo(ChronoUnit.DAYS)
             .minusDays(1)
             .withHour(12)
         val firstDay = lastDay
             .minusDays(7)
 
-        val sessions = mutableListOf<SleepSessionDataSerializable>()
+        val sessions = mutableListOf<SleepSessionData>()
         val sleepSessionRequest = ReadRecordsRequest(
             recordType = SleepSessionRecord::class,
             timeRangeFilter = TimeRangeFilter.between(firstDay.toInstant(), lastDay.toInstant()),
@@ -331,7 +330,7 @@ class HealthConnectManager(private val context: Context) {
                     endZoneOffset = session.endZoneOffset,
                     duration = aggregateResponse[SleepSessionRecord.SLEEP_DURATION_TOTAL],
                     stages = session.stages
-                ).toSerializable()
+                )
             )
         }
         return sessions

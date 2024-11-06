@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.serialization.screen.sleepdata
+package com.lam.pedro.presentation.serialization.sleepdata
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,12 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.lam.pedro.data.SleepSessionDataSerializable
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes@Composable
-fun SleepSessionItem(sleepSession: SleepSessionDataSerializable) {
+import com.lam.pedro.data.SleepSessionData
+
+@Composable
+fun SleepSessionItem(sleepSession: SleepSessionData) {
     val (hours, minutes) = remember(sleepSession.duration) {
-        Pair(sleepSession.duration?.hours, sleepSession.duration?.minutes)
+        Pair(sleepSession.duration?.toHours(), sleepSession.duration?.toMinutes())
     }
 
     Card(
@@ -50,10 +50,13 @@ fun SleepSessionItem(sleepSession: SleepSessionDataSerializable) {
                 text = "Finisce: ${sleepSession.endTime}",
                 style = MaterialTheme.typography.bodySmall
             )
-//            Text(
-//                text = "Stadi: ${sleepSession.stages}",
-//                style = MaterialTheme.typography.bodySmall
-//            )
+            // per ogni stage stampa le proprietà
+            sleepSession.stages.forEach {
+                Text(
+                    text = "Stage: ${it.stage}, inizia: ${it.startTime}, finisce: ${it.endTime}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }

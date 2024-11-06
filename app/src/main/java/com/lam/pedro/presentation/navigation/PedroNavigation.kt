@@ -37,7 +37,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import com.example.healthconnectsample.data.HealthConnectManager
 import com.example.healthconnectsample.presentation.screen.HealthConnectScreen
-import com.lam.pedro.presentation.serialization.screen.sleepdata.SleepScreen
+import com.lam.pedro.presentation.serialization.sleepdata.SleepScreen
 import com.lam.pedro.presentation.screen.AboutScreen
 import com.lam.pedro.presentation.screen.ActivitiesScreen
 import com.lam.pedro.presentation.screen.HomeScreen
@@ -66,7 +66,8 @@ import com.lam.pedro.presentation.screen.recordlist.SeriesRecordsType
 import com.lam.pedro.presentation.screen.sleepsession.SleepSessionScreen
 import com.lam.pedro.presentation.screen.sleepsession.SleepSessionViewModel
 import com.lam.pedro.presentation.screen.sleepsession.SleepSessionViewModelFactory
-import com.lam.pedro.presentation.serialization.screen.exercisedata.ExerciseScreen
+import com.lam.pedro.presentation.serialization.activecalories.MyScreenRecords
+import com.lam.pedro.presentation.serialization.exercisedata.ExerciseScreen
 import com.lam.pedro.showExceptionSnackbar
 import kotlinx.coroutines.launch
 
@@ -84,7 +85,7 @@ fun PedroNavigation(
 
     val scope = rememberCoroutineScope()
     NavHost(navController = navController,
-        startDestination = Screen.SleepSessionData.route,
+        startDestination = Screen.MyScreenRecords.route,
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None }) {
         val availability by healthConnectManager.availability
@@ -142,11 +143,15 @@ fun PedroNavigation(
             LandingScreen()
         }
         composable(Screen.SleepSessionData.route) {
-            SleepScreen(healthConnectManager, navController)
+            SleepScreen(navController)
         }
 
         composable(Screen.ExerciseSessionData.route) {
-            ExerciseScreen(healthConnectManager, navController)
+            ExerciseScreen(navController)
+        }
+
+        composable(Screen.MyScreenRecords.route){
+            MyScreenRecords(navController)
         }
 
         composable(

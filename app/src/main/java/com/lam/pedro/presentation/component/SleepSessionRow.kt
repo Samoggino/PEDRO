@@ -38,25 +38,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.SleepSessionRecord
-import com.lam.pedro.data.SleepSessionDataSerializable
 import com.example.healthconnectsample.data.dateTimeWithOffsetOrDefault
 import com.example.healthconnectsample.data.formatHoursMinutes
 import com.lam.pedro.R
+import com.lam.pedro.data.SleepSessionData
 import java.time.Duration
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 /**
- * Creates a row to represent a [SleepSessionDataSerializable], which encompasses data for both the sleep
+ * Creates a row to represent a [SleepSessionData], which encompasses data for both the sleep
  * session and any fine-grained sleep stages.
  */
 @Composable
 fun SleepSessionRow(
-    sessionData: SleepSessionDataSerializable,
+    sessionData: SleepSessionData,
     startExpanded: Boolean = false
 ) {
-    val startZonedDateTime = ZonedDateTime.parse(sessionData.startTime)
-    val endZonedDateTime = ZonedDateTime.parse(sessionData.endTime)
+    val startZonedDateTime = ZonedDateTime.parse(sessionData.startZoneOffset.toString())
+    val endZonedDateTime = ZonedDateTime.parse(sessionData.endZoneOffset.toString())
     val endZonedOffset = endZonedDateTime.offset
     val sessionToDuration = Duration.between(startZonedDateTime.toInstant(), endZonedDateTime.toInstant())
 
@@ -91,8 +91,8 @@ fun SleepSessionRow(
         }
     }
     if (expanded) {
-        val startZonedDateTime = ZonedDateTime.parse(sessionData.startTime)
-        val endZonedDateTime = ZonedDateTime.parse(sessionData.endTime)
+//        val startZonedDateTime = ZonedDateTime.parse(sessionData.startZoneOffset)
+//        val endZonedDateTime = ZonedDateTime.parse(sessionData.endZoneOffset)
 
         val startEndLabel = formatDisplayTimeStartEnd(
             startZonedDateTime,
@@ -119,7 +119,7 @@ data class StageDisplay(
     val endTime: String
 )
 
-fun SleepSessionDataSerializable.toDisplayStages(): List<StageDisplay> {
+fun SleepSessionData.toDisplayStages(): List<StageDisplay> {
     return stages.map {
         StageDisplay(
             stageType = when (it.stage) {
@@ -128,8 +128,8 @@ fun SleepSessionDataSerializable.toDisplayStages(): List<StageDisplay> {
                 SleepSessionRecord.STAGE_TYPE_REM -> "REM"
                 else -> "Unknown"
             },
-            startTime = it.startTime,
-            endTime = it.endTime
+            startTime = it.startTime.toString(),
+            endTime = it.endTime.toString()
         )
     }
 }
