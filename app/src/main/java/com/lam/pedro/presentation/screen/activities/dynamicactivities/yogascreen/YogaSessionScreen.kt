@@ -40,9 +40,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.navigation.NavController
 import com.lam.pedro.R
-import com.lam.pedro.data.ExerciseSession
 import com.lam.pedro.presentation.component.ActivityScreenHeader
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.PermissionRequired
@@ -58,7 +58,7 @@ import java.util.UUID
 fun YogaSessionScreen(
     permissions: Set<String>,
     permissionsGranted: Boolean,
-    sessionsList: List<ExerciseSession>,
+    sessionsList: List<ExerciseSessionRecord>,
     uiState: ActivitySessionViewModel.UiState,
     onInsertClick: () -> Unit = {},
     onError: (Throwable?) -> Unit = {},
@@ -125,7 +125,7 @@ fun YogaSessionScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
+                    .padding(0.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {

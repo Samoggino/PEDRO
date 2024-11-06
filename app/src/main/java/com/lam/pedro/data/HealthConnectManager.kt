@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.flow
 import java.io.IOException
 import java.io.InvalidObjectException
 import java.time.Instant
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import kotlin.random.Random
@@ -109,6 +110,7 @@ class HealthConnectManager(private val context: Context) {
         healthConnectClient.permissionController.revokeAllPermissions()
     }
 
+    /*
     /**
      * Obtains a list of [ExerciseSessionRecord]s in a specified time frame. An Exercise Session Record is a
      * period of time given to an activity, that would make sense to a user, e.g. "Afternoon run"
@@ -124,6 +126,10 @@ class HealthConnectManager(private val context: Context) {
         return response.records
     }
 
+     */
+
+
+    /*
     /**
      * Writes an [ExerciseSessionRecord] to Health Connect, and additionally writes underlying data for
      * the session too, such as [StepsRecord], [DistanceRecord] etc.
@@ -169,6 +175,44 @@ class HealthConnectManager(private val context: Context) {
         )
     }
 
+     */
+
+    suspend fun insertExerciseSession(
+        startTime: Instant,
+        endTime: Instant,
+        exerciseType: Int,
+        title: String,
+        notes: String
+    ) {
+
+        // Create the ExerciseSessionRecord
+        val exerciseSessionRecord = ExerciseSessionRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            exerciseType = exerciseType,
+            title = title,
+            notes = notes
+        )
+
+        /*
+        val stepsRecord(
+        ), etc
+        */
+
+        // Insert the record into Health Connect
+        try {
+            healthConnectClient.insertRecords(
+                listOf(exerciseSessionRecord/*, stepsRecord, etc*/)
+
+            )
+            println("Exercise session recorded successfully!")
+        } catch (e: Exception) {
+            println("Error recording exercise session: ${e.message}")
+        }
+    }
+
     /**
      * Deletes an [ExerciseSessionRecord] and underlying data.
      */
@@ -193,6 +237,18 @@ class HealthConnectManager(private val context: Context) {
         rawDataTypes.forEach { rawType ->
             healthConnectClient.deleteRecords(rawType, timeRangeFilter)
         }
+    }
+
+    // Funzione per leggere le sessioni di esercizio
+    suspend fun readExerciseSessions(start: Instant, end: Instant): List<ExerciseSessionRecord> {
+        val request = ReadRecordsRequest(
+            recordType = ExerciseSessionRecord::class,
+            timeRangeFilter = TimeRangeFilter.between(start, end)
+        )
+
+        // Leggi i record dalle API
+        val response = healthConnectClient.readRecords(request)
+        return response.records
     }
 
     /**
@@ -223,7 +279,8 @@ class HealthConnectManager(private val context: Context) {
         val aggregateRequest = AggregateRequest(
             metrics = aggregateDataTypes,
             timeRangeFilter = timeRangeFilter,
-            dataOriginFilter = dataOriginFilter)
+            dataOriginFilter = dataOriginFilter
+        )
         val aggregateData = healthConnectClient.aggregate(aggregateRequest)
 
         return ExerciseSessionData(
@@ -431,7 +488,9 @@ class HealthConnectManager(private val context: Context) {
                 SleepSessionRecord.Stage(
                     stage = randomSleepStage(),
                     startTime = stageStart.toInstant(),
-                    endTime = checkedEnd.toInstant()))
+                    endTime = checkedEnd.toInstant()
+                )
+            )
             stageStart = checkedEnd
         }
         return sleepStages
@@ -442,7 +501,11 @@ class HealthConnectManager(private val context: Context) {
      * Record types compatible with this function must be declared in the
      * [com.example.healthconnectsample.presentation.screen.recordlist.RecordType] enum.
      */
-    suspend fun fetchSeriesRecordsFromUid(recordType: KClass<out Record>, uid: String, seriesRecordsType: KClass<out Record>): List<Record> {
+    suspend fun fetchSeriesRecordsFromUid(
+        recordType: KClass<out Record>,
+        uid: String,
+        seriesRecordsType: KClass<out Record>
+    ): List<Record> {
         val recordResponse = healthConnectClient.readRecord(recordType, uid)
         // Use the start time and end time from the session, for reading raw and aggregate data.
         val timeRangeFilter =
@@ -452,10 +515,12 @@ class HealthConnectManager(private val context: Context) {
                     val record = recordResponse.record as ExerciseSessionRecord
                     TimeRangeFilter.between(startTime = record.startTime, endTime = record.endTime)
                 }
+
                 is SleepSessionRecord -> {
                     val record = recordResponse.record as SleepSessionRecord
                     TimeRangeFilter.between(startTime = record.startTime, endTime = record.endTime)
                 }
+
                 else -> {
                     throw InvalidObjectException("Record with unregistered data type returned")
                 }
@@ -469,7 +534,8 @@ class HealthConnectManager(private val context: Context) {
             ReadRecordsRequest(
                 recordType = seriesRecordsType,
                 dataOriginFilter = dataOriginFilter,
-                timeRangeFilter = timeRangeFilter)
+                timeRangeFilter = timeRangeFilter
+            )
         return healthConnectClient.readRecords(request).records
     }
 
@@ -482,7 +548,9 @@ class HealthConnectManager(private val context: Context) {
         while (time.isBefore(sessionEndTime)) {
             samples.add(
                 HeartRateRecord.Sample(
-                    time = time.toInstant(), beatsPerMinute = (80 + Random.nextInt(80)).toLong()))
+                    time = time.toInstant(), beatsPerMinute = (80 + Random.nextInt(80)).toLong()
+                )
+            )
             time = time.plusSeconds(30)
         }
         return HeartRateRecord(
@@ -490,7 +558,8 @@ class HealthConnectManager(private val context: Context) {
             startZoneOffset = sessionStartTime.offset,
             endTime = sessionEndTime.toInstant(),
             endZoneOffset = sessionEndTime.offset,
-            samples = samples)
+            samples = samples
+        )
     }
 
     suspend fun writeRunInput(distanceRecord: DistanceRecord) {

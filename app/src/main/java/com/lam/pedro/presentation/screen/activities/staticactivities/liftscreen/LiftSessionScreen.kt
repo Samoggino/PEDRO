@@ -51,10 +51,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.units.Mass
 import androidx.navigation.NavHostController
 import com.lam.pedro.R
-import com.lam.pedro.data.ExerciseSession
 import com.lam.pedro.data.WeightData
 import com.lam.pedro.presentation.component.ActivityScreenHeader
 import com.lam.pedro.presentation.component.BackButton
@@ -73,7 +73,7 @@ fun WeightSessionScreen(
     permissions: Set<String>,
     permissionsGranted: Boolean,
     uiState: ActivitySessionViewModel.UiState,
-    sessionsList: List<ExerciseSession>,
+    sessionsList: List<ExerciseSessionRecord>,
     onInsertClick: (Double) -> Unit = {},
     onDeleteClick: (String) -> Unit = {},
     onError: (Throwable?) -> Unit = {},
@@ -147,7 +147,7 @@ fun WeightSessionScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
+                    .padding(0.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 item {

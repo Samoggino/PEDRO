@@ -6,14 +6,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,9 +45,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.navigation.NavController
 import com.lam.pedro.R
-import com.lam.pedro.data.ExerciseSession
 import com.lam.pedro.data.SleepSessionData
 import com.lam.pedro.presentation.component.ActivityScreenHeader
 import com.lam.pedro.presentation.component.BackButton
@@ -63,7 +67,7 @@ import java.util.UUID
 fun SleepSessionScreen(
     permissions: Set<String>,
     permissionsGranted: Boolean,
-    sessionsList: List<ExerciseSession>,
+    sessionsList: List<ExerciseSessionRecord>,
     uiState: ActivitySessionViewModel.UiState,
     onInsertClick: () -> Unit = {},
     onError: (Throwable?) -> Unit = {},
@@ -102,6 +106,7 @@ fun SleepSessionScreen(
     }
 
     Scaffold(
+        containerColor = Color.Transparent,
         floatingActionButton = {
             if (permissionsGranted) {
                 ExtendedFloatingActionButton(
@@ -130,7 +135,7 @@ fun SleepSessionScreen(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues),
+                    .padding(top = 0.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {

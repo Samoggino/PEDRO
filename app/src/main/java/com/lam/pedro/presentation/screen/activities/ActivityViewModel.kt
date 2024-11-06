@@ -5,12 +5,13 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.lam.pedro.data.ExerciseSession
+//import com.lam.pedro.data.ExerciseSession
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.SessionState
 import com.lam.pedro.data.dateTimeWithOffsetOrDefault
@@ -33,6 +34,7 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import java.time.Duration
 import java.time.Instant
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.UUID
@@ -50,7 +52,7 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
     var permissionsGranted = mutableStateOf(false)
         private set
 
-    var sessionsList: MutableState<List<ExerciseSession>> = mutableStateOf(listOf())
+    var sessionsList: MutableState<List<ExerciseSessionRecord>> = mutableStateOf(listOf())
         private set
 
     var uiState: UiState by mutableStateOf(UiState.Uninitialized)
@@ -66,10 +68,10 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
     private var timerJob: Job? = null
     val sessionState: StateFlow<SessionState> get() = _sessionState
 
-    private val _selectedSession = MutableLiveData<ExerciseSession>()
-    val selectedSession: LiveData<ExerciseSession> = _selectedSession
+    private val _selectedSession = MutableLiveData<ExerciseSessionRecord>()
+    val selectedSession: LiveData<ExerciseSessionRecord> = _selectedSession
 
-    fun selectSession(session: ExerciseSession) {
+    fun selectSession(session: ExerciseSessionRecord) {
         _selectedSession.value = session
     }
 
@@ -126,20 +128,32 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
             endTime?.let { end ->
                 val adjustedEnd = end - pausedTime // Sottrae il tempo totale in pausa
                 // Registra la sessione tramite Health Connect
-                healthConnectManager.writeExerciseSession(start, adjustedEnd)
+                healthConnectManager.insertExerciseSession(
+                    start.toInstant(),
+                    adjustedEnd.toInstant(),
+                    ExerciseSessionRecord.EXERCISE_TYPE_RUNNING,
+                    "My Run",
+                    "Notes"
+                )
+
             }
         }
     }
 
     suspend fun saveExerciseTest(start: ZonedDateTime, finish: ZonedDateTime) {
-        healthConnectManager.writeExerciseSession(start, finish)
+        healthConnectManager.insertExerciseSession(
+            start.toInstant(),
+            finish.toInstant(),
+            ExerciseSessionRecord.EXERCISE_TYPE_RUNNING,
+            "My Run",
+            "Notes"
+        )
     }
-
 
     fun initialLoad() {
         viewModelScope.launch {
             tryWithPermissionsCheck {
-                readExerciseSessions()
+                fetchExerciseSessions()
             }
         }
     }
@@ -151,32 +165,34 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
                 val endOfSession = startOfSession.plusMinutes(30) // imposta un esempio di durata
 
                 // Avvia la sessione di esercizio e registra i dati necessari
-                healthConnectManager.writeExerciseSession(startOfSession, endOfSession)
-                readExerciseSessions()  // aggiorna la lista delle sessioni
+                healthConnectManager.insertExerciseSession(startOfSession.toInstant(), endOfSession.toInstant(), ExerciseSessionRecord.EXERCISE_TYPE_RUNNING, "My Run", "Notes")
+                fetchExerciseSessions()  // aggiorna la lista delle sessioni
             }
         }
     }
 
-    suspend fun readExerciseSessions() {
+    suspend fun fetchExerciseSessions() {
         val start = Instant.EPOCH // 1st January 1970
-
         val now = Instant.now()
 
-        sessionsList.value = healthConnectManager
-            .readExerciseSessions(start, now)
-            .map { record ->
-                val packageName = record.metadata.dataOrigin.packageName
-                ExerciseSession(
-                    startTime = dateTimeWithOffsetOrDefault(
-                        record.startTime,
-                        record.startZoneOffset
-                    ),
-                    endTime = dateTimeWithOffsetOrDefault(record.startTime, record.startZoneOffset),
-                    id = record.metadata.id,
-                    sourceAppInfo = healthConnectCompatibleApps[packageName],
-                    title = record.title
-                )
-            }
+        // Chiamata al metodo del manager per leggere i dati da Health Connect
+        val records = healthConnectManager.readExerciseSessions(start, now)
+
+        // Mappa i record letti in un formato desiderato, se necessario
+        sessionsList.value = records.map { record ->
+            ExerciseSessionRecord(
+                startTime = record.startTime,
+                startZoneOffset = record.startZoneOffset,
+                endTime = record.endTime,
+                endZoneOffset = record.endZoneOffset,
+                exerciseType = record.exerciseType,
+                title = record.title,
+                notes = record.notes,
+                metadata = record.metadata,
+                segments = record.segments,
+                laps = record.laps
+            )
+        }
     }
 
     /**
@@ -229,18 +245,22 @@ class GeneralActivityViewModelFactory(
                 @Suppress("UNCHECKED_CAST")
                 CycleSessionViewModel(healthConnectManager) as T
             }
+
             modelClass.isAssignableFrom(RunSessionViewModel::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
                 RunSessionViewModel(healthConnectManager) as T
             }
+
             modelClass.isAssignableFrom(TrainSessionViewModel::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
                 TrainSessionViewModel(healthConnectManager) as T
             }
+
             modelClass.isAssignableFrom(WalkSessionViewModel::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
                 WalkSessionViewModel(healthConnectManager) as T
             }
+
             modelClass.isAssignableFrom(YogaSessionViewModel::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
                 YogaSessionViewModel(healthConnectManager) as T
@@ -251,22 +271,27 @@ class GeneralActivityViewModelFactory(
                 @Suppress("UNCHECKED_CAST")
                 DriveSessionViewModel(healthConnectManager) as T
             }
+
             modelClass.isAssignableFrom(LiftSessionViewModel::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
                 LiftSessionViewModel(healthConnectManager) as T
             }
+
             modelClass.isAssignableFrom(ListenSessionViewModel::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
                 ListenSessionViewModel(healthConnectManager) as T
             }
+
             modelClass.isAssignableFrom(SitSessionViewModel::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
                 SitSessionViewModel(healthConnectManager) as T
             }
+
             modelClass.isAssignableFrom(SleepSessionViewModel::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
                 SleepSessionViewModel(healthConnectManager) as T
             }
+
             else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
     }

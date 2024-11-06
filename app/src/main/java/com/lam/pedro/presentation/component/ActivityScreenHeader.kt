@@ -39,7 +39,8 @@ fun ActivityScreenHeader(titleId: Int, color: Color, image: Int) {
         Text(
             text = stringResource(titleId),
             style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = Color(0xB3FFFFFF)
         )
         Spacer(modifier = Modifier.weight(1f))
         Image(

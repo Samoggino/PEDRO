@@ -32,7 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.lam.pedro.R
-import com.lam.pedro.data.ExerciseSession
+//import com.lam.pedro.data.ExerciseSession
 import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 import com.lam.pedro.presentation.theme.PedroYellow
@@ -44,13 +44,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.health.connect.client.records.ExerciseSessionRecord
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SessionHistoryRow(
     color: Color,
     image: Int,
-    session: ExerciseSession,
+    session: ExerciseSessionRecord,
     viewModel: ActivitySessionViewModel
 ) {
 

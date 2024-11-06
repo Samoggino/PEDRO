@@ -212,7 +212,7 @@ fun NewActivityScreen(
 
                                         endTime = ZonedDateTime.now()
                                         viewModel.saveExerciseTest(startTime, endTime)
-                                        viewModel.readExerciseSessions()
+                                        viewModel.fetchExerciseSessions()
 
 
 
