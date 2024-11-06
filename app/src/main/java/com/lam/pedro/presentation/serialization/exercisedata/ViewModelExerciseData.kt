@@ -6,11 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import com.lam.pedro.data.ExerciseSessionData
-import com.lam.pedro.data.ExerciseSessionDataSerializable
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getAccessToken
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.SupabaseClientProvider.supabase
-import com.lam.pedro.data.deserialized
 import com.lam.pedro.presentation.navigation.Screen
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
@@ -34,13 +32,15 @@ class ViewModelExerciseData : ViewModel() {
 
             val uuid = getUUID(context)
 
+
             // Crea un oggetto JSON completo con i dati della sessione di sonno e l'UUID dell'utente
             val jsonFinal = buildJsonObject {
                 put("input_data", buildJsonObject {
-                    put("data", Json.encodeToJsonElement(exerciseSessionData.toSerializable()))
+                    put("data", Json.encodeToJsonElement(exerciseSessionData))
                     put("user_UUID", Json.encodeToJsonElement(uuid))
                 })
             }
+
 
             Log.d("Supabase-HealthConnect", "Dati di esercizio da caricare $jsonFinal")
 
@@ -65,9 +65,10 @@ class ViewModelExerciseData : ViewModel() {
             val response = supabase()
                 .from("exercise_sessions")
                 .select()
-                .decodeList<ExerciseSessionDataSerializable>()
+                .decodeList<ExerciseSessionData>()
 
-            return response.listIterator().asSequence().map { it.deserialized() }.toList()
+
+            return response
 
         } catch (e: Exception) {
             Log.e(

@@ -19,7 +19,6 @@ import java.time.Instant
 import java.time.ZoneOffset
 
 
-
 @Serializable
 data class SleepSessionData(
     val uid: String,
@@ -31,4 +30,12 @@ data class SleepSessionData(
     val endZoneOffset: ZoneOffset?,
     val duration: Duration?,
     val stages: List<SleepSessionRecord.Stage>
+)
+
+// Classe serializzabile per Stage
+@Serializable
+data class StageSerializable(
+    val startTime: Instant,
+    val endTime: Instant,
+    val stage: Int
 )
