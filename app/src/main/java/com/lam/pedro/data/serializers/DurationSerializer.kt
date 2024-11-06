@@ -11,12 +11,10 @@ object DurationSerializer : KSerializer<Duration> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Duration")
 
     override fun serialize(encoder: Encoder, value: Duration) {
-        // Serializza come il numero di secondi
         encoder.encodeLong(value.seconds)
     }
 
     override fun deserialize(decoder: Decoder): Duration {
-        // Deserializza come un numero di secondi
         val seconds = decoder.decodeLong()
         return Duration.ofSeconds(seconds)
     }

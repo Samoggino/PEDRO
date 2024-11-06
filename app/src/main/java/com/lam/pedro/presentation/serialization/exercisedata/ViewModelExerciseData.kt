@@ -66,8 +66,7 @@ class ViewModelExerciseData : ViewModel() {
                 .from("exercise_sessions")
                 .select()
                 .decodeList<ExerciseSessionData>()
-
-
+            
             return response
 
         } catch (e: Exception) {
