@@ -6,6 +6,7 @@
     TotalCaloriesBurnedRecordSerializer::class,
     StepsRecordSerializer::class,
     SpeedRecordSerializer::class
+
 )
 
 package com.lam.pedro.data.activity
@@ -15,29 +16,64 @@ import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ElevationGainedRecord
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.SpeedRecord
-import androidx.health.connect.client.records.StepsCadenceRecord
-import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import com.lam.pedro.data.serializers.activity.ActiveCaloriesBurnedRecordSerializer
 import com.lam.pedro.data.serializers.activity.DistanceRecordSerializer
 import com.lam.pedro.data.serializers.activity.ElevationGainedRecordSerializer
 import com.lam.pedro.data.serializers.activity.ExerciseRouteSerializer
 import com.lam.pedro.data.serializers.activity.TotalCaloriesBurnedRecordSerializer
-import com.lam.pedro.data.serializers.lists.ListStepsCadenceSampleSerializer
 import com.lam.pedro.data.serializers.primitive.SpeedRecordSerializer
 import com.lam.pedro.data.serializers.primitive.StepsRecordSerializer
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
+
+/***
+ * CYCLING:
+ *
+ * val permissions = setOf(
+ *         /*
+ *         * ActiveCaloriesBurnedRecord
+ *         * */
+ *
+ *         /*
+ *         * DistanceRecord
+ *         * */
+ *
+ *         /*
+ *         * ElevationGainedRecord
+ *         * */
+ *
+ *         /*
+ *         * ExerciseRoute - it isn't a record, it uses GPS so it requires manifest permissions
+ *         * */
+ *
+ *         /*
+ *         * CyclingPedalingCadenceRecord
+ *         * */
+ *
+ *         /*
+ *         * SpeedRecord
+ *         * */
+ *
+ *         /*
+ *         * TotalCaloriesBurnedRecord
+ *         * */
+ *
+ *
+ *         )
+ */
+
+
 @Serializable
-data class RunData(
+data class CyclingData(
     val calories: ActiveCaloriesBurnedRecord,
-    val totalCaloriesBurned: TotalCaloriesBurnedRecord?,
     val distanceRecord: DistanceRecord,
     val elevationGainedRecord: ElevationGainedRecord,
     val exerciseRoute: ExerciseRoute,
+//    val pedalingCadenceRecord: CyclingPedalingCadenceRecord,
     val speedRecord: SpeedRecord,
-    @Serializable(with = ListStepsCadenceSampleSerializer::class) val cadenceRecord: List<@Contextual StepsCadenceRecord.Sample>,
-    val stepsRecord: StepsRecord,
+    val totalCaloriesBurned: TotalCaloriesBurnedRecord?
+
+    // TODO: Add pedalingCadenceRecord
 )
