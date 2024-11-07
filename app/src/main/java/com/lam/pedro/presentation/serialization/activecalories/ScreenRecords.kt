@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
-import androidx.health.connect.client.units.Energy
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lam.pedro.presentation.navigation.Screen
@@ -40,23 +39,13 @@ fun ButtonList(
             onClick = {
                 coroutineScope.launch {
 
-                    val response = viewModel.actionOne(
-                        navController = navController,
-                        record = ActiveCaloriesBurnedRecord(
-                            startTime = start1.toInstant(),
-                            startZoneOffset = start1.offset,
-                            endTime = end1.toInstant(),
-                            endZoneOffset = end1.offset,
-                            energy = Energy.kilocalories(100.0),
-                        ),
-                        context = context
-                    )
+                    viewModel.actionOne()
                 }
 
             },
             modifier = Modifier.padding(vertical = 4.dp)
         ) {
-            Text("Bottone 1")
+            Text("TrainData")
         }
         Button(
             onClick = {
@@ -72,7 +61,7 @@ fun ButtonList(
             },
             modifier = Modifier.padding(vertical = 4.dp)
         ) {
-            Text("Bottone 3")
+            Text("YogaData")
         }
         Button(
             onClick = {
@@ -80,7 +69,7 @@ fun ButtonList(
             },
             modifier = Modifier.padding(vertical = 4.dp)
         ) {
-            Text("Bottone 4")
+            Text("RunData")
         }
 
         Button(

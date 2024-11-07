@@ -1,3 +1,12 @@
+@file:UseSerializers(
+    ActiveCaloriesBurnedRecordSerializer::class,
+    DistanceRecordSerializer::class,
+    ElevationGainedRecordSerializer::class,
+    ExerciseRouteSerializer::class,
+    TotalCaloriesBurnedRecordSerializer::class,
+    StepsRecordSerializer::class
+)
+
 package com.lam.pedro.data.activity
 
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
@@ -18,15 +27,16 @@ import com.lam.pedro.data.serializers.lists.ListStepsCadenceSampleSerializer
 import com.lam.pedro.data.serializers.primitive.StepsRecordSerializer
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
 
 @Serializable
 data class RunData(
-    @Serializable(with = ActiveCaloriesBurnedRecordSerializer::class) val calories: ActiveCaloriesBurnedRecord,
-    @Serializable(with = TotalCaloriesBurnedRecordSerializer::class) val totalCaloriesBurned: TotalCaloriesBurnedRecord?,
-    @Serializable(with = DistanceRecordSerializer::class) val distanceRecord: DistanceRecord,
-    @Serializable(with = ElevationGainedRecordSerializer::class) val elevationGainedRecord: ElevationGainedRecord,
-    @Serializable(with = ExerciseRouteSerializer::class) val exerciseRoute: ExerciseRoute,
+    val calories: ActiveCaloriesBurnedRecord,
+    val totalCaloriesBurned: TotalCaloriesBurnedRecord?,
+    val distanceRecord: DistanceRecord,
+    val elevationGainedRecord: ElevationGainedRecord,
+    val exerciseRoute: ExerciseRoute,
     @Serializable(with = ListSpeedRecordSampleSerializer::class) val speedRecord: List<@Contextual SpeedRecord.Sample>,
     @Serializable(with = ListStepsCadenceSampleSerializer::class) val cadenceRecord: List<@Contextual StepsCadenceRecord.Sample>,
-    @Serializable(with = StepsRecordSerializer::class) val stepsRecord: StepsRecord,
+    val stepsRecord: StepsRecord,
 )

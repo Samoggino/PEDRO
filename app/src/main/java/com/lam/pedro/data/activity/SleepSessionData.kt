@@ -18,7 +18,6 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset
 
-
 @Serializable
 data class SleepSessionData(
     val uid: String,

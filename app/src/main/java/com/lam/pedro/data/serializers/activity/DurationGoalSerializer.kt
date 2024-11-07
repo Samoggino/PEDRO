@@ -1,19 +1,18 @@
 package com.lam.pedro.data.serializers.activity
 
 import androidx.health.connect.client.records.ExerciseCompletionGoal
+import com.lam.pedro.data.serializers.primitive.DurationSerializer
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import java.time.Duration
 
 object DurationGoalSerializer : KSerializer<ExerciseCompletionGoal.DurationGoal> {
-    override val descriptor: SerialDescriptor =
-        PrimitiveSerialDescriptor(
-            "DurationGoal",
-            kotlinx.serialization.descriptors.PrimitiveKind.STRING
-        )
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("DurationGoal") {
+        element("duration", DurationSerializer.descriptor)
+    }
 
     override fun serialize(encoder: Encoder, value: ExerciseCompletionGoal.DurationGoal) {
         // Serializza solo la durata come stringa

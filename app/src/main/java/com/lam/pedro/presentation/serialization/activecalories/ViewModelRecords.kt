@@ -12,7 +12,6 @@ import androidx.health.connect.client.records.ElevationGainedRecord
 import androidx.health.connect.client.records.ExerciseCompletionGoal
 import androidx.health.connect.client.records.ExerciseLap
 import androidx.health.connect.client.records.ExerciseRoute
-import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.StepsCadenceRecord
 import androidx.health.connect.client.records.StepsRecord
@@ -22,8 +21,8 @@ import androidx.health.connect.client.units.Length
 import androidx.health.connect.client.units.Velocity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
 import com.lam.pedro.data.activity.RunData
+import com.lam.pedro.data.activity.TrainData
 import com.lam.pedro.data.activity.YogaData
 import com.lam.pedro.data.serializers.activity.ActiveCaloriesBurnedRecordSerializer
 import kotlinx.serialization.UseSerializers
@@ -35,16 +34,41 @@ import java.time.ZoneOffset
 
 class ViewModelRecords : ViewModel() {
 
-    fun actionOne(
-        navController: NavController,
-        record: ActiveCaloriesBurnedRecord,
-        context: Context
-    ): List<ActiveCaloriesBurnedRecord> {
-
+    fun actionOne() {
 
         try {
+            val trainData = TrainData(
+                activeCaloriesBurnedRecord = ActiveCaloriesBurnedRecord(
+                    startTime = Instant.now(),
+                    startZoneOffset = ZoneOffset.UTC,
+                    endTime = Instant.now().plusSeconds(3600),
+                    endZoneOffset = ZoneOffset.UTC,
+                    energy = Energy.kilocalories(100.0)
+                ),
+                repetitionsGoal = ExerciseCompletionGoal.RepetitionsGoal(
+                    repetitions = 10
+                ),
+                durationGoal = ExerciseCompletionGoal.DurationGoal(
+                    duration = Duration.between(
+                        Instant.now(),
+                        Instant.now().plusSeconds(3600)
+                    )
+                ),
+                exerciseLap = ExerciseLap(
+                    startTime = Instant.now(),
+                    endTime = Instant.now().plusSeconds(3600),
+                    length = Length.meters(500.0)
+                ),
+                totalCaloriesBurnedRecord = TotalCaloriesBurnedRecord(
+                    startTime = Instant.now(),
+                    startZoneOffset = ZoneOffset.UTC,
+                    endTime = Instant.now().plusSeconds(3600),
+                    endZoneOffset = ZoneOffset.UTC,
+                    energy = Energy.kilocalories(100.0)
+                )
+            )
 
-            checkSerialization(record)
+            checkSerialization(trainData)
 
         } catch (e: Exception) {
             Log.e(
@@ -53,15 +77,11 @@ class ViewModelRecords : ViewModel() {
             )
         }
 
-        return emptyList()
     }
 
     fun actionTwo() {
-        // crea un oggetto stage e prova a serializzarlo e deserializzarlo
-        val stage = SleepSessionRecord.Stage(Instant.now(), Instant.now(), 2)
 
-        // verifica se sono uguali
-        checkSerialization(stage)
+//        checkSerialization(stage)
 
     }
 
