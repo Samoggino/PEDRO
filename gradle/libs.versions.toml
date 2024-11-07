@@ -1,6 +1,6 @@
 [versions]
 accompanistDrawablepainter = "0.36.0"
-agp = "8.7.1"
+agp = "8.7.2"
 concurrentFuturesKtx = "1.2.0"
 connectClient = "1.1.0-alpha09"
 desugar_jdk_libs = "2.1.2"

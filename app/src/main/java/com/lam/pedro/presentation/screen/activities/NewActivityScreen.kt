@@ -54,6 +54,7 @@ import com.lam.pedro.R
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.DisplayLottieAnimation
+import com.lam.pedro.presentation.navigation.Screen
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
@@ -334,7 +335,10 @@ fun NewActivityScreen(
                 val seconds = (elapsedTime / 1000) % 60
                 val centiseconds = (elapsedTime % 1000) / 10
 
-                Column() {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
                     Text(
                         String.format("%02d:%02d:%02d", minutes, seconds, centiseconds),
                         style = MaterialTheme.typography.headlineLarge.copy(fontSize = 60.sp),
@@ -345,7 +349,29 @@ fun NewActivityScreen(
 
                     Spacer(modifier = Modifier.height(60.dp))
 
-                    DisplayLottieAnimation("https://lottie.host/484dc375-3dc0-4d9a-a788-455943b5cc61/wmTnJFRiES.lottie")
+                    if (titleId == Screen.RunSessionScreen.titleId) {
+                        DisplayLottieAnimation("https://lottie.host/d32ef6d1-6bd0-4e39-b2f4-cbab8ca8c19d/79Mbx9ocLg.lottie")
+                    } else if (titleId == Screen.CycleSessionScreen.titleId) {//TODO
+                        DisplayLottieAnimation("https://lottie.host/58060237-49bc-4e38-b630-9db0992858e3/QkvECf9V38.lottie")
+                    } else if (titleId == Screen.TrainSessionScreen.titleId) {//TODO
+                        DisplayLottieAnimation("https://lottie.host/80db1f9c-c1f6-4f2d-8512-fbbee80d23d0/DeQ19gEueZ.lottie")
+                    } else if (titleId == Screen.WalkSessionScreen.titleId) {//TODO
+                        DisplayLottieAnimation("https://lottie.host/d32ef6d1-6bd0-4e39-b2f4-cbab8ca8c19d/79Mbx9ocLg.lottie")
+                    } else if (titleId == Screen.YogaSessionScreen.titleId) {//TODO
+                        DisplayLottieAnimation("https://lottie.host/d32ef6d1-6bd0-4e39-b2f4-cbab8ca8c19d/79Mbx9ocLg.lottie")
+                    } else if (titleId == Screen.DriveSessionScreen.titleId) {
+                        DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
+                    } else if (titleId == Screen.WeightScreen.titleId) {//TODO
+                        DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
+                    } else if (titleId == Screen.ListenSessionScreen.titleId) {//TODO
+                        DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
+                    } else if (titleId == Screen.SitSessionScreen.titleId) {//TODO
+                        DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
+                    } else if (titleId == Screen.SleepSessions.titleId) {//TODO
+                        DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
+                    }
+
+
                 }
 
             }
