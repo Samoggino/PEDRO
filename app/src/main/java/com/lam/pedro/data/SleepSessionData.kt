@@ -31,11 +31,11 @@ data class SleepSessionData(
     val duration: Duration?,
     val stages: List<SleepSessionRecord.Stage>
 )
-
-// Classe serializzabile per Stage
-@Serializable
-data class StageSerializable(
-    val startTime: Instant,
-    val endTime: Instant,
-    val stage: Int
-)
+//
+//// Classe serializzabile per Stage
+//@Serializable
+//data class StageSerializable(
+//    val startTime: Instant,
+//    val endTime: Instant,
+//    val stage: Int
+//)

@@ -74,6 +74,14 @@ fun ButtonList(
         ) {
             Text("Bottone 3")
         }
+        Button(
+            onClick = {
+                viewModel.actionFour(context)
+            },
+            modifier = Modifier.padding(vertical = 4.dp)
+        ) {
+            Text("Bottone 4")
+        }
 
         Button(
             onClick = {

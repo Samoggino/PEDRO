@@ -15,11 +15,11 @@ import kotlinx.serialization.UseSerializers
 import java.time.Instant
 import java.time.ZoneOffset
 
-@Serializable
-data class ActiveCaloriesBurnedRecord(
-    val startTime: Instant,
-    val startZoneOffset: ZoneOffset? = null,
-    val endTime: Instant,
-    val endZoneOffset: ZoneOffset? = null,
-    val energy: Energy,
-)
+//@Serializable
+//data class ActiveCaloriesBurnedRecord(
+//    val startTime: Instant,
+//    val startZoneOffset: ZoneOffset? = null,
+//    val endTime: Instant,
+//    val endZoneOffset: ZoneOffset? = null,
+//    val energy: Energy,
+//)

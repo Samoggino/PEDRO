@@ -7,15 +7,21 @@ package com.lam.pedro.presentation.serialization.activecalories
 import android.content.Context
 import android.util.Log
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
+import androidx.health.connect.client.records.DistanceRecord
+import androidx.health.connect.client.records.ElevationGainedRecord
 import androidx.health.connect.client.records.ExerciseCompletionGoal
 import androidx.health.connect.client.records.ExerciseLap
+import androidx.health.connect.client.records.ExerciseRoute
+import androidx.health.connect.client.records.SleepSessionRecord
+import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
+import androidx.health.connect.client.units.Velocity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
-import com.lam.pedro.data.StageSerializable
+import com.lam.pedro.data.RunData
 import com.lam.pedro.data.YogaData
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getAccessToken
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
@@ -84,21 +90,10 @@ class ViewModelRecords : ViewModel() {
 
     fun actionTwo() {
         // crea un oggetto stage e prova a serializzarlo e deserializzarlo
-        val stage = StageSerializable(Instant.now(), Instant.now(), 2)
-        val serialized = Json.encodeToString(stage)
-        val deserialized = Json.decodeFromString<StageSerializable>(serialized)
-        Log.d("Supabase", "Stage serializzato: $serialized")
-        Log.d("Supabase", "Stage deserializzato: $deserialized")
-        Log.d("Supabase", "Stage deserializzato: ${deserialized.startTime}")
-        Log.d("Supabase", "Stage deserializzato: ${deserialized.endTime}")
-        Log.d("Supabase", "Stage deserializzato: ${deserialized.stage}")
+        val stage = SleepSessionRecord.Stage(Instant.now(), Instant.now(), 2)
 
         // verifica se sono uguali
-        Log.d(
-            "Supabase",
-            "Stage serializzato e deserializzato sono uguali: ${stage == deserialized}"
-        )
-
+        checkSerialization(stage)
 
     }
 
@@ -147,29 +142,111 @@ class ViewModelRecords : ViewModel() {
                 exerciseLap = exerciseLap
             )
 
-            // serializza e deserializza l'oggetto per verificare che funzioni
-            val serialized = Json.encodeToString(yogaData)
-            val deserialized = Json.decodeFromString<YogaData>(serialized)
-            // verifica se sono uguali
-            Log.d(
-                "Supabase",
-                "YogaData serializzato e deserializzato sono uguali: ${yogaData == deserialized}"
-            )
-
-            // prova a serializzare e deserializzare l'oggetto
-            val jsonFinal = buildJsonObject {
-                put("input_data", buildJsonObject {
-                    put("data", Json.encodeToJsonElement(yogaData))
-                    put("user_UUID", Json.encodeToJsonElement(getUUID(context)))
-                })
-            }
-
-            Log.d("Supabase", "Dati di esercizio da caricare $jsonFinal")
+            checkSerialization(yogaData)
 
         } catch (e: Exception) {
             Log.e("Supabase", "Errore durante la creazione di YogaRecord: ${e.message}")
         }
     }
+
+
+    fun actionFour(context: Context) {
+        // crea un oggetto RunData e prova a serializzarlo e deserializzarlo
+        val runData = RunData(
+            calories = ActiveCaloriesBurnedRecord(
+                startTime = Instant.now(),
+                startZoneOffset = ZoneOffset.UTC,
+                endTime = Instant.now().plusSeconds(3600),
+                endZoneOffset = ZoneOffset.UTC,
+                energy = Energy.kilocalories(100.0)
+            ),
+            totalCaloriesBurned = TotalCaloriesBurnedRecord(
+                startTime = Instant.now(),
+                startZoneOffset = ZoneOffset.UTC,
+                endTime = Instant.now().plusSeconds(3600),
+                endZoneOffset = ZoneOffset.UTC,
+                energy = Energy.kilocalories(100.0)
+            ),
+            distanceRecord = DistanceRecord(
+                startTime = Instant.now(),
+                startZoneOffset = ZoneOffset.UTC,
+                endTime = Instant.now().plusSeconds(3600),
+                endZoneOffset = ZoneOffset.UTC,
+                distance = Length.meters(500.0)
+            ),
+            elevationGainedRecord = ElevationGainedRecord(
+                startTime = Instant.now(),
+                startZoneOffset = ZoneOffset.UTC,
+                endTime = Instant.now().plusSeconds(3600),
+                endZoneOffset = ZoneOffset.UTC,
+                elevation = Length.meters(100.0)
+            ),
+            exerciseRoute = ExerciseRoute(
+                route = listOf(
+                    ExerciseRoute.Location(
+                        time = Instant.now(),
+                        latitude = 0.0,
+                        longitude = 0.0,
+                        horizontalAccuracy = Length.meters(10.0),
+                        verticalAccuracy = Length.meters(10.0),
+                        altitude = Length.meters(10.0)
+                    ),
+                    ExerciseRoute.Location(
+                        time = Instant.now().plusSeconds(3600),
+                        latitude = 0.0,
+                        longitude = 0.0,
+                        horizontalAccuracy = Length.meters(10.0),
+                        verticalAccuracy = Length.meters(10.0),
+                        altitude = Length.meters(10.0)
+                    )
+                )
+            ),
+            speedRecord = listOf(
+                SpeedRecord.Sample(
+                    time = Instant.now(),
+                    speed = Velocity.metersPerSecond(10.0)
+                ),
+                SpeedRecord.Sample(
+                    time = Instant.now().plusSeconds(3600),
+                    speed = Velocity.metersPerSecond(10.0)
+                )
+
+            )
+        )
+
+        checkSerialization(runData)
+
+    }
+
+
+    /**
+     * Funzione per verificare la serializzazione e deserializzazione di un oggetto
+     *
+     * @param obj oggetto da verificare
+     * @return true se la serializzazione e deserializzazione sono andate a buon fine, false altrimenti
+     */
+    private inline fun <reified T> checkSerialization(obj: T): Boolean {
+        try {
+            if (obj == Json.decodeFromString<T>(Json.encodeToString(obj))) {
+                Log.d("Serializing", "Serializzazione e deserializzazione riuscite")
+                return true
+            } else {
+                Log.e(
+                    "Serializing",
+                    "Gli oggetti serializzati e deserializzati non sono uguali"
+                )
+                return false
+            }
+        } catch (e: Exception) {
+            // Log dell'errore nel caso in cui si verifichi un'eccezione
+            Log.e(
+                "Serializing",
+                "Errore durante la serializzazione/deserializzazione: ${e.message}"
+            )
+            return false
+        }
+    }
+
 }
 
 @Suppress("UNCHECKED_CAST")
