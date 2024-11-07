@@ -1,18 +1,12 @@
 package com.lam.pedro.presentation.screen.activities.dynamicactivities.trainscreen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,8 +19,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,21 +28,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.navigation.NavController
 import com.lam.pedro.R
 import com.lam.pedro.presentation.component.ActivityScreenHeader
-import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.PermissionRequired
 import com.lam.pedro.presentation.component.SessionHistoryRow
 import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
-import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionViewModel
-import java.time.Instant
+import com.lam.pedro.presentation.screen.activities.SessionScreen
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +46,6 @@ import java.util.UUID
 fun TrainSessionScreen(
     permissions: Set<String>,
     permissionsGranted: Boolean,
-    sessionsList: List<ExerciseSessionRecord>,
     uiState: ActivitySessionViewModel.UiState,
     onInsertClick: () -> Unit = {},
     onError: (Throwable?) -> Unit = {},
@@ -71,13 +58,26 @@ fun TrainSessionScreen(
     image: Int,
     viewModel: TrainSessionViewModel
 ) {
+    SessionScreen(
+        permissions = permissions,
+        permissionsGranted = permissionsGranted,
+        uiState = uiState,
+        onInsertClick = onInsertClick,
+        onError = onError,
+        onPermissionsResult = onPermissionsResult,
+        onPermissionsLaunch = onPermissionsLaunch,
+        onStartRecording = onStartRecording,
+        navController = navController,
+        titleId = titleId,
+        color = color,
+        image = image,
+        viewModel = viewModel
+    )
 
+    /*
     // Remember the last error ID, such that it is possible to avoid re-launching the error
     // notification for the same error when the screen is recomposed, or configuration changes etc.
     val errorId = rememberSaveable { mutableStateOf(UUID.randomUUID()) }
-    // Per memorizzare lo stato del bottone e il tempo di inizio della sessione
-    val isRecording = rememberSaveable { mutableStateOf(false) }
-    val startTime = rememberSaveable { mutableStateOf<Instant?>(null) }
     val sessionList by viewModel.sessionsList
 
     LaunchedEffect(uiState) {
@@ -126,8 +126,11 @@ fun TrainSessionScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(0.dp),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally,
+                horizontalAlignment = if (!permissionsGranted) {
+                    Alignment.CenterHorizontally
+                } else {
+                    Alignment.Start
+                }
             ) {
                 item {
                     ActivityScreenHeader(titleId, color, image)
@@ -194,5 +197,7 @@ fun TrainSessionScreen(
         }
 
     }
+
+     */
 
 }

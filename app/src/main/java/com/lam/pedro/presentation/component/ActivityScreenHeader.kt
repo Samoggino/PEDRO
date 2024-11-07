@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +35,8 @@ fun ActivityScreenHeader(titleId: Int, color: Color, image: Int) {
                     bottomEnd = 26.dp
                 )
             )
-            .background(color),
+            .background(color)
+            .padding(horizontal = 16.dp),
     ) {
         Text(
             text = stringResource(titleId),

@@ -182,5 +182,6 @@
     <string name="login">Login</string>
     <string name="activity_history">History</string>
     <string name="new_activity_screen">New activity</string>
+    <string name="empty_history">There is no recordered activity yet</string>
 
 </resources>

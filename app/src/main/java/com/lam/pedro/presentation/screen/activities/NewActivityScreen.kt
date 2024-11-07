@@ -26,9 +26,11 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,10 +48,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.lam.pedro.R
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.component.BackButton
+import com.lam.pedro.presentation.component.DisplayLottieAnimation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
@@ -116,6 +120,8 @@ fun NewActivityScreen(
             // Lista dei risultati dei timer
             val timerResults = remember { mutableStateListOf<String>() }
 
+            Spacer(modifier = Modifier.height(60.dp))
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
@@ -124,7 +130,7 @@ fun NewActivityScreen(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(26.dp))
-                        .size(70.dp)
+                        .size(150.dp)
                         .background(color)
                 ) {
                     IconButton(
@@ -141,7 +147,7 @@ fun NewActivityScreen(
                         Image(
                             painter = painterResource(id = if (!isPaused) R.drawable.pause_icon else R.drawable.play_icon),
                             contentDescription = if (visible) "Pause" else "Play",
-                            modifier = Modifier.size(40.dp)
+                            modifier = Modifier.size(75.dp)
                         )
                     }
                 }
@@ -162,78 +168,148 @@ fun NewActivityScreen(
                         },
                         modifier = Modifier
                             .clip(RoundedCornerShape(26.dp))
-                            .size(70.dp)
+                            .size(150.dp)
                             .background(Color(0xFFF44336))
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.stop_icon),
                             contentDescription = "Stop",
-                            modifier = Modifier.size(40.dp)
+                            modifier = Modifier.size(75.dp)
                         )
                     }
                 }
             }
 
-            // Mostra il dialogo di conferma
+            Spacer(modifier = Modifier.height(60.dp))
+
+            var title by remember { mutableStateOf("") }
+            var notes by remember { mutableStateOf("") }
+            var isTitleEmpty by remember { mutableStateOf(false) } // Variabile per controllare se il titolo è vuoto
+
+// Mostra il dialogo di conferma
             if (showDialog) {
                 AlertDialog(
                     onDismissRequest = { showDialog = false },
-                    title = { Text("Conferma") },
+                    title = { Text(text = "Confirm", color = color) },
                     text = {
-                        Text(
-                            if (isStopAction) "Vuoi fermare l'attività?" else if (visible) "Vuoi mettere in pausa?" else "Vuoi avviare l'attività?"
-                        )
+                        Column {
+                            // Messaggio di conferma in base all'azione
+                            Text(
+                                if (isStopAction) "Want to stop the activity? (you can change these while stopping)" else if (visible) "Want to pause?" else "Want to start?"
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Campo di input per il titolo
+                            OutlinedTextField(
+                                value = title,
+                                onValueChange = {
+                                    title = it
+                                    isTitleEmpty = title.isBlank() // Controlla se il titolo è vuoto
+                                },
+                                label = { Text("Titolo") },
+                                isError = isTitleEmpty,
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(26.dp),
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedIndicatorColor = color,
+                                    cursorColor = color,
+                                    focusedLabelColor = color,
+                                )
+                            )
+
+                            if (isTitleEmpty) {
+                                Text(
+                                    text = "Title is required",
+                                    color = Color.Red,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            // Campo di input per le note
+                            OutlinedTextField(
+                                value = notes,
+                                onValueChange = { notes = it },
+                                label = { Text("Note (optional)") },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(26.dp),
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent,
+                                    focusedIndicatorColor = color,
+                                    cursorColor = color,
+                                    focusedLabelColor = color,
+                                )
+                            )
+                        }
                     },
                     confirmButton = {
                         TextButton(
                             onClick = {
-                                coroutineScope.launch {
-                                    if (isStopAction) {
-                                        timerRunning = false // Ferma il timer
-                                        visible = false // Nascondi il pulsante di pausa
-                                        isPaused = true // Imposta il timer in pausa
-                                        // Aggiungi il tempo finale alla lista dei risultati
-                                        val minutes = (elapsedTime / 60000) % 60
-                                        val seconds = (elapsedTime / 1000) % 60
-                                        val centiseconds = (elapsedTime % 1000) / 10
-                                        timerResults.add(
-                                            String.format(
-                                                "%02d:%02d:%02d",
-                                                minutes,
-                                                seconds,
-                                                centiseconds
+                                if (title.isNotBlank()) { // Verifica che il titolo non sia vuoto
+                                    coroutineScope.launch {
+                                        if (isStopAction) {
+                                            timerRunning = false // Ferma il timer
+                                            visible = false // Nascondi il pulsante di pausa
+                                            isPaused = true // Imposta il timer in pausa
+
+                                            // Aggiungi il tempo finale alla lista dei risultati
+                                            val minutes = (elapsedTime / 60000) % 60
+                                            val seconds = (elapsedTime / 1000) % 60
+                                            val centiseconds = (elapsedTime % 1000) / 10
+                                            timerResults.add(
+                                                String.format(
+                                                    "%02d:%02d:%02d",
+                                                    minutes,
+                                                    seconds,
+                                                    centiseconds
+                                                )
                                             )
-                                        )
-                                        Log.d(TAG, "------------Timer results: $timerResults")
+                                            Log.d(TAG, "------------Timer results: $timerResults")
 
+                                            endTime = ZonedDateTime.now()
 
-                                        endTime = ZonedDateTime.now()
-                                        viewModel.saveExerciseTest(startTime, endTime, activityType, "My Run", "Notes")
-                                        viewModel.fetchExerciseSessions(activityType)
+                                            // Salva i dati usando i valori inseriti dall'utente
+                                            viewModel.saveExerciseTest(
+                                                startTime,
+                                                endTime,
+                                                activityType,
+                                                title,
+                                                notes
+                                            )
+                                            viewModel.fetchExerciseSessions(activityType)
 
+                                            elapsedTime = 0
 
+                                            navController.popBackStack()
+                                        } else {
+                                            visible = !visible // Alterna il valore di visible
 
-                                        elapsedTime = 0 // Resetta il tempo
-                                    } else {
-                                        // Alterna il valore di visible
-                                        visible = !visible
-
-                                        if (visible) {
-                                            isPaused = false // Avvia il timer
-                                            timerRunning = true
+                                            if (visible) {
+                                                isPaused = false // Avvia il timer
+                                                timerRunning = true
+                                            }
                                         }
+                                        showDialog = false // Chiude il dialogo
                                     }
-                                    showDialog = false // Chiude il dialogo
+                                } else {
+                                    isTitleEmpty = true // Imposta l'errore se il titolo è vuoto
                                 }
-                            }) {
-                            Text("Sì")
+
+                            }
+                        ) {
+                            Text(text = "Yes", color = color)
                         }
                     },
                     dismissButton = {
                         TextButton(
                             onClick = { showDialog = false }
                         ) {
-                            Text("Annulla")
+                            Text(text = "Dismiss", color = color)
                         }
                     }
                 )
@@ -258,14 +334,20 @@ fun NewActivityScreen(
                 val seconds = (elapsedTime / 1000) % 60
                 val centiseconds = (elapsedTime % 1000) / 10
 
-                Text(
-                    String.format("%02d:%02d:%02d", minutes, seconds, centiseconds),
-                    style = MaterialTheme.typography.headlineLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .wrapContentWidth(Alignment.CenterHorizontally) // Centro orizzontalmente
-                )
+                Column() {
+                    Text(
+                        String.format("%02d:%02d:%02d", minutes, seconds, centiseconds),
+                        style = MaterialTheme.typography.headlineLarge.copy(fontSize = 60.sp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth(Alignment.CenterHorizontally) // Centro orizzontalmente
+                    )
+
+                    Spacer(modifier = Modifier.height(60.dp))
+
+                    DisplayLottieAnimation("https://lottie.host/484dc375-3dc0-4d9a-a788-455943b5cc61/wmTnJFRiES.lottie")
+                }
+
             }
 
         }

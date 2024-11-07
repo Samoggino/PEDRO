@@ -27,14 +27,16 @@ private val DarkColorPalette: ColorScheme = darkColorScheme(
     primary = PedroYellow,
     secondary = PedroBlack,
     primaryContainer = PedroDarkGray,
-    secondaryContainer = PedroDark
+    secondaryContainer = PedroDark,
+    onSecondaryContainer = PedroLighterGray
 )
 
 private val LightColorPalette: ColorScheme = lightColorScheme(
     primary = PedroBlack,
     secondary = PedroBlack,
     primaryContainer = PedroLightGray,
-    secondaryContainer = PedroLight
+    secondaryContainer = PedroLight,
+    onSecondaryContainer = PedroLightGray
 )
 
 @Composable

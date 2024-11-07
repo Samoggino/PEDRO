@@ -97,6 +97,8 @@ dependencies {
     implementation("androidx.compose.ui:ui:1.7.0-alpha07")
     implementation("androidx.compose.animation:animation:1.7.0-alpha07")
 
+    implementation("com.airbnb.android:lottie-compose:4.2.0")
+
 
 }
 

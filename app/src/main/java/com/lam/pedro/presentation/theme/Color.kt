@@ -24,3 +24,4 @@ val PedroLight = Color(0xFFE7E7E7)
 
 val PedroDarkGray = Color(0xFF2D2D2D)
 val PedroLightGray = Color(0xFF606060)
+val PedroLighterGray = Color(0xFF999999)

@@ -291,7 +291,8 @@ fun PedroNavigation(
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
-                val onPermissionsResult = { viewModel.initialLoad(Screen.RunSessionScreen.activityType) }
+                val onPermissionsResult =
+                    { viewModel.initialLoad(Screen.RunSessionScreen.activityType) }
 
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
@@ -301,12 +302,15 @@ fun PedroNavigation(
                 screenStack.add(Screen.RunSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 RunSessionScreen(
-                    permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    sessionsList = sessionsList,
+                    permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.startRecording(Screen.RunSessionScreen.activityType, "My Run", "Notes")
+                        viewModel.startRecording(
+                            Screen.RunSessionScreen.activityType,
+                            "My Run",
+                            "Notes"
+                        )
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -348,7 +352,8 @@ fun PedroNavigation(
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
-                val onPermissionsResult = { viewModel.initialLoad(Screen.SleepSessions.activityType) }
+                val onPermissionsResult =
+                    { viewModel.initialLoad(Screen.SleepSessions.activityType) }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
@@ -356,12 +361,15 @@ fun PedroNavigation(
                 screenStack.add(Screen.SleepSessions.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 SleepSessionScreen(
-                    permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    sessionsList = sessionsList,
+                    permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.startRecording(Screen.SleepSessions.activityType, "My Sleep", "Notes")
+                        viewModel.startRecording(
+                            Screen.SleepSessions.activityType,
+                            "My Sleep",
+                            "Notes"
+                        )
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -403,7 +411,8 @@ fun PedroNavigation(
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
-                val onPermissionsResult = { viewModel.initialLoad(Screen.WalkSessionScreen.activityType) }
+                val onPermissionsResult =
+                    { viewModel.initialLoad(Screen.WalkSessionScreen.activityType) }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
@@ -411,12 +420,15 @@ fun PedroNavigation(
                 screenStack.add(Screen.WalkSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 WalkSessionScreen(
-                    permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    sessionsList = sessionsList,
+                    permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.startRecording(Screen.WalkSessionScreen.activityType, "My Walk", "Notes")
+                        viewModel.startRecording(
+                            Screen.WalkSessionScreen.activityType,
+                            "My Walk",
+                            "Notes"
+                        )
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -458,7 +470,8 @@ fun PedroNavigation(
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
-                val onPermissionsResult = { viewModel.initialLoad(Screen.DriveSessionScreen.activityType) }
+                val onPermissionsResult =
+                    { viewModel.initialLoad(Screen.DriveSessionScreen.activityType) }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
@@ -466,12 +479,15 @@ fun PedroNavigation(
                 screenStack.add(Screen.DriveSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 DriveSessionScreen(
-                    permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    sessionsList = sessionsList,
+                    permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.startRecording(Screen.DriveSessionScreen.activityType, "My Drive", "Notes")
+                        viewModel.startRecording(
+                            Screen.DriveSessionScreen.activityType,
+                            "My Drive",
+                            "Notes"
+                        )
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -513,7 +529,8 @@ fun PedroNavigation(
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
-                val onPermissionsResult = { viewModel.initialLoad(Screen.SitSessionScreen.activityType) }
+                val onPermissionsResult =
+                    { viewModel.initialLoad(Screen.SitSessionScreen.activityType) }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
@@ -521,12 +538,15 @@ fun PedroNavigation(
                 screenStack.add(Screen.SitSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 SitSessionScreen(
-                    permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    sessionsList = sessionsList,
+                    permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.startRecording(Screen.SitSessionScreen.activityType, "My Sit", "Notes")
+                        viewModel.startRecording(
+                            Screen.SitSessionScreen.activityType,
+                            "My Sit",
+                            "Notes"
+                        )
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -568,7 +588,8 @@ fun PedroNavigation(
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
-                val onPermissionsResult = { viewModel.initialLoad(Screen.ListenSessionScreen.activityType) }
+                val onPermissionsResult =
+                    { viewModel.initialLoad(Screen.ListenSessionScreen.activityType) }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
@@ -576,12 +597,15 @@ fun PedroNavigation(
                 screenStack.add(Screen.ListenSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 ListenSessionScreen(
-                    permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    sessionsList = sessionsList,
+                    permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.startRecording(Screen.ListenSessionScreen.activityType, "My Listen", "Notes")
+                        viewModel.startRecording(
+                            Screen.ListenSessionScreen.activityType,
+                            "My Listen",
+                            "Notes"
+                        )
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -616,7 +640,8 @@ fun PedroNavigation(
                 val permissions = viewModel.permissions
                 val sessionsList by viewModel.sessionsList
 
-                val onPermissionsResult = { viewModel.initialLoad(Screen.WeightScreen.activityType) }
+                val onPermissionsResult =
+                    { viewModel.initialLoad(Screen.WeightScreen.activityType) }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
@@ -624,15 +649,15 @@ fun PedroNavigation(
                 screenStack.add(Screen.WeightScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 WeightSessionScreen(
-                    permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    sessionsList = sessionsList,
+                    permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
-                    onInsertClick = { weightInput ->
-                        viewModel.startRecording(Screen.WeightScreen.activityType, "My Lift", "Notes")
-                    },
-                    onDeleteClick = { uid ->
-                        //viewModel.deleteSleepData(uid)
+                    onInsertClick = {
+                        viewModel.startRecording(
+                            Screen.WeightScreen.activityType,
+                            "My Lift",
+                            "Notes"
+                        )
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -674,7 +699,8 @@ fun PedroNavigation(
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
-                val onPermissionsResult = { viewModel.initialLoad(Screen.YogaSessionScreen.activityType) }
+                val onPermissionsResult =
+                    { viewModel.initialLoad(Screen.YogaSessionScreen.activityType) }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
@@ -682,12 +708,15 @@ fun PedroNavigation(
                 screenStack.add(Screen.YogaSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 YogaSessionScreen(
-                    permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    sessionsList = sessionsList,
+                    permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.startRecording(Screen.YogaSessionScreen.activityType, "My Yoga", "Notes")
+                        viewModel.startRecording(
+                            Screen.YogaSessionScreen.activityType,
+                            "My Yoga",
+                            "Notes"
+                        )
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -730,7 +759,8 @@ fun PedroNavigation(
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
-                val onPermissionsResult = { viewModel.initialLoad(Screen.CycleSessionScreen.activityType) }
+                val onPermissionsResult =
+                    { viewModel.initialLoad(Screen.CycleSessionScreen.activityType) }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
@@ -738,12 +768,15 @@ fun PedroNavigation(
                 screenStack.add(Screen.CycleSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 CycleSessionScreen(
-                    permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    sessionsList = sessionsList,
+                    permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.startRecording(Screen.CycleSessionScreen.activityType, "My Cycle", "Notes")
+                        viewModel.startRecording(
+                            Screen.CycleSessionScreen.activityType,
+                            "My Cycle",
+                            "Notes"
+                        )
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
@@ -785,7 +818,8 @@ fun PedroNavigation(
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
-                val onPermissionsResult = { viewModel.initialLoad(Screen.TrainSessionScreen.activityType) }
+                val onPermissionsResult =
+                    { viewModel.initialLoad(Screen.TrainSessionScreen.activityType) }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
                         onPermissionsResult()
@@ -793,12 +827,15 @@ fun PedroNavigation(
                 screenStack.add(Screen.TrainSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 TrainSessionScreen(
-                    permissionsGranted = permissionsGranted,
                     permissions = permissions,
-                    sessionsList = sessionsList,
+                    permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
                     onInsertClick = {
-                        viewModel.startRecording(Screen.TrainSessionScreen.activityType, "My Train", "Notes")
+                        viewModel.startRecording(
+                            Screen.TrainSessionScreen.activityType,
+                            "My Train",
+                            "Notes"
+                        )
                     },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
