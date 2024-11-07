@@ -5,12 +5,12 @@
     StageSerializer::class
 )
 
-package com.lam.pedro.data
+package com.lam.pedro.data.activity
 
 import androidx.health.connect.client.records.SleepSessionRecord
 import com.lam.pedro.data.serializers.primitive.DurationSerializer
 import com.lam.pedro.data.serializers.primitive.InstantSerializer
-import com.lam.pedro.data.serializers.activity.StageSerializer
+import com.lam.pedro.data.serializers.primitive.StageSerializer
 import com.lam.pedro.data.serializers.primitive.ZoneOffsetSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -31,11 +31,4 @@ data class SleepSessionData(
     val duration: Duration?,
     val stages: List<SleepSessionRecord.Stage>
 )
-//
-//// Classe serializzabile per Stage
-//@Serializable
-//data class StageSerializable(
-//    val startTime: Instant,
-//    val endTime: Instant,
-//    val stage: Int
-//)
+

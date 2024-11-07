@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.lam.pedro.data.ExerciseSessionData
+import com.lam.pedro.data.activity.ExerciseSessionData
 
 @Composable
 fun ExerciseDataItem(exerciseSession: ExerciseSessionData) {

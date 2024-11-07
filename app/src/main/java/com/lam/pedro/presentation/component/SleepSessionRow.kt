@@ -41,7 +41,7 @@ import androidx.health.connect.client.records.SleepSessionRecord
 import com.example.healthconnectsample.data.dateTimeWithOffsetOrDefault
 import com.example.healthconnectsample.data.formatHoursMinutes
 import com.lam.pedro.R
-import com.lam.pedro.data.SleepSessionData
+import com.lam.pedro.data.activity.SleepSessionData
 import java.time.Duration
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter

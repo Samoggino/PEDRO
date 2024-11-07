@@ -1,11 +1,4 @@
-@file:UseSerializers(
-    ActiveCaloriesBurnedRecordSerializer::class,
-    TotalCaloriesBurnedRecordSerializer::class,
-    DurationGoalSerializer::class,
-    ExerciseLapSerializer::class
-)
-
-package com.lam.pedro.data
+package com.lam.pedro.data.activity
 
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.ExerciseCompletionGoal
@@ -16,7 +9,6 @@ import com.lam.pedro.data.serializers.activity.DurationGoalSerializer
 import com.lam.pedro.data.serializers.activity.ExerciseLapSerializer
 import com.lam.pedro.data.serializers.activity.TotalCaloriesBurnedRecordSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 
 @Serializable
 data class YogaData(

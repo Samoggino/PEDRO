@@ -1,5 +1,6 @@
 package com.lam.pedro.data.serializers.activity
 
+import android.util.Log
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.units.Energy
 import com.lam.pedro.data.serializers.primitive.EnergySerializer
@@ -21,58 +22,83 @@ object ActiveCaloriesBurnedRecordSerializer : KSerializer<ActiveCaloriesBurnedRe
 
     override val descriptor: SerialDescriptor =
         buildClassSerialDescriptor("ActiveCaloriesBurnedRecord") {
-            element("startTime", InstantSerializer.descriptor)
-            element("startZoneOffset", ZoneOffsetSerializer.descriptor, isOptional = true)
-            element("endTime", InstantSerializer.descriptor)
-            element("endZoneOffset", ZoneOffsetSerializer.descriptor, isOptional = true)
-            element("energy", EnergySerializer.descriptor)
+            try {
+                element("startTime", InstantSerializer.descriptor)
+                element("startZoneOffset", ZoneOffsetSerializer.descriptor, isOptional = true)
+                element("endTime", InstantSerializer.descriptor)
+                element("endZoneOffset", ZoneOffsetSerializer.descriptor, isOptional = true)
+                element("energy", EnergySerializer.descriptor)
+            } catch (e: Exception) {
+                Log.e(
+                    "Serializing",
+                    "Error creating SerialDescriptor for ActiveCaloriesBurnedRecord: $e"
+                )
+                throw SerializationException(
+                    "Error creating SerialDescriptor for ActiveCaloriesBurnedRecord",
+                    e
+                )
+            }
         }
 
     override fun serialize(encoder: Encoder, value: ActiveCaloriesBurnedRecord) {
-        encoder.encodeStructure(descriptor) {
-            encodeSerializableElement(descriptor, 0, InstantSerializer, value.startTime)
-            value.startZoneOffset?.let {
-                encodeSerializableElement(descriptor, 1, ZoneOffsetSerializer, it)
+        try {
+            encoder.encodeStructure(descriptor) {
+                encodeSerializableElement(descriptor, 0, InstantSerializer, value.startTime)
+                value.startZoneOffset?.let {
+                    encodeSerializableElement(descriptor, 1, ZoneOffsetSerializer, it)
+                }
+                encodeSerializableElement(descriptor, 2, InstantSerializer, value.endTime)
+                value.endZoneOffset?.let {
+                    encodeSerializableElement(descriptor, 3, ZoneOffsetSerializer, it)
+                }
+                encodeSerializableElement(descriptor, 4, EnergySerializer, value.energy)
             }
-            encodeSerializableElement(descriptor, 2, InstantSerializer, value.endTime)
-            value.endZoneOffset?.let {
-                encodeSerializableElement(descriptor, 3, ZoneOffsetSerializer, it)
-            }
-            encodeSerializableElement(descriptor, 4, EnergySerializer, value.energy)
+        } catch (e: Exception) {
+            Log.e("Serializing", "Error serializing ActiveCaloriesBurnedRecord: $e")
+            throw SerializationException("Error serializing ActiveCaloriesBurnedRecord", e)
         }
     }
 
     override fun deserialize(decoder: Decoder): ActiveCaloriesBurnedRecord {
-        return decoder.decodeStructure(descriptor) {
-            var startTime: Instant? = null
-            var startZoneOffset: ZoneOffset? = null
-            var endTime: Instant? = null
-            var endZoneOffset: ZoneOffset? = null
-            var energy: Energy? = null
+        try {
+            return decoder.decodeStructure(descriptor) {
+                var startTime: Instant? = null
+                var startZoneOffset: ZoneOffset? = null
+                var endTime: Instant? = null
+                var endZoneOffset: ZoneOffset? = null
+                var energy: Energy? = null
 
-            loop@ while (true) {
-                when (val index = decodeElementIndex(descriptor)) {
-                    0 -> startTime = decodeSerializableElement(descriptor, index, InstantSerializer)
-                    1 -> startZoneOffset =
-                        decodeSerializableElement(descriptor, index, ZoneOffsetSerializer)
+                loop@ while (true) {
+                    when (val index = decodeElementIndex(descriptor)) {
+                        0 -> startTime =
+                            decodeSerializableElement(descriptor, index, InstantSerializer)
 
-                    2 -> endTime = decodeSerializableElement(descriptor, index, InstantSerializer)
-                    3 -> endZoneOffset =
-                        decodeSerializableElement(descriptor, index, ZoneOffsetSerializer)
+                        1 -> startZoneOffset =
+                            decodeSerializableElement(descriptor, index, ZoneOffsetSerializer)
 
-                    4 -> energy = decodeSerializableElement(descriptor, index, EnergySerializer)
-                    CompositeDecoder.DECODE_DONE -> break@loop
-                    else -> throw SerializationException("Unknown index $index")
+                        2 -> endTime =
+                            decodeSerializableElement(descriptor, index, InstantSerializer)
+
+                        3 -> endZoneOffset =
+                            decodeSerializableElement(descriptor, index, ZoneOffsetSerializer)
+
+                        4 -> energy = decodeSerializableElement(descriptor, index, EnergySerializer)
+                        CompositeDecoder.DECODE_DONE -> break@loop
+                        else -> throw SerializationException("Unknown index $index")
+                    }
                 }
-            }
 
-            ActiveCaloriesBurnedRecord(
-                startTime = startTime!!,
-                startZoneOffset = startZoneOffset,
-                endTime = endTime!!,
-                endZoneOffset = endZoneOffset,
-                energy = energy!!
-            )
+                ActiveCaloriesBurnedRecord(
+                    startTime = startTime!!,
+                    startZoneOffset = startZoneOffset,
+                    endTime = endTime!!,
+                    endZoneOffset = endZoneOffset,
+                    energy = energy!!
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("Serializing", "Error deserializing ActiveCaloriesBurnedRecord: $e")
+            throw SerializationException("Error deserializing ActiveCaloriesBurnedRecord", e)
         }
 
     }

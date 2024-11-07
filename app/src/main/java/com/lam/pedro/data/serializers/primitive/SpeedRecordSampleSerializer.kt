@@ -16,7 +16,7 @@ import java.time.Instant
  * Sample(time: Instant, speed: Velocity)
  */
 
-object SampleSerializer : KSerializer<SpeedRecord.Sample> {
+object SpeedRecordSampleSerializer : KSerializer<SpeedRecord.Sample> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Sample") {
         try {
             element("time", InstantSerializer.descriptor)

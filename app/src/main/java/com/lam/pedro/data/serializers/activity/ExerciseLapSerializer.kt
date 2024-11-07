@@ -12,6 +12,7 @@ import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.decodeStructure
+import kotlinx.serialization.encoding.encodeStructure
 import java.time.Instant
 
 object ExerciseLapSerializer : KSerializer<ExerciseLap> {
@@ -23,39 +24,18 @@ object ExerciseLapSerializer : KSerializer<ExerciseLap> {
 
     override fun serialize(encoder: Encoder, value: ExerciseLap) {
         try {
-            // Iniziamo la struttura
-            val compositeEncoder = encoder.beginStructure(descriptor)
-
-            // Serializziamo ogni campo, verificando se è presente o nullo
-            compositeEncoder.encodeSerializableElement(
-                descriptor,
-                0,
-                InstantSerializer,
-                value.startTime
-            )
-
-            compositeEncoder.encodeSerializableElement(
-                descriptor,
-                1,
-                InstantSerializer,
-                value.endTime
-            )
-
-
-            Log.d("Serializing", "Instant done")
-
-            value.length?.let {
-                compositeEncoder.encodeSerializableElement(
-                    descriptor,
-                    2,
-                    LengthSerializer,
-                    it
-                )
+            encoder.encodeStructure(descriptor) {
+                encodeSerializableElement(descriptor, 0, InstantSerializer, value.startTime)
+                encodeSerializableElement(descriptor, 1, InstantSerializer, value.endTime)
+                if (value.length != null) {
+                    encodeSerializableElement(
+                        descriptor,
+                        2,
+                        LengthSerializer,
+                        value.length as Length
+                    )
+                }
             }
-
-            compositeEncoder.endStructure(descriptor)
-
-            Log.d("Serializing", "Length done")
 
 
         } catch (e: Exception) {

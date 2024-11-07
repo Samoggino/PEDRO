@@ -34,7 +34,7 @@ import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.lam.pedro.data.ExerciseSessionData
+import com.lam.pedro.data.activity.ExerciseSessionData
 import kotlinx.coroutines.launch
 import java.time.Duration
 import java.time.ZonedDateTime

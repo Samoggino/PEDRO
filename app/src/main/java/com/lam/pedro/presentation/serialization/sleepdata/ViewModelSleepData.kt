@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
-import com.lam.pedro.data.SleepSessionData
+import com.lam.pedro.data.activity.SleepSessionData
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getAccessToken
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.SupabaseClientProvider.supabase

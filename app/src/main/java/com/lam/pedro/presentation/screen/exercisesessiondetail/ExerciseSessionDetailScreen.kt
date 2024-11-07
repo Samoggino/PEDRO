@@ -42,7 +42,7 @@ import com.example.healthconnectsample.data.formatTime
 import com.lam.pedro.presentation.component.ExerciseSessionDetailsMinMaxAvg
 import com.lam.pedro.presentation.component.sessionDetailsItem
 import com.lam.pedro.R
-import com.lam.pedro.data.ExerciseSessionData
+import com.lam.pedro.data.activity.ExerciseSessionData
 import com.lam.pedro.presentation.screen.recordlist.RecordType
 import com.lam.pedro.presentation.screen.recordlist.SeriesRecordsType
 import com.lam.pedro.presentation.theme.HealthConnectTheme

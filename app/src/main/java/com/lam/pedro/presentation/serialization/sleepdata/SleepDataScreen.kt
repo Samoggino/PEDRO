@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.lam.pedro.data.SleepSessionData
+import com.lam.pedro.data.activity.SleepSessionData
 import com.lam.pedro.presentation.serialization.exercisedata.IndeterminateCircularIndicator
 import kotlinx.coroutines.launch
 import java.time.Duration
