@@ -1,4 +1,4 @@
-package com.lam.pedro.data.serializers
+package com.lam.pedro.data.serializers.primitive
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor

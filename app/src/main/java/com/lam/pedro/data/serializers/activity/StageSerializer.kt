@@ -1,6 +1,7 @@
-package com.lam.pedro.data.serializers
+package com.lam.pedro.data.serializers.activity
 
 import androidx.health.connect.client.records.SleepSessionRecord
+import com.lam.pedro.data.serializers.primitive.InstantSerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.builtins.serializer

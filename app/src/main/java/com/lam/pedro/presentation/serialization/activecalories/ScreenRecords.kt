@@ -68,7 +68,7 @@ fun ButtonList(
         }
         Button(
             onClick = {
-                viewModel.actionThree()
+                viewModel.actionThree(context)
             },
             modifier = Modifier.padding(vertical = 4.dp)
         ) {

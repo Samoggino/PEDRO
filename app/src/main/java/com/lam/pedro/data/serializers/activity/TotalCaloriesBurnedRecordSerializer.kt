@@ -1,11 +1,13 @@
-package com.lam.pedro.data.serializers
+package com.lam.pedro.data.serializers.activity
 
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.units.Energy
+import com.lam.pedro.data.serializers.primitive.EnergySerializer
+import com.lam.pedro.data.serializers.primitive.InstantSerializer
+import com.lam.pedro.data.serializers.primitive.ZoneOffsetSerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
-import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder

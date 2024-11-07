@@ -1,8 +1,10 @@
-package com.lam.pedro.data.serializers
+package com.lam.pedro.data.serializers.activity
 
 import android.util.Log
 import androidx.health.connect.client.records.ExerciseLap
 import androidx.health.connect.client.units.Length
+import com.lam.pedro.data.serializers.primitive.InstantSerializer
+import com.lam.pedro.data.serializers.primitive.LengthSerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
@@ -39,6 +41,9 @@ object ExerciseLapSerializer : KSerializer<ExerciseLap> {
                 value.endTime
             )
 
+
+            Log.d("Serializing", "Instant done")
+
             value.length?.let {
                 compositeEncoder.encodeSerializableElement(
                     descriptor,
@@ -50,9 +55,11 @@ object ExerciseLapSerializer : KSerializer<ExerciseLap> {
 
             compositeEncoder.endStructure(descriptor)
 
+            Log.d("Serializing", "Length done")
+
 
         } catch (e: Exception) {
-            Log.e("ExerciseLapSerializer", "Error serializing ExerciseLap", e)
+            Log.e("Serializing", "Error serializing ExerciseLap", e)
         }
 
     }

@@ -8,9 +8,9 @@ package com.lam.pedro.data
 
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
-import com.lam.pedro.data.serializers.DurationSerializer
-import com.lam.pedro.data.serializers.EnergySerializer
-import com.lam.pedro.data.serializers.LengthSerializer
+import com.lam.pedro.data.serializers.primitive.DurationSerializer
+import com.lam.pedro.data.serializers.primitive.EnergySerializer
+import com.lam.pedro.data.serializers.primitive.LengthSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import java.time.Duration

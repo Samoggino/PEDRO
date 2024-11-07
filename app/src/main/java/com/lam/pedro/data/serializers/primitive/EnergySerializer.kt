@@ -1,4 +1,4 @@
-package com.lam.pedro.data.serializers
+package com.lam.pedro.data.serializers.primitive
 
 import androidx.health.connect.client.units.Energy
 import kotlinx.serialization.KSerializer

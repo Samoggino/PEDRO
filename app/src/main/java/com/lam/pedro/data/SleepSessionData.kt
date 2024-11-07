@@ -8,10 +8,10 @@
 package com.lam.pedro.data
 
 import androidx.health.connect.client.records.SleepSessionRecord
-import com.lam.pedro.data.serializers.DurationSerializer
-import com.lam.pedro.data.serializers.InstantSerializer
-import com.lam.pedro.data.serializers.StageSerializer
-import com.lam.pedro.data.serializers.ZoneOffsetSerializer
+import com.lam.pedro.data.serializers.primitive.DurationSerializer
+import com.lam.pedro.data.serializers.primitive.InstantSerializer
+import com.lam.pedro.data.serializers.activity.StageSerializer
+import com.lam.pedro.data.serializers.primitive.ZoneOffsetSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import java.time.Duration

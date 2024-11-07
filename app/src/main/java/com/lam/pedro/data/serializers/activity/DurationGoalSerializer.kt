@@ -1,4 +1,4 @@
-package com.lam.pedro.data.serializers
+package com.lam.pedro.data.serializers.activity
 
 import androidx.health.connect.client.records.ExerciseCompletionGoal
 import kotlinx.serialization.KSerializer
