@@ -5,9 +5,9 @@
 
 package com.lam.pedro.presentation.serialization.activecalories
 
-import android.content.Context
 import android.util.Log
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
+import androidx.health.connect.client.records.CyclingPedalingCadenceRecord
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ElevationGainedRecord
 import androidx.health.connect.client.records.ExerciseCompletionGoal
@@ -22,6 +22,7 @@ import androidx.health.connect.client.units.Length
 import androidx.health.connect.client.units.Velocity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.lam.pedro.data.activity.CyclingData
 import com.lam.pedro.data.activity.RunData
 import com.lam.pedro.data.activity.TrainData
 import com.lam.pedro.data.activity.YogaData
@@ -44,6 +45,9 @@ class ViewModelRecords : ViewModel() {
     val length: Length = Length.meters(500.0)
 
 
+    /**
+     * TrainData
+     */
     fun actionOne() {
 
         try {
@@ -89,107 +93,108 @@ class ViewModelRecords : ViewModel() {
 
     }
 
+    /**
+     * CyclingData
+     */
     fun actionTwo() {
-        val jsonString = """{
-  "calories": {
-    "startTime": "2024-11-07T18:53:24.162008Z",
-    "startZoneOffset": "Z",
-    "endTime": "2024-11-07T19:53:24.162032Z",
-    "endZoneOffset": "Z",
-    "energy": 250.5
-  },
-  "totalCaloriesBurned": {
-    "startTime": "2024-11-07T18:53:24.162008Z",
-    "startZoneOffset": "Z",
-    "endTime": "2024-11-07T19:53:24.162032Z",
-    "endZoneOffset": "Z",
-    "energy": 250.5
-  },
-  "distanceRecord": {
-    "startTime": "2024-11-07T18:53:24.162008Z",
-    "startZoneOffset": "Z",
-    "endTime": "2024-11-07T19:53:24.162032Z",
-    "endZoneOffset": "Z",
-    "distance": 1200.5
-  },
-  "elevationGainedRecord": {
-    "startTime": "2024-11-07T18:53:24.162008Z",
-    "startZoneOffset": "Z",
-    "endTime": "2024-11-07T19:53:24.162032Z",
-    "endZoneOffset": "Z",
-    "elevation": 450.0
-  },
-  "exerciseRoute": {
-    "route": [
-      {
-        "time": "2024-11-07T18:53:24.162008Z",
-        "latitude": 45.1234,
-        "longitude": 12.4321,
-        "horizontalAccuracy": 50.0,
-        "verticalAccuracy": 50.0,
-        "altitude": 400.0
-      },
-      {
-        "time": "2024-11-07T19:53:24.162032Z",
-        "latitude": 45.1256,
-        "longitude": 12.4356,
-        "horizontalAccuracy": 50.0,
-        "verticalAccuracy": 50.0,
-        "altitude": 420.0
-      }
-    ]
-  },
-  "speedRecord": {
-    "startTime": "2024-11-07T18:53:24.162008Z",
-    "startZoneOffset": "Z",
-    "endTime": "2024-11-07T19:53:24.162032Z",
-    "endZoneOffset": "Z",
-    "samples": [
-      {
-        "time": "2024-11-07T18:53:26.152240Z",
-        "speed": 3.2
-      },
-      {
-        "time": "2024-11-07T19:53:24.162032Z",
-        "speed": 2.9
-      }
-    ]
-  },
-  "cadenceRecord": [
-    {
-      "time": "2024-11-07T18:53:26.152467Z",
-      "rate": 12.5
-    },
-    {
-      "time": "2024-11-07T19:53:24.162032Z",
-      "rate": 11.2
-    }
-  ],
-  "stepsRecord": {
-    "startTime": "2024-11-07T18:53:24.162008Z",
-    "startZoneOffset": "Z",
-    "endTime": "2024-11-07T19:53:24.162032Z",
-    "endZoneOffset": "Z",
-    "count": 1500
-  }
-}"""
 
-        // serializza e deserializza più volte l'oggetto per verificare che la serializzazione e deserializzazione siano corrette
-        val runData = Json.decodeFromString<RunData>(
-            Json.encodeToString(
-                (Json.decodeFromString<RunData>(jsonString))
+        try {
+            val cyclingData = CyclingData(
+                calories = ActiveCaloriesBurnedRecord(
+                    startTime = startTime,
+                    startZoneOffset = startZoneOffset,
+                    endTime = endTime,
+                    endZoneOffset = endZoneOffset,
+                    energy = energy
+                ),
+
+                distanceRecord = DistanceRecord(
+                    startTime = startTime,
+                    startZoneOffset = startZoneOffset,
+                    endTime = endTime,
+                    endZoneOffset = endZoneOffset,
+                    distance = length
+                ),
+                elevationGainedRecord = ElevationGainedRecord(
+                    startTime = startTime,
+                    startZoneOffset = startZoneOffset,
+                    endTime = endTime,
+                    endZoneOffset = endZoneOffset,
+                    elevation = length
+                ),
+                exerciseRoute = ExerciseRoute(
+                    route = listOf(
+                        ExerciseRoute.Location(
+                            time = startTime,
+                            latitude = 0.0,
+                            longitude = 0.0,
+                            horizontalAccuracy = length,
+                            verticalAccuracy = length,
+                            altitude = length
+                        ),
+                        ExerciseRoute.Location(
+                            time = endTime,
+                            latitude = 0.0,
+                            longitude = 0.0,
+                            horizontalAccuracy = length,
+                            verticalAccuracy = length,
+                            altitude = length
+                        )
+                    )
+                ),
+                pedalingCadenceRecord = CyclingPedalingCadenceRecord(
+                    startTime = startTime,
+                    startZoneOffset = startZoneOffset,
+                    endTime = endTime,
+                    endZoneOffset = endZoneOffset,
+                    samples = listOf(
+                        CyclingPedalingCadenceRecord.Sample(
+                            time = startTime,
+                            revolutionsPerMinute = 10.0
+                        ),
+                        CyclingPedalingCadenceRecord.Sample(
+                            time = endTime,
+                            revolutionsPerMinute = 10.0
+                        )
+                    )
+                ),
+                speedRecord = SpeedRecord(
+                    startTime = startTime,
+                    startZoneOffset = startZoneOffset,
+                    endTime = endTime,
+                    endZoneOffset = endZoneOffset,
+                    samples = listOf(
+                        SpeedRecord.Sample(
+                            time = Instant.now(),
+                            speed = Velocity.kilometersPerHour(10.0)
+                        ),
+                        SpeedRecord.Sample(
+                            time = endTime,
+                            speed = Velocity.kilometersPerHour(10.0)
+                        )
+                    )
+                ),
+                totalCaloriesBurned = TotalCaloriesBurnedRecord(
+                    startTime = startTime,
+                    startZoneOffset = startZoneOffset,
+                    endTime = endTime,
+                    endZoneOffset = endZoneOffset,
+                    energy = energy
+                )
             )
-        )
-        runData.speedRecord.samples.forEach {
-            Log.d("Supabase", "SpeedRecord.Sample: $it")
-        }
-        checkSerialization(runData)
 
+            checkSerialization(cyclingData)
+        } catch (e: Exception) {
+            Log.e("Serializing", "Errore durante il caricamento dei dati: ${e.message}")
+        }
 
     }
 
 
-    fun actionThree(context: Context) {
+    /**
+     * YogaData
+     */
+    fun actionThree() {
 
 
         // Creazione di un oggetto YogaRecord con i valori di esempio
@@ -238,7 +243,7 @@ class ViewModelRecords : ViewModel() {
     }
 
 
-    fun actionFour(context: Context) {
+    fun actionFour() {
         // crea un oggetto RunData e prova a serializzarlo e deserializzarlo
         val runData = RunData(
             calories = ActiveCaloriesBurnedRecord(

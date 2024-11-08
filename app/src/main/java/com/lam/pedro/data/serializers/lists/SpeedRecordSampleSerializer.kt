@@ -1,7 +1,10 @@
-package com.lam.pedro.data.serializers.primitive
+package com.lam.pedro.data.serializers.lists
 
+import android.util.Log
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.units.Velocity
+import com.lam.pedro.data.serializers.primitive.InstantSerializer
+import com.lam.pedro.data.serializers.primitive.VelocitySerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.SerialDescriptor
@@ -17,12 +20,13 @@ import java.time.Instant
  */
 
 object SpeedRecordSampleSerializer : KSerializer<SpeedRecord.Sample> {
-    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("Sample") {
+    override val descriptor: SerialDescriptor = buildClassSerialDescriptor("SpeedRecordSample") {
         try {
             element("time", InstantSerializer.descriptor)
             element("speed", VelocitySerializer.descriptor)
         } catch (e: Exception) {
-            throw SerializationException("Error creating Sample descriptor", e)
+            Log.e("Creating", "Error creating SpeedSample descriptor", e)
+            throw SerializationException("Error creating SpeedSample descriptor", e)
         }
     }
 
@@ -45,7 +49,8 @@ object SpeedRecordSampleSerializer : KSerializer<SpeedRecord.Sample> {
             dec.endStructure(descriptor)
             return SpeedRecord.Sample(time, speed)
         } catch (e: Exception) {
-            throw SerializationException("Error deserializing Sample", e)
+            Log.e("Deserializing", "Error deserializing SpeedSample", e)
+            throw SerializationException("Error deserializing SpeedSample", e)
         }
     }
 
@@ -56,7 +61,8 @@ object SpeedRecordSampleSerializer : KSerializer<SpeedRecord.Sample> {
                 encodeSerializableElement(descriptor, 1, VelocitySerializer, value.speed)
             }
         } catch (e: Exception) {
-            throw SerializationException("Error serializing Sample", e)
+            Log.e("Serializing", "Error serializing SpeedSample", e)
+            throw SerializationException("Error serializing SpeedSample", e)
         }
     }
 }

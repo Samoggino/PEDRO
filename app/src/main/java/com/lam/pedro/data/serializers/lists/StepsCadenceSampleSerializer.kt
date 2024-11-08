@@ -1,7 +1,8 @@
-package com.lam.pedro.data.serializers.primitive
+package com.lam.pedro.data.serializers.lists
 
 import android.util.Log
 import androidx.health.connect.client.records.StepsCadenceRecord
+import com.lam.pedro.data.serializers.primitive.InstantSerializer
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
@@ -32,10 +33,10 @@ object StepsCadenceSampleSerializer : KSerializer<StepsCadenceRecord.Sample> {
     override fun deserialize(decoder: Decoder): StepsCadenceRecord.Sample {
         return decoder.decodeStructure(descriptor) {
             var time: Instant = Instant.EPOCH
-            var rate: Double = 0.0
+            var rate = 0.0
 
             while (true) {
-                when (val index = decodeElementIndex(descriptor)) {
+                when (decodeElementIndex(descriptor)) {
                     0 -> time = decodeSerializableElement(descriptor, 0, InstantSerializer)
                     1 -> rate = decodeDoubleElement(descriptor, 1)
                     else -> break

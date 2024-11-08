@@ -8,7 +8,6 @@ import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import android.util.Log
-import com.lam.pedro.data.serializers.primitive.StepsCadenceSampleSerializer
 
 object ListStepsCadenceSampleSerializer : KSerializer<List<StepsCadenceRecord.Sample>> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("ListStepsCadenceSample") {

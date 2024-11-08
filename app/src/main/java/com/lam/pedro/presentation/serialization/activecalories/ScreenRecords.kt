@@ -5,34 +5,23 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lam.pedro.presentation.navigation.Screen
 import kotlinx.coroutines.launch
-import java.time.ZonedDateTime
 
 @Composable
 fun ButtonList(
     navController: NavController,
 ) {
 
-    val activeCaloriesBurned by remember { mutableStateOf(emptyList<ActiveCaloriesBurnedRecord>()) }
     val viewModel: ViewModelRecords = viewModel(factory = ViewModelRecordFactory())
-    val context = LocalContext.current
+//    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-
-    val end2 = ZonedDateTime.now()
-    val end1 = end2.minusDays(1)
-    val start1 = end1.minusHours(5)
 
     Column(modifier = Modifier.padding(16.dp)) {
         Button(
@@ -53,11 +42,11 @@ fun ButtonList(
             },
             modifier = Modifier.padding(vertical = 4.dp)
         ) {
-            Text("Bottone 2")
+            Text("CyclingData")
         }
         Button(
             onClick = {
-                viewModel.actionThree(context)
+                viewModel.actionThree()
             },
             modifier = Modifier.padding(vertical = 4.dp)
         ) {
@@ -65,7 +54,7 @@ fun ButtonList(
         }
         Button(
             onClick = {
-                viewModel.actionFour(context)
+                viewModel.actionFour()
             },
             modifier = Modifier.padding(vertical = 4.dp)
         ) {

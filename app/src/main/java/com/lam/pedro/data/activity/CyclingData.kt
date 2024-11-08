@@ -5,13 +5,14 @@
     ExerciseRouteSerializer::class,
     TotalCaloriesBurnedRecordSerializer::class,
     StepsRecordSerializer::class,
-    SpeedRecordSerializer::class
-
+    SpeedRecordSerializer::class,
+    CyclingPedalingCadenceRecordSerializer::class
 )
 
 package com.lam.pedro.data.activity
 
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
+import androidx.health.connect.client.records.CyclingPedalingCadenceRecord
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ElevationGainedRecord
 import androidx.health.connect.client.records.ExerciseRoute
@@ -22,6 +23,7 @@ import com.lam.pedro.data.serializers.activity.DistanceRecordSerializer
 import com.lam.pedro.data.serializers.activity.ElevationGainedRecordSerializer
 import com.lam.pedro.data.serializers.activity.ExerciseRouteSerializer
 import com.lam.pedro.data.serializers.activity.TotalCaloriesBurnedRecordSerializer
+import com.lam.pedro.data.serializers.primitive.CyclingPedalingCadenceRecordSerializer
 import com.lam.pedro.data.serializers.primitive.SpeedRecordSerializer
 import com.lam.pedro.data.serializers.primitive.StepsRecordSerializer
 import kotlinx.serialization.Serializable
@@ -71,9 +73,7 @@ data class CyclingData(
     val distanceRecord: DistanceRecord,
     val elevationGainedRecord: ElevationGainedRecord,
     val exerciseRoute: ExerciseRoute,
-//    val pedalingCadenceRecord: CyclingPedalingCadenceRecord,
+    val pedalingCadenceRecord: CyclingPedalingCadenceRecord,
     val speedRecord: SpeedRecord,
     val totalCaloriesBurned: TotalCaloriesBurnedRecord?
-
-    // TODO: Add pedalingCadenceRecord
 )
