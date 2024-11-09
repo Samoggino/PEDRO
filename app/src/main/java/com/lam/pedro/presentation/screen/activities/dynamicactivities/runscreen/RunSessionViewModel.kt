@@ -75,6 +75,8 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
         HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
         HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
 
+        HealthPermission.PERMISSION_WRITE_EXERCISE_ROUTE
+
         )
     override var value: ActivitySessionViewModel?
         get() = TODO("Not yet implemented")

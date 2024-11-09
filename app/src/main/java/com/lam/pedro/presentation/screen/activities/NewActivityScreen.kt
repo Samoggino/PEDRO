@@ -40,25 +40,38 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.health.connect.client.records.ExerciseRoute
+import androidx.health.connect.client.records.SpeedRecord
+import androidx.health.connect.client.units.Energy
+import androidx.health.connect.client.units.Length
 import androidx.navigation.NavController
 import com.lam.pedro.R
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.DisplayLottieAnimation
 import com.lam.pedro.presentation.navigation.Screen
+import com.lam.pedro.util.SpeedTracker
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
 
+
+fun collectRoute(): List<ExerciseRoute.Location> {
+    val exerciseRoute = mutableListOf<ExerciseRoute.Location>()
+    exerciseRoute.add(ExerciseRoute.Location(time = java.time.Instant.now(), latitude = 0.0, longitude = 0.0))
+return exerciseRoute
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -113,13 +126,18 @@ fun NewActivityScreen(
 
             // Variabili per il timer
             var timerRunning by remember { mutableStateOf(false) }
-            var elapsedTime by remember { mutableStateOf(0) } // tempo in millisecondi
+            var elapsedTime by remember { mutableStateOf(0) }
 
             var startTime: ZonedDateTime by remember { mutableStateOf(ZonedDateTime.now()) }
             var endTime: ZonedDateTime
+            val speedTracker = SpeedTracker(LocalContext.current)
 
             // Lista dei risultati dei timer
             val timerResults = remember { mutableStateListOf<String>() }
+
+            // oggetti utili per registrare una run
+            var speedSamples = remember { mutableStateListOf<SpeedRecord.Sample>() }
+            var exerciseRoute = remember { mutableStateListOf<ExerciseRoute.Location>() }
 
             Spacer(modifier = Modifier.height(60.dp))
 
@@ -275,13 +293,45 @@ fun NewActivityScreen(
                                             endTime = ZonedDateTime.now()
 
                                             // Salva i dati usando i valori inseriti dall'utente
-                                            viewModel.saveExerciseTest(
-                                                startTime,
-                                                endTime,
-                                                activityType,
-                                                title,
-                                                notes
-                                            )
+                                            if (titleId == Screen.RunSessionScreen.titleId) {
+                                                viewModel.saveRunSession(
+                                                    startTime = startTime.toInstant(),
+                                                    endTime = endTime.toInstant(),
+                                                    title = title,
+                                                    notes = notes,
+                                                    speedSamples = speedSamples,
+                                                    stepsCount = 2,
+                                                    totalEnergy = Energy.calories(3.0), //TODO: Calcolare energia
+                                                    activeEnergy = Energy.calories(3.0), //TODO: Calcolare energia,
+                                                    distance = Length.meters(3.0), //TODO: Calcolare distanza,
+                                                    elevationGained = Length.meters(3.0), //TODO: Calcolare elevamento,
+                                                    exerciseRoute = ExerciseRoute(exerciseRoute)
+                                                )
+                                            }
+                                            /*
+                                            if (titleId == Screen.RunSessionScreen.titleId) {
+                                                DisplayLottieAnimation("https://lottie.host/58060237-49bc-4e38-b630-9db0992858e3/QkvECf9V38.lottie")
+                                            } else if (titleId == Screen.CycleSessionScreen.titleId) {//TODO
+                                                DisplayLottieAnimation("https://lottie.host/58060237-49bc-4e38-b630-9db0992858e3/QkvECf9V38.lottie")
+                                            } else if (titleId == Screen.TrainSessionScreen.titleId) {//TODO
+                                                DisplayLottieAnimation("https://lottie.host/80db1f9c-c1f6-4f2d-8512-fbbee80d23d0/DeQ19gEueZ.lottie")
+                                            } else if (titleId == Screen.WalkSessionScreen.titleId) {//TODO
+                                                DisplayLottieAnimation("https://lottie.host/d32ef6d1-6bd0-4e39-b2f4-cbab8ca8c19d/79Mbx9ocLg.lottie")
+                                            } else if (titleId == Screen.YogaSessionScreen.titleId) {//TODO
+                                                DisplayLottieAnimation("https://lottie.host/d32ef6d1-6bd0-4e39-b2f4-cbab8ca8c19d/79Mbx9ocLg.lottie")
+                                            } else if (titleId == Screen.DriveSessionScreen.titleId) {
+                                                DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
+                                            } else if (titleId == Screen.WeightScreen.titleId) {//TODO
+                                                DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
+                                            } else if (titleId == Screen.ListenSessionScreen.titleId) {//TODO
+                                                DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
+                                            } else if (titleId == Screen.SitSessionScreen.titleId) {//TODO
+                                                DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
+                                            } else if (titleId == Screen.SleepSessions.titleId) {//TODO
+                                                DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
+                                            }
+
+                                             */
                                             viewModel.fetchExerciseSessions(activityType)
 
                                             elapsedTime = 0
@@ -325,6 +375,8 @@ fun NewActivityScreen(
                         delay(10) // Aggiorna ogni 10 millisecondi
                         elapsedTime += 10 // Incrementa il tempo
                     }
+                    speedSamples = speedTracker.collectSpeedSamples() as SnapshotStateList<SpeedRecord.Sample>
+                    exerciseRoute = collectRoute() as SnapshotStateList<ExerciseRoute.Location>
                 }
             }
 

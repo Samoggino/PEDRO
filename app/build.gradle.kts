@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.lam.pedro"
-        minSdk = 26
+        minSdk = 31
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.benchmark.common)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

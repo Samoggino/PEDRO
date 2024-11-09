@@ -59,7 +59,7 @@ import com.lam.pedro.presentation.screen.activities.staticactivities.liftscreen.
 import com.lam.pedro.presentation.screen.activities.staticactivities.liftscreen.WeightSessionScreen
 import com.lam.pedro.presentation.screen.activities.staticactivities.listenscreen.ListenSessionViewModel
 import com.lam.pedro.presentation.screen.activities.staticactivities.sitscreen.SitSessionViewModel
-import com.lam.pedro.showExceptionSnackbar
+import com.lam.pedro.util.showExceptionSnackbar
 import kotlinx.coroutines.launch
 
 /**

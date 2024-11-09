@@ -43,7 +43,7 @@ import com.lam.pedro.data.SleepSessionData
 import com.lam.pedro.data.dateTimeWithOffsetOrDefault
 import com.lam.pedro.data.formatHoursMinutes
 import com.lam.pedro.R
-import com.lam.pedro.formatDisplayTimeStartEnd
+import com.lam.pedro.util.formatDisplayTimeStartEnd
 import com.lam.pedro.presentation.theme.PedroTheme
 import java.time.Duration
 import java.time.ZonedDateTime

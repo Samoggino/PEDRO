@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.SleepSessionRecord
-import com.lam.pedro.formatDisplayTimeStartEnd
+import com.lam.pedro.util.formatDisplayTimeStartEnd
 import com.lam.pedro.presentation.theme.PedroTheme
 import java.time.ZonedDateTime
 

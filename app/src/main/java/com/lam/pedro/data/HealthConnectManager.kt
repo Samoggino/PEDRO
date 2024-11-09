@@ -12,12 +12,20 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectClient.Companion.SDK_UNAVAILABLE
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.changes.Change
+import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
+import androidx.health.connect.client.records.CyclingPedalingCadenceRecord
 import androidx.health.connect.client.records.DistanceRecord
+import androidx.health.connect.client.records.ElevationGainedRecord
+import androidx.health.connect.client.records.ExerciseLap
+import androidx.health.connect.client.records.ExerciseRoute
+import androidx.health.connect.client.records.ExerciseSegment
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.HeartRateRecord
+import androidx.health.connect.client.records.HydrationRecord
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
+import androidx.health.connect.client.records.StepsCadenceRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.records.WeightRecord
@@ -29,6 +37,7 @@ import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import androidx.health.connect.client.units.Mass
+import androidx.health.connect.client.units.Volume
 import com.lam.pedro.R
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -129,15 +138,15 @@ class HealthConnectManager(private val context: Context) {
      */
 
 
-    /*
     /**
      * Writes an [ExerciseSessionRecord] to Health Connect, and additionally writes underlying data for
      * the session too, such as [StepsRecord], [DistanceRecord] etc.
      */
-    suspend fun writeExerciseSession(
+    suspend fun writeRunSession(
         start: ZonedDateTime,
         end: ZonedDateTime,
-        title: String = "My Run #${Random.nextInt(0, 60)}"
+        title: String = "My Run #${Random.nextInt(0, 60)}",
+        notes: String
     ): InsertRecordsResponse {
 
         return healthConnectClient.insertRecords(
@@ -175,8 +184,6 @@ class HealthConnectManager(private val context: Context) {
         )
     }
 
-     */
-
     suspend fun insertExerciseSession(
         startTime: Instant,
         endTime: Instant,
@@ -196,20 +203,634 @@ class HealthConnectManager(private val context: Context) {
             notes = notes
         )
 
-        /*
-        val stepsRecord(
-        ), etc
-        */
-
         // Insert the record into Health Connect
         try {
             healthConnectClient.insertRecords(
-                listOf(exerciseSessionRecord/*, stepsRecord, etc*/)
+                listOf(exerciseSessionRecord)
 
             )
             println("Exercise session recorded successfully!")
         } catch (e: Exception) {
             println("Error recording exercise session: ${e.message}")
+        }
+    }
+
+    suspend fun insertCycleSession(
+        startTime: Instant,
+        endTime: Instant,
+        title: String,
+        notes: String,
+        speedSamples: List<SpeedRecord.Sample>,
+        cyclingPedalingCadenceSamples: List<CyclingPedalingCadenceRecord.Sample>,
+        totalEnergy: Energy,
+        activeEnergy: Energy,
+        distance: Length,
+        elevationGained: Length,
+        exerciseRoute: ExerciseRoute
+    ) {
+
+        // Create the ExerciseSessionRecord
+        val exerciseSessionRecord = ExerciseSessionRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_BIKING,
+            title = title,
+            notes = notes,
+            exerciseRoute = exerciseRoute
+        )
+
+        val activeCaloriesBurnedRecord = TotalCaloriesBurnedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            energy = activeEnergy
+        )
+        val distanceRecord = DistanceRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            distance = distance
+        )
+        val elevationGainedRecord = ElevationGainedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            elevation = elevationGained
+        )
+
+        val cyclingPedalingCadenceRecord = CyclingPedalingCadenceRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            samples = cyclingPedalingCadenceSamples
+        )
+
+        val speedRecord = SpeedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            samples = speedSamples
+        )
+
+        val totalCaloriesBurnedRecord = TotalCaloriesBurnedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            energy = totalEnergy
+        )
+
+        // Insert the record into Health Connect
+        try {
+            healthConnectClient.insertRecords(
+                listOf(
+                    exerciseSessionRecord,
+                    activeCaloriesBurnedRecord,
+                    distanceRecord,
+                    elevationGainedRecord,
+                    speedRecord,
+                    cyclingPedalingCadenceRecord,
+                    totalCaloriesBurnedRecord
+                )
+
+            )
+            println("Exercise session recorded successfully!")
+        } catch (e: Exception) {
+            println("Error recording exercise session: ${e.message}")
+        }
+    }
+
+    suspend fun insertRunSession(
+        startTime: Instant,
+        endTime: Instant,
+        title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
+        notes: String,
+        speedSamples: List<SpeedRecord.Sample>,
+        //stepsCadenceSamples: List<StepsCadenceRecord.Sample>,
+        stepsCount: Long,
+        totalEnergy: Energy,
+        activeEnergy: Energy,
+        distance: Length,
+        elevationGained: Length,
+        exerciseRoute: ExerciseRoute
+    ) {
+
+        // Create the ExerciseSessionRecord
+        val exerciseSessionRecord = ExerciseSessionRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_RUNNING,
+            title = title,
+            notes = notes,
+            exerciseRoute = exerciseRoute
+        )
+
+        // Create other records as needed
+        val activeCaloriesBurnedRecord = TotalCaloriesBurnedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            energy = activeEnergy
+        )
+        val distanceRecord = DistanceRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            distance = distance
+        )
+        val elevationGainedRecord = ElevationGainedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            elevation = elevationGained
+        )
+        val speedRecord = SpeedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            samples = speedSamples
+        )
+        /*
+        val stepsCadenceRecord = StepsCadenceRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            samples = stepsCadenceSamples
+        )
+
+         */
+        val stepsRecord = StepsRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            count = stepsCount
+        )
+        val totalCaloriesBurnedRecord = TotalCaloriesBurnedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            energy = totalEnergy
+        )
+
+        // Insert the records into Health Connect
+        try {
+            healthConnectClient.insertRecords(
+                listOf(
+                    exerciseSessionRecord,
+                    activeCaloriesBurnedRecord,
+                    distanceRecord,
+                    elevationGainedRecord,
+                    speedRecord,
+                    //stepsCadenceRecord,
+                    stepsRecord,
+                    totalCaloriesBurnedRecord
+                )
+            )
+            println("Exercise session with route recorded successfully!")
+        } catch (e: Exception) {
+            println("Error recording exercise session with route: ${e.message}")
+        }
+    }
+
+    suspend fun insertTrainSession(
+        startTime: Instant,
+        endTime: Instant,
+        title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
+        notes: String,
+        totalEnergy: Energy,
+        activeEnergy: Energy,
+        exerciseSegment: List<ExerciseSegment>,
+        exerciseLap: List<ExerciseLap>
+    ) {
+
+        // Create the ExerciseSessionRecord
+        val exerciseSessionRecord = ExerciseSessionRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_EXERCISE_CLASS,
+            title = title,
+            notes = notes,
+            segments = exerciseSegment,
+            laps = exerciseLap
+        )
+
+        // Create other records as needed
+        val activeCaloriesBurnedRecord = TotalCaloriesBurnedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            energy = activeEnergy
+        )
+        val totalCaloriesBurnedRecord = TotalCaloriesBurnedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            energy = totalEnergy
+        )
+
+        // Insert the records into Health Connect
+        try {
+            healthConnectClient.insertRecords(
+                listOf(
+                    exerciseSessionRecord,
+                    activeCaloriesBurnedRecord,
+                    totalCaloriesBurnedRecord
+                )
+            )
+            println("Exercise session with route recorded successfully!")
+        } catch (e: Exception) {
+            println("Error recording exercise session with route: ${e.message}")
+        }
+    }
+
+    suspend fun insertWalkSession(
+        startTime: Instant,
+        endTime: Instant,
+        title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
+        notes: String,
+        speedSamples: List<SpeedRecord.Sample>,
+        stepsCadenceSamples: List<StepsCadenceRecord.Sample>,
+        stepsCount: Long,
+        totalEnergy: Energy,
+        activeEnergy: Energy,
+        distance: Length,
+        elevationGained: Length,
+        exerciseRoute: ExerciseRoute
+    ) {
+
+        // Create the ExerciseSessionRecord
+        val exerciseSessionRecord = ExerciseSessionRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_WALKING,
+            title = title,
+            notes = notes,
+            exerciseRoute = exerciseRoute
+        )
+
+        // Create other records as needed
+        val activeCaloriesBurnedRecord = TotalCaloriesBurnedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            energy = activeEnergy
+        )
+        val distanceRecord = DistanceRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            distance = distance
+        )
+        val elevationGainedRecord = ElevationGainedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            elevation = elevationGained
+        )
+        val speedRecord = SpeedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            samples = speedSamples
+        )
+        val stepsCadenceRecord = StepsCadenceRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            samples = stepsCadenceSamples
+        )
+        val stepsRecord = StepsRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            count = stepsCount
+        )
+        val totalCaloriesBurnedRecord = TotalCaloriesBurnedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            energy = totalEnergy
+        )
+
+        // Insert the records into Health Connect
+        try {
+            healthConnectClient.insertRecords(
+                listOf(
+                    exerciseSessionRecord,
+                    activeCaloriesBurnedRecord,
+                    distanceRecord,
+                    elevationGainedRecord,
+                    speedRecord,
+                    stepsCadenceRecord,
+                    stepsRecord,
+                    totalCaloriesBurnedRecord
+                )
+            )
+            println("Exercise session with route recorded successfully!")
+        } catch (e: Exception) {
+            println("Error recording exercise session with route: ${e.message}")
+        }
+    }
+
+    suspend fun insertYogaSession(
+        startTime: Instant,
+        endTime: Instant,
+        title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
+        notes: String,
+        totalEnergy: Energy,
+        activeEnergy: Energy,
+        exerciseSegment: List<ExerciseSegment>,
+        exerciseLap: List<ExerciseLap>
+    ) {
+
+        // Create the ExerciseSessionRecord
+        val exerciseSessionRecord = ExerciseSessionRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_YOGA,
+            title = title,
+            notes = notes,
+            segments = exerciseSegment,
+            laps = exerciseLap
+        )
+
+        // Create other records as needed
+        val activeCaloriesBurnedRecord = TotalCaloriesBurnedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            energy = activeEnergy
+        )
+        val totalCaloriesBurnedRecord = TotalCaloriesBurnedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            energy = totalEnergy
+        )
+
+        // Insert the records into Health Connect
+        try {
+            healthConnectClient.insertRecords(
+                listOf(
+                    exerciseSessionRecord,
+                    activeCaloriesBurnedRecord,
+                    totalCaloriesBurnedRecord
+                )
+            )
+            println("Exercise session with route recorded successfully!")
+        } catch (e: Exception) {
+            println("Error recording exercise session with route: ${e.message}")
+        }
+    }
+
+    suspend fun insertDriveSession(
+        startTime: Instant,
+        endTime: Instant,
+        title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
+        notes: String,
+        speedSamples: List<SpeedRecord.Sample>,
+        distance: Length,
+        elevationGained: Length,
+        exerciseRoute: ExerciseRoute
+    ) {
+
+        // Create the ExerciseSessionRecord
+        val exerciseSessionRecord = ExerciseSessionRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT,
+            title = title,
+            notes = notes,
+            exerciseRoute = exerciseRoute
+        )
+        val distanceRecord = DistanceRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            distance = distance
+        )
+        val elevationGainedRecord = ElevationGainedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            elevation = elevationGained
+        )
+        val speedRecord = SpeedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            samples = speedSamples
+        )
+
+
+        // Insert the records into Health Connect
+        try {
+            healthConnectClient.insertRecords(
+                listOf(
+                    exerciseSessionRecord,
+                    distanceRecord,
+                    elevationGainedRecord,
+                    speedRecord
+                )
+            )
+            println("Exercise session with route recorded successfully!")
+        } catch (e: Exception) {
+            println("Error recording exercise session with route: ${e.message}")
+        }
+    }
+
+    suspend fun insertLiftSession(
+        startTime: Instant,
+        endTime: Instant,
+        title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
+        notes: String,
+        totalEnergy: Energy,
+        activeEnergy: Energy,
+        exerciseSegment: List<ExerciseSegment>,
+        exerciseLap: List<ExerciseLap>
+    ) {
+
+        // Create the ExerciseSessionRecord
+        val exerciseSessionRecord = ExerciseSessionRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_WEIGHTLIFTING,
+            title = title,
+            notes = notes,
+            segments = exerciseSegment,
+            laps = exerciseLap
+        )
+
+        // Create other records as needed
+        val activeCaloriesBurnedRecord = TotalCaloriesBurnedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            energy = activeEnergy
+        )
+        val totalCaloriesBurnedRecord = TotalCaloriesBurnedRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            energy = totalEnergy
+        )
+
+        // Insert the records into Health Connect
+        try {
+            healthConnectClient.insertRecords(
+                listOf(
+                    exerciseSessionRecord,
+                    activeCaloriesBurnedRecord,
+                    totalCaloriesBurnedRecord
+                )
+            )
+            println("Exercise session with route recorded successfully!")
+        } catch (e: Exception) {
+            println("Error recording exercise session with route: ${e.message}")
+        }
+    }
+
+    suspend fun insertListenSession(
+        startTime: Instant,
+        endTime: Instant,
+        title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
+        notes: String
+    ) {
+
+        // Create the ExerciseSessionRecord
+        val exerciseSessionRecord = ExerciseSessionRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT,
+            title = title,
+            notes = notes
+        )
+
+
+        // Insert the records into Health Connect
+        try {
+            healthConnectClient.insertRecords(
+                listOf(
+                    exerciseSessionRecord
+                )
+            )
+            println("Exercise session with route recorded successfully!")
+        } catch (e: Exception) {
+            println("Error recording exercise session with route: ${e.message}")
+        }
+    }
+
+    suspend fun insertSitSession(
+        startTime: Instant,
+        endTime: Instant,
+        title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
+        notes: String,
+        volume: Volume
+    ) {
+
+        // Create the ExerciseSessionRecord
+        val exerciseSessionRecord = ExerciseSessionRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT,
+            title = title,
+            notes = notes
+        )
+        val hydrationRecord = HydrationRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            volume = volume
+        )
+
+
+        // Insert the records into Health Connect
+        try {
+            healthConnectClient.insertRecords(
+                listOf(
+                    exerciseSessionRecord,
+                    hydrationRecord
+                )
+            )
+            println("Exercise session with route recorded successfully!")
+        } catch (e: Exception) {
+            println("Error recording exercise session with route: ${e.message}")
+        }
+    }
+
+    suspend fun insertSleepSession(
+        startTime: Instant,
+        endTime: Instant,
+        title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
+        notes: String
+    ) {
+
+        val sleepSessionRecord = SleepSessionRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            title = title,
+            notes = notes
+        )
+
+        // Insert the records into Health Connect
+        try {
+            healthConnectClient.insertRecords(
+                listOf(
+                    sleepSessionRecord
+                )
+            )
+            println("Exercise session with route recorded successfully!")
+        } catch (e: Exception) {
+            println("Error recording exercise session with route: ${e.message}")
         }
     }
 
@@ -240,7 +861,11 @@ class HealthConnectManager(private val context: Context) {
     }
 
     // Funzione per leggere le sessioni di esercizio, con un filtro per exerciseType
-    suspend fun readExerciseSessions(start: Instant, end: Instant, exerciseType: Int): List<ExerciseSessionRecord> {
+    suspend fun readExerciseSessions(
+        start: Instant,
+        end: Instant,
+        exerciseType: Int
+    ): List<ExerciseSessionRecord> {
         val request = ReadRecordsRequest(
             recordType = ExerciseSessionRecord::class,
             timeRangeFilter = TimeRangeFilter.between(start, end)
@@ -542,53 +1167,6 @@ class HealthConnectManager(private val context: Context) {
                 timeRangeFilter = timeRangeFilter
             )
         return healthConnectClient.readRecords(request).records
-    }
-
-    private fun buildHeartRateSeries(
-        sessionStartTime: ZonedDateTime,
-        sessionEndTime: ZonedDateTime
-    ): HeartRateRecord {
-        val samples = mutableListOf<HeartRateRecord.Sample>()
-        var time = sessionStartTime
-        while (time.isBefore(sessionEndTime)) {
-            samples.add(
-                HeartRateRecord.Sample(
-                    time = time.toInstant(), beatsPerMinute = (80 + Random.nextInt(80)).toLong()
-                )
-            )
-            time = time.plusSeconds(30)
-        }
-        return HeartRateRecord(
-            startTime = sessionStartTime.toInstant(),
-            startZoneOffset = sessionStartTime.offset,
-            endTime = sessionEndTime.toInstant(),
-            endZoneOffset = sessionEndTime.offset,
-            samples = samples
-        )
-    }
-
-    suspend fun writeRunInput(distanceRecord: DistanceRecord) {
-        try {
-            // Scrive il record di distanza nel database di Health Connect
-            healthConnectClient.insertRecords(listOf(distanceRecord))
-
-            // Gestisci eventuali ulteriori logiche dopo la scrittura, come l'aggiornamento dello stato dell'UI o notifiche
-        } catch (e: Exception) {
-
-            throw e // Rilancia l'eccezione se necessario
-        }
-    }
-
-    suspend fun writeStepsInput(stepsRecord: StepsRecord) {
-        try {
-            // Scrive il record di distanza nel database di Health Connect
-            healthConnectClient.insertRecords(listOf(stepsRecord))
-
-            // Gestisci eventuali ulteriori logiche dopo la scrittura, come l'aggiornamento dello stato dell'UI o notifiche
-        } catch (e: Exception) {
-
-            throw e // Rilancia l'eccezione se necessario
-        }
     }
 
     // Represents the two types of messages that can be sent in a Changes flow.
