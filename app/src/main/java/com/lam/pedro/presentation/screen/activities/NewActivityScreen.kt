@@ -1,6 +1,10 @@
 package com.lam.pedro.presentation.screen.activities
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -51,6 +55,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.units.Energy
@@ -82,6 +87,28 @@ fun NewActivityScreen(
     viewModel: ActivitySessionViewModel,
     activityType: Int
 ) {
+
+    val context = LocalContext.current
+    var hasPermission by remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    // ActivityResultLauncher to request permission
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        hasPermission = isGranted
+        if (isGranted) {
+            //do nothing
+        } else {
+            //TODO: Handle permission denied, the app won't work
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -269,6 +296,7 @@ fun NewActivityScreen(
                     confirmButton = {
                         TextButton(
                             onClick = {
+                                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                                 if (title.isNotBlank()) { // Verifica che il titolo non sia vuoto
                                     coroutineScope.launch {
                                         if (isStopAction) {

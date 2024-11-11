@@ -103,29 +103,31 @@ fun SessionHistoryRow(
                 ) {
                     Text(text = "Sessione selezionata:")
 
-                    session?.let {
-                        // Visualizza i dettagli della sessione
-                        it.title?.let { it1 -> Text(text = it1) }
-                        // Altri dettagli...
-                    }
-
-                    // Sheet content
-                    Button(onClick = {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                            if (!sheetState.isVisible) {
-                                showBottomSheet = false
-                            }
-                        }
-                    }) {
-                        Text("Close")
-                    }
-
+                    session.title?.let { Text(text = it) }
+                    Text(text = session.laps.toString())
+                    session.notes?.let { Text(text = it) }
+                    Text(text = session.segments.toString())
+                    Text(text = session.exerciseRouteResult.toString())
+                    Text(text = session.startTime.toString())
+                    Text(text = session.endTime.toString())
                 }
 
+                // Sheet content
+                Button(onClick = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            showBottomSheet = false
+                        }
+                    }
+                }) {
+                    Text("Close")
+                }
 
             }
 
-        }
-    }
 
+        }
+
+    }
 }
+

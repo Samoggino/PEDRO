@@ -67,15 +67,6 @@ class SpeedTracker(
     private val context: Context
 ) {
 
-    private val LOCATION_PERMISSION_REQUEST_CODE = 1
-
-    private fun checkLocationPermission() {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
-        }
-    }
-
-
     private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
     suspend fun collectSpeedSamples(): List<SpeedRecord.Sample> {
