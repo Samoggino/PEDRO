@@ -157,7 +157,7 @@ class HealthConnectManager(private val context: Context) {
                     endTime = end.toInstant(),
                     endZoneOffset = end.offset,
                     exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_RUNNING,
-                    title = title
+                    title = title,
                 ),
                 StepsRecord(
                     startTime = start.toInstant(),
@@ -874,11 +874,19 @@ class HealthConnectManager(private val context: Context) {
         // Leggi i record dalle API
         val response = healthConnectClient.readRecords(request)
 
+        /*
+        val routes = healthConnectClient.re(
+            sessionRecord.records,
+            ExerciseRoute::class
+        )
+         */
+
         // Filtra i record in base all'exerciseType
         return response.records.filter { record ->
             record.exerciseType == exerciseType
         }
     }
+
 
 
     /**

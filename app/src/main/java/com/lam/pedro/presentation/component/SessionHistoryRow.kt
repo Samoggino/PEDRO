@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.ExpandLess
@@ -44,14 +45,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.records.ExerciseSessionRecord
+import androidx.health.connect.client.request.ReadRecordsRequest
+import androidx.health.connect.client.time.TimeRangeFilter
+import com.lam.pedro.data.activitySession.ActivitySession
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SessionHistoryRow(
     color: Color,
     image: Int,
-    session: ExerciseSessionRecord,
+    session: ActivitySession,
     viewModel: ActivitySessionViewModel
 ) {
 
@@ -96,32 +101,8 @@ fun SessionHistoryRow(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ) {
 
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxSize()
-                ) {
-                    Text(text = "Sessione selezionata:")
+                ShowSessionDetails(session)
 
-                    session.title?.let { Text(text = it) }
-                    Text(text = session.laps.toString())
-                    session.notes?.let { Text(text = it) }
-                    Text(text = session.segments.toString())
-                    Text(text = session.exerciseRouteResult.toString())
-                    Text(text = session.startTime.toString())
-                    Text(text = session.endTime.toString())
-                }
-
-                // Sheet content
-                Button(onClick = {
-                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                        if (!sheetState.isVisible) {
-                            showBottomSheet = false
-                        }
-                    }
-                }) {
-                    Text("Close")
-                }
 
             }
 

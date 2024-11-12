@@ -1,7 +1,10 @@
 package com.lam.pedro.presentation.screen.activities
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -56,12 +59,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import androidx.navigation.NavController
 import com.lam.pedro.R
+import com.lam.pedro.data.activitySession.RunSession
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.DisplayLottieAnimation
@@ -70,13 +75,6 @@ import com.lam.pedro.util.SpeedTracker
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
-
-
-fun collectRoute(): List<ExerciseRoute.Location> {
-    val exerciseRoute = mutableListOf<ExerciseRoute.Location>()
-    exerciseRoute.add(ExerciseRoute.Location(time = java.time.Instant.now(), latitude = 0.0, longitude = 0.0))
-return exerciseRoute
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,7 +102,7 @@ fun NewActivityScreen(
     ) { isGranted ->
         hasPermission = isGranted
         if (isGranted) {
-            //do nothing
+            Log.d(TAG, "-----------------GPS Permission granted-----------------")
         } else {
             //TODO: Handle permission denied, the app won't work
         }
@@ -322,7 +320,7 @@ fun NewActivityScreen(
 
                                             // Salva i dati usando i valori inseriti dall'utente
                                             if (titleId == Screen.RunSessionScreen.titleId) {
-                                                viewModel.saveRunSession(
+                                                val runSession = RunSession(
                                                     startTime = startTime.toInstant(),
                                                     endTime = endTime.toInstant(),
                                                     title = title,
@@ -335,6 +333,7 @@ fun NewActivityScreen(
                                                     elevationGained = Length.meters(3.0), //TODO: Calcolare elevamento,
                                                     exerciseRoute = ExerciseRoute(exerciseRoute)
                                                 )
+                                                viewModel.saveRunSession(runSession)
                                             }
                                             /*
                                             if (titleId == Screen.RunSessionScreen.titleId) {
@@ -358,8 +357,9 @@ fun NewActivityScreen(
                                             } else if (titleId == Screen.SleepSessions.titleId) {//TODO
                                                 DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
                                             }
-
                                              */
+
+
                                             viewModel.fetchExerciseSessions(activityType)
 
                                             elapsedTime = 0
@@ -397,16 +397,29 @@ fun NewActivityScreen(
             // Timer
             if (timerRunning && !isPaused) {
                 LaunchedEffect(Unit) {
-                    //FIXME ad ogni resume resetta il tempo di inizio
+                    // FIX: Start time only resets once, at the beginning.
                     startTime = ZonedDateTime.now()
-                    while (timerRunning) {
-                        delay(10) // Aggiorna ogni 10 millisecondi
-                        elapsedTime += 10 // Incrementa il tempo
+
+                    // Coroutine for tracking elapsed time
+                    launch {
+                        while (timerRunning) {
+                            delay(10)
+                            elapsedTime += 10
+                        }
                     }
-                    speedSamples = speedTracker.collectSpeedSamples() as SnapshotStateList<SpeedRecord.Sample>
-                    exerciseRoute = collectRoute() as SnapshotStateList<ExerciseRoute.Location>
+
+                    // Coroutine for collecting speed samples
+                    launch {
+                        speedSamples = speedTracker.collectSpeedSamples() as SnapshotStateList<SpeedRecord.Sample>
+                    }
+
+                    // Coroutine for collecting location samples
+                    launch {
+                        exerciseRoute = speedTracker.collectLocationSamples() as SnapshotStateList<ExerciseRoute.Location>
+                    }
                 }
             }
+
 
             // Mostra il timer con animazione AnimatedVisibility
             AnimatedVisibility(visible = timerRunning || !isPaused) {

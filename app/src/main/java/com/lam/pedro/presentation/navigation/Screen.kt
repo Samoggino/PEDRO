@@ -37,7 +37,7 @@ enum class Screen(val route: String, val titleId: Int, val image: Int, val color
     HomeScreen("home_screen", R.string.home_screen, 1, Color(0xFFfaaf5a), 1),
     ExerciseSessions("exercise_sessions", R.string.exercise_sessions, 1, Color(0xFFfaaf5a), 1, false),
     ExerciseSessionDetail("exercise_session_detail", R.string.exercise_session_detail, 1, Color(0xFFfaaf5a), 1, false),
-    SleepSessions("sleep_sessions", R.string.sleep_sessions, R.drawable.sleeping_icon, Color(0xff74c9c6), ExerciseSessionRecord.EXERCISE_TYPE_RUNNING, false),
+    SleepSessions("sleep_sessions", R.string.sleep_sessions, R.drawable.sleeping_icon, Color(0xff74c9c6), ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT, false),
     SleepSessionDetail("sleep_session_detail", R.string.sleep_session_detail, 1, Color(0xff74c9c6), 1, false),
     WeightScreen("weight_screen", R.string.input_readings, R.drawable.dumbells_icon, Color(0xFF7771C9), ExerciseSessionRecord.EXERCISE_TYPE_WEIGHTLIFTING, false),
     DriveSessionScreen("drive_screen", R.string.drive_screen, R.drawable.car_icon, Color(0xFF61a6f1), ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT,false),
