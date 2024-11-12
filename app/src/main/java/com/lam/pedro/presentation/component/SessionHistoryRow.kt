@@ -107,7 +107,7 @@ fun SessionHistoryRow(
                     Text(text = session.laps.toString())
                     session.notes?.let { Text(text = it) }
                     Text(text = session.segments.toString())
-                    Text(text = session.exerciseRouteResult.toString())
+                    Text(text = session.exerciseRoute)
                     Text(text = session.startTime.toString())
                     Text(text = session.endTime.toString())
                 }

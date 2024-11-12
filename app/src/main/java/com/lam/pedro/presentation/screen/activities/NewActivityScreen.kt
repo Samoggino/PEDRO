@@ -71,13 +71,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
 
-
-fun collectRoute(): List<ExerciseRoute.Location> {
-    val exerciseRoute = mutableListOf<ExerciseRoute.Location>()
-    exerciseRoute.add(ExerciseRoute.Location(time = java.time.Instant.now(), latitude = 0.0, longitude = 0.0))
-return exerciseRoute
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewActivityScreen(
@@ -104,7 +97,7 @@ fun NewActivityScreen(
     ) { isGranted ->
         hasPermission = isGranted
         if (isGranted) {
-            //do nothing
+            Log.d(TAG, "-----------------GPS Permission granted-----------------")
         } else {
             //TODO: Handle permission denied, the app won't work
         }
@@ -400,11 +393,11 @@ fun NewActivityScreen(
                     //FIXME ad ogni resume resetta il tempo di inizio
                     startTime = ZonedDateTime.now()
                     while (timerRunning) {
-                        delay(10) // Aggiorna ogni 10 millisecondi
-                        elapsedTime += 10 // Incrementa il tempo
+                        delay(10)
+                        elapsedTime += 10
                     }
                     speedSamples = speedTracker.collectSpeedSamples() as SnapshotStateList<SpeedRecord.Sample>
-                    exerciseRoute = collectRoute() as SnapshotStateList<ExerciseRoute.Location>
+                    exerciseRoute = speedTracker.collectLocationSamples() as SnapshotStateList<ExerciseRoute.Location>
                 }
             }
 
