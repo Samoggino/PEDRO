@@ -53,7 +53,7 @@ fun LoginScreen(
 
     // al lancio fai una stampa
     LaunchedEffect(true) {
-        Log.i("Supabase", "LaunchedEffect")
+        Log.i("Supabase", "LaunchedEffect in LoginScreen")
 
         // controlla al mount che l'utente sia loggato o abbia un token
         viewModel.checkUserLoggedIn(navController, true)

@@ -260,7 +260,7 @@ class SupabaseAuthViewModel : ViewModel() {
                     errorMessage = "Effettua il login per accedere"
                     showErrorDialog = true
                 } else {
-                    navController.navigate(Screen.LoginScreen.route)
+//                    navController.navigate(Screen.LoginScreen.route)
                 }
             }
         }

@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -14,23 +15,21 @@ import com.lam.pedro.presentation.navigation.Screen
 import kotlinx.coroutines.launch
 
 @Composable
-fun ButtonList(
+fun MyScreenRecords(
     navController: NavController,
 ) {
 
     val viewModel: ViewModelRecords = viewModel(factory = ViewModelRecordFactory())
-//    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
 
+    // Caricamento dei dati all'interno di LaunchedEffect
     Column(modifier = Modifier.padding(16.dp)) {
         Button(
             onClick = {
                 coroutineScope.launch {
-
                     viewModel.actionOne()
                 }
-
             },
             modifier = Modifier.padding(vertical = 4.dp)
         ) {
@@ -80,14 +79,26 @@ fun ButtonList(
                 "Vai alla schermata di sonno"
             )
         }
+        Button(
+            onClick = {
+                navController.navigate(Screen.SleepSessionData.route)
+            }
+        ) {
+            Text(
+                "Vai alla schermata di sonno"
+            )
+        }
+
+        Button(
+            onClick = {
+                navController.navigate(Screen.FollowScreen.route)
+            }
+        ) {
+            Text(
+                "Vai alla schermata dei follower"
+            )
+        }
 
 
     }
-}
-
-
-// Esempio di utilizzo del composable in una schermata
-@Composable
-fun MyScreenRecords(navController: NavController) {
-    ButtonList(navController)
 }

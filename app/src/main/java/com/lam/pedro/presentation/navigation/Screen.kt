@@ -51,4 +51,5 @@ enum class Screen(val route: String, val titleId: Int, val hasMenuItem: Boolean 
     SleepSessionData("sleep_session_data", R.string.read_health_connect_data, false),
     ExerciseSessionData("exercise_session_data", R.string.exercise_sessions, false),
     MyScreenRecords("my_screen_records", R.string.my_screen_records, false),
+    FollowScreen("follow_screen", R.string.follow_screen, false),
 }

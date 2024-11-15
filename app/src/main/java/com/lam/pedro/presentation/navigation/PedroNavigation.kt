@@ -1,18 +1,3 @@
-/*
- * Copyright 2022 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.lam.pedro.presentation.navigation
 
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -37,12 +22,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import com.example.healthconnectsample.data.HealthConnectManager
 import com.example.healthconnectsample.presentation.screen.HealthConnectScreen
-import com.lam.pedro.presentation.serialization.sleepdata.SleepScreen
+import com.lam.pedro.presentation.following.FollowScreen
 import com.lam.pedro.presentation.screen.AboutScreen
 import com.lam.pedro.presentation.screen.ActivitiesScreen
 import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.LandingScreen
-import com.lam.pedro.presentation.screen.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.MoreScreen
 import com.lam.pedro.presentation.screen.SettingsScreen
 import com.lam.pedro.presentation.screen.changes.DifferentialChangesScreen
@@ -57,17 +41,19 @@ import com.lam.pedro.presentation.screen.exercisesessiondetail.ExerciseSessionDe
 import com.lam.pedro.presentation.screen.inputreadings.InputReadingsScreen
 import com.lam.pedro.presentation.screen.inputreadings.InputReadingsViewModel
 import com.lam.pedro.presentation.screen.inputreadings.InputReadingsViewModelFactory
+import com.lam.pedro.presentation.screen.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.privacypolicy.PrivacyPolicyScreen
-import com.lam.pedro.presentation.screen.recordlist.RecordType
 import com.lam.pedro.presentation.screen.recordlist.RecordListScreen
 import com.lam.pedro.presentation.screen.recordlist.RecordListScreenViewModel
 import com.lam.pedro.presentation.screen.recordlist.RecordListViewModelFactory
+import com.lam.pedro.presentation.screen.recordlist.RecordType
 import com.lam.pedro.presentation.screen.recordlist.SeriesRecordsType
 import com.lam.pedro.presentation.screen.sleepsession.SleepSessionScreen
 import com.lam.pedro.presentation.screen.sleepsession.SleepSessionViewModel
 import com.lam.pedro.presentation.screen.sleepsession.SleepSessionViewModelFactory
 import com.lam.pedro.presentation.serialization.activecalories.MyScreenRecords
 import com.lam.pedro.presentation.serialization.exercisedata.ExerciseScreen
+import com.lam.pedro.presentation.serialization.sleepdata.SleepScreen
 import com.lam.pedro.showExceptionSnackbar
 import kotlinx.coroutines.launch
 
@@ -152,6 +138,10 @@ fun PedroNavigation(
 
         composable(Screen.MyScreenRecords.route){
             MyScreenRecords(navController)
+        }
+
+        composable(Screen.FollowScreen.route){
+            FollowScreen()
         }
 
         composable(

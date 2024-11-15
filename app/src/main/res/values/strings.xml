@@ -172,5 +172,6 @@
     <string name="login_screen">Login screen</string>
     <string name="read_health_connect_data">prova con health connect</string>
     <string name="my_screen_records">pagina per testare la serializzazione</string>
+    <string name="follow_screen">pagina per i followers</string>
 
 </resources>

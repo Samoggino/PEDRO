@@ -334,6 +334,7 @@ class ViewModelRecords : ViewModel() {
     }
 
 
+
     /**
      * Funzione per verificare la serializzazione e deserializzazione di un oggetto
      *
