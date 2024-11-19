@@ -1,5 +1,6 @@
 [versions]
 agp = "8.7.2"
+coilCompose = "2.4.0"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -10,10 +11,12 @@ ktorClientOkhttp = "3.0.0"
 lifecycleRuntimeKtx = "2.8.6"
 activityCompose = "1.9.3"
 composeBom = "2024.10.00"
+lottieCompose = "6.1.0"
 materialIconsCore = "1.7.4"
 constraintlayoutCompose = "1.0.1"
 navigationCompose = "2.8.3"
 securityCrypto = "1.1.0-alpha06"
+storageKt = "3.0.1"
 
 [libraries]
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
@@ -22,6 +25,7 @@ androidx-material-icons-core = { module = "androidx.compose.material:material-ic
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsCore" }
 androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
 auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
 github-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 github-realtime-kt = { module = "io.github.jan-tennert.supabase:realtime-kt" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
@@ -40,6 +44,8 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktorClientOkhttp" }
 androidx-constraintlayout-compose = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "constraintlayoutCompose" }
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
+storage-kt = { module = "io.github.jan-tennert.supabase:storage-kt", version.ref = "storageKt" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

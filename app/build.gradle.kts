@@ -82,15 +82,20 @@ dependencies {
     // Supabase
     //noinspection UseTomlInstead
     implementation(platform("io.github.jan-tennert.supabase:bom:3.0.1"))
-    
+    implementation(libs.storage.kt)
     implementation(libs.github.postgrest.kt)
     implementation(libs.auth.kt)  // Non è necessario specificare la versione, usa semplicemente libs.auth.kt
     implementation(libs.github.realtime.kt)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
-    
+    implementation(libs.coil.compose)
+
+
     //noinspection UseTomlInstead
     implementation("androidx.health.connect:connect-client:1.1.0-alpha10")
+
+    // AirBnB Lottie
+    implementation(libs.lottie.compose)
 
 
 }

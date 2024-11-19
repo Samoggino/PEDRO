@@ -1,6 +1,7 @@
 package com.lam.pedro.presentation.following
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -9,6 +10,9 @@ import com.lam.pedro.data.datasource.SupabaseClientProvider.supabase
 import com.lam.pedro.presentation.screen.loginscreen.User
 import com.lam.pedro.presentation.screen.loginscreen.parseUsers
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.storage.storage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
@@ -18,7 +22,6 @@ class ViewModelFollowScreen : ViewModel() {
     suspend fun getFollowedUsers(context: Context): Map<User, Boolean> {
 
         try {
-
             return parseUsers(
                 supabase()
                     .postgrest
@@ -63,6 +66,36 @@ class ViewModelFollowScreen : ViewModel() {
                 "Supabase",
                 "Errore durante il toggleFollowUser: ${e.message}  e ${e.cause}",
             )
+        }
+    }
+
+    /**
+     * Metodo che carica un file nel bucket di Supabase
+     * @param context il contesto dell'applicazione
+     * @param fileUri l'uri del file da caricare
+     */
+    suspend fun uploadFileToSupabase(context: Context, fileUri: Uri) {
+        // FIXME: Il file caricato non ha il tipo giusto, probabilmente perchè non viene passato il content type
+        try {
+            // Leggi i byte del file selezionato
+            val inputStream = context.contentResolver.openInputStream(fileUri)
+            val fileBytes =
+                inputStream?.readBytes() ?: throw Exception("Impossibile leggere il file")
+            withContext(Dispatchers.IO) {
+                inputStream.close()
+            }
+
+            // Carica il file nel bucket di Supabase
+            val bucket = supabase().storage.from("avatars")
+            val fileName = getUUID(context).toString()
+
+            val result = bucket.upload(fileName, fileBytes) {
+                upsert = true
+            }
+
+            Log.i("Supabase", "File caricato con successo: $result")
+        } catch (e: Exception) {
+            Log.e("Supabase", "Errore durante il caricamento: ${e.message}", e)
         }
     }
 
