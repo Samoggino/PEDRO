@@ -11,6 +11,7 @@ import com.lam.pedro.presentation.screen.loginscreen.User
 import com.lam.pedro.presentation.screen.loginscreen.parseUsers
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.storage.storage
+import io.ktor.http.ContentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.buildJsonObject
@@ -91,6 +92,9 @@ class ViewModelFollowScreen : ViewModel() {
 
             val result = bucket.upload(fileName, fileBytes) {
                 upsert = true
+                contentType = ContentType.Image.PNG
+                contentType = ContentType.Image.JPEG
+                contentType = ContentType.Image.SVG
             }
 
             Log.i("Supabase", "File caricato con successo: $result")
