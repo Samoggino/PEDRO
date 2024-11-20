@@ -97,6 +97,10 @@ dependencies {
     // AirBnB Lottie
     implementation(libs.lottie.compose)
 
+    // Accompanist
+    implementation(libs.accompanist.placeholder.material)
+
+
 
 }
 
