@@ -24,6 +24,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,12 +42,6 @@ import kotlinx.coroutines.launch
 @Preview(showBackground = true)
 @Composable
 fun FollowScreenPreview() {
-    mapOf(
-        User("1", "user1@example.com", "") to true,
-        User("2", "user2@example.com", "") to false,
-        User("3", "user3@example.com", "") to true
-    )
-
     FollowScreen()
 }
 
@@ -56,12 +51,14 @@ fun FollowScreen() {
     var isRefreshing by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val viewModel: ViewModelFollowScreen = viewModel(factory = ViewModelFollowScreenFactory())
-    var userFollowMap by remember { mutableStateOf<Map<User, Boolean>?>(null) } // Nullable per il caricamento
+    val userFollowMap by viewModel.userFollowMap.collectAsState() // Osserva il Flow
+
     val coroutineScope = rememberCoroutineScope()
 
-    // Carica i dati iniziali
+    // Carica i dati iniziali al primo caricamento
     LaunchedEffect(true) {
-        userFollowMap = viewModel.getFollowedUsers(context)
+        Log.i("Supabase-Following", "FollowScreen")
+        viewModel.getFollowedUsers(context)
     }
 
     Scaffold(
@@ -74,13 +71,12 @@ fun FollowScreen() {
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
             // Schermata con PullToRefresh
-
             PullToRefreshBox(
                 isRefreshing = isRefreshing,
                 onRefresh = {
                     isRefreshing = true
                     coroutineScope.launch {
-                        userFollowMap = viewModel.getFollowedUsers(context)
+                        viewModel.getFollowedUsers(context)
                         isRefreshing = false
                     }
                 },
@@ -98,7 +94,12 @@ fun FollowScreen() {
                             onFollowToggle = { user, isFollowing ->
                                 coroutineScope.launch {
                                     viewModel.toggleFollowUser(context, user, isFollowing)
-                                    userFollowMap = viewModel.getFollowedUsers(context)
+                                    // Modifica solo lo stato senza ricaricare tutto
+                                    userFollowMap?.let {
+                                        val updatedMap = it.toMutableMap()
+                                        updatedMap[user] = !isFollowing
+                                        viewModel.updateFollowState(updatedMap)
+                                    }
                                 }
                             }
                         )
@@ -110,11 +111,9 @@ fun FollowScreen() {
                         FileUploadButton(viewModel)
                     }
                 }
-
             }
         }
     }
-
 }
 
 @Composable
