@@ -1,52 +1,36 @@
 package com.lam.pedro.util
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
-import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
-import android.location.LocationRequest
-import android.os.Looper
-import android.util.Log
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.health.connect.client.records.ExerciseRoute
-import androidx.health.connect.client.records.SpeedRecord
-import androidx.health.connect.client.units.Velocity
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationResult
-import com.lam.pedro.presentation.TAG
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.withContext
-import java.security.AccessController.checkPermission
 import java.time.Instant
 
-class SpeedTracker(
+class LocationTracker(
     private val context: Context
 ) {
 
-    private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    private val locationManager =
+        context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-    fun trackSpeed(): Flow<SpeedRecord.Sample> = callbackFlow {
+    fun trackLocation(): Flow<ExerciseRoute.Location> = callbackFlow {
         if (!hasLocationPermissions(context)) {
             close(SecurityException("Location permissions are not granted."))
             return@callbackFlow
         }
 
         val locationListener = LocationListener { location ->
-            val speedInMetersPerSecond = location.speed.toDouble()
-            val velocity = Velocity.metersPerSecond(speedInMetersPerSecond)
-            val sample = SpeedRecord.Sample(
+            val locationSample = ExerciseRoute.Location(
                 time = Instant.now(),
-                speed = velocity
+                latitude = location.latitude,
+                longitude = location.longitude
             )
-            trySend(sample)
+            trySend(locationSample)
         }
 
         // Ensure location updates are requested on the main thread
@@ -65,6 +49,4 @@ class SpeedTracker(
 
         awaitClose { locationManager.removeUpdates(locationListener) }
     }
-
-
 }
