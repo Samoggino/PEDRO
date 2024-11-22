@@ -10,6 +10,7 @@ import java.time.Instant
 // Factory per creare le sessioni
 object ActivitySessionFactory {
     private val exerciseRouteSamples = ExerciseRoute(listOf(ExerciseRoute.Location(Instant.now(), 1.0, 1.0)))
+    //TODO: retrive exerciseRoute from Health Connect
     private val creators: Map<Int, (ExerciseSessionRecord) -> ActivitySession> = mapOf(
 
         ExerciseSessionRecord.EXERCISE_TYPE_BIKING to { record ->

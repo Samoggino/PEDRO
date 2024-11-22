@@ -163,7 +163,7 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
 
      */
 
-    suspend fun saveExerciseTest(
+    private suspend fun saveExerciseTest(
         start: ZonedDateTime, finish: ZonedDateTime, exerciseType: Int, title: String, notes: String
     ) {
         healthConnectManager.insertExerciseSession(
@@ -219,6 +219,8 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
          */
         runSession: RunSession
     ) {
+        sessionsList.value += runSession
+        /*
         healthConnectManager.insertRunSession(
             runSession.startTime,
             runSession.endTime,
@@ -233,6 +235,8 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
             runSession.elevationGained,
             runSession.exerciseRoute
         )
+
+         */
     }
 
     suspend fun saveTrainSession(
@@ -451,9 +455,12 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
         // Chiamata al metodo del manager per leggere i dati da Health Connect
         val records = healthConnectManager.readExerciseSessions(start, now, exerciseType)
 
+        /*
         sessionsList.value = records.map { record ->
             ActivitySessionFactory.create(exerciseType, record)
         }
+
+         */
     }
 
 

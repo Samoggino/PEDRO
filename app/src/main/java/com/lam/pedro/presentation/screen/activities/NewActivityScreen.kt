@@ -72,6 +72,10 @@ import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.DisplayLottieAnimation
 import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.util.SpeedTracker
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.ZonedDateTime
@@ -107,6 +111,8 @@ fun NewActivityScreen(
             //TODO: Handle permission denied, the app won't work
         }
     }
+
+
 
     Scaffold(
         topBar = {
@@ -147,8 +153,6 @@ fun NewActivityScreen(
             var visible by remember { mutableStateOf(false) }
             var isPaused by remember { mutableStateOf(true) }
 
-            val coroutineScope = rememberCoroutineScope()
-
             // Variabili per il timer
             var timerRunning by remember { mutableStateOf(false) }
             var elapsedTime by remember { mutableStateOf(0) }
@@ -163,6 +167,11 @@ fun NewActivityScreen(
             // oggetti utili per registrare una run
             var speedSamples = remember { mutableStateListOf<SpeedRecord.Sample>() }
             var exerciseRoute = remember { mutableStateListOf<ExerciseRoute.Location>() }
+
+            val coroutineScope = rememberCoroutineScope()
+            val sessionJob = remember { Job() }
+            val sessionScope = remember { CoroutineScope(sessionJob + Dispatchers.Default) }
+
 
             Spacer(modifier = Modifier.height(60.dp))
 
@@ -333,7 +342,11 @@ fun NewActivityScreen(
                                                     elevationGained = Length.meters(3.0), //TODO: Calcolare elevamento,
                                                     exerciseRoute = ExerciseRoute(exerciseRoute)
                                                 )
+                                                Log.d(TAG, "------------Run session: $runSession")
                                                 viewModel.saveRunSession(runSession)
+
+                                                // Termina le coroutine
+                                                sessionJob.cancelAndJoin()
                                             }
                                             /*
                                             if (titleId == Screen.RunSessionScreen.titleId) {
@@ -395,13 +408,14 @@ fun NewActivityScreen(
             }
 
             // Timer
+
             if (timerRunning && !isPaused) {
                 LaunchedEffect(Unit) {
                     // FIX: Start time only resets once, at the beginning.
                     startTime = ZonedDateTime.now()
 
                     // Coroutine for tracking elapsed time
-                    launch {
+                    sessionScope.launch {
                         while (timerRunning) {
                             delay(10)
                             elapsedTime += 10
@@ -409,17 +423,22 @@ fun NewActivityScreen(
                     }
 
                     // Coroutine for collecting speed samples
-                    launch {
-                        speedSamples = speedTracker.collectSpeedSamples() as SnapshotStateList<SpeedRecord.Sample>
+                    sessionScope.launch {
+                        speedTracker.trackSpeed().collect { sample ->
+                            speedSamples.add(sample) // Aggiungi ogni nuovo campione alla lista
+                            Log.d(TAG, "----------------------New Speed Sample: $sample")
+                        }
                     }
 
                     // Coroutine for collecting location samples
-                    launch {
-                        exerciseRoute = speedTracker.collectLocationSamples() as SnapshotStateList<ExerciseRoute.Location>
+                    sessionScope.launch {
+                        speedTracker.trackLocation().collect { location ->
+                            exerciseRoute.add(location) // Aggiungi ogni nuova posizione alla lista
+                            Log.d(TAG, "--------------------------------New location: $location")
+                        }
                     }
                 }
             }
-
 
             // Mostra il timer con animazione AnimatedVisibility
             AnimatedVisibility(visible = timerRunning || !isPaused) {
@@ -473,134 +492,3 @@ fun NewActivityScreen(
     }
 
 }
-
-/*
-@Composable
-fun StartActivityComponent(
-    color: Color,
-    viewModel: RunSessionViewModel // Passa il ViewModel
-) {
-    val sessionState by viewModel.sessionState.collectAsState()
-    val elapsedTime by viewModel.elapsedTime.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
-
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(16.dp)
-    ) {
-        val density = LocalDensity.current
-        var showDialog by remember { mutableStateOf(false) }
-        var isStopAction by remember { mutableStateOf(false) }
-
-        // Controlla lo stato del timer e visualizza i pulsanti di conseguenza
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            // Pulsante Pausa/Play
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(26.dp))
-                    .size(70.dp)
-                    .background(color)
-            ) {
-                IconButton(
-                    onClick = {
-                        when (sessionState) {
-                            SessionState.IDLE -> {
-                                isStopAction = false
-                                showDialog = true
-                            }
-
-                            SessionState.RUNNING -> viewModel.pauseSession()
-                            SessionState.PAUSED -> viewModel.resumeSession()
-                            else -> {}
-                        }
-                    },
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Image(
-                        painter = painterResource(id = if (sessionState == SessionState.RUNNING) R.drawable.pause_icon else R.drawable.play_icon),
-                        contentDescription = "Play or Pause",
-                        modifier = Modifier.size(40.dp)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.width(20.dp))
-
-            // Pulsante Stop
-            if (sessionState != SessionState.IDLE) {
-                IconButton(
-                    onClick = {
-                        isStopAction = true
-                        showDialog = true
-                    },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(26.dp))
-                        .size(70.dp)
-                        .background(Color(0xFFF44336))
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.stop_icon),
-                        contentDescription = "Stop",
-                        modifier = Modifier.size(40.dp)
-                    )
-                }
-            }
-        }
-
-        // Mostra il dialogo di conferma
-        if (showDialog) {
-            AlertDialog(
-                onDismissRequest = { showDialog = false },
-                title = { Text("Conferma") },
-                text = {
-                    Text(
-                        if (isStopAction) "Vuoi fermare l'attività?"
-                        else if (sessionState == SessionState.RUNNING) "Vuoi mettere in pausa?"
-                        else "Vuoi avviare l'attività?"
-                    )
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            coroutineScope.launch { // Lancia una coroutine
-                                if (isStopAction) {
-                                    viewModel.stopSession() // Chiama stopSession qui
-                                } else {
-                                    viewModel.startSession() // Avvia la sessione
-                                }
-                                showDialog = false // Chiude il dialogo
-                            }
-                        }) {
-                        Text("Sì")
-                    }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showDialog = false }) {
-                        Text("Annulla")
-                    }
-                }
-            )
-        }
-
-        // Mostra il timer
-        if (sessionState != SessionState.IDLE) {
-            val minutes = (elapsedTime / 60000) % 60
-            val seconds = (elapsedTime / 1000) % 60
-            val centiseconds = (elapsedTime % 1000) / 10
-
-            Text(
-                String.format("%02d:%02d:%02d", minutes, seconds, centiseconds),
-                style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-            )
-        }
-    }
-}
-*/

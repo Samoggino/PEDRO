@@ -18,10 +18,12 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
 import com.lam.pedro.presentation.TAG
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.withContext
 import java.security.AccessController.checkPermission
 import java.time.Instant
 
@@ -31,22 +33,7 @@ class SpeedTracker(
 
     private val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-    suspend fun collectSpeedSamples(): List<SpeedRecord.Sample> {
-        if (!hasLocationPermissions()) {
-            throw SecurityException("Location permissions are not granted.")
-        }
-
-        val speedSamples = mutableListOf<SpeedRecord.Sample>()
-
-        // Crea un Flow che traccia la velocità nel tempo
-        trackSpeed().collect { sample ->
-            speedSamples.add(sample)
-        }
-
-        return speedSamples
-    }
-
-    private fun trackSpeed(): Flow<SpeedRecord.Sample> = callbackFlow {
+    fun trackSpeed(): Flow<SpeedRecord.Sample> = callbackFlow {
         if (!hasLocationPermissions()) {
             close(SecurityException("Location permissions are not granted."))
             return@callbackFlow
@@ -62,37 +49,24 @@ class SpeedTracker(
             trySend(sample)
         }
 
-        val provider = LocationManager.GPS_PROVIDER
-        val providerProperties = locationManager.getProviderProperties(provider)
+        // Ensure location updates are requested on the main thread
+        withContext(Dispatchers.Main) {
+            val provider = LocationManager.GPS_PROVIDER
+            val providerProperties = locationManager.getProviderProperties(provider)
 
-        if (providerProperties != null) {
-            try {
-                locationManager.requestLocationUpdates(provider, 5000L, 0f, locationListener)
-            } catch (e: SecurityException) {
-                close(e)
+            if (providerProperties != null) {
+                try {
+                    locationManager.requestLocationUpdates(provider, 5000L, 0f, locationListener)
+                } catch (e: SecurityException) {
+                    close(e)
+                }
             }
         }
 
         awaitClose { locationManager.removeUpdates(locationListener) }
     }
 
-    suspend fun collectLocationSamples(): List<ExerciseRoute.Location> {
-        if (!hasLocationPermissions()) {
-            throw SecurityException("Location permissions are not granted.")
-        }
-
-        val locationSamples = mutableListOf<ExerciseRoute.Location>()
-
-        // Crea un Flow che traccia la posizione nel tempo
-        trackLocation().collect { locationSample ->
-            locationSamples.add(locationSample)
-            Log.d(TAG, "------------Location Samples: $locationSample")
-        }
-
-        return locationSamples
-    }
-
-    private fun trackLocation(): Flow<ExerciseRoute.Location> = callbackFlow {
+    fun trackLocation(): Flow<ExerciseRoute.Location> = callbackFlow {
         if (!hasLocationPermissions()) {
             close(SecurityException("Location permissions are not granted."))
             return@callbackFlow
@@ -107,19 +81,23 @@ class SpeedTracker(
             trySend(locationSample)
         }
 
-        val provider = LocationManager.GPS_PROVIDER
-        val providerProperties = locationManager.getProviderProperties(provider)
+        // Ensure location updates are requested on the main thread
+        withContext(Dispatchers.Main) {
+            val provider = LocationManager.GPS_PROVIDER
+            val providerProperties = locationManager.getProviderProperties(provider)
 
-        if (providerProperties != null) {
-            try {
-                locationManager.requestLocationUpdates(provider, 5000L, 0f, locationListener)
-            } catch (e: SecurityException) {
-                close(e)
+            if (providerProperties != null) {
+                try {
+                    locationManager.requestLocationUpdates(provider, 5000L, 0f, locationListener)
+                } catch (e: SecurityException) {
+                    close(e)
+                }
             }
         }
 
         awaitClose { locationManager.removeUpdates(locationListener) }
     }
+
 
     /*
     suspend fun collectSpeedSamples(): List<SpeedRecord.Sample> {

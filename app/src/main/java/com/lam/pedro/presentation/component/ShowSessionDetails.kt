@@ -35,7 +35,7 @@ fun ShowSessionDetails(session: ActivitySession) {
             Text(text = "Fine: ${session.endTime}")
         }
 
-        /*
+
         when (session) {
             is CycleSession -> {
                 item {
@@ -49,12 +49,13 @@ fun ShowSessionDetails(session: ActivitySession) {
             }
             is RunSession -> {
                 item {
-                    Text(text = "Distanza: ${session.distance}")
-                    Text(text = "Passi: ${session.stepsCount}")
                     Text(text = "Velocità: ${session.speedSamples}")
+                    Text(text = "Passi: ${session.stepsCount}")
                     Text(text = "Energia totale: ${session.totalEnergy}")
                     Text(text = "Energia attiva: ${session.activeEnergy}")
+                    Text(text = "Distanza: ${session.distance}")
                     Text(text = "Elevazione guadagnata: ${session.elevationGained}")
+                    Text(text = "Route: ${session.exerciseRoute}")
                 }
             }
             is TrainSession -> {
@@ -113,7 +114,5 @@ fun ShowSessionDetails(session: ActivitySession) {
                 //nothing else to display
             }
         }
-
-         */
     }
 }
