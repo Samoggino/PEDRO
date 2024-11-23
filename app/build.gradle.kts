@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.androidx.benchmark.common)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.play.services.location)
+    implementation(libs.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -100,6 +101,7 @@ dependencies {
 
     implementation("com.airbnb.android:lottie-compose:4.2.0")
 
+    implementation ("org.maplibre.gl:android-sdk:11.6.1")
 
 }
 

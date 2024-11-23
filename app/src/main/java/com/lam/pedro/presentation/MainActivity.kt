@@ -7,7 +7,7 @@ import androidx.activity.compose.setContent
 import com.lam.pedro.presentation.theme.PedroTheme
 
 /**
- * The entry point into the sample.
+ * The entry point
  */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

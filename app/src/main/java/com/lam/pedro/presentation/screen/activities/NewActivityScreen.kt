@@ -71,6 +71,7 @@ import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.DisplayLottieAnimation
 import com.lam.pedro.presentation.navigation.Screen
+import com.lam.pedro.util.LocationTracker
 import com.lam.pedro.util.SpeedTracker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -160,6 +161,7 @@ fun NewActivityScreen(
             var startTime: ZonedDateTime by remember { mutableStateOf(ZonedDateTime.now()) }
             var endTime: ZonedDateTime
             val speedTracker = SpeedTracker(LocalContext.current)
+            val locationTracker = LocationTracker(LocalContext.current)
 
             // Lista dei risultati dei timer
             val timerResults = remember { mutableStateListOf<String>() }
@@ -432,7 +434,7 @@ fun NewActivityScreen(
 
                     // Coroutine for collecting location samples
                     sessionScope.launch {
-                        speedTracker.trackLocation().collect { location ->
+                        locationTracker.trackLocation().collect { location ->
                             exerciseRoute.add(location) // Aggiungi ogni nuova posizione alla lista
                             Log.d(TAG, "--------------------------------New location: $location")
                         }

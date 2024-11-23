@@ -1,11 +1,15 @@
 package com.lam.pedro.presentation.component
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import com.lam.pedro.data.activitySession.ActivitySession
@@ -19,6 +23,8 @@ import com.lam.pedro.data.activitySession.SleepSession
 import com.lam.pedro.data.activitySession.TrainSession
 import com.lam.pedro.data.activitySession.WalkSession
 import com.lam.pedro.data.activitySession.YogaSession
+import com.lam.pedro.presentation.TAG
+import org.maplibre.android.geometry.LatLng
 
 @Composable
 fun ShowSessionDetails(session: ActivitySession) {
@@ -55,7 +61,12 @@ fun ShowSessionDetails(session: ActivitySession) {
                     Text(text = "Energia attiva: ${session.activeEnergy}")
                     Text(text = "Distanza: ${session.distance}")
                     Text(text = "Elevazione guadagnata: ${session.elevationGained}")
-                    Text(text = "Route: ${session.exerciseRoute}")
+                    val positions = session.exerciseRoute.route.map { LatLng(it.latitude, it.longitude) }
+                    Text(text = "Posizioni: $positions")
+                    MapComponent(
+                        modifier = Modifier.fillMaxWidth().height(300.dp),
+                        positions = positions
+                    )
                 }
             }
             is TrainSession -> {
