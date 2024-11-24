@@ -33,6 +33,7 @@ import com.lam.pedro.presentation.screen.ActivitiesScreen
 import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.LandingScreen
 import com.lam.pedro.presentation.screen.MoreScreen
+import com.lam.pedro.presentation.screen.ProfileScreen
 import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.GeneralActivityViewModelFactory
 import com.lam.pedro.presentation.screen.activities.NewActivityScreen
@@ -105,7 +106,7 @@ fun PedroNavigation(
                 }) {
                 screenStack.add(Screen.HomeScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                HomeScreen()
+                HomeScreen(navController)
             }
             composable(Screen.ActivitiesScreen.route, enterTransition = {
                 fadeIn(
@@ -130,6 +131,18 @@ fun PedroNavigation(
                 screenStack.add(Screen.MoreScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 MoreScreen(navController)
+            }
+            composable(Screen.ProfileScreen.route, enterTransition = {
+                fadeIn(
+                    animationSpec = tween(700) // Personalizza la durata dell'animazione
+                )
+            },
+                exitTransition = {
+                    fadeOut(animationSpec = tween(600)) // Aggiungi un'animazione di uscita, se desiderato
+                }) {
+                screenStack.add(Screen.ProfileScreen.route)
+                logScreenStack()
+                ProfileScreen(navController, topBarTitle)
             }
             composable(
                 Screen.AboutScreen.route,

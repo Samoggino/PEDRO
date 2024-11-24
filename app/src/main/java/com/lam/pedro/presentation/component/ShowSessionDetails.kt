@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.ExerciseSessionRecord
@@ -64,7 +66,7 @@ fun ShowSessionDetails(session: ActivitySession) {
                     val positions = session.exerciseRoute.route.map { LatLng(it.latitude, it.longitude) }
                     Text(text = "Posizioni: $positions")
                     MapComponent(
-                        modifier = Modifier.fillMaxWidth().height(300.dp),
+                        modifier = Modifier.fillMaxWidth().height(300.dp).clip(RoundedCornerShape(26.dp)),
                         positions = positions
                     )
                 }

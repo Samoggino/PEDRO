@@ -35,6 +35,7 @@ const val SERIES_RECORDS_TYPE = "seriesRecordsType"
 enum class Screen(val route: String, val titleId: Int, val image: Int, val color: Color, val activityType: Int, val hasMenuItem: Boolean = true, ) {
     WelcomeScreen("welcome_screen", R.string.welcome_screen, 1, Color(0xFFfaaf5a), 1, false),
     HomeScreen("home_screen", R.string.home_screen, 1, Color(0xFFfaaf5a), 1),
+    ProfileScreen("profile_screen", R.string.profile_screen, 1, Color(0xFFfaaf5a), 1, false),
     ExerciseSessions("exercise_sessions", R.string.exercise_sessions, 1, Color(0xFFfaaf5a), 1, false),
     ExerciseSessionDetail("exercise_session_detail", R.string.exercise_session_detail, 1, Color(0xFFfaaf5a), 1, false),
     SleepSessions("sleep_sessions", R.string.sleep_sessions, R.drawable.sleeping_icon, Color(0xff74c9c6), ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT, false),

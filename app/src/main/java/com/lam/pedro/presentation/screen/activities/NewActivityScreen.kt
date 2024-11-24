@@ -4,6 +4,8 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -35,13 +37,17 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -92,6 +98,13 @@ fun NewActivityScreen(
 ) {
 
     val context = LocalContext.current
+
+    val coroutineScope = rememberCoroutineScope()
+    val sessionJob = remember { Job() }
+    val sessionScope = remember { CoroutineScope(sessionJob + Dispatchers.Default) }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
     var hasPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(
@@ -113,7 +126,36 @@ fun NewActivityScreen(
         }
     }
 
+    val sensorManager by lazy {
+        context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    }
+    val stepCounterSensor: Sensor? by lazy {
+        sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+    }
 
+    var steps by remember { mutableStateOf(0f) }
+
+    LaunchedEffect(stepCounterSensor) {
+        if (stepCounterSensor == null) {
+            snackbarHostState.showSnackbar("Step counter sensor is not present on this device")
+        } else {
+            snackbarHostState.showSnackbar("Step counter sensor OK")
+        }
+    }
+
+    val stepListener = object : SensorEventListener {
+        override fun onSensorChanged(event: SensorEvent?) {
+            if (event != null && event.sensor.type == Sensor.TYPE_STEP_COUNTER) {
+                val steps = event.values[0].toInt() // Qui ottieni il numero di passi
+                // Salva il conteggio dei passi o aggiorna l'interfaccia utente
+                Log.d("Steps", "Steps: $steps")
+            }
+        }
+
+        override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+            // Gestisci i cambiamenti di precisione se necessario
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -140,7 +182,8 @@ fun NewActivityScreen(
 
 
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -169,11 +212,6 @@ fun NewActivityScreen(
             // oggetti utili per registrare una run
             var speedSamples = remember { mutableStateListOf<SpeedRecord.Sample>() }
             var exerciseRoute = remember { mutableStateListOf<ExerciseRoute.Location>() }
-
-            val coroutineScope = rememberCoroutineScope()
-            val sessionJob = remember { Job() }
-            val sessionScope = remember { CoroutineScope(sessionJob + Dispatchers.Default) }
-
 
             Spacer(modifier = Modifier.height(60.dp))
 
@@ -337,7 +375,7 @@ fun NewActivityScreen(
                                                     title = title,
                                                     notes = notes,
                                                     speedSamples = speedSamples,
-                                                    stepsCount = 2,
+                                                    stepsCount = steps.toLong(),
                                                     totalEnergy = Energy.calories(3.0), //TODO: Calcolare energia
                                                     activeEnergy = Energy.calories(3.0), //TODO: Calcolare energia,
                                                     distance = Length.meters(3.0), //TODO: Calcolare distanza,
@@ -410,8 +448,8 @@ fun NewActivityScreen(
             }
 
             // Timer
-
             if (timerRunning && !isPaused) {
+
                 LaunchedEffect(Unit) {
                     // FIX: Start time only resets once, at the beginning.
                     startTime = ZonedDateTime.now()
@@ -422,6 +460,14 @@ fun NewActivityScreen(
                             delay(10)
                             elapsedTime += 10
                         }
+                    }
+
+                    sessionScope.launch {
+                        sensorManager.registerListener(
+                            stepListener,
+                            stepCounterSensor,
+                            SensorManager.SENSOR_DELAY_UI
+                        )
                     }
 
                     // Coroutine for collecting speed samples
@@ -439,6 +485,8 @@ fun NewActivityScreen(
                             Log.d(TAG, "--------------------------------New location: $location")
                         }
                     }
+
+
                 }
             }
 
@@ -463,28 +511,30 @@ fun NewActivityScreen(
 
                     Spacer(modifier = Modifier.height(60.dp))
 
-                    if (titleId == Screen.RunSessionScreen.titleId) {
-                        DisplayLottieAnimation("https://lottie.host/d32ef6d1-6bd0-4e39-b2f4-cbab8ca8c19d/79Mbx9ocLg.lottie")
-                    } else if (titleId == Screen.CycleSessionScreen.titleId) {//TODO
-                        DisplayLottieAnimation("https://lottie.host/58060237-49bc-4e38-b630-9db0992858e3/QkvECf9V38.lottie")
-                    } else if (titleId == Screen.TrainSessionScreen.titleId) {//TODO
-                        DisplayLottieAnimation("https://lottie.host/80db1f9c-c1f6-4f2d-8512-fbbee80d23d0/DeQ19gEueZ.lottie")
-                    } else if (titleId == Screen.WalkSessionScreen.titleId) {//TODO
-                        DisplayLottieAnimation("https://lottie.host/d32ef6d1-6bd0-4e39-b2f4-cbab8ca8c19d/79Mbx9ocLg.lottie")
-                    } else if (titleId == Screen.YogaSessionScreen.titleId) {//TODO
-                        DisplayLottieAnimation("https://lottie.host/d32ef6d1-6bd0-4e39-b2f4-cbab8ca8c19d/79Mbx9ocLg.lottie")
-                    } else if (titleId == Screen.DriveSessionScreen.titleId) {
-                        DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
-                    } else if (titleId == Screen.WeightScreen.titleId) {//TODO
-                        DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
-                    } else if (titleId == Screen.ListenSessionScreen.titleId) {//TODO
-                        DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
-                    } else if (titleId == Screen.SitSessionScreen.titleId) {//TODO
-                        DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
-                    } else if (titleId == Screen.SleepSessions.titleId) {//TODO
-                        DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
-                    }
 
+                    Box(modifier = Modifier.fillMaxWidth().height(300.dp), contentAlignment = Alignment.Center) {
+                        if (titleId == Screen.RunSessionScreen.titleId) {
+                            DisplayLottieAnimation("https://lottie.host/d32ef6d1-6bd0-4e39-b2f4-cbab8ca8c19d/79Mbx9ocLg.lottie")
+                        } else if (titleId == Screen.CycleSessionScreen.titleId) {//TODO
+                            DisplayLottieAnimation("https://lottie.host/58060237-49bc-4e38-b630-9db0992858e3/QkvECf9V38.lottie")
+                        } else if (titleId == Screen.TrainSessionScreen.titleId) {//TODO
+                            DisplayLottieAnimation("https://lottie.host/80db1f9c-c1f6-4f2d-8512-fbbee80d23d0/DeQ19gEueZ.lottie")
+                        } else if (titleId == Screen.WalkSessionScreen.titleId) {//TODO
+                            DisplayLottieAnimation("https://lottie.host/d32ef6d1-6bd0-4e39-b2f4-cbab8ca8c19d/79Mbx9ocLg.lottie")
+                        } else if (titleId == Screen.YogaSessionScreen.titleId) {//TODO
+                            DisplayLottieAnimation("https://lottie.host/d32ef6d1-6bd0-4e39-b2f4-cbab8ca8c19d/79Mbx9ocLg.lottie")
+                        } else if (titleId == Screen.DriveSessionScreen.titleId) {
+                            DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
+                        } else if (titleId == Screen.WeightScreen.titleId) {//TODO
+                            DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
+                        } else if (titleId == Screen.ListenSessionScreen.titleId) {//TODO
+                            DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
+                        } else if (titleId == Screen.SitSessionScreen.titleId) {//TODO
+                            DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
+                        } else if (titleId == Screen.SleepSessions.titleId) {//TODO
+                            DisplayLottieAnimation("https://lottie.host/bb545e90-529a-4bfd-aff9-1324080aaa4b/HF3zQgFQFe.lottie")
+                        }
+                    }
 
                 }
 

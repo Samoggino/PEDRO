@@ -86,6 +86,9 @@ fun PedroApp(healthConnectManager: HealthConnectManager) {
             Screen.ActivitiesScreen.route -> Screen.ActivitiesScreen.titleId
             Screen.MoreScreen.route -> Screen.MoreScreen.titleId
 
+            /* Profile */
+            Screen.ProfileScreen.route -> Screen.ProfileScreen.titleId
+
             /* Activities */
             Screen.SleepSessions.route -> Screen.SleepSessions.titleId
             Screen.DriveSessionScreen.route -> Screen.DriveSessionScreen.titleId
