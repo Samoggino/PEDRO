@@ -21,7 +21,7 @@ fun MyScreenRecords(
 
     val viewModel: ViewModelRecords = viewModel(factory = ViewModelRecordFactory())
     val coroutineScope = rememberCoroutineScope()
-
+    val context = LocalContext.current
 
     // Caricamento dei dati all'interno di LaunchedEffect
     Column(modifier = Modifier.padding(16.dp)) {
@@ -45,11 +45,23 @@ fun MyScreenRecords(
         }
         Button(
             onClick = {
-                viewModel.actionThree()
+                coroutineScope.launch {
+                    viewModel.yogaSession(context)
+                }
             },
             modifier = Modifier.padding(vertical = 4.dp)
         ) {
             Text("YogaData")
+        }
+        Button(
+            onClick = {
+                coroutineScope.launch {
+                    viewModel.getYogaSession(context)
+                }
+            },
+            modifier = Modifier.padding(vertical = 4.dp)
+        ) {
+            Text("DAMMI LO YOGA, PER DIO")
         }
         Button(
             onClick = {

@@ -12,7 +12,7 @@ import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-object SupabaseClientProvider {
+object SupabaseClient {
 
     /**
      * Inizializzazione del client

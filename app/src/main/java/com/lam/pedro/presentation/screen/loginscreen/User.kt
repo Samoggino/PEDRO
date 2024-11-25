@@ -6,10 +6,10 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class User(
-    @SerialName("user_id") val id: String,
-    @SerialName("user_email") val email: String,
+    @SerialName("id") val id: String,
+    @SerialName("email") val email: String,
     // avatar url è un campo opzionale, quindi se non è presente nel JSON, verrà impostato su una stringa vuota
-    @SerialName("avatar_url") val avatarUrl: String
+    @SerialName("avatar") val avatarUrl: String? = null
 )
 
 fun parseUsers(jsonString: String): Map<User, Boolean> {
@@ -38,4 +38,3 @@ private data class RawUserWithFollowStatus(
     @SerialName("user_avatar") val avatarUrl: String? = null,
     @SerialName("is_following") val isFollowed: Boolean
 )
-

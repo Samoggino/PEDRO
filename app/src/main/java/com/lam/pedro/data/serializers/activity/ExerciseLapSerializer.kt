@@ -17,9 +17,13 @@ import java.time.Instant
 
 object ExerciseLapSerializer : KSerializer<ExerciseLap> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("ExerciseLap") {
-        element("startTime", InstantSerializer.descriptor)
-        element("endTime", InstantSerializer.descriptor)
-        element("length", LengthSerializer.descriptor, isOptional = true)
+        try {
+            element("startTime", InstantSerializer.descriptor)
+            element("endTime", InstantSerializer.descriptor)
+            element("length", LengthSerializer.descriptor, isOptional = true)
+        } catch (e: Exception) {
+            Log.e("Creating", "Error creating ExerciseLap descriptor", e)
+        }
     }
 
     override fun serialize(encoder: Encoder, value: ExerciseLap) {
@@ -45,42 +49,47 @@ object ExerciseLapSerializer : KSerializer<ExerciseLap> {
     }
 
     override fun deserialize(decoder: Decoder): ExerciseLap {
-        return decoder.decodeStructure(descriptor) {
-            var startTime: Instant? = null
-            var endTime: Instant? = null
-            var length: Length? = null
+        try {
+            return decoder.decodeStructure(descriptor) {
+                var startTime: Instant? = null
+                var endTime: Instant? = null
+                var length: Length? = null
 
-            loop@ while (true) {
-                when (val index = decodeElementIndex(descriptor)) {
-                    0 -> startTime = decodeSerializableElement(
-                        descriptor,
-                        index,
-                        InstantSerializer
-                    )
+                loop@ while (true) {
+                    when (val index = decodeElementIndex(descriptor)) {
+                        0 -> startTime = decodeSerializableElement(
+                            descriptor,
+                            index,
+                            InstantSerializer
+                        )
 
-                    1 -> endTime = decodeSerializableElement(
-                        descriptor,
-                        index,
-                        InstantSerializer
-                    )
+                        1 -> endTime = decodeSerializableElement(
+                            descriptor,
+                            index,
+                            InstantSerializer
+                        )
 
-                    2 -> length = decodeSerializableElement(
-                        descriptor,
-                        index,
-                        LengthSerializer
-                    )
+                        2 -> length = decodeSerializableElement(
+                            descriptor,
+                            index,
+                            LengthSerializer
+                        )
 
-                    CompositeDecoder.DECODE_DONE -> break@loop
-                    else -> throw IllegalStateException("Unexpected index: $index")
+                        CompositeDecoder.DECODE_DONE -> break@loop
+                        else -> throw IllegalStateException("Unexpected index: $index")
+                    }
                 }
-            }
 
-            // Restituiamo l'oggetto ExerciseLap con i valori deserializzati
-            ExerciseLap(
-                startTime ?: throw IllegalStateException("startTime is required"),
-                endTime ?: throw IllegalStateException("endTime is required"),
-                length
-            )
+                // Restituiamo l'oggetto ExerciseLap con i valori deserializzati
+                ExerciseLap(
+                    startTime = startTime ?: throw IllegalStateException("startTime is required"),
+                    endTime = endTime ?: throw IllegalStateException("endTime is required"),
+                    length = length
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("Deserializing", "Error deserializing ExerciseLap", e)
+            throw e
         }
     }
 }

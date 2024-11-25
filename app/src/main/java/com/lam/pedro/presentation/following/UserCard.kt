@@ -101,7 +101,7 @@ fun UserCard(user: User, isFollowing: Boolean, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Avatar(user.avatarUrl)
+            user.avatarUrl?.let { Avatar(it) }
             UserBody(user, isFollowing)
             FollowButton(isFollowing, onClick)
         }

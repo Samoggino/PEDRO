@@ -5,6 +5,7 @@
 
 package com.lam.pedro.presentation.serialization.activecalories
 
+import android.content.Context
 import android.util.Log
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.CyclingPedalingCadenceRecord
@@ -13,24 +14,30 @@ import androidx.health.connect.client.records.ElevationGainedRecord
 import androidx.health.connect.client.records.ExerciseCompletionGoal
 import androidx.health.connect.client.records.ExerciseLap
 import androidx.health.connect.client.records.ExerciseRoute
+import androidx.health.connect.client.records.ExerciseSegment
 import androidx.health.connect.client.records.SpeedRecord
-import androidx.health.connect.client.records.StepsCadenceRecord
-import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import androidx.health.connect.client.units.Velocity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.lam.pedro.data.activity.ActivitySession
 import com.lam.pedro.data.activity.CyclingData
-import com.lam.pedro.data.activity.RunData
+import com.lam.pedro.data.activity.RunSession
 import com.lam.pedro.data.activity.TrainData
-import com.lam.pedro.data.activity.YogaData
+import com.lam.pedro.data.activity.YogaSession
+import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
+import com.lam.pedro.data.datasource.SupabaseClientProvider.supabase
 import com.lam.pedro.data.serializers.activity.ActiveCaloriesBurnedRecordSerializer
 import com.lam.pedro.data.serializers.primitive.InstantSerializer
+import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.put
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset
@@ -194,86 +201,88 @@ class ViewModelRecords : ViewModel() {
     /**
      * YogaData
      */
-    fun actionThree() {
-
-
-        // Creazione di un oggetto YogaRecord con i valori di esempio
-
+    suspend fun yogaSession(context: Context) {
         try {
-            val yogaData = YogaData(
-                // crea un oggetto YogaRecord e prova a serializzarlo e deserializzarlo
-                // Creazione di un oggetto ActiveCaloriesBurnedRecord con valori di esempio
-                calories = ActiveCaloriesBurnedRecord(
-                    startTime = startTime,
-                    startZoneOffset = startZoneOffset,
-                    endTime = endTime, // 1 ora di durata
-                    endZoneOffset = endZoneOffset,
-                    energy = energy // Ad esempio, 100 kcal
-                ),
+            Log.d("Supabase", "Creazione di una sessione di yoga")
+            val supabase = supabase()
 
-                // Creazione di un oggetto ExerciseCompletionGoal.DurationGoal con valore di esempio
-                durationGoal = ExerciseCompletionGoal.DurationGoal(
-                    duration = Duration.between(
-                        startTime, endTime
+            val yogaSession = YogaSession(
+                activitySession = ActivitySession(
+                    startTime = Instant.now(),
+                    endTime = Instant.now(),
+                    title = "Yoga",
+                    notes = "Yoga session"
+                ),
+                totalEnergy = energy,
+                activeEnergy = energy,
+                exerciseSegment = listOf(
+                    ExerciseSegment(
+                        startTime = Instant.now(),
+                        endTime = Instant.now(),
+                        segmentType = 0,
+                        repetitions = 1
                     )
-                ), // Durata di 1 ora
-
-                // Creazione di un oggetto TotalCaloriesBurnedRecord con valori di esempio
-                totalCaloriesBurned = TotalCaloriesBurnedRecord(
-                    startTime = startTime,
-                    startZoneOffset = startZoneOffset,
-                    endTime = endTime,
-                    endZoneOffset = endZoneOffset,
-                    energy = energy
                 ),
-
-                // Creazione di un oggetto ExerciseLap con valori di esempio
-                exerciseLap = ExerciseLap(
-                    startTime = startTime,
-                    endTime = endTime,
-                    length = length// Ad esempio, una distanza di 500 metri
+                exerciseLap = listOf(
+                    ExerciseLap(
+                        startTime = Instant.now(),
+                        endTime = Instant.now(),
+                        length = length
+                    )
                 )
             )
 
-            checkSerialization(yogaData)
+
+            val jsonFinal = buildJsonObject {
+                put("input_data", buildJsonObject {
+                    put("data", Json.encodeToJsonElement(yogaSession))
+                    put("user_UUID", Json.encodeToJsonElement(getUUID(context)))
+                })
+            }
+
+            // Esegui la chiamata RPC su Supabase
+            supabase.postgrest.rpc("insert_yoga_session", jsonFinal)
+
 
         } catch (e: Exception) {
             Log.e("Supabase", "Errore durante la creazione di YogaRecord: ${e.message}")
         }
     }
 
+    suspend fun getYogaSession(context: Context) {
+        try {
+            val response = supabase()
+                .postgrest
+                .rpc("get_yoga_session", buildJsonObject {
+                    put("user_uuid", getUUID(context).toString())
+                })
+                .decodeList<YogaSession>()
+
+
+            Log.d("Supabase", "Dati delle sessioni di yoga: $response")
+
+        } catch (e: Exception) {
+            Log.e(
+                "Supabase-HealthConnect",
+                "Errore durante il recupero dei dati di sonno $e"
+            )
+        }
+    }
+
 
     fun actionFour() {
         // crea un oggetto RunData e prova a serializzarlo e deserializzarlo
-        val runData = RunData(
-            calories = ActiveCaloriesBurnedRecord(
-                startTime = startTime,
-                startZoneOffset = startZoneOffset,
-                endTime = endTime,
-                endZoneOffset = endZoneOffset,
-                energy = energy
+        val runData = RunSession(
+            activitySession = ActivitySession(
+                startTime = Instant.now(),
+                endTime = Instant.now(),
+                title = "Run",
+                notes = "Running session"
             ),
-            totalCaloriesBurned = TotalCaloriesBurnedRecord(
-                startTime = startTime,
-                startZoneOffset = startZoneOffset,
-                endTime = endTime,
-                endZoneOffset = endZoneOffset,
-                energy = energy
-            ),
-            distanceRecord = DistanceRecord(
-                startTime = startTime,
-                startZoneOffset = startZoneOffset,
-                endTime = endTime,
-                endZoneOffset = endZoneOffset,
-                distance = length
-            ),
-            elevationGainedRecord = ElevationGainedRecord(
-                startTime = startTime,
-                startZoneOffset = startZoneOffset,
-                endTime = endTime,
-                endZoneOffset = endZoneOffset,
-                elevation = length
-            ),
+            activeEnergy = energy,
+            totalEnergy = energy,
+            distance = length,
+            elevationGained = length,
             exerciseRoute = ExerciseRoute(
                 route = listOf(
                     ExerciseRoute.Location(
@@ -294,45 +303,22 @@ class ViewModelRecords : ViewModel() {
                     )
                 )
             ),
-            speedRecord = SpeedRecord(
-                startTime = startTime,
-                startZoneOffset = startZoneOffset,
-                endTime = endTime,
-                endZoneOffset = endZoneOffset,
-                samples = listOf(
-                    SpeedRecord.Sample(
-                        time = Instant.now(),
-                        speed = Velocity.kilometersPerHour(10.0)
-                    ),
-                    SpeedRecord.Sample(
-                        time = endTime,
-                        speed = Velocity.kilometersPerHour(10.0)
-                    )
-                )
-            ),
-            cadenceRecord = listOf(
-                StepsCadenceRecord.Sample(
+            speedSamples = listOf(
+                SpeedRecord.Sample(
                     time = Instant.now(),
-                    rate = 10.0
+                    speed = Velocity.kilometersPerHour(10.0)
                 ),
-                StepsCadenceRecord.Sample(
+                SpeedRecord.Sample(
                     time = endTime,
-                    rate = 10.0
+                    speed = Velocity.kilometersPerHour(10.0)
                 )
             ),
-            stepsRecord = StepsRecord(
-                startTime = startTime,
-                startZoneOffset = startZoneOffset,
-                endTime = endTime,
-                endZoneOffset = endZoneOffset,
-                count = 1000
-            )
+            stepsCount = 1000
         )
 
         checkSerialization(runData)
 
     }
-
 
 
     /**
@@ -359,7 +345,6 @@ class ViewModelRecords : ViewModel() {
                 return false
             }
         } catch (e: Exception) {
-            // Log dell'errore nel caso in cui si verifichi un'eccezione
             Log.e(
                 "Serializing",
                 "Errore durante la serializzazione/deserializzazione: ${e.message}"
@@ -367,6 +352,7 @@ class ViewModelRecords : ViewModel() {
             return false
         }
     }
+
 
 }
 
