@@ -8,7 +8,7 @@ import androidx.navigation.NavController
 import com.lam.pedro.data.activity.SleepSessionData
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getAccessToken
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
-import com.lam.pedro.data.datasource.SupabaseClientProvider.supabase
+import com.lam.pedro.data.datasource.SupabaseClient.supabase
 import com.lam.pedro.presentation.navigation.Screen
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest

@@ -15,10 +15,6 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.encodeStructure
 import java.time.Instant
 
-/***
- * Sample(time: Instant, speed: Velocity)
- */
-
 object SpeedRecordSampleSerializer : KSerializer<SpeedRecord.Sample> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("SpeedRecordSample") {
         try {

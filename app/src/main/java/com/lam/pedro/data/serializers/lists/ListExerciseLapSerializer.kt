@@ -8,7 +8,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-object ExerciseLapListSerializer : KSerializer<List<ExerciseLap>> {
+object ListExerciseLapSerializer : KSerializer<List<ExerciseLap>> {
     override val descriptor: SerialDescriptor = ListSerializer(ExerciseLapSerializer).descriptor
 
     override fun serialize(encoder: Encoder, value: List<ExerciseLap>) {

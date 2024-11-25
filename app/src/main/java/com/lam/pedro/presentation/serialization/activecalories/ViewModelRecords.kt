@@ -1,44 +1,33 @@
-@file:UseSerializers(
-    ActiveCaloriesBurnedRecordSerializer::class,
-    InstantSerializer::class
-)
-
 package com.lam.pedro.presentation.serialization.activecalories
 
 import android.content.Context
 import android.util.Log
-import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.CyclingPedalingCadenceRecord
-import androidx.health.connect.client.records.DistanceRecord
-import androidx.health.connect.client.records.ElevationGainedRecord
-import androidx.health.connect.client.records.ExerciseCompletionGoal
 import androidx.health.connect.client.records.ExerciseLap
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSegment
 import androidx.health.connect.client.records.SpeedRecord
-import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import androidx.health.connect.client.units.Velocity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.lam.pedro.data.activity.ActivitySession
-import com.lam.pedro.data.activity.CyclingData
+import com.lam.pedro.data.activity.ActivityType
+import com.lam.pedro.data.activity.BasicActivity
+import com.lam.pedro.data.activity.CyclingSession
+import com.lam.pedro.data.activity.DriveSession
+import com.lam.pedro.data.activity.LiftSession
 import com.lam.pedro.data.activity.RunSession
-import com.lam.pedro.data.activity.TrainData
+import com.lam.pedro.data.activity.TrainSession
 import com.lam.pedro.data.activity.YogaSession
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
-import com.lam.pedro.data.datasource.SupabaseClientProvider.supabase
-import com.lam.pedro.data.serializers.activity.ActiveCaloriesBurnedRecordSerializer
-import com.lam.pedro.data.serializers.primitive.InstantSerializer
+import com.lam.pedro.data.datasource.SupabaseClient.supabase
 import io.github.jan.supabase.postgrest.postgrest
-import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
-import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset
 
@@ -52,272 +41,387 @@ class ViewModelRecords : ViewModel() {
     val length: Length = Length.meters(500.0)
 
 
-    /**
-     * TrainData
-     */
-    fun actionOne() {
-
+    suspend fun getActivitySession(context: Context, activityType: ActivityType) {
         try {
-            val trainData = TrainData(
-                activeCaloriesBurnedRecord = ActiveCaloriesBurnedRecord(
-                    startTime = startTime,
-                    startZoneOffset = startZoneOffset,
-                    endTime = endTime,
-                    endZoneOffset = endZoneOffset,
-                    energy = energy
-                ),
-                repetitionsGoal = ExerciseCompletionGoal.RepetitionsGoal(
-                    repetitions = 10
-                ),
-                durationGoal = ExerciseCompletionGoal.DurationGoal(
-                    duration = Duration.between(
-                        startTime,
-                        endTime
-                    )
-                ),
-                exerciseLap = ExerciseLap(
-                    startTime = startTime,
-                    endTime = endTime,
-                    length = length
-                ),
-                totalCaloriesBurnedRecord = TotalCaloriesBurnedRecord(
-                    startTime = startTime,
-                    startZoneOffset = startZoneOffset,
-                    endTime = endTime,
-                    endZoneOffset = endZoneOffset,
-                    energy = energy
-                )
-            )
+            val response = when (activityType) {
+                ActivityType.YOGA -> {
+                    supabase()
+                        .postgrest
+                        .rpc("get_yoga_session", buildJsonObject {
+                            put("user_uuid", getUUID(context).toString())
+                        })
+                        .decodeList<YogaSession>()
+                }
 
-            checkSerialization(trainData)
+                ActivityType.RUN -> {
+                    supabase()
+                        .postgrest
+                        .rpc("get_run_session", buildJsonObject {
+                            put("user_uuid", getUUID(context).toString())
+                        })
+                        .decodeList<RunSession>()
+                }
 
-        } catch (e: Exception) {
-            Log.e(
-                "Supabase",
-                "Errore durante il caricamento dei dati: ${e.message}",
-            )
-        }
+                ActivityType.CYCLING -> {
 
-    }
+                    supabase()
+                        .postgrest
+                        .rpc("get_cycling_session", buildJsonObject {
+                            put("user_uuid", getUUID(context).toString())
+                        })
+                        .decodeList<CyclingSession>()
+                }
 
-    /**
-     * CyclingData
-     */
-    fun actionTwo() {
+                ActivityType.TRAIN -> {
+                    supabase()
+                        .postgrest
+                        .rpc("get_train_session", buildJsonObject {
+                            put("user_uuid", getUUID(context).toString())
+                        })
+                        .decodeList<TrainSession>()
+                }
 
-        try {
-            val cyclingData = CyclingData(
-                calories = ActiveCaloriesBurnedRecord(
-                    startTime = startTime,
-                    startZoneOffset = startZoneOffset,
-                    endTime = endTime,
-                    endZoneOffset = endZoneOffset,
-                    energy = energy
-                ),
+                ActivityType.DRIVE -> {
+                    supabase()
+                        .postgrest
+                        .rpc("get_drive_session", buildJsonObject {
+                            put("user_uuid", getUUID(context).toString())
+                        })
+                        .decodeList<DriveSession>()
+                }
 
-                distanceRecord = DistanceRecord(
-                    startTime = startTime,
-                    startZoneOffset = startZoneOffset,
-                    endTime = endTime,
-                    endZoneOffset = endZoneOffset,
-                    distance = length
-                ),
-                elevationGainedRecord = ElevationGainedRecord(
-                    startTime = startTime,
-                    startZoneOffset = startZoneOffset,
-                    endTime = endTime,
-                    endZoneOffset = endZoneOffset,
-                    elevation = length
-                ),
-                exerciseRoute = ExerciseRoute(
-                    route = listOf(
-                        ExerciseRoute.Location(
-                            time = startTime,
-                            latitude = 0.0,
-                            longitude = 0.0,
-                            horizontalAccuracy = length,
-                            verticalAccuracy = length,
-                            altitude = length
-                        ),
-                        ExerciseRoute.Location(
-                            time = endTime,
-                            latitude = 0.0,
-                            longitude = 0.0,
-                            horizontalAccuracy = length,
-                            verticalAccuracy = length,
-                            altitude = length
-                        )
-                    )
-                ),
-                pedalingCadenceRecord = CyclingPedalingCadenceRecord(
-                    startTime = startTime,
-                    startZoneOffset = startZoneOffset,
-                    endTime = endTime,
-                    endZoneOffset = endZoneOffset,
-                    samples = listOf(
-                        CyclingPedalingCadenceRecord.Sample(
-                            time = startTime,
-                            revolutionsPerMinute = 10.0
-                        ),
-                        CyclingPedalingCadenceRecord.Sample(
-                            time = endTime,
-                            revolutionsPerMinute = 10.0
-                        )
-                    )
-                ),
-                speedRecord = SpeedRecord(
-                    startTime = startTime,
-                    startZoneOffset = startZoneOffset,
-                    endTime = endTime,
-                    endZoneOffset = endZoneOffset,
-                    samples = listOf(
-                        SpeedRecord.Sample(
-                            time = Instant.now(),
-                            speed = Velocity.kilometersPerHour(10.0)
-                        ),
-                        SpeedRecord.Sample(
-                            time = endTime,
-                            speed = Velocity.kilometersPerHour(10.0)
-                        )
-                    )
-                ),
-                totalCaloriesBurned = TotalCaloriesBurnedRecord(
-                    startTime = startTime,
-                    startZoneOffset = startZoneOffset,
-                    endTime = endTime,
-                    endZoneOffset = endZoneOffset,
-                    energy = energy
-                )
-            )
-
-            checkSerialization(cyclingData)
-        } catch (e: Exception) {
-            Log.e("Serializing", "Errore durante il caricamento dei dati: ${e.message}")
-        }
-
-    }
-
-
-    /**
-     * YogaData
-     */
-    suspend fun yogaSession(context: Context) {
-        try {
-            Log.d("Supabase", "Creazione di una sessione di yoga")
-            val supabase = supabase()
-
-            val yogaSession = YogaSession(
-                activitySession = ActivitySession(
-                    startTime = Instant.now(),
-                    endTime = Instant.now(),
-                    title = "Yoga",
-                    notes = "Yoga session"
-                ),
-                totalEnergy = energy,
-                activeEnergy = energy,
-                exerciseSegment = listOf(
-                    ExerciseSegment(
-                        startTime = Instant.now(),
-                        endTime = Instant.now(),
-                        segmentType = 0,
-                        repetitions = 1
-                    )
-                ),
-                exerciseLap = listOf(
-                    ExerciseLap(
-                        startTime = Instant.now(),
-                        endTime = Instant.now(),
-                        length = length
-                    )
-                )
-            )
-
-
-            val jsonFinal = buildJsonObject {
-                put("input_data", buildJsonObject {
-                    put("data", Json.encodeToJsonElement(yogaSession))
-                    put("user_UUID", Json.encodeToJsonElement(getUUID(context)))
-                })
+                ActivityType.SIT -> TODO()
+                ActivityType.SLEEP -> TODO()
+                ActivityType.WALK -> TODO()
+                ActivityType.LIFT -> {
+                    supabase()
+                        .postgrest
+                        .rpc("get_lift_session", buildJsonObject {
+                            put("user_uuid", getUUID(context).toString())
+                        })
+                        .decodeList<LiftSession>()
+                }
             }
 
-            // Esegui la chiamata RPC su Supabase
-            supabase.postgrest.rpc("insert_yoga_session", jsonFinal)
-
-
-        } catch (e: Exception) {
-            Log.e("Supabase", "Errore durante la creazione di YogaRecord: ${e.message}")
-        }
-    }
-
-    suspend fun getYogaSession(context: Context) {
-        try {
-            val response = supabase()
-                .postgrest
-                .rpc("get_yoga_session", buildJsonObject {
-                    put("user_uuid", getUUID(context).toString())
-                })
-                .decodeList<YogaSession>()
-
-
-            Log.d("Supabase", "Dati delle sessioni di yoga: $response")
+            Log.d("Supabase", "Dati delle attività: $response")
 
         } catch (e: Exception) {
             Log.e(
                 "Supabase-HealthConnect",
-                "Errore durante il recupero dei dati di sonno $e"
+                "Errore durante il recupero dei dati delle attività $e"
             )
         }
     }
 
-
-    fun actionFour() {
-        // crea un oggetto RunData e prova a serializzarlo e deserializzarlo
-        val runData = RunSession(
-            activitySession = ActivitySession(
-                startTime = Instant.now(),
-                endTime = Instant.now(),
-                title = "Run",
-                notes = "Running session"
-            ),
-            activeEnergy = energy,
-            totalEnergy = energy,
-            distance = length,
-            elevationGained = length,
-            exerciseRoute = ExerciseRoute(
-                route = listOf(
-                    ExerciseRoute.Location(
-                        time = startTime,
-                        latitude = 0.0,
-                        longitude = 0.0,
-                        horizontalAccuracy = length,
-                        verticalAccuracy = length,
-                        altitude = length
-                    ),
-                    ExerciseRoute.Location(
-                        time = endTime,
-                        latitude = 0.0,
-                        longitude = 0.0,
-                        horizontalAccuracy = length,
-                        verticalAccuracy = length,
-                        altitude = length
+    suspend fun insertActivitySession(context: Context, activityType: ActivityType) {
+        try {
+            val supabase = supabase()
+            when (activityType) {
+                ActivityType.YOGA -> {
+                    Log.d("Supabase", "Creazione di una sessione di yoga")
+                    val yogaSession = YogaSession(
+                        basicActivity = BasicActivity(
+                            startTime = Instant.now(),
+                            endTime = Instant.now(),
+                            title = "Yoga",
+                            notes = "Yoga session"
+                        ),
+                        totalEnergy = energy,
+                        activeEnergy = energy,
+                        exerciseSegment = listOf(
+                            ExerciseSegment(
+                                startTime = Instant.now(),
+                                endTime = Instant.now(),
+                                segmentType = 0,
+                                repetitions = 1
+                            )
+                        ),
+                        exerciseLap = listOf(
+                            ExerciseLap(
+                                startTime = Instant.now(),
+                                endTime = Instant.now(),
+                                length = length
+                            )
+                        )
                     )
-                )
-            ),
-            speedSamples = listOf(
-                SpeedRecord.Sample(
-                    time = Instant.now(),
-                    speed = Velocity.kilometersPerHour(10.0)
-                ),
-                SpeedRecord.Sample(
-                    time = endTime,
-                    speed = Velocity.kilometersPerHour(10.0)
-                )
-            ),
-            stepsCount = 1000
-        )
 
-        checkSerialization(runData)
+                    val jsonFinal = buildJsonObject {
+                        put("input_data", buildJsonObject {
+                            put("data", Json.encodeToJsonElement(yogaSession))
+                            put("user_UUID", Json.encodeToJsonElement(getUUID(context)))
+                        })
+                    }
+                    // Esegui la chiamata RPC su Supabase
+                    supabase.postgrest.rpc("insert_yoga_session", jsonFinal)
 
+                }
+
+                ActivityType.RUN -> {
+                    Log.d("Supabase", "Creazione di una sessione di corsa")
+                    val runSession = RunSession(
+                        basicActivity = BasicActivity(
+                            startTime = Instant.now(),
+                            endTime = Instant.now(),
+                            title = "Run",
+                            notes = "Running session"
+                        ),
+                        activeEnergy = energy,
+                        totalEnergy = energy,
+                        distance = length,
+                        elevationGained = length,
+                        exerciseRoute = ExerciseRoute(
+                            route = listOf(
+                                ExerciseRoute.Location(
+                                    time = startTime,
+                                    latitude = 0.0,
+                                    longitude = 0.0,
+                                    horizontalAccuracy = length,
+                                    verticalAccuracy = length,
+                                    altitude = length
+                                ),
+                                ExerciseRoute.Location(
+                                    time = endTime,
+                                    latitude = 0.0,
+                                    longitude = 0.0,
+                                    horizontalAccuracy = length,
+                                    verticalAccuracy = length,
+                                    altitude = length
+                                )
+                            )
+                        ),
+                        speedSamples = listOf(
+                            SpeedRecord.Sample(
+                                time = Instant.now(),
+                                speed = Velocity.kilometersPerHour(10.0)
+                            ),
+                            SpeedRecord.Sample(
+                                time = endTime,
+                                speed = Velocity.kilometersPerHour(10.0)
+                            )
+                        ),
+                        stepsCount = 1000
+                    )
+
+                    val jsonFinal = buildJsonObject {
+                        put("input_data", buildJsonObject {
+                            put("data", Json.encodeToJsonElement(runSession))
+                            put("user_UUID", Json.encodeToJsonElement(getUUID(context)))
+                        })
+                    }
+
+                    // Esegui la chiamata RPC su Supabase
+                    supabase.postgrest.rpc("insert_run_session", jsonFinal)
+                }
+
+                ActivityType.CYCLING -> {
+                    Log.d("Supabase", "Creazione di una sessione di ciclismo")
+                    val cyclingSession = CyclingSession(
+                        basicActivity = BasicActivity(
+                            startTime = Instant.now(),
+                            endTime = Instant.now(),
+                            title = "Cycling",
+                            notes = "Cycling session"
+                        ),
+                        totalEnergy = energy,
+                        activeEnergy = energy,
+                        distance = length,
+                        elevationGained = length,
+                        exerciseRoute = ExerciseRoute(
+                            route = listOf(
+                                ExerciseRoute.Location(
+                                    time = startTime,
+                                    latitude = 0.0,
+                                    longitude = 0.0,
+                                    horizontalAccuracy = length,
+                                    verticalAccuracy = length,
+                                    altitude = length
+                                ),
+                                ExerciseRoute.Location(
+                                    time = endTime,
+                                    latitude = 0.0,
+                                    longitude = 0.0,
+                                    horizontalAccuracy = length,
+                                    verticalAccuracy = length,
+                                    altitude = length
+                                )
+                            )
+                        ),
+                        speedSamples = listOf(
+                            SpeedRecord.Sample(
+                                time = Instant.now(),
+                                speed = Velocity.metersPerSecond(10.0)
+                            ),
+                            SpeedRecord.Sample(
+                                time = endTime,
+                                speed = Velocity.metersPerSecond(10.0)
+                            )
+                        ),
+                        cyclingPedalingCadenceSamples = listOf(
+                            CyclingPedalingCadenceRecord.Sample(
+                                time = Instant.now(),
+                                revolutionsPerMinute = 1.0
+                            ),
+                            CyclingPedalingCadenceRecord.Sample(
+                                time = endTime,
+                                revolutionsPerMinute = 1.0
+                            )
+                        )
+                    )
+
+                    val jsonFinal = buildJsonObject {
+                        put("input_data", buildJsonObject {
+                            put("data", Json.encodeToJsonElement(cyclingSession))
+                            put("user_UUID", Json.encodeToJsonElement(getUUID(context)))
+                        })
+                    }
+
+                    // Esegui la chiamata RPC su Supabase
+                    supabase.postgrest.rpc("insert_cycling_session", jsonFinal)
+                }
+
+                ActivityType.TRAIN -> {
+                    Log.d("Supabase", "Creazione di una sessione di allenamento")
+                    val trainSession = TrainSession(
+                        basicActivity = BasicActivity(
+                            startTime = Instant.now(),
+                            endTime = Instant.now(),
+                            title = "Train",
+                            notes = "Train session"
+                        ),
+                        totalEnergy = energy,
+                        activeEnergy = energy,
+                        exerciseSegment = listOf(
+                            ExerciseSegment(
+                                startTime = Instant.now(),
+                                endTime = Instant.now(),
+                                segmentType = 0,
+                                repetitions = 1
+                            )
+                        ),
+                        exerciseLap = listOf(
+                            ExerciseLap(
+                                startTime = Instant.now(),
+                                endTime = Instant.now(),
+                                length = length
+                            )
+                        )
+                    )
+
+                    val jsonFinal = buildJsonObject {
+                        put("input_data", buildJsonObject {
+                            put("data", Json.encodeToJsonElement(trainSession))
+                            put("user_UUID", Json.encodeToJsonElement(getUUID(context)))
+                        })
+                    }
+
+                    // Esegui la chiamata RPC su Supabase
+                    supabase.postgrest.rpc("insert_train_session", jsonFinal)
+                }
+
+                ActivityType.DRIVE -> {
+                    Log.d("Supabase", "Creazione di una sessione di guida")
+                    val driveSession = DriveSession(
+                        basicActivity = BasicActivity(
+                            startTime = Instant.now(),
+                            endTime = Instant.now(),
+                            title = "Drive",
+                            notes = "Drive session"
+                        ),
+                        distance = length,
+                        elevationGained = length,
+                        exerciseRoute = ExerciseRoute(
+                            route = listOf(
+                                ExerciseRoute.Location(
+                                    time = startTime,
+                                    latitude = 0.0,
+                                    longitude = 0.0,
+                                    horizontalAccuracy = length,
+                                    verticalAccuracy = length,
+                                    altitude = length
+                                ),
+                                ExerciseRoute.Location(
+                                    time = endTime,
+                                    latitude = 0.0,
+                                    longitude = 0.0,
+                                    horizontalAccuracy = length,
+                                    verticalAccuracy = length,
+                                    altitude = length
+                                )
+                            )
+                        ),
+                        speedSamples = listOf(
+                            SpeedRecord.Sample(
+                                time = Instant.now(),
+                                speed = Velocity.kilometersPerHour(10.0)
+                            ),
+                            SpeedRecord.Sample(
+                                time = endTime,
+                                speed = Velocity.kilometersPerHour(10.0)
+                            )
+                        )
+                    )
+
+                    val jsonFinal = buildJsonObject {
+                        put("input_data", buildJsonObject {
+                            put("data", Json.encodeToJsonElement(driveSession))
+                            put("user_UUID", Json.encodeToJsonElement(getUUID(context)))
+                        })
+                    }
+
+                    // Esegui la chiamata RPC su Supabase
+                    supabase.postgrest.rpc("insert_drive_session", jsonFinal)
+                }
+
+                ActivityType.SIT -> TODO()
+                ActivityType.SLEEP -> TODO()
+                ActivityType.WALK -> TODO()
+                ActivityType.LIFT -> {
+                    Log.d("Supabase", "Creazione di una sessione di sollevamento pesi")
+                    val liftSession = LiftSession(
+                        basicActivity = BasicActivity(
+                            startTime = Instant.now(),
+                            endTime = Instant.now(),
+                            title = "Lift",
+                            notes = "Lift session"
+                        ),
+                        totalEnergy = energy,
+                        activeEnergy = energy,
+                        exerciseSegment = listOf(
+                            ExerciseSegment(
+                                startTime = Instant.now(),
+                                endTime = Instant.now(),
+                                segmentType = 0,
+                                repetitions = 1
+                            )
+                        ),
+                        exerciseLap = listOf(
+                            ExerciseLap(
+                                startTime = Instant.now(),
+                                endTime = Instant.now(),
+                                length = length
+                            )
+                        )
+                    )
+
+                    val jsonFinal = buildJsonObject {
+                        put("input_data", buildJsonObject {
+                            put("data", Json.encodeToJsonElement(liftSession))
+                            put("user_UUID", Json.encodeToJsonElement(getUUID(context)))
+                        })
+                    }
+
+                    // Esegui la chiamata RPC su Supabase
+                    supabase.postgrest.rpc("insert_lift_session", jsonFinal)
+                }
+            }
+
+
+        } catch (e: Exception) {
+            Log.e(
+                "Supabase-HealthConnect",
+                "Errore durante il recupero dei dati delle attività $e"
+            )
+        }
     }
 
 

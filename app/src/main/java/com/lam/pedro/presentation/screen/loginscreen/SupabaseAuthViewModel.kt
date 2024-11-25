@@ -11,8 +11,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.lam.pedro.data.datasource.SecurePreferencesManager.clearSecurePrefs
 import com.lam.pedro.data.datasource.SecurePreferencesManager.saveTokens
-import com.lam.pedro.data.datasource.SupabaseClientProvider.supabase
-import com.lam.pedro.data.datasource.SupabaseClientProvider.userSession
+import com.lam.pedro.data.datasource.SupabaseClient.supabase
+import com.lam.pedro.data.datasource.SupabaseClient.userSession
 import com.lam.pedro.presentation.navigation.Screen
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException

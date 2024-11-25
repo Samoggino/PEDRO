@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
-import com.lam.pedro.data.datasource.SupabaseClientProvider.supabase
+import com.lam.pedro.data.datasource.SupabaseClient.supabase
 import com.lam.pedro.presentation.screen.loginscreen.User
 import com.lam.pedro.presentation.screen.loginscreen.parseUsers
 import io.github.jan.supabase.postgrest.postgrest

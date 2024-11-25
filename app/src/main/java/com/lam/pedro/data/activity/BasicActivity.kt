@@ -11,9 +11,13 @@ import java.time.Instant
 import kotlin.random.Random
 
 @Serializable
-data class ActivitySession(
+data class BasicActivity(
     val startTime: Instant,
     val endTime: Instant,
     val title: String = "My Activity #${Random.nextInt(0, Int.MAX_VALUE)}",
     val notes: String
 )
+
+interface ActivityInterface {
+    val basicActivity: BasicActivity
+}
