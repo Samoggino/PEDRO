@@ -10,4 +10,5 @@ enum class ActivityType {
     SLEEP,
     WALK,
     LIFT,
+    LISTEN
 }

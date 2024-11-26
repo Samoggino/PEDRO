@@ -15,13 +15,6 @@ import kotlinx.serialization.encoding.decodeStructure
 import kotlinx.serialization.encoding.encodeStructure
 import java.time.Instant
 
-/**
- * Sample(
- *     time: Instant,
- *     revolutionsPerMinute: @FloatRange(from = 0.0, to = 10000.0) Double
- * )
- */
-
 object CyclingCadenceSampleSerializer : KSerializer<CyclingPedalingCadenceRecord.Sample> {
     override val descriptor = buildClassSerialDescriptor("CyclingCadenceSample") {
         try {

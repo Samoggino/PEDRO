@@ -17,7 +17,7 @@ package com.lam.pedro.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
-val PedroYellow = Color(0xFFFFC107)
+val PedroYellow = Color(0xFF646262)
 /*val PedroBlack = Color(0xFF272727)*/
 val PedroBlack = Color(0xff0d1c47)
 

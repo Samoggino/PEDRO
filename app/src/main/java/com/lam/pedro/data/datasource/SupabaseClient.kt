@@ -7,16 +7,16 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.JsonObject
 
 object SupabaseClient {
 
-    /**
-     * Inizializzazione del client
-     */
     private val lazyClient: SupabaseClient by lazy {
         try {
             createSupabaseClient(
@@ -27,7 +27,6 @@ object SupabaseClient {
                     install(Auth)
                     install(Postgrest)
                     install(Storage)
-
                 } catch (e: Exception) {
                     System.err.println("Errore durante la connessione a Supabase: ${e.message}")
                     e.printStackTrace()
@@ -37,44 +36,45 @@ object SupabaseClient {
             Log.e("Supabase", "Errore durante la creazione del client Supabase: ${e.message}")
             throw e
         }
-
     }
 
-    /**
-     * Restituisce il client Supabase in modo asincrono.
-     *
-     * Questa funzione sospesa garantisce che l'inizializzazione del client avvenga
-     * su un thread di I/O per evitare di bloccare il thread principale.
-     *
-     * @return Un'istanza di [SupabaseClient].
-     */
     suspend fun supabase(): SupabaseClient {
-        try {
-            return withContext(Dispatchers.IO) {
-                lazyClient // Questo garantisce che l'inizializzazione avvenga su un thread I/O
-            }
-        } catch (e: Exception) {
-            Log.e("Supabase", "Errore durante la creazione del client Supabase: ${e.message}")
-            throw e
+        return withContext(Dispatchers.IO) {
+            lazyClient
+        }
+    }
+
+    suspend fun userSession(): UserSession? {
+        return withContext(Dispatchers.IO) {
+            lazyClient.auth.currentSessionOrNull()
         }
     }
 
     /**
-     * Restituisce una sessione utente se c'è, altrimenti return null.
-     *
-     * Questa funzione sospesa garantisce che l'inizializzazione del client avvenga
-     * su un thread di I/O per evitare di bloccare il thread principale.
-     *
-     * @return Un'istanza di [UserSession].
+     * Funzione sicura per eseguire una RPC su Supabase, gestendo errori di inizializzazione e autenticazione.
      */
-    suspend fun userSession(): UserSession? {
+    suspend fun safeRpcCall(rpcFunctionName: String, jsonFinal: JsonObject): Any? {
         try {
-            return withContext(Dispatchers.IO) {
-                lazyClient.auth.currentSessionOrNull()
-            }
+            // Esegui la RPC
+            val client = supabase()
+            return client.postgrest.rpc(rpcFunctionName, jsonFinal)
+
+        } catch (e: UnauthorizedRestException) {
+            Log.e("Supabase", "Autenticazione fallita: ${e.message}")
+            // Gestire il caso di errore di autenticazione (ad esempio, tentare di fare il login)
+            return handleUnauthorizedException()
+
         } catch (e: Exception) {
-            Log.e("Supabase", "Errore durante il recupero della sessione utente: ${e.message}")
-            throw e
+            Log.e("Supabase", "Errore durante la chiamata RPC: ${e.message}")
+            throw e // Rilancia l'eccezione o gestisci altri tipi di errori
         }
+    }
+
+    private fun handleUnauthorizedException(): Any? {
+        // Logica per gestire l'errore di autenticazione, come il ri-autenticarsi
+        // Esegui di nuovo la RPC dopo aver risolto il problema di autenticazione
+        Log.d("Supabase", "Tentando di ripristinare la sessione utente...")
+        // Aggiungi logica per ripristinare la sessione o eseguire un login
+        return null // O ritenta la RPC dopo aver risolto l'autenticazione
     }
 }

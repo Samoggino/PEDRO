@@ -1,24 +1,11 @@
-@file:UseSerializers(
-    InstantSerializer::class,
-    ZoneOffsetSerializer::class,
-    DurationSerializer::class,
-    StageSerializer::class
-)
-
 package com.lam.pedro.data.activity
 
 import androidx.health.connect.client.records.SleepSessionRecord
-import com.lam.pedro.data.serializers.primitive.DurationSerializer
-import com.lam.pedro.data.serializers.primitive.InstantSerializer
-import com.lam.pedro.data.serializers.primitive.StageSerializer
-import com.lam.pedro.data.serializers.primitive.ZoneOffsetSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset
 
-@Serializable
 data class SleepSessionData(
     val uid: String,
     val title: String?,
@@ -28,6 +15,10 @@ data class SleepSessionData(
     val endTime: Instant,
     val endZoneOffset: ZoneOffset?,
     val duration: Duration?,
-    val stages: List<SleepSessionRecord.Stage>
+    val stages: List<SleepSessionRecord.Stage> = listOf()
 )
 
+@Serializable
+data class SleepSession(
+    override val basicActivity: BasicActivity,
+) : ActivityInterface()

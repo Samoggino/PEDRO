@@ -51,9 +51,7 @@ import com.lam.pedro.presentation.screen.recordlist.SeriesRecordsType
 import com.lam.pedro.presentation.screen.sleepsession.SleepSessionScreen
 import com.lam.pedro.presentation.screen.sleepsession.SleepSessionViewModel
 import com.lam.pedro.presentation.screen.sleepsession.SleepSessionViewModelFactory
-import com.lam.pedro.presentation.serialization.activecalories.MyScreenRecords
-import com.lam.pedro.presentation.serialization.exercisedata.ExerciseScreen
-import com.lam.pedro.presentation.serialization.sleepdata.SleepScreen
+import com.lam.pedro.presentation.serialization.MyScreenRecords
 import com.lam.pedro.showExceptionSnackbar
 import kotlinx.coroutines.launch
 
@@ -128,19 +126,12 @@ fun PedroNavigation(
         composable(Screen.LandingScreen.route) {
             LandingScreen()
         }
-        composable(Screen.SleepSessionData.route) {
-            SleepScreen(navController)
-        }
 
-        composable(Screen.ExerciseSessionData.route) {
-            ExerciseScreen(navController)
-        }
-
-        composable(Screen.MyScreenRecords.route){
+        composable(Screen.MyScreenRecords.route) {
             MyScreenRecords(navController)
         }
 
-        composable(Screen.FollowScreen.route){
+        composable(Screen.FollowScreen.route) {
             FollowScreen()
         }
 

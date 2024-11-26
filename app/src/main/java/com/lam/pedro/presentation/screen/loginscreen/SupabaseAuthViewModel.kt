@@ -60,7 +60,7 @@ class SupabaseAuthViewModel : ViewModel() {
             isLoading = true
             val session = logInAuth(email, password, context)
             if (session != null) {
-                navController.navigate(Screen.SleepSessionData.route)
+                navController.navigate(Screen.MyScreenRecords.route)
             } else {
                 errorMessage = "Email o password errati."
                 showErrorDialog = true
@@ -81,7 +81,7 @@ class SupabaseAuthViewModel : ViewModel() {
         viewModelScope.launch {
             isLoading = true
             when (val result = signUpAuth(email, password, context)) {
-                is SignUpResult.Success -> navController.navigate(Screen.SleepSessionData.route)
+                is SignUpResult.Success -> navController.navigate(Screen.MyScreenRecords.route)
                 is SignUpResult.UserAlreadyExists -> {
                     errorMessage = "Utente già registrato"
                     showErrorDialog = true

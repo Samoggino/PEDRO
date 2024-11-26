@@ -18,6 +18,7 @@ data class BasicActivity(
     val notes: String
 )
 
-interface ActivityInterface {
-    val basicActivity: BasicActivity
+@Serializable
+sealed class ActivityInterface {
+    abstract val basicActivity: BasicActivity
 }
