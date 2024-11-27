@@ -40,11 +40,12 @@ class ViewModelRecords : ViewModel() {
             viewModelScope.launch(Dispatchers.IO) {
                 val uuid = getUUID(context).toString()
                 try {
-                    val responseJson = (safeRpcCall(
-                        "get_${activityType.name.lowercase()}_session",
-                        buildJsonObject {
-                            put("user_uuid", Json.encodeToJsonElement(uuid))
-                        }) as? PostgrestResult)
+                    val responseJson = (
+                            safeRpcCall(
+                                rpcFunctionName = "get_${activityType.name.lowercase()}_session",
+                                jsonFinal = buildJsonObject {
+                                    put("user_uuid", Json.encodeToJsonElement(uuid))
+                                }) as? PostgrestResult)
                         ?.data
 
                     // Usa il tipo specifico per deserializzare
@@ -85,6 +86,8 @@ class ViewModelRecords : ViewModel() {
                             put("user_UUID", uuid) // Passa la stringa direttamente
                         })
                     }
+
+                    Log.d("Supabase", "Inserimento della sessione: $jsonFinal")
 
                     // Inserisci la sessione nel database come oggetto JSON
                     safeRpcCall("insert_${activityType.name.lowercase()}_session", jsonFinal)

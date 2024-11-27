@@ -48,7 +48,10 @@ fun MyScreenRecords(navController: NavController) {
                 ActivityRow(
                     activityType = activityType,
                     onInsertClick = {
-                        viewModel.insertActivitySession(context, activityType)
+                        viewModel.insertActivitySession(
+                            context = context,
+                            activityType = activityType
+                        )
                     },
                     onGetClick = {
                         when (activityType) {

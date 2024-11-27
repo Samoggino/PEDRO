@@ -5,4 +5,4 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ListenSession(
     override val basicActivity: BasicActivity,
-) : ActivityInterface()
+) : ActivityInterface(activityType = ActivityType.LISTEN)

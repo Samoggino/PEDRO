@@ -29,4 +29,4 @@ data class RunSession(
     val distance: Length,
     val elevationGained: Length,
     val exerciseRoute: ExerciseRoute,
-) : ActivityInterface()
+) : ActivityInterface(activityType = ActivityType.RUN)

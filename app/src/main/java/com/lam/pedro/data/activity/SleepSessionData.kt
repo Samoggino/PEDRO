@@ -21,4 +21,4 @@ data class SleepSessionData(
 @Serializable
 data class SleepSession(
     override val basicActivity: BasicActivity,
-) : ActivityInterface()
+) : ActivityInterface(ActivityType.SLEEP)

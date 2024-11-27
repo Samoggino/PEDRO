@@ -23,54 +23,28 @@ import com.lam.pedro.data.activity.TrainSession
 import com.lam.pedro.data.activity.WalkSession
 import com.lam.pedro.data.activity.YogaSession
 import java.time.Instant
-import java.time.ZoneOffset
 import kotlin.reflect.KClass
 
 object SessionCreator {
 
     val startTime: Instant = Instant.now()
     val endTime: Instant = Instant.now().plusSeconds(3600)
-    val startZoneOffset: ZoneOffset? = ZoneOffset.UTC
-    val endZoneOffset: ZoneOffset? = ZoneOffset.UTC
     val energy: Energy = Energy.kilocalories(100.0)
     val length: Length = Length.meters(500.0)
 
     fun createYogaSession(): YogaSession {
         return YogaSession(
-            basicActivity = BasicActivity(
-                startTime = Instant.now(),
-                endTime = Instant.now(),
-                title = "Yoga",
-                notes = "Yoga session"
-            ),
+            basicActivity = basicActivity("Yoga Title", "Yoga Notes"),
             totalEnergy = energy,
             activeEnergy = energy,
-            exerciseSegment = listOf(
-                ExerciseSegment(
-                    startTime = Instant.now(),
-                    endTime = Instant.now(),
-                    segmentType = 0,
-                    repetitions = 1
-                )
-            ),
-            exerciseLap = listOf(
-                ExerciseLap(
-                    startTime = Instant.now(),
-                    endTime = Instant.now(),
-                    length = length
-                )
-            )
+            exerciseSegment = exerciseSegmentList(),
+            exerciseLap = exerciseLapList()
         )
     }
 
     fun createRunSession(): RunSession {
         return RunSession(
-            basicActivity = BasicActivity(
-                startTime = Instant.now(),
-                endTime = Instant.now(),
-                title = "Run",
-                notes = "Run session"
-            ),
+            basicActivity = basicActivity("Run Title", "Run Notes"),
             totalEnergy = energy,
             activeEnergy = energy,
             speedSamples = speedRecordSampleList(),
@@ -80,6 +54,99 @@ object SessionCreator {
             exerciseRoute = exerciseRouteCreator()
         )
     }
+
+    fun listenSessionCreator() = ListenSession(
+        basicActivity = basicActivity("Listen Title", "Listen Notes")
+    )
+
+    fun liftSessionCreator() = LiftSession(
+        basicActivity = basicActivity("Lift Title", "Lift Notes"),
+        totalEnergy = energy,
+        activeEnergy = energy,
+        exerciseSegment = exerciseSegmentList(),
+        exerciseLap = exerciseLapList()
+    )
+
+    fun sitSessionCreator() = SitSession(
+        basicActivity = basicActivity("Sit Title", "Sit Notes"),
+        volume = Volume.liters(100.0)
+    )
+
+    fun cyclingSessionCreator() = CyclingSession(
+        basicActivity = basicActivity("Cycling Title", "Cycling Notes"),
+        totalEnergy = energy,
+        activeEnergy = energy,
+        distance = length,
+        elevationGained = length,
+        exerciseRoute = exerciseRouteCreator(),
+        speedSamples = speedRecordSampleList(),
+        cyclingPedalingCadenceSamples = listOf(
+            CyclingPedalingCadenceRecord.Sample(
+                time = Instant.now(),
+                revolutionsPerMinute = 1.0
+            ),
+            CyclingPedalingCadenceRecord.Sample(
+                time = endTime,
+                revolutionsPerMinute = 1.0
+            )
+        )
+    )
+
+    fun driveSessionCreator() = DriveSession(
+        basicActivity = basicActivity("Drive Title", "Drive Notes"),
+        distance = length,
+        elevationGained = length,
+        exerciseRoute = exerciseRouteCreator(),
+        speedSamples = listOf(
+            SpeedRecord.Sample(
+                time = Instant.now(),
+                speed = Velocity.kilometersPerHour(10.0)
+            ),
+            SpeedRecord.Sample(
+                time = endTime,
+                speed = Velocity.kilometersPerHour(10.0)
+            )
+        )
+    )
+
+    fun sleepSessionCreator() = SleepSession(
+        basicActivity = basicActivity("Sleep Title", "Sleep Notes"),
+    )
+
+    fun walkSessionCreator() = WalkSession(
+        basicActivity = basicActivity("Walk Title", "Walk Notes"),
+        totalEnergy = energy,
+        activeEnergy = energy,
+        distance = length,
+        elevationGained = length,
+        exerciseRoute = exerciseRouteCreator(),
+        speedSamples = speedRecordSampleList(),
+        stepsCount = 1000
+    )
+
+    fun trainSessionCreator() = TrainSession(
+        basicActivity = basicActivity("Train Title", "Train Notes"),
+        totalEnergy = energy,
+        activeEnergy = energy,
+        exerciseSegment = exerciseSegmentList(),
+        exerciseLap = exerciseLapList()
+    )
+
+    private fun basicActivity(title: String, notes: String) = BasicActivity(
+        startTime = Instant.now(),
+        endTime = Instant.now(),
+        title = title,
+        notes = notes
+    )
+
+    private fun exerciseSegmentList() = listOf(
+        ExerciseSegment(
+            startTime = Instant.now(),
+            endTime = Instant.now(),
+            segmentType = 0,
+            repetitions = 1
+        )
+    )
 
     private fun speedRecordSampleList() = listOf(
         SpeedRecord.Sample(
@@ -113,148 +180,16 @@ object SessionCreator {
         )
     )
 
-    fun listenSessionCreator() = ListenSession(
-        basicActivity = BasicActivity(
+    private fun exerciseLapList() = listOf(
+        ExerciseLap(
             startTime = Instant.now(),
             endTime = Instant.now(),
-            title = "Listen",
-            notes = "Listen session"
+            length = length
         )
     )
 
-    fun liftSessionCreator() = LiftSession(
-        basicActivity = BasicActivity(
-            startTime = Instant.now(),
-            endTime = Instant.now(),
-            title = "Lift",
-            notes = "Lift session"
-        ),
-        totalEnergy = energy,
-        activeEnergy = energy,
-        exerciseSegment = listOf(
-            ExerciseSegment(
-                startTime = Instant.now(),
-                endTime = Instant.now(),
-                segmentType = 0,
-                repetitions = 1
-            )
-        ),
-        exerciseLap = listOf(
-            ExerciseLap(
-                startTime = Instant.now(),
-                endTime = Instant.now(),
-                length = length
-            )
-        )
-    )
 
-    fun sitSessionCreator() = SitSession(
-        basicActivity = BasicActivity(
-            startTime = Instant.now(),
-            endTime = Instant.now(),
-            title = "Sit",
-            notes = "Sit session"
-        ),
-        volume = Volume.liters(100.0)
-    )
 
-    fun cyclingSessionCreator() = CyclingSession(
-        basicActivity = BasicActivity(
-            startTime = Instant.now(),
-            endTime = Instant.now(),
-            title = "Cycling",
-            notes = "Cycling session"
-        ),
-        totalEnergy = energy,
-        activeEnergy = energy,
-        distance = length,
-        elevationGained = length,
-        exerciseRoute = exerciseRouteCreator(),
-        speedSamples = speedRecordSampleList(),
-        cyclingPedalingCadenceSamples = listOf(
-            CyclingPedalingCadenceRecord.Sample(
-                time = Instant.now(),
-                revolutionsPerMinute = 1.0
-            ),
-            CyclingPedalingCadenceRecord.Sample(
-                time = endTime,
-                revolutionsPerMinute = 1.0
-            )
-        )
-    )
-
-    fun trainSessionCreator() = TrainSession(
-        basicActivity = BasicActivity(
-            startTime = Instant.now(),
-            endTime = Instant.now(),
-            title = "Train",
-            notes = "Train session"
-        ),
-        totalEnergy = energy,
-        activeEnergy = energy,
-        exerciseSegment = listOf(
-            ExerciseSegment(
-                startTime = Instant.now(),
-                endTime = Instant.now(),
-                segmentType = 0,
-                repetitions = 1
-            )
-        ),
-        exerciseLap = listOf(
-            ExerciseLap(
-                startTime = Instant.now(),
-                endTime = Instant.now(),
-                length = length
-            )
-        )
-    )
-
-    fun driveSessionCreator() = DriveSession(
-        basicActivity = BasicActivity(
-            startTime = Instant.now(),
-            endTime = Instant.now(),
-            title = "Drive",
-            notes = "Drive session"
-        ),
-        distance = length,
-        elevationGained = length,
-        exerciseRoute = exerciseRouteCreator(),
-        speedSamples = listOf(
-            SpeedRecord.Sample(
-                time = Instant.now(),
-                speed = Velocity.kilometersPerHour(10.0)
-            ),
-            SpeedRecord.Sample(
-                time = endTime,
-                speed = Velocity.kilometersPerHour(10.0)
-            )
-        )
-    )
-
-    fun sleepSessionCreator() = SleepSession(
-        basicActivity = BasicActivity(
-            startTime = Instant.now(),
-            endTime = Instant.now(),
-            title = "Sleep",
-            notes = "Sleep session"
-        )
-    )
-
-    fun walkSessionCreator() = WalkSession(
-        basicActivity = BasicActivity(
-            startTime = Instant.now(),
-            endTime = Instant.now(),
-            title = "Walk",
-            notes = "Walk session"
-        ),
-        totalEnergy = energy,
-        activeEnergy = energy,
-        distance = length,
-        elevationGained = length,
-        exerciseRoute = exerciseRouteCreator(),
-        speedSamples = speedRecordSampleList(),
-        stepsCount = 1000
-    )
 
     data class ActivityConfig<T : ActivityInterface>(
         val responseType: KClass<T>,

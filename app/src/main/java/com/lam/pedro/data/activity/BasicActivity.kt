@@ -19,6 +19,8 @@ data class BasicActivity(
 )
 
 @Serializable
-sealed class ActivityInterface {
+sealed class ActivityInterface(
+    open val activityType: ActivityType
+) {
     abstract val basicActivity: BasicActivity
 }

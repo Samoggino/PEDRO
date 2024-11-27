@@ -11,4 +11,4 @@ import kotlinx.serialization.UseSerializers
 data class SitSession(
     override val basicActivity: BasicActivity,
     val volume: Volume
-) : ActivityInterface()
+) : ActivityInterface(activityType = ActivityType.SIT)

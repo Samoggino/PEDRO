@@ -24,4 +24,4 @@ data class YogaSession(
 
     @Serializable(with = ListExerciseSegmentSerializer::class) val exerciseSegment: List<@Contextual ExerciseSegment>,
     @Serializable(with = ListExerciseLapSerializer::class) val exerciseLap: List<@Contextual ExerciseLap>,
-) : ActivityInterface()
+) : ActivityInterface(activityType = ActivityType.YOGA)
