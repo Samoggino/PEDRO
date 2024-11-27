@@ -50,4 +50,5 @@ enum class Screen(val route: String, val titleId: Int, val hasMenuItem: Boolean 
     LoginScreen("login_screen", R.string.login_screen, false),
     MyScreenRecords("my_screen_records", R.string.my_screen_records, false),
     FollowScreen("follow_screen", R.string.follow_screen, false),
+    ChartsScreen("charts_screen", R.string.charts_screen, false),
 }

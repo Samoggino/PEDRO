@@ -121,6 +121,10 @@ fun MyScreenRecords(navController: NavController) {
                     text = "Vai alla schermata dei follower",
                     onClick = { navController.navigate(Screen.FollowScreen.route) }
                 )
+                NavigationButton(
+                    text = "Vai alla schermata dei charts",
+                    onClick = { navController.navigate(Screen.ChartsScreen.route) }
+                )
             }
         }
     }

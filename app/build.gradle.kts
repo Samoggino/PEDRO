@@ -100,6 +100,9 @@ dependencies {
     // Accompanist
     implementation(libs.accompanist.placeholder.material)
 
+    // charts
+    implementation (libs.compose.charts)
+
 
 
 }
