@@ -27,7 +27,11 @@ android {
 
         buildConfigField("String", "SUPABASE_KEY", "\"${properties.getProperty("SUPABASE_KEY")}\"")
         buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
-        buildConfigField("String", "SUPABASE_SERVICE_ROLE", "\"${properties.getProperty("SUPABASE_SERVICE_ROLE")}\"")
+        buildConfigField(
+            "String",
+            "SUPABASE_SERVICE_ROLE",
+            "\"${properties.getProperty("SUPABASE_SERVICE_ROLE")}\""
+        )
 
     }
 
@@ -67,7 +71,6 @@ dependencies {
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.security.crypto)
-    implementation(libs.androidx.ui.viewbinding)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -102,17 +105,7 @@ dependencies {
     implementation(libs.accompanist.placeholder.material)
 
     // charts
-    implementation (libs.compose.charts)
-
-    /// Vico
-    implementation(libs.vico.compose)
-    implementation(libs.vico.compose.m2)
-    implementation(libs.vico.compose.m3)
-    implementation(libs.vico.core)
-    implementation(libs.vico.views)
-
-
-
+    implementation(libs.compose.charts)
 }
 
 
