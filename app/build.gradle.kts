@@ -27,11 +27,7 @@ android {
 
         buildConfigField("String", "SUPABASE_KEY", "\"${properties.getProperty("SUPABASE_KEY")}\"")
         buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
-        buildConfigField(
-            "String",
-            "SUPABASE_SERVICE_ROLE",
-            "\"${properties.getProperty("SUPABASE_SERVICE_ROLE")}\""
-        )
+        buildConfigField("String", "SUPABASE_SERVICE_ROLE", "\"${properties.getProperty("SUPABASE_SERVICE_ROLE")}\"")
 
     }
 
