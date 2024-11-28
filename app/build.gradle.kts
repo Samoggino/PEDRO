@@ -67,6 +67,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.security.crypto)
+    implementation(libs.androidx.ui.viewbinding)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -102,6 +103,13 @@ dependencies {
 
     // charts
     implementation (libs.compose.charts)
+
+    /// Vico
+    implementation(libs.vico.compose)
+    implementation(libs.vico.compose.m2)
+    implementation(libs.vico.compose.m3)
+    implementation(libs.vico.core)
+    implementation(libs.vico.views)
 
 
 

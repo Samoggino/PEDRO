@@ -22,6 +22,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import com.example.healthconnectsample.data.HealthConnectManager
 import com.example.healthconnectsample.presentation.screen.HealthConnectScreen
+import com.lam.pedro.presentation.charts.ChartsEhsannarmaniScreen
+import com.lam.pedro.presentation.charts.VicoScreen
 import com.lam.pedro.presentation.following.FollowScreen
 import com.lam.pedro.presentation.screen.AboutScreen
 import com.lam.pedro.presentation.screen.ActivitiesScreen
@@ -51,7 +53,6 @@ import com.lam.pedro.presentation.screen.recordlist.SeriesRecordsType
 import com.lam.pedro.presentation.screen.sleepsession.SleepSessionScreen
 import com.lam.pedro.presentation.screen.sleepsession.SleepSessionViewModel
 import com.lam.pedro.presentation.screen.sleepsession.SleepSessionViewModelFactory
-import com.lam.pedro.presentation.serialization.ChartsScreen
 import com.lam.pedro.presentation.serialization.MyScreenRecords
 import com.lam.pedro.showExceptionSnackbar
 import kotlinx.coroutines.launch
@@ -137,7 +138,7 @@ fun PedroNavigation(
         }
 
         composable(Screen.ChartsScreen.route) {
-            ChartsScreen()
+            ChartsEhsannarmaniScreen()
         }
 
         composable(

@@ -2,7 +2,6 @@
 accompanistPlaceholderMaterial = "0.19.0"
 agp = "8.7.2"
 coilCompose = "2.4.0"
-composeCharts = "0.0.19"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -19,6 +18,8 @@ constraintlayoutCompose = "1.0.1"
 navigationCompose = "2.8.3"
 securityCrypto = "1.1.0-alpha06"
 storageKt = "3.0.1"
+# charts
+composeCharts = "0.0.19"
 
 [libraries]
 accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanistPlaceholderMaterial" }
@@ -29,7 +30,6 @@ androidx-material-icons-extended = { module = "androidx.compose.material:materia
 androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
 auth-kt = { module = "io.github.jan-tennert.supabase:auth-kt" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
-compose-charts = { module = "io.github.ehsannarmani:compose-charts", version.ref = "composeCharts" }
 github-postgrest-kt = { module = "io.github.jan-tennert.supabase:postgrest-kt" }
 github-realtime-kt = { module = "io.github.jan-tennert.supabase:realtime-kt" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
@@ -50,6 +50,8 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 androidx-constraintlayout-compose = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 storage-kt = { module = "io.github.jan-tennert.supabase:storage-kt", version.ref = "storageKt" }
+### charts
+compose-charts = { module = "io.github.ehsannarmani:compose-charts", version.ref = "composeCharts" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
