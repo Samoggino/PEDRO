@@ -1,18 +1,20 @@
 package com.lam.pedro.presentation.serialization
 
-import android.content.Context
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.lam.pedro.data.activity.ActivityInterface
 import com.lam.pedro.data.activity.ActivityType
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.SupabaseClient.safeRpcCall
 import com.lam.pedro.presentation.serialization.SessionCreator.activityConfigs
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
@@ -23,56 +25,72 @@ import kotlinx.serialization.serializer
 
 class ViewModelRecords : ViewModel() {
 
+    // LiveData per osservare il risultato delle sessioni di attività
+    private val _activitySessions = MutableLiveData<List<GenericActivity>>()
+    val activitySessions: LiveData<List<GenericActivity>> = _activitySessions
+
+    // LiveData per gestire l'errore
+    private val _error = MutableLiveData<String>()
+    val error: LiveData<String> = _error
+
     /**
      * Recupera una sessione di attività dal database in base al tipo passato in input
-     * @param context il contesto dell'applicazione
      * @param activityType il tipo di attività da recuperare
      */
+    fun loadActivitySession(activityType: ActivityType) {
+        viewModelScope.launch {
+            try {
+                val sessions = getActivitySession(activityType)
+                _activitySessions.postValue(sessions)  // Aggiorna LiveData
+            } catch (e: Exception) {
+                _error.postValue("Errore durante il recupero delle attività: ${e.message}")
+            }
+        }
+    }
+
     @OptIn(InternalSerializationApi::class)
-    fun getActivitySession(
-        context: Context,
+    suspend fun getActivitySession(
         activityType: ActivityType
-    ) {
+    ): List<GenericActivity> {
         Log.d("Supabase", "Recupero delle attività di tipo $activityType")
         val config = activityConfigs[activityType] as? SessionCreator.ActivityConfig<*>
 
         if (config != null) {
-            viewModelScope.launch(Dispatchers.IO) {
-                val uuid = getUUID(context).toString()
+            return withContext(Dispatchers.IO) {
+                val uuid = getUUID()
                 try {
                     val responseJson = (
                             safeRpcCall(
                                 rpcFunctionName = "get_${activityType.name.lowercase()}_session",
                                 jsonFinal = buildJsonObject {
                                     put("user_uuid", Json.encodeToJsonElement(uuid))
-                                }) as? PostgrestResult)
-                        ?.data
+                                }) as? PostgrestResult
+                            )?.data
 
-                    // Usa il tipo specifico per deserializzare
-                    val response: List<ActivityInterface> = Json.decodeFromString(
+                    val response: List<GenericActivity> = Json.decodeFromString(
                         ListSerializer(config.responseType.serializer()),
                         responseJson!!
                     )
 
-                    Log.d("Supabase", "Dati delle attività: $response")
+                    response
                 } catch (e: Exception) {
                     Log.e("Supabase-HealthConnect", "Errore durante il recupero delle attività: $e")
+                    emptyList()
                 }
             }
         } else {
             Log.e("Supabase", "Configurazione non trovata per $activityType")
+            return emptyList()
         }
     }
 
-
     /**
      * Inserisce una sessione di attività nel database in base al tipo passato in input
-     * @param context il contesto dell'applicazione
      * @param activityType il tipo di attività da inserire
      */
-    fun insertActivitySession(context: Context, activityType: ActivityType) {
+    fun insertActivitySession(activityType: ActivityType) {
         viewModelScope.launch(Dispatchers.IO) {
-            val uuid = getUUID(context).toString()
+            val uuid = getUUID().toString()
             val config = activityConfigs[activityType]
 
             if (config != null) {
@@ -83,7 +101,7 @@ class ViewModelRecords : ViewModel() {
                     val jsonFinal = buildJsonObject {
                         put("input_data", buildJsonObject {
                             put("data", Json.encodeToJsonElement(newSession))
-                            put("user_UUID", uuid) // Passa la stringa direttamente
+                            put("user_UUID", uuid)
                         })
                     }
 
@@ -105,8 +123,8 @@ class ViewModelRecords : ViewModel() {
             }
         }
     }
-
 }
+
 
 @Suppress("UNCHECKED_CAST")
 class ViewModelRecordFactory :

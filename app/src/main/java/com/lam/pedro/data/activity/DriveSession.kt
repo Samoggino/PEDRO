@@ -23,4 +23,4 @@ data class DriveSession(
     val distance: Length,
     val elevationGained: Length,
     val exerciseRoute: ExerciseRoute,
-) : ActivityInterface(activityType = ActivityType.DRIVE)
+) : GenericActivity(activityType = ActivityType.DRIVE)

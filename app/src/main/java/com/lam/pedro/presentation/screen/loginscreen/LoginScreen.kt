@@ -33,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -47,7 +46,6 @@ import com.lam.pedro.presentation.component.LinkedApp
 fun LoginScreen(
     navController: NavController
 ) {
-    val context = LocalContext.current
     val viewModel: SupabaseAuthViewModel = viewModel(factory = SupabaseAuthViewModelFactory())
     var isPasswordVisible by remember { mutableStateOf(false) }
 
@@ -112,7 +110,7 @@ fun LoginScreen(
 
         // Pulsante di accesso
         Button(
-            onClick = { viewModel.login(navController, context) },
+            onClick = { viewModel.login(navController) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 32.dp)
@@ -124,7 +122,7 @@ fun LoginScreen(
             Text("Password dimenticata?")
         }
 
-        TextButton(onClick = { viewModel.signUp(navController, context) }) {
+        TextButton(onClick = { viewModel.signUp(navController) }) {
             Text("Non hai un account? Registrati")
         }
 

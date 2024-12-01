@@ -1,6 +1,5 @@
 package com.lam.pedro.presentation.screen.loginscreen
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,9 +46,8 @@ class SupabaseAuthViewModel : ViewModel() {
      * naviga verso la schermata di lettura dei dati di Health Connect.
      *
      * @param navController Il controller di navigazione.
-     * @param context Il contesto dell'applicazione.
      */
-    fun login(navController: NavController, context: Context) {
+    fun login(navController: NavController) {
         if (!checkCredentials(email, password)) {
             errorMessage = "Credenziali non valide"
             showErrorDialog = true
@@ -58,7 +56,7 @@ class SupabaseAuthViewModel : ViewModel() {
 
         viewModelScope.launch {
             isLoading = true
-            val session = logInAuth(email, password, context)
+            val session = logInAuth(email, password)
             if (session != null) {
                 navController.navigate(Screen.MyScreenRecords.route)
             } else {
@@ -77,10 +75,10 @@ class SupabaseAuthViewModel : ViewModel() {
      *
      * @param navController Il controller di navigazione.
      */
-    fun signUp(navController: NavController, context: Context) {
+    fun signUp(navController: NavController) {
         viewModelScope.launch {
             isLoading = true
-            when (val result = signUpAuth(email, password, context)) {
+            when (val result = signUpAuth(email, password)) {
                 is SignUpResult.Success -> navController.navigate(Screen.MyScreenRecords.route)
                 is SignUpResult.UserAlreadyExists -> {
                     errorMessage = "Utente già registrato"
@@ -122,10 +120,9 @@ class SupabaseAuthViewModel : ViewModel() {
      *
      * @param email L'email dell'utente.
      * @param password La password dell'utente.
-     * @param context Il contesto dell'applicazione.
      * @return La sessione utente se il login ha successo, altrimenti null.
      */
-    private suspend fun logInAuth(email: String, password: String, context: Context): UserSession? {
+    private suspend fun logInAuth(email: String, password: String): UserSession? {
         if (!checkCredentials(email, password)) return null
         if (!userExists(email)) return null
 
@@ -140,7 +137,7 @@ class SupabaseAuthViewModel : ViewModel() {
 
             // Salva il token di accesso e il refresh token
             if (session != null) {
-                saveTokens(session.accessToken, session.refreshToken, context, session.user?.id)
+                saveTokens(session.accessToken, session.refreshToken, session.user?.id)
                 Log.d("Supabase", "Login success: ${session.accessToken}")
             }
 
@@ -164,8 +161,7 @@ class SupabaseAuthViewModel : ViewModel() {
      */
     private suspend fun signUpAuth(
         email: String,
-        password: String,
-        context: Context
+        password: String
     ): SignUpResult {
         if (!checkCredentials(email, password)) return SignUpResult.Error("Credenziali non valide")
         if (userExists(email)) return SignUpResult.UserAlreadyExists
@@ -178,10 +174,9 @@ class SupabaseAuthViewModel : ViewModel() {
 
             val session = userSession()
             saveTokens(
-                session?.accessToken ?: "",
-                session?.refreshToken ?: "",
-                context,
-                session?.user?.id
+                accessToken = session?.accessToken ?: "",
+                refreshToken = session?.refreshToken ?: "",
+                id = session?.user?.id
             )
 
             Log.d("Supabase", "Registrazione avvenuta: ${session?.accessToken}")
@@ -211,7 +206,7 @@ class SupabaseAuthViewModel : ViewModel() {
                 // pulisci la sessione
                 supabase.auth.sessionManager.deleteSession()
                 supabase.auth.signOut()
-                clearSecurePrefs(navController.context)
+                clearSecurePrefs()
 
                 Log.d("Supabase", "Logout avvenuto con successo")
 

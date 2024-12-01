@@ -31,4 +31,4 @@ data class CyclingSession(
     val distance: Length,
     val elevationGained: Length,
     val exerciseRoute: ExerciseRoute,
-) : ActivityInterface(activityType = ActivityType.CYCLING)
+) : GenericActivity(activityType = ActivityType.CYCLING)

@@ -18,26 +18,31 @@ object SecurePreferencesManager {
     private var encryptedPrefs: SharedPreferences? = null
 
     /**
-     * Restituisce un'istanza di [SharedPreferences] crittografata.
+     * Inizializza il SecurePreferencesManager con l'application context.
      *
      * @param context Il contesto dell'applicazione.
-     * @return Un'istanza di [SharedPreferences] crittografata.
      */
-    private fun getPrefs(context: Context): SharedPreferences {
+    fun initialize(context: Context) {
         if (encryptedPrefs == null) {
-            val masterKey = MasterKey.Builder(context)
+            val appContext = context.applicationContext
+            val masterKey = MasterKey.Builder(appContext)
                 .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                 .build()
 
             encryptedPrefs = EncryptedSharedPreferences.create(
-                context,
+                appContext,
                 PREFS_NAME,
                 masterKey,
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
         }
-        return encryptedPrefs!!
+    }
+
+    private fun checkInitialized() {
+        if (encryptedPrefs == null) {
+            throw IllegalStateException("SecurePreferencesManager is not initialized. Call initialize(context) first.")
+        }
     }
 
     /**
@@ -45,15 +50,13 @@ object SecurePreferencesManager {
      *
      * @param accessToken Il token di accesso da salvare.
      * @param refreshToken Il token di aggiornamento da salvare.
-     * @param context Il contesto dell'applicazione.
      */
-    fun saveTokens(accessToken: String, refreshToken: String, context: Context, id: String?) {
-        with(getPrefs(context).edit()) {
+    fun saveTokens(accessToken: String, refreshToken: String, id: String?) {
+        checkInitialized()
+        with(encryptedPrefs!!.edit()) {
             putString(ACCESS_TOKEN_KEY, accessToken)
             putString(REFRESH_TOKEN_KEY, refreshToken)
-            if (id != null) {
-                putString(UUID, id)
-            }
+            id?.let { putString(UUID, it) }
             apply()
         }
     }
@@ -61,41 +64,42 @@ object SecurePreferencesManager {
     /**
      * Ottiene il token di accesso dalle SharedPreferences crittografate.
      *
-     * @param context Il contesto dell'applicazione.
      * @return Il token di accesso o null se non è presente.
      */
-    fun getAccessToken(context: Context): String? {
-        return getPrefs(context).getString(ACCESS_TOKEN_KEY, null)
+    private fun getAccessToken(): String? {
+        checkInitialized()
+        return encryptedPrefs!!.getString(ACCESS_TOKEN_KEY, null)
     }
 
     /**
      * Ottiene il token di aggiornamento dalle SharedPreferences crittografate.
      *
-     * @param context Il contesto dell'applicazione.
      * @return Il token di aggiornamento o null se non è presente.
      */
-    private fun getRefreshToken(context: Context): String? {
-        return getPrefs(context).getString(REFRESH_TOKEN_KEY, null)
+    private fun getRefreshToken(): String? {
+        checkInitialized()
+        return encryptedPrefs!!.getString(REFRESH_TOKEN_KEY, null)
     }
 
     /**
      * Verifica se l'utente è autenticato controllando se esiste un access token salvato.
      *
-     * @param context Il contesto dell'applicazione.
      * @return true se l'access token esiste, altrimenti false.
      */
-    fun isUserAuthenticated(context: Context): Boolean {
-        return !getAccessToken(context).isNullOrEmpty()
+    fun isUserAuthenticated(): Boolean {
+        return !getAccessToken().isNullOrEmpty()
     }
 
     /**
      * Cancella tutti i dati memorizzati nelle SharedPreferences crittografate.
      * Utile per eseguire il logout dell'utente.
      *
-     * @param context Il contesto dell'applicazione.
      */
-    fun clearSecurePrefs(context: Context) {
-        with(getPrefs(context).edit()) {
+    fun clearSecurePrefs() {
+        checkInitialized()
+
+        // FIXME: non deve cancellare tutto, ma solo i campi di login
+        with(encryptedPrefs!!.edit()) {
             clear()
             apply()
         }
@@ -104,20 +108,19 @@ object SecurePreferencesManager {
     /**
      * Fa refresh della session con il refresh token
      *
-     * @param context Il contesto dell'applicazione.
      * @return La nuova sessione utente se il refresh ha successo, altrimenti null.
      * @see UserSession
      */
-    suspend fun refreshSession(context: Context): UserSession? {
+    suspend fun refreshSession(): UserSession? {
         // Funzione per recuperare il refresh token salvato
-        val refreshToken = getRefreshToken(context)
+        val refreshToken = getRefreshToken()
         return if (refreshToken != null) {
             try {
 
                 val session = supabase().auth.refreshSession(refreshToken)
 
                 // Salva i nuovi token
-                saveTokens(session.accessToken, session.refreshToken, context, session.user?.id)
+                saveTokens(session.accessToken, session.refreshToken, session.user?.id)
                 session.accessToken // Ritorna il nuovo access token
 
             } catch (e: Exception) {
@@ -130,8 +133,10 @@ object SecurePreferencesManager {
         }
     }
 
-    fun getUUID(context: Context): String? {
-        return getPrefs(context).getString(UUID, null)
+
+    fun getUUID(): String? {
+        checkInitialized()
+        return encryptedPrefs!!.getString(UUID, null)
     }
 
 

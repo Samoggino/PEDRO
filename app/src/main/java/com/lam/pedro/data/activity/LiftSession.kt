@@ -24,4 +24,4 @@ data class LiftSession(
 
     val exerciseSegment: List<ExerciseSegment>,
     val exerciseLap: List<ExerciseLap>,
-) : ActivityInterface(activityType = ActivityType.LIFT)
+) : GenericActivity(activityType = ActivityType.LIFT)

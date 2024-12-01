@@ -29,4 +29,4 @@ data class WalkSession(
     val distance: Length,
     val elevationGained: Length,
     val exerciseRoute: ExerciseRoute,
-) : ActivityInterface(activityType = ActivityType.WALK)
+) : GenericActivity(activityType = ActivityType.WALK)

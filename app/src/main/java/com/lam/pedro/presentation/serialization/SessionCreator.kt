@@ -9,7 +9,7 @@ import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import androidx.health.connect.client.units.Velocity
 import androidx.health.connect.client.units.Volume
-import com.lam.pedro.data.activity.ActivityInterface
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.ActivityType
 import com.lam.pedro.data.activity.BasicActivity
 import com.lam.pedro.data.activity.CyclingSession
@@ -22,7 +22,11 @@ import com.lam.pedro.data.activity.SleepSession
 import com.lam.pedro.data.activity.TrainSession
 import com.lam.pedro.data.activity.WalkSession
 import com.lam.pedro.data.activity.YogaSession
+import kotlinx.datetime.Month
 import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import kotlin.random.Random
 import kotlin.reflect.KClass
 
 object SessionCreator {
@@ -131,13 +135,27 @@ object SessionCreator {
         exerciseSegment = exerciseSegmentList(),
         exerciseLap = exerciseLapList()
     )
+    private fun basicActivity(title: String, notes: String): BasicActivity {
+        // Crea un anno e un mese randomici
+        val randomMonth = Month.entries[Random.nextInt(Month.entries.size)] // Scegli un mese casuale
+        val randomYear = 2024 // Puoi decidere l'anno (es. 2024)
 
-    private fun basicActivity(title: String, notes: String) = BasicActivity(
-        startTime = Instant.now(),
-        endTime = Instant.now(),
-        title = title,
-        notes = notes
-    )
+        // Scegli un giorno casuale del mese
+        val randomDay = Random.nextInt(1, randomMonth.length(false) + 1)
+
+        // Crea la data con un giorno, mese e anno casuali
+        val localDate = LocalDate.of(randomYear, randomMonth, randomDay)
+
+        // Converte LocalDate in Instant
+        val startTime = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
+
+        return BasicActivity(
+            startTime = startTime,
+            endTime = startTime,  // Imposta endTime uguale a startTime, puoi modificarlo se necessario
+            title = title,
+            notes = notes
+        )
+    }
 
     private fun exerciseSegmentList() = listOf(
         ExerciseSegment(
@@ -191,7 +209,7 @@ object SessionCreator {
 
 
 
-    data class ActivityConfig<T : ActivityInterface>(
+    data class ActivityConfig<T : GenericActivity>(
         val responseType: KClass<T>,
         val sessionCreator: () -> T // Funzione per creare una nuova sessione
     )

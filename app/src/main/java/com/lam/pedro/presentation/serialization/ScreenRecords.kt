@@ -9,25 +9,30 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lam.pedro.data.activity.ActivityType
 import com.lam.pedro.presentation.navigation.Screen
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyScreenRecords(navController: NavController) {
-    val viewModel: ViewModelRecords = viewModel(factory = ViewModelRecordFactory())
-    val context = LocalContext.current
+fun MyScreenRecords(
+    navController: NavController,
+    viewModel: ViewModelRecords = viewModel(factory = ViewModelRecordFactory())
+) {
     val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -49,62 +54,15 @@ fun MyScreenRecords(navController: NavController) {
                     activityType = activityType,
                     onInsertClick = {
                         viewModel.insertActivitySession(
-                            context = context,
                             activityType = activityType
                         )
                     },
                     onGetClick = {
-                        when (activityType) {
-                            ActivityType.YOGA -> viewModel.getActivitySession(
-                                context,
-                                activityType
-                            )
 
-                            ActivityType.RUN -> viewModel.getActivitySession(
-                                context,
-                                activityType
+                        coroutineScope.launch {
+                            viewModel.getActivitySession(
+                                activityType = activityType
                             )
-
-                            ActivityType.CYCLING -> viewModel.getActivitySession(
-                                context,
-                                activityType
-                            )
-
-                            ActivityType.LIFT -> viewModel.getActivitySession(
-                                context,
-                                activityType
-                            )
-
-                            ActivityType.DRIVE -> viewModel.getActivitySession(
-                                context,
-                                activityType
-                            )
-
-                            ActivityType.WALK -> viewModel.getActivitySession(
-                                context,
-                                activityType
-                            )
-
-                            ActivityType.SIT -> viewModel.getActivitySession(
-                                context,
-                                activityType
-                            )
-
-                            ActivityType.SLEEP -> viewModel.getActivitySession(
-                                context,
-                                activityType
-                            )
-
-                            ActivityType.TRAIN -> viewModel.getActivitySession(
-                                context,
-                                activityType
-                            )
-
-                            ActivityType.LISTEN -> viewModel.getActivitySession(
-                                context,
-                                activityType
-                            )
-
                         }
                     }
                 )
@@ -112,21 +70,26 @@ fun MyScreenRecords(navController: NavController) {
             }
 
             // Navigation buttons
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-
-                NavigationButton(
-                    text = "Vai alla schermata dei follower",
-                    onClick = { navController.navigate(Screen.FollowScreen.route) }
-                )
-                NavigationButton(
-                    text = "Vai alla schermata dei charts",
-                    onClick = { navController.navigate(Screen.ChartsScreen.route) }
-                )
-            }
+            NavButtons(navController)
         }
+    }
+}
+
+@Composable
+fun NavButtons(navController: NavController) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+
+        NavigationButton(
+            text = "Vai alla schermata dei follower",
+            onClick = { navController.navigate(Screen.FollowScreen.route) }
+        )
+        NavigationButton(
+            text = "Vai alla schermata dei charts",
+            onClick = { navController.navigate(Screen.ChartsScreen.route) }
+        )
     }
 }
 
@@ -140,10 +103,21 @@ fun ActivityRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Button(onClick = onInsertClick) {
+        Button(
+            onClick = onInsertClick,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = activityType.color // Cambia il colore del bottone
+            )
+        ) {
             Text("Insert ${activityType.name}")
         }
-        Button(onClick = onGetClick) {
+
+        Button(
+            onClick = onGetClick,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = activityType.color // Cambia il colore del bottone
+            )
+        ) {
             Text("Get ${activityType.name}")
         }
     }
@@ -157,4 +131,29 @@ fun NavigationButton(text: String, onClick: () -> Unit) {
     ) {
         Text(text)
     }
+}
+
+@Preview
+@Composable
+fun PreviewScreenRecords() {
+    ActivityRow(
+        activityType = ActivityType.RUN, // Passa l'ActivityType desiderato
+        onInsertClick = { /* Handle insert click */ },
+        onGetClick = { /* Handle get click */ }
+    )
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        NavigationButton(
+            text = "Vai alla schermata dei follower",
+            onClick = {}
+        )
+        NavigationButton(
+            text = "Vai alla schermata dei charts",
+            onClick = {}
+        )
+    }
+
 }

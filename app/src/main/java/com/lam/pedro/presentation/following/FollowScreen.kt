@@ -58,7 +58,7 @@ fun FollowScreen() {
     // Carica i dati iniziali al primo caricamento
     LaunchedEffect(true) {
         Log.i("Supabase-Following", "FollowScreen")
-        viewModel.getFollowedUsers(context)
+        viewModel.getFollowedUsers()
     }
 
     Scaffold(
@@ -76,7 +76,7 @@ fun FollowScreen() {
                 onRefresh = {
                     isRefreshing = true
                     coroutineScope.launch {
-                        viewModel.getFollowedUsers(context)
+                        viewModel.getFollowedUsers()
                         isRefreshing = false
                     }
                 },
@@ -93,7 +93,7 @@ fun FollowScreen() {
                             userFollowMap = userFollowMap,
                             onFollowToggle = { user, isFollowing ->
                                 coroutineScope.launch {
-                                    viewModel.toggleFollowUser(context, user, isFollowing)
+                                    viewModel.toggleFollowUser(user, isFollowing)
                                     // Modifica solo lo stato senza ricaricare tutto
                                     userFollowMap?.let {
                                         val updatedMap = it.toMutableMap()

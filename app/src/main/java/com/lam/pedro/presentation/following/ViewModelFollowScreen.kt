@@ -26,14 +26,13 @@ class ViewModelFollowScreen : ViewModel() {
 
     /**
      * Metodo per recuperare gli utenti seguiti.
-     * @param context il contesto dell'applicazione
      */
-    suspend fun getFollowedUsers(context: Context) {
+    suspend fun getFollowedUsers() {
         try {
             val result = parseUsers(
                 supabase().postgrest
                     .rpc("get_users_with_follow_status", buildJsonObject {
-                        put("current_user_id", getUUID(context).toString())
+                        put("current_user_id", getUUID().toString())
                     }).data
             )
             _userFollowMap.value = result
@@ -50,19 +49,17 @@ class ViewModelFollowScreen : ViewModel() {
 
     /**
      * Metodo per invertire lo stato di follow di un utente.
-     * @param context il contesto dell'applicazione
      * @param followedUser l'utente da seguire/non seguire
      * @param isAlreadyFollowing lo stato attuale di follow
      */
     suspend fun toggleFollowUser(
-        context: Context,
         followedUser: User,
         isAlreadyFollowing: Boolean
     ) {
         try {
             val rpcFunction = if (isAlreadyFollowing) "remove_follow" else "add_follow"
             val response = supabase().postgrest.rpc(rpcFunction, buildJsonObject {
-                put("follower", getUUID(context).toString())
+                put("follower", getUUID().toString())
                 put("followed", followedUser.id)
             })
             Log.i("Supabase", "Follow state updated successfully: $response")
@@ -87,7 +84,7 @@ class ViewModelFollowScreen : ViewModel() {
             }
 
             val bucket = supabase().storage.from("avatars")
-            val fileName = getUUID(context).toString()
+            val fileName = getUUID().toString()
 
             // Specifica correttamente il content type
             val result = bucket.upload(fileName, fileBytes) {

@@ -22,8 +22,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navDeepLink
 import com.example.healthconnectsample.data.HealthConnectManager
 import com.example.healthconnectsample.presentation.screen.HealthConnectScreen
-import com.lam.pedro.presentation.charts.ChartsEhsannarmaniScreen
-import com.lam.pedro.presentation.charts.VicoScreen
+import com.lam.pedro.data.activity.ActivityType
+import com.lam.pedro.presentation.charts.ScreenCharts
 import com.lam.pedro.presentation.following.FollowScreen
 import com.lam.pedro.presentation.screen.AboutScreen
 import com.lam.pedro.presentation.screen.ActivitiesScreen
@@ -138,7 +138,9 @@ fun PedroNavigation(
         }
 
         composable(Screen.ChartsScreen.route) {
-            ChartsEhsannarmaniScreen()
+            ScreenCharts(
+                activityType = ActivityType.CYCLING,
+            )
         }
 
         composable(

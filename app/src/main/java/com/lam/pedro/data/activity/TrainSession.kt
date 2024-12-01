@@ -24,4 +24,4 @@ data class TrainSession(
 
     val exerciseSegment: List<ExerciseSegment>,
     val exerciseLap: List<ExerciseLap>,
-) : ActivityInterface(activityType = ActivityType.TRAIN)
+) : GenericActivity(activityType = ActivityType.TRAIN)
