@@ -15,7 +15,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,7 +22,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lam.pedro.data.activity.ActivityType
 import com.lam.pedro.presentation.navigation.Screen
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +30,6 @@ fun MyScreenRecords(
     viewModel: ViewModelRecords = viewModel(factory = ViewModelRecordFactory())
 ) {
     val scrollState = rememberScrollState()
-    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -58,12 +55,7 @@ fun MyScreenRecords(
                         )
                     },
                     onGetClick = {
-
-                        coroutineScope.launch {
-                            viewModel.getActivitySession(
-                                activityType = activityType
-                            )
-                        }
+                        navController.navigate(Screen.ChartsScreen.route + "/${activityType.name}")
                     }
                 )
 

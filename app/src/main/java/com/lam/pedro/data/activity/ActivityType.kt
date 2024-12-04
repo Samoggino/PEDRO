@@ -14,15 +14,15 @@ import com.lam.pedro.presentation.theme.YogaColor
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class ActivityType(val color: Color) {
-    CYCLING(CyclingColor),
-    RUN(RunColor),
-    YOGA(YogaColor),
-    TRAIN(TrainColor),
-    DRIVE(DriveColor),
+enum class ActivityType(val color: Color, val energyMetrics: Boolean = false, val distanceMetrics: Boolean = false) {
+    CYCLING(CyclingColor, energyMetrics = true, distanceMetrics = true),
+    RUN(RunColor, energyMetrics = true, distanceMetrics = true),
+    YOGA(YogaColor, energyMetrics = true),
+    TRAIN(TrainColor, energyMetrics = true),
+    DRIVE(DriveColor, distanceMetrics = true),
     SIT(SitColor),
     SLEEP(SleepColor),
-    WALK(WalkColor),
-    LIFT(LiftColor),
+    WALK(WalkColor, distanceMetrics = true, energyMetrics = true),
+    LIFT(LiftColor, energyMetrics = true),
     LISTEN(ListenColor)
 }

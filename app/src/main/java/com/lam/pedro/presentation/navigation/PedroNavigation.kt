@@ -137,9 +137,14 @@ fun PedroNavigation(
             FollowScreen()
         }
 
-        composable(Screen.ChartsScreen.route) {
+        composable(Screen.ChartsScreen.route + "/{activityType}") { backStackEntry ->
+            val activityTypeProp =
+                backStackEntry.arguments?.getString("activityType")
+                    ?.let { ActivityType.valueOf(it) }!!
+
+
             ScreenCharts(
-                activityType = ActivityType.CYCLING,
+                activityType = activityTypeProp,
             )
         }
 

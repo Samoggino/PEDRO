@@ -31,14 +31,24 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.health.connect.client.units.Energy
+import androidx.health.connect.client.units.Length
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.shimmer
 import com.google.accompanist.placeholder.placeholder
 import com.lam.pedro.data.activity.ActivityType
+import com.lam.pedro.data.activity.ActivityType.CYCLING
+import com.lam.pedro.data.activity.ActivityType.DRIVE
+import com.lam.pedro.data.activity.ActivityType.LIFT
+import com.lam.pedro.data.activity.ActivityType.RUN
+import com.lam.pedro.data.activity.ActivityType.TRAIN
+import com.lam.pedro.data.activity.ActivityType.WALK
+import com.lam.pedro.data.activity.ActivityType.YOGA
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.GenericActivity.CyclingSession
 import com.lam.pedro.data.activity.GenericActivity.RunSession
+import com.lam.pedro.data.activity.GenericActivity.TrainSession
 import com.lam.pedro.data.activity.GenericActivity.WalkSession
 import com.lam.pedro.data.activity.toMonthNumber
 import com.lam.pedro.presentation.serialization.ViewModelRecordFactory
@@ -57,12 +67,13 @@ fun ScreenCharts(
     activityType: ActivityType,
     viewModel: ViewModelRecords = viewModel(factory = ViewModelRecordFactory())
 ) {
+    var selectedMetric by remember { mutableStateOf(LabelMetrics.Distance) }
     val activities by viewModel.activitySessions.observeAsState(emptyList())
     val error by viewModel.error.observeAsState("")
-    var selectedMetric by remember { mutableStateOf("Distance") }
 
-    LaunchedEffect(true, error, activityType) {
+    LaunchedEffect(selectedMetric, error, activityType, activities) {
         Log.d("Supabase", "Caricamento delle attività di tipo $activityType")
+        Log.d("Supabase", "Attività caricate: $activities")
         viewModel.loadActivitySession(activityType)
     }
 
@@ -84,49 +95,29 @@ fun ScreenCharts(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            val barsList = generateBarsList(activities, activityType, selectedMetric)
-            Chart(barsList)
-        }
+            if (activities.isEmpty()) {
+                Text(text = "No data available", color = Color.White)
 
-        MetricSelector { metric ->
-            selectedMetric = metric
-        }
-    }
+            } else {
 
+                val barsList = generateBarsList(
+                    activities = activities,
+                    activityType = activityType,
+                    selectedMetric = selectedMetric
+                )
 
-}
-
-fun generateBarsList(
-    activities: List<Any>,
-    activityType: ActivityType,
-    selectedMetric: String
-): List<Bars> {
-    return when (activityType) {
-        ActivityType.CYCLING -> {
-            val sessions = activities.map { it as CyclingSession }
-            sessions.toMonthlyBarsList {
-                when (selectedMetric) {
-                    "Distance" -> it.distance.inMeters
-                    "Calories" -> it.totalEnergy.inKilocalories
-                    "Elevation" -> it.elevationGained.inMeters
-                    else -> 0.0
-                }
+                Chart(barsList)
             }
         }
 
-        ActivityType.RUN -> {
-            val sessions = activities.map { it as RunSession }
-            sessions.toMonthlyBarsList { it.distance.inMeters }
+        MetricSelector { metric ->
+            selectedMetric = LabelMetrics.valueOf(metric)
         }
-
-        ActivityType.WALK -> {
-            val sessions = activities.map { it as WalkSession }
-            sessions.toMonthlyBarsList { it.distance.inMeters }
-        }
-
-        else -> emptyList()
     }
+
+
 }
+
 
 @Composable
 fun Chart(barsList: List<Bars>) {
@@ -196,6 +187,150 @@ fun <T> List<T>.toMonthlyBarsList(getValue: (T) -> Double): List<Bars> where T :
 }
 
 
+fun generateBarsList(
+    activities: List<GenericActivity>,
+    activityType: ActivityType,
+    selectedMetric: LabelMetrics
+): List<Bars> {
+
+    when {
+        activityType.energyMetrics && activityType.distanceMetrics -> {
+
+            when (activityType) {
+
+                WALK -> {
+                    val sessions = activities.map { it as WalkSession }
+                    return sessions.toMonthlyBarsList {
+                        metrics(
+                            selectedMetric = selectedMetric,
+                            distance = it.distance,
+                            elevationGained = it.elevationGained,
+                            totalCalories = it.totalEnergy,
+                            activeCalories = it.activeEnergy,
+                            duration = it.basicActivity.durationInMinutes()
+                        )
+                    }
+                }
+
+                CYCLING -> {
+                    val sessions = activities.map { it as CyclingSession }
+                    return sessions.toMonthlyBarsList {
+                        metrics(
+                            selectedMetric = selectedMetric,
+                            distance = it.distance,
+                            elevationGained = it.elevationGained,
+                            totalCalories = it.totalEnergy,
+                            activeCalories = it.activeEnergy,
+                            duration = it.basicActivity.durationInMinutes()
+                        )
+                    }
+                }
+
+                RUN -> {
+                    val sessions = activities.map { it as RunSession }
+                    return sessions.toMonthlyBarsList {
+                        metrics(
+                            selectedMetric = selectedMetric,
+                            distance = it.distance,
+                            elevationGained = it.elevationGained,
+                            totalCalories = it.totalEnergy,
+                            activeCalories = it.activeEnergy,
+                            duration = it.basicActivity.durationInMinutes()
+                        )
+                    }
+                }
+
+                else -> return emptyList()
+            }
+
+
+        }
+
+        activityType.energyMetrics -> {
+
+            when (activityType) {
+                TRAIN -> {
+                    val sessions = activities.map { it as TrainSession }
+                    return sessions.toMonthlyBarsList {
+                        metrics(
+                            selectedMetric = selectedMetric,
+                            totalCalories = it.totalEnergy,
+                            activeCalories = it.activeEnergy,
+                            duration = it.basicActivity.durationInMinutes()
+                        )
+                    }
+                }
+
+                YOGA -> {
+                    val sessions = activities.map { it as GenericActivity.YogaSession }
+                    return sessions.toMonthlyBarsList {
+                        metrics(
+                            selectedMetric = selectedMetric,
+                            totalCalories = it.totalEnergy,
+                            activeCalories = it.activeEnergy,
+                            duration = it.basicActivity.durationInMinutes()
+                        )
+                    }
+                }
+
+                LIFT -> {
+                    val sessions = activities.map { it as GenericActivity.LiftSession }
+                    return sessions.toMonthlyBarsList {
+                        metrics(
+                            selectedMetric = selectedMetric,
+                            totalCalories = it.totalEnergy,
+                            activeCalories = it.activeEnergy,
+                            duration = it.basicActivity.durationInMinutes()
+                        )
+                    }
+                }
+
+                else -> return emptyList()
+            }
+
+        }
+
+        activityType.distanceMetrics -> when (activityType) {
+
+            DRIVE -> {
+                val sessions = activities.map { it as GenericActivity.DriveSession }
+                return sessions.toMonthlyBarsList {
+                    metrics(
+                        selectedMetric = selectedMetric,
+                        distance = it.distance,
+                        elevationGained = it.elevationGained,
+                        duration = it.basicActivity.durationInMinutes()
+                    )
+                }
+            }
+
+
+            else -> return emptyList()
+        }
+
+
+        else -> return emptyList()
+    }
+
+}
+
+private fun metrics(
+    selectedMetric: LabelMetrics?,
+    distance: Length? = null,
+    elevationGained: Length? = null,
+    totalCalories: Energy? = null,
+    activeCalories: Energy? = null,
+    duration: Double
+) = when (selectedMetric) {
+    LabelMetrics.Distance -> distance?.inMeters!!
+    LabelMetrics.Elevation -> elevationGained?.inMeters!!
+    LabelMetrics.TotalCalories -> totalCalories?.inKilocalories!!
+    LabelMetrics.ActiveCalories -> activeCalories?.inKilocalories!!
+    LabelMetrics.Duration -> duration
+    else -> 0.0
+}
+
+
 fun Modifier.placeholder(
     isLoading: Boolean,
     backgroundColor: Color = Color.Unspecified,
@@ -216,22 +351,31 @@ fun Modifier.placeholder(
     )
 }
 
+
 @Composable
 fun MetricSelector(
     onMetricChange: (String) -> Unit
 ) {
-    val metrics = listOf("Distance", "Calories", "Elevation")
 
     DropdownMenu(
         expanded = true,
         onDismissRequest = { /* Handle dismiss */ },
         modifier = Modifier.fillMaxWidth()
     ) {
-        metrics.forEach { metric ->
+        LabelMetrics.entries.forEach { metric ->
             DropdownMenuItem(
-                onClick = { onMetricChange(metric) },
-                text = { Text(text = metric) },
+                onClick = { onMetricChange(metric.toString()) },
+                text = { Text(text = metric.toString()) },
             )
         }
     }
+}
+
+// enum delle label che voglio mostrare
+enum class LabelMetrics {
+    Distance,
+    TotalCalories,
+    Elevation,
+    Duration,
+    ActiveCalories,
 }

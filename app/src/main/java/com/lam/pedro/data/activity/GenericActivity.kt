@@ -36,6 +36,7 @@ import kotlinx.datetime.Month
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import kotlin.random.Random
@@ -65,7 +66,20 @@ sealed class GenericActivity(
         val endTime: Instant,
         val title: String = "My Activity #${Random.nextInt(0, Int.MAX_VALUE)}",
         val notes: String
-    )
+    ) {
+
+        // Metodo per ottenere la durata in double (in ore, per esempio)
+        fun durationInHours(): Double {
+            val duration = Duration.between(startTime, endTime)
+            return duration.toMinutes() / 60.0 // Converte la durata in minuti e la divide per 60 per ottenere le ore
+        }
+
+        // Metodo opzionale per ottenere la durata in minuti (se preferisci minuti)
+        fun durationInMinutes(): Double {
+            val duration = Duration.between(startTime, endTime)
+            return duration.toMinutes().toDouble() // Restituisce la durata in minuti
+        }
+    }
 
     @Serializable
     data class YogaSession(
