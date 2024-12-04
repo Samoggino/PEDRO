@@ -33,7 +33,7 @@ import com.lam.pedro.presentation.screen.ActivitiesScreen
 import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.LandingScreen
 import com.lam.pedro.presentation.screen.MoreScreen
-import com.lam.pedro.presentation.screen.ProfileScreen
+import com.lam.pedro.presentation.screen.profile.ProfileScreen
 import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.GeneralActivityViewModelFactory
 import com.lam.pedro.presentation.screen.activities.NewActivityScreen

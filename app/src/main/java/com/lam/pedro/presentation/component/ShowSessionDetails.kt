@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.ExerciseSessionRecord
@@ -29,7 +30,7 @@ import com.lam.pedro.presentation.TAG
 import org.maplibre.android.geometry.LatLng
 
 @Composable
-fun ShowSessionDetails(session: ActivitySession) {
+fun ShowSessionDetails(session: ActivitySession, color: Color) {
     LazyColumn(
         modifier = Modifier
             .padding(16.dp)
@@ -57,17 +58,19 @@ fun ShowSessionDetails(session: ActivitySession) {
             }
             is RunSession -> {
                 item {
+                    val positions = session.exerciseRoute.route.map { LatLng(it.latitude, it.longitude) }
+
                     Text(text = "Velocità: ${session.speedSamples}")
                     Text(text = "Passi: ${session.stepsCount}")
                     Text(text = "Energia totale: ${session.totalEnergy}")
                     Text(text = "Energia attiva: ${session.activeEnergy}")
                     Text(text = "Distanza: ${session.distance}")
                     Text(text = "Elevazione guadagnata: ${session.elevationGained}")
-                    val positions = session.exerciseRoute.route.map { LatLng(it.latitude, it.longitude) }
                     Text(text = "Posizioni: $positions")
                     MapComponent(
                         modifier = Modifier.fillMaxWidth().height(300.dp).clip(RoundedCornerShape(26.dp)),
-                        positions = positions
+                        positions = positions,
+                        color = color
                     )
                 }
             }

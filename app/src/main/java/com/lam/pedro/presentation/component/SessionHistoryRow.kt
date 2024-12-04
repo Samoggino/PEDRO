@@ -100,13 +100,8 @@ fun SessionHistoryRow(
                 sheetState = sheetState,
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ) {
-
-                ShowSessionDetails(session)
-
-
+                ShowSessionDetails(session, color)
             }
-
-
         }
 
     }
