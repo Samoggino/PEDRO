@@ -9,19 +9,19 @@ import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import androidx.health.connect.client.units.Velocity
 import androidx.health.connect.client.units.Volume
-import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.ActivityType
-import com.lam.pedro.data.activity.BasicActivity
-import com.lam.pedro.data.activity.CyclingSession
-import com.lam.pedro.data.activity.DriveSession
-import com.lam.pedro.data.activity.LiftSession
-import com.lam.pedro.data.activity.ListenSession
-import com.lam.pedro.data.activity.RunSession
-import com.lam.pedro.data.activity.SitSession
-import com.lam.pedro.data.activity.SleepSession
-import com.lam.pedro.data.activity.TrainSession
-import com.lam.pedro.data.activity.WalkSession
-import com.lam.pedro.data.activity.YogaSession
+import com.lam.pedro.data.activity.GenericActivity
+import com.lam.pedro.data.activity.GenericActivity.BasicActivity
+import com.lam.pedro.data.activity.GenericActivity.CyclingSession
+import com.lam.pedro.data.activity.GenericActivity.DriveSession
+import com.lam.pedro.data.activity.GenericActivity.LiftSession
+import com.lam.pedro.data.activity.GenericActivity.ListenSession
+import com.lam.pedro.data.activity.GenericActivity.RunSession
+import com.lam.pedro.data.activity.GenericActivity.SitSession
+import com.lam.pedro.data.activity.GenericActivity.SleepSession
+import com.lam.pedro.data.activity.GenericActivity.TrainSession
+import com.lam.pedro.data.activity.GenericActivity.WalkSession
+import com.lam.pedro.data.activity.GenericActivity.YogaSession
 import kotlinx.datetime.Month
 import java.time.Instant
 import java.time.LocalDate
@@ -135,9 +135,11 @@ object SessionCreator {
         exerciseSegment = exerciseSegmentList(),
         exerciseLap = exerciseLapList()
     )
+
     private fun basicActivity(title: String, notes: String): BasicActivity {
         // Crea un anno e un mese randomici
-        val randomMonth = Month.entries[Random.nextInt(Month.entries.size)] // Scegli un mese casuale
+        val randomMonth =
+            Month.entries[Random.nextInt(Month.entries.size)] // Scegli un mese casuale
         val randomYear = 2024 // Puoi decidere l'anno (es. 2024)
 
         // Scegli un giorno casuale del mese
@@ -205,8 +207,6 @@ object SessionCreator {
             length = length
         )
     )
-
-
 
 
     data class ActivityConfig<T : GenericActivity>(

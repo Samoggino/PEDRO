@@ -1,7 +1,7 @@
 @file:UseSerializers(
     LengthSerializer::class,
     ExerciseRouteSerializer::class,
-    SpeedRecordSampleSerializer::class,
+
 )
 
 package com.lam.pedro.data.activity
@@ -15,12 +15,3 @@ import com.lam.pedro.data.serializers.primitive.LengthSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
-@Serializable
-data class DriveSession(
-    override val basicActivity: BasicActivity,
-
-    val speedSamples: List<SpeedRecord.Sample>,
-    val distance: Length,
-    val elevationGained: Length,
-    val exerciseRoute: ExerciseRoute,
-) : GenericActivity(activityType = ActivityType.DRIVE)

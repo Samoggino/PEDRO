@@ -15,13 +15,3 @@ import com.lam.pedro.data.serializers.primitive.ExerciseSegmentSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
-@Serializable
-data class LiftSession(
-    override val basicActivity: BasicActivity,
-
-    val activeEnergy: Energy,
-    val totalEnergy: Energy,
-
-    val exerciseSegment: List<ExerciseSegment>,
-    val exerciseLap: List<ExerciseLap>,
-) : GenericActivity(activityType = ActivityType.LIFT)

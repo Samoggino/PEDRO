@@ -21,6 +21,7 @@ storageKt = "3.0.1"
 runtimeLivedata = "1.7.5"
 # charts
 composeCharts = "0.0.19"
+storage = "1.5.0"
 
 [libraries]
 accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanistPlaceholderMaterial" }
@@ -55,6 +56,7 @@ androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtim
 
 ### charts
 compose-charts = { module = "io.github.ehsannarmani:compose-charts", version.ref = "composeCharts" }
+androidx-storage = { group = "androidx.test.services", name = "storage", version.ref = "storage" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

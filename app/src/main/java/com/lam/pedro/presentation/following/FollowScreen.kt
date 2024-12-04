@@ -49,7 +49,6 @@ fun FollowScreenPreview() {
 @Composable
 fun FollowScreen() {
     var isRefreshing by remember { mutableStateOf(false) }
-    val context = LocalContext.current
     val viewModel: ViewModelFollowScreen = viewModel(factory = ViewModelFollowScreenFactory())
     val userFollowMap by viewModel.userFollowMap.collectAsState() // Osserva il Flow
 

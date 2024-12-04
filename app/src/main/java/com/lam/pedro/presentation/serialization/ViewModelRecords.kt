@@ -23,15 +23,15 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
 import kotlinx.serialization.serializer
 
-class ViewModelRecords : ViewModel() {
+open class ViewModelRecords : ViewModel() {
 
     // LiveData per osservare il risultato delle sessioni di attività
     private val _activitySessions = MutableLiveData<List<GenericActivity>>()
-    val activitySessions: LiveData<List<GenericActivity>> = _activitySessions
+    open val activitySessions: LiveData<List<GenericActivity>> = _activitySessions
 
     // LiveData per gestire l'errore
     private val _error = MutableLiveData<String>()
-    val error: LiveData<String> = _error
+    open val error: LiveData<String> = _error
 
     /**
      * Recupera una sessione di attività dal database in base al tipo passato in input
@@ -47,6 +47,7 @@ class ViewModelRecords : ViewModel() {
             }
         }
     }
+
 
     @OptIn(InternalSerializationApi::class)
     suspend fun getActivitySession(

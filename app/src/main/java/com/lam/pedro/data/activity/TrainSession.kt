@@ -16,12 +16,4 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
 
-@Serializable
-data class TrainSession(
-    override val basicActivity: BasicActivity,
-    val totalEnergy: Energy,
-    val activeEnergy: Energy,
 
-    val exerciseSegment: List<ExerciseSegment>,
-    val exerciseLap: List<ExerciseLap>,
-) : GenericActivity(activityType = ActivityType.TRAIN)

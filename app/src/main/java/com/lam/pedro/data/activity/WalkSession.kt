@@ -18,15 +18,3 @@ import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
-@Serializable
-data class WalkSession(
-    override val basicActivity: BasicActivity,
-    val totalEnergy: Energy,
-    val activeEnergy: Energy,
-//    @Serializable(with = ListStepsCadenceSampleSerializer::class) val cadenceRecord: List<@Contextual StepsCadenceRecord.Sample>,
-    @Serializable(with = ListSpeedRecordSampleSerializer::class) val speedSamples: List<@Contextual SpeedRecord.Sample>,
-    val stepsCount: Long,
-    val distance: Length,
-    val elevationGained: Length,
-    val exerciseRoute: ExerciseRoute,
-) : GenericActivity(activityType = ActivityType.WALK)

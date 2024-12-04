@@ -18,7 +18,3 @@ data class SleepSessionData(
     val stages: List<SleepSessionRecord.Stage> = listOf()
 )
 
-@Serializable
-data class SleepSession(
-    override val basicActivity: BasicActivity,
-) : GenericActivity(ActivityType.SLEEP)
