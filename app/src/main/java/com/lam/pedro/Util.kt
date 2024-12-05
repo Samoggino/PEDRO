@@ -15,9 +15,20 @@
  */
 package com.lam.pedro
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.takeOrElse
+import androidx.compose.ui.unit.dp
 import com.example.healthconnectsample.data.dateTimeWithOffsetOrDefault
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.material.shimmer
+import com.google.accompanist.placeholder.placeholder
+import com.lam.pedro.presentation.theme.PedroDarkGray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -51,4 +62,24 @@ fun formatDisplayTimeStartEnd(
     val start = timeFormatter.format(dateTimeWithOffsetOrDefault(startTime, startZoneOffset))
     val end = timeFormatter.format(dateTimeWithOffsetOrDefault(endTime, endZoneOffset))
     return "$start - $end"
+}
+
+fun Modifier.placeholder(
+    isLoading: Boolean,
+    backgroundColor: Color = Color.Unspecified,
+    shape: Shape = RoundedCornerShape(15.dp),
+    showShimmerAnimation: Boolean = true
+): Modifier = composed {
+    val highlight = if (showShimmerAnimation) {
+        PlaceholderHighlight.shimmer()
+    } else {
+        null
+    }
+    val specifiedBackgroundColor = backgroundColor.takeOrElse { PedroDarkGray.copy(0.6f) }
+    Modifier.placeholder(
+        color = specifiedBackgroundColor,
+        visible = isLoading,
+        shape = shape,
+        highlight = highlight
+    )
 }

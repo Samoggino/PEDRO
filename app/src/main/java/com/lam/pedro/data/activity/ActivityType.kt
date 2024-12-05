@@ -14,7 +14,11 @@ import com.lam.pedro.presentation.theme.YogaColor
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class ActivityType(val color: Color, val energyMetrics: Boolean = false, val distanceMetrics: Boolean = false) {
+enum class ActivityType(
+    val color: Color,
+    val energyMetrics: Boolean = false,
+    val distanceMetrics: Boolean = false
+) {
     CYCLING(CyclingColor, energyMetrics = true, distanceMetrics = true),
     RUN(RunColor, energyMetrics = true, distanceMetrics = true),
     YOGA(YogaColor, energyMetrics = true),

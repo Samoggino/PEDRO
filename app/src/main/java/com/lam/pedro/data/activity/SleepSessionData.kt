@@ -1,7 +1,6 @@
 package com.lam.pedro.data.activity
 
 import androidx.health.connect.client.records.SleepSessionRecord
-import kotlinx.serialization.Serializable
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset

@@ -31,10 +31,10 @@ import kotlin.reflect.KClass
 
 object SessionCreator {
 
-    val startTime: Instant = Instant.now()
-    val endTime: Instant = Instant.now().plusSeconds(3600)
-    val energy: Energy = Energy.kilocalories(100.0)
-    val length: Length = Length.meters(500.0)
+    private val startTime: Instant = Instant.now()
+    private val endTime: Instant = Instant.now().plusSeconds(3600)
+    private val energy: Energy = Energy.kilocalories(100.0)
+    private val length: Length = Length.meters(500.0)
 
     fun createYogaSession(): YogaSession {
         return YogaSession(
@@ -137,23 +137,20 @@ object SessionCreator {
     )
 
     private fun basicActivity(title: String, notes: String): BasicActivity {
-        // Crea un anno e un mese randomici
-        val randomMonth =
-            Month.entries[Random.nextInt(Month.entries.size)] // Scegli un mese casuale
-        val randomYear = 2024 // Puoi decidere l'anno (es. 2024)
 
-        // Scegli un giorno casuale del mese
+        val randomMonth = Month.entries[Random.nextInt(Month.entries.size)]
         val randomDay = Random.nextInt(1, randomMonth.length(false) + 1)
+        val startTime = LocalDate
+            .of(2024, randomMonth, randomDay)
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
 
-        // Crea la data con un giorno, mese e anno casuali
-        val localDate = LocalDate.of(randomYear, randomMonth, randomDay)
-
-        // Converte LocalDate in Instant
-        val startTime = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
+        // durata random ma non troppo lunga per evitare problemi con Instant
+        val endTime = startTime.plusSeconds(3600 * 1 / Random.nextLong(1, 5))
 
         return BasicActivity(
             startTime = startTime,
-            endTime = startTime,  // Imposta endTime uguale a startTime, puoi modificarlo se necessario
+            endTime = endTime,
             title = title,
             notes = notes
         )
