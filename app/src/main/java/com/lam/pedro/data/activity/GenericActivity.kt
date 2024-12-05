@@ -12,7 +12,6 @@
 
 package com.lam.pedro.data.activity
 
-import android.util.Log
 import androidx.health.connect.client.records.CyclingPedalingCadenceRecord
 import androidx.health.connect.client.records.ExerciseLap
 import androidx.health.connect.client.records.ExerciseRoute
@@ -78,7 +77,6 @@ sealed class GenericActivity(
         // Metodo opzionale per ottenere la durata in minuti (se preferisci minuti)
         fun durationInMinutes(): Double {
             val duration = Duration.between(startTime, endTime)
-            Log.d("Supabase", "Duration: ${duration.toMinutes().toDouble()}")
             return duration.toMinutes().toDouble() // Restituisce la durata in minuti
         }
     }

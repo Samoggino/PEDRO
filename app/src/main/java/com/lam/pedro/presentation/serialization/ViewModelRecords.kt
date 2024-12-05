@@ -33,21 +33,6 @@ open class ViewModelRecords : ViewModel() {
     private val _error = MutableLiveData<String>()
     open val error: LiveData<String> = _error
 
-    /**
-     * Recupera una sessione di attività dal database in base al tipo passato in input
-     * @param activityType il tipo di attività da recuperare
-     */
-    fun loadActivitySession(activityType: ActivityType) {
-        viewModelScope.launch {
-            try {
-                val sessions = getActivitySession(activityType)
-                _activitySessions.postValue(sessions)  // Aggiorna LiveData
-            } catch (e: Exception) {
-                _error.postValue("Errore durante il recupero delle attività: ${e.message}")
-            }
-        }
-    }
-
 
     @OptIn(InternalSerializationApi::class)
     suspend fun getActivitySession(

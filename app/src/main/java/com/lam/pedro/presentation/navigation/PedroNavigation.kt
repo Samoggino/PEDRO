@@ -142,9 +142,9 @@ fun PedroNavigation(
                 backStackEntry.arguments?.getString("activityType")
                     ?.let { ActivityType.valueOf(it) }!!
 
-
             ScreenCharts(
                 activityType = activityTypeProp,
+                navController = navController // Passa il NavController
             )
         }
 
