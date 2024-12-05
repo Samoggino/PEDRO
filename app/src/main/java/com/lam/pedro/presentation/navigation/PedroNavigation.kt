@@ -17,8 +17,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.example.healthconnectsample.data.HealthConnectManager
 import com.example.healthconnectsample.presentation.screen.HealthConnectScreen
@@ -137,16 +139,18 @@ fun PedroNavigation(
             FollowScreen()
         }
 
-        composable(Screen.ChartsScreen.route + "/{activityType}") { backStackEntry ->
-            val activityTypeProp =
-                backStackEntry.arguments?.getString("activityType")
-                    ?.let { ActivityType.valueOf(it) }!!
+        composable(
+            route = Screen.ChartsScreen.route + "/{activityType}",
+            arguments = listOf(navArgument("activityType") { type = NavType.StringType }),
+            content = {
+                val activityTypeProp =
+                    ActivityType.valueOf(it.arguments?.getString("activityType")!!)
 
-            ScreenCharts(
-                activityType = activityTypeProp,
-                navController = navController // Passa il NavController
-            )
-        }
+                ScreenCharts(
+                    activityType = activityTypeProp
+                )
+            }
+        )
 
         composable(
             route = Screen.PrivacyPolicy.route,

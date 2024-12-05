@@ -1,5 +1,6 @@
 package com.lam.pedro.presentation.charts
 
+import android.util.Log
 import androidx.compose.ui.graphics.Brush
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
@@ -24,6 +25,7 @@ import com.lam.pedro.data.activity.GenericActivity.WalkSession
 import com.lam.pedro.data.activity.toMonthNumber
 import com.lam.pedro.presentation.serialization.ViewModelRecords
 import ir.ehsannarmani.compose_charts.models.Bars
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
@@ -47,18 +49,24 @@ class ViewModelCharts(
      * Carica i dati iniziali e salva la lista di attività in cache
      */
     fun loadActivityData(activityType: ActivityType) {
+
+        Log.d("Charts", "Caricamento dati nel viewModel $activityType")
         _isLoading.value = true // Inizia il caricamento
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                val activities = viewModelRecords.getActivitySession(activityType)
-                cachedActivities = activities
-                _barsList.postValue(generateBarsList(activities, activityType, selectedMetric))
+                cachedActivities = viewModelRecords.getActivitySession(activityType)
+                _barsList.postValue(
+                    generateBarsList(cachedActivities, activityType, selectedMetric)
+                )
+                Log.d("Charts", "Dati caricati con successo")
             } catch (e: Exception) {
                 _error.postValue("Errore durante il caricamento dei dati: ${e.message}")
             } finally {
-                _isLoading.postValue(false) // Fine caricamento
+                _isLoading.postValue(false) // Segnala la fine del caricamento
+                Log.d("Charts", "Fine caricamento")
             }
         }
+
     }
 
     /**
@@ -66,11 +74,14 @@ class ViewModelCharts(
      */
 
     fun changeMetric(newMetric: LabelMetrics, activityType: ActivityType) {
-        _isLoading.value = true // Inizia il caricamento
+        if (_isLoading.value == true) return // Evita di cambiare la metrica se già in caricamento
+        _isLoading.value = true
         selectedMetric = newMetric
-        _barsList.postValue(generateBarsList(cachedActivities, activityType, selectedMetric))
-        _isLoading.value = false // Fine caricamento
+        Log.d("Charts", "Cambio metrica: $selectedMetric")
+        _barsList.value = generateBarsList(cachedActivities, activityType, selectedMetric)
+        _isLoading.value = false
     }
+
 
     /**
      * Calcola il valore della metrica selezionata

@@ -1,8 +1,6 @@
 package com.lam.pedro.presentation.serialization
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -23,16 +21,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
 import kotlinx.serialization.serializer
 
-open class ViewModelRecords : ViewModel() {
-
-    // LiveData per osservare il risultato delle sessioni di attività
-    private val _activitySessions = MutableLiveData<List<GenericActivity>>()
-    open val activitySessions: LiveData<List<GenericActivity>> = _activitySessions
-
-    // LiveData per gestire l'errore
-    private val _error = MutableLiveData<String>()
-    open val error: LiveData<String> = _error
-
+class ViewModelRecords : ViewModel() {
 
     @OptIn(InternalSerializationApi::class)
     suspend fun getActivitySession(
