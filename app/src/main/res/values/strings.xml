@@ -174,5 +174,6 @@
     <string name="empty_history">There is no recordered activity yet</string>
     <string name="profile_screen">Profile</string>
     <string name="location_permission_description">To track the route and obtain accurate data, the location permission is required. Without this permission, the feature will not be available.</string>
+    <string name="location_permission_title">Location required</string>
 
 </resources>

@@ -70,7 +70,7 @@ class StepCounter(context: Context) {
     }
      */
 
-    suspend fun steps() = suspendCancellableCoroutine { continuation ->
+    suspend fun stepsCounter(updateSteps: (Float) -> Unit) = suspendCancellableCoroutine { continuation ->
         Log.d(TAG, "Registering sensor listener... ")
 
         var initialSteps: Long? = null // Valore iniziale da cui calcolare la differenza
@@ -89,6 +89,7 @@ class StepCounter(context: Context) {
                     // Calcola i passi rispetto al valore iniziale
                     val stepsSinceListenerStarted = stepsSinceLastReboot - initialSteps!!
                     Log.d(TAG, "Steps since listener started: $stepsSinceListenerStarted")
+                    updateSteps(stepsSinceListenerStarted.toFloat())
 
                     if (continuation.isActive) {
                         continuation.resume(stepsSinceListenerStarted)
