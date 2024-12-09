@@ -10,18 +10,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.activity.ActivityType
-import com.lam.pedro.data.activity.ActivityType.CYCLING
-import com.lam.pedro.data.activity.ActivityType.DRIVE
-import com.lam.pedro.data.activity.ActivityType.LIFT
-import com.lam.pedro.data.activity.ActivityType.RUN
-import com.lam.pedro.data.activity.ActivityType.TRAIN
-import com.lam.pedro.data.activity.ActivityType.WALK
-import com.lam.pedro.data.activity.ActivityType.YOGA
 import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.data.activity.GenericActivity.CyclingSession
-import com.lam.pedro.data.activity.GenericActivity.RunSession
-import com.lam.pedro.data.activity.GenericActivity.TrainSession
-import com.lam.pedro.data.activity.GenericActivity.WalkSession
 import com.lam.pedro.data.activity.toMonthNumber
 import com.lam.pedro.presentation.serialization.ViewModelRecords
 import ir.ehsannarmani.compose_charts.models.Bars
@@ -39,7 +28,7 @@ class ViewModelCharts(
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
 
-    private var selectedMetric: LabelMetrics = LabelMetrics.Distance
+    private var selectedMetric: LabelMetrics = LabelMetrics.DURATION
     private var cachedActivities: List<GenericActivity> = emptyList()
 
     private val _isLoading = MutableLiveData<Boolean>()
@@ -56,7 +45,7 @@ class ViewModelCharts(
             try {
                 cachedActivities = viewModelRecords.getActivitySession(activityType)
                 _barsList.postValue(
-                    generateBarsList(cachedActivities, activityType, selectedMetric)
+                    generateBarsList(cachedActivities, selectedMetric)
                 )
                 Log.d("Charts", "Dati caricati con successo")
             } catch (e: Exception) {
@@ -73,18 +62,18 @@ class ViewModelCharts(
      * Cambia la metrica selezionata e aggiorna il grafico
      */
 
-    fun changeMetric(newMetric: LabelMetrics, activityType: ActivityType) {
+    fun changeMetric(newMetric: LabelMetrics) {
         if (_isLoading.value == true) return // Evita di cambiare la metrica se già in caricamento
         _isLoading.value = true
         selectedMetric = newMetric
         Log.d("Charts", "Cambio metrica: $selectedMetric")
-        _barsList.value = generateBarsList(cachedActivities, activityType, selectedMetric)
+        _barsList.value = generateBarsList(cachedActivities, selectedMetric)
         _isLoading.value = false
     }
 
 
     /**
-     * Calcola il valore della metrica selezionata
+     * Calcola il valore della metrica selezionata.
      */
     private fun metrics(
         selectedMetric: LabelMetrics,
@@ -95,189 +84,111 @@ class ViewModelCharts(
         duration: Double
     ): Double {
         return when (selectedMetric) {
-            LabelMetrics.Distance -> distance?.inMeters ?: 0.0
-            LabelMetrics.Elevation -> elevationGained?.inMeters ?: 0.0
-            LabelMetrics.TotalCalories -> totalCalories?.inKilocalories ?: 0.0
-            LabelMetrics.ActiveCalories -> activeCalories?.inKilocalories ?: 0.0
-            LabelMetrics.Duration -> duration
+            LabelMetrics.DISTANCE -> distance?.inMeters ?: 0.0
+            LabelMetrics.ELEVATION -> elevationGained?.inMeters ?: 0.0
+            LabelMetrics.TOTAL_CALORIES -> totalCalories?.inKilocalories ?: 0.0
+            LabelMetrics.ACTIVE_CALORIES -> activeCalories?.inKilocalories ?: 0.0
+            LabelMetrics.DURATION -> duration
         }
     }
 
-
+    /**
+     * Genera la lista delle barre mensili per le attività selezionate.
+     */
     private fun generateBarsList(
         activities: List<GenericActivity>,
-        activityType: ActivityType,
         selectedMetric: LabelMetrics
     ): List<Bars> {
+        return activities.map { it }
+            .toMonthlyBarsList(
+                getValue = { session ->
 
-        when {
-            activityType.energyMetrics && activityType.distanceMetrics -> {
+                    val duration = session.basicActivity.durationInMinutes()
 
-                when (activityType) {
-
-                    WALK -> {
-                        val sessions = activities.map { it as WalkSession }
-                        return sessions.toMonthlyBarsList(
-                            getValue = {
+                    try {
+                        when (session) {
+                            is GenericActivity.FullMetrics -> {
                                 metrics(
                                     selectedMetric = selectedMetric,
-                                    distance = it.distance,
-                                    elevationGained = it.elevationGained,
-                                    totalCalories = it.totalEnergy,
-                                    activeCalories = it.activeEnergy,
-                                    duration = it.basicActivity.durationInMinutes()
+                                    distance = session.distance,
+                                    elevationGained = session.elevationGained,
+                                    totalCalories = session.totalEnergy,
+                                    activeCalories = session.activeEnergy,
+                                    duration = duration
                                 )
-                            },
-                            label = selectedMetric
-                        )
-                    }
+                            }
 
-                    CYCLING -> {
-                        val sessions = activities.map { it as CyclingSession }
-                        return sessions.toMonthlyBarsList(
-                            getValue = {
+                            is GenericActivity.DistanceMetrics -> {
                                 metrics(
                                     selectedMetric = selectedMetric,
-                                    distance = it.distance,
-                                    elevationGained = it.elevationGained,
-                                    totalCalories = it.totalEnergy,
-                                    activeCalories = it.activeEnergy,
-                                    duration = it.basicActivity.durationInMinutes()
+                                    distance = session.distance,
+                                    elevationGained = session.elevationGained,
+                                    duration = duration
                                 )
-                            },
-                            label = selectedMetric
-                        )
-                    }
+                            }
 
-                    RUN -> {
-                        val sessions = activities.map { it as RunSession }
-                        return sessions.toMonthlyBarsList(
-                            getValue = {
+                            is GenericActivity.EnergyMetrics -> {
                                 metrics(
                                     selectedMetric = selectedMetric,
-                                    distance = it.distance,
-                                    elevationGained = it.elevationGained,
-                                    totalCalories = it.totalEnergy,
-                                    activeCalories = it.activeEnergy,
-                                    duration = it.basicActivity.durationInMinutes()
+                                    totalCalories = session.totalEnergy,
+                                    activeCalories = session.activeEnergy,
+                                    duration = duration
                                 )
-                            },
-                            label = selectedMetric
-                        )
-                    }
+                            }
 
-                    else -> return emptyList()
-                }
-
-
-            }
-
-            activityType.distanceMetrics -> when (activityType) {
-
-                DRIVE -> {
-                    val sessions = activities.map { it as GenericActivity.DriveSession }
-                    return sessions.toMonthlyBarsList(
-                        getValue = {
-                            metrics(
-                                selectedMetric = selectedMetric,
-                                distance = it.distance,
-                                elevationGained = it.elevationGained,
-                                duration = it.basicActivity.durationInMinutes()
-                            )
-                        },
-                        label = selectedMetric
-                    )
-                }
-
-
-                else -> return emptyList()
-            }
-
-            activityType.energyMetrics -> {
-
-                when (activityType) {
-                    TRAIN -> {
-                        val sessions = activities.map { it as TrainSession }
-                        return sessions.toMonthlyBarsList(
-                            getValue = {
+                            else -> {
                                 metrics(
                                     selectedMetric = selectedMetric,
-                                    totalCalories = it.totalEnergy,
-                                    activeCalories = it.activeEnergy,
-                                    duration = it.basicActivity.durationInMinutes()
+                                    duration = duration
                                 )
-                            },
-                            label = selectedMetric
-                        )
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Log.e("Charts", "Errore durante il calcolo della metrica: ${e.message}", e)
+                        0.0 // In caso di errore, restituisci un valore di fallback
                     }
-
-                    YOGA -> {
-                        val sessions = activities.map { it as GenericActivity.YogaSession }
-                        return sessions.toMonthlyBarsList(
-                            getValue = {
-                                metrics(
-                                    selectedMetric = selectedMetric,
-                                    totalCalories = it.totalEnergy,
-                                    activeCalories = it.activeEnergy,
-                                    duration = it.basicActivity.durationInMinutes()
-                                )
-                            },
-                            label = selectedMetric
-                        )
-                    }
-
-                    LIFT -> {
-                        val sessions = activities.map { it as GenericActivity.LiftSession }
-                        return sessions.toMonthlyBarsList(
-                            getValue = {
-                                metrics(
-                                    selectedMetric = selectedMetric,
-                                    totalCalories = it.totalEnergy,
-                                    activeCalories = it.activeEnergy,
-                                    duration = it.basicActivity.durationInMinutes()
-                                )
-                            },
-                            label = selectedMetric
-                        )
-                    }
-
-                    else -> return emptyList()
-                }
-
-            }
-
-            else -> return emptyList()
-        }
-
+                },
+                label = selectedMetric
+            )
     }
 
-    private fun <T> List<T>.toMonthlyBarsList(
-        getValue: (T) -> Double,
-        label: LabelMetrics
-    ): List<Bars> where T : GenericActivity {
-        return this
-            .groupBy { it.basicActivity.startTime.toMonthNumber() } // Raggruppiamo per mese
-            .toList()
-            .sortedBy { it.first }
-            .map { (month, sessionsInMonth) ->
-                Bars(
-                    label = month.toString(),
-                    values = listOf(
-                        Bars.Data(
-                            label = label.toString(),
-                            value = sessionsInMonth.sumOf { session -> getValue(session) },
-                            color = Brush.verticalGradient(
-                                colors = listOf(
-                                    sessionsInMonth[0].activityType.color,
-                                    sessionsInMonth[0].activityType.color,
-                                )
+}
+
+
+private fun <T> List<T>.toMonthlyBarsList(
+    getValue: (T) -> Double,
+    label: LabelMetrics
+): List<Bars> where T : GenericActivity {
+    return this
+        .groupBy { it.basicActivity.startTime.toMonthNumber() } // Raggruppiamo per mese
+        .toList()
+        .sortedBy { it.first }
+        .map { (month, sessionsInMonth) ->
+            Bars(
+                label = month.toString(),
+                values = listOf(
+                    Bars.Data(
+                        label = label.toString(),
+                        value = sessionsInMonth.sumOf { session -> getValue(session) },
+                        color = Brush.verticalGradient(
+                            colors = listOf(
+                                sessionsInMonth[0].activityType.color,
+                                sessionsInMonth[0].activityType.color,
                             )
                         )
                     )
                 )
-            }
-    }
+            )
+        }
 }
+
+fun availableMetricsFilter(activityType: ActivityType) =
+    when {
+        activityType.fullEnergyDistanceMetrics -> LabelMetrics.entries
+        activityType.distanceMetrics -> LabelMetrics.entries.filter { it != LabelMetrics.ACTIVE_CALORIES && it != LabelMetrics.TOTAL_CALORIES }
+        activityType.energyMetrics -> LabelMetrics.entries.filter { it != LabelMetrics.DISTANCE && it != LabelMetrics.ELEVATION }
+        else -> LabelMetrics.entries.filter { it == LabelMetrics.DURATION }
+    }
 
 
 @Suppress("UNCHECKED_CAST")

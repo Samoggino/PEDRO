@@ -17,16 +17,19 @@ import kotlinx.serialization.Serializable
 enum class ActivityType(
     val color: Color,
     val energyMetrics: Boolean = false,
-    val distanceMetrics: Boolean = false
+    val distanceMetrics: Boolean = false,
+    val fullEnergyDistanceMetrics: Boolean = false
 ) {
-    CYCLING(CyclingColor, energyMetrics = true, distanceMetrics = true),
-    RUN(RunColor, energyMetrics = true, distanceMetrics = true),
+    CYCLING(CyclingColor, fullEnergyDistanceMetrics = true),
+    RUN(RunColor, fullEnergyDistanceMetrics = true),
+    WALK(WalkColor, fullEnergyDistanceMetrics = true),
+
     YOGA(YogaColor, energyMetrics = true),
     TRAIN(TrainColor, energyMetrics = true),
     DRIVE(DriveColor, distanceMetrics = true),
+    LIFT(LiftColor, energyMetrics = true),
+
     SIT(SitColor),
     SLEEP(SleepColor),
-    WALK(WalkColor, distanceMetrics = true, energyMetrics = true),
-    LIFT(LiftColor, energyMetrics = true),
     LISTEN(ListenColor)
 }

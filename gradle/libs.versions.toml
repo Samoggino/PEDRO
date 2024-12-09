@@ -20,7 +20,7 @@ securityCrypto = "1.1.0-alpha06"
 storageKt = "3.0.1"
 runtimeLivedata = "1.7.5"
 # charts
-composeCharts = "0.0.19"
+composeCharts = "0.1.0"
 storage = "1.5.0"
 
 [libraries]

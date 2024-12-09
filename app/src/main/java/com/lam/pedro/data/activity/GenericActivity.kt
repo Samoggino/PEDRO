@@ -56,8 +56,18 @@ sealed class GenericActivity(
 ) {
     abstract val basicActivity: BasicActivity
 
-    interface DistanceMetrics
-    interface EnergyMetrics
+    interface DistanceMetrics {
+        val distance: Length
+        val elevationGained: Length
+    }
+
+    interface EnergyMetrics {
+        val totalEnergy: Energy
+        val activeEnergy: Energy
+    }
+
+    interface StaticMetric
+    interface FullMetrics : DistanceMetrics, EnergyMetrics
 
 
     @Serializable
@@ -82,10 +92,71 @@ sealed class GenericActivity(
     }
 
     @Serializable
+    data class WalkSession(
+        override val basicActivity: BasicActivity,
+        override val totalEnergy: Energy,
+        override val activeEnergy: Energy,
+//    @Serializable(with = ListStepsCadenceSampleSerializer::class) val cadenceRecord: List<@Contextual StepsCadenceRecord.Sample>,
+        @Serializable(with = ListSpeedRecordSampleSerializer::class) val speedSamples: List<@Contextual SpeedRecord.Sample>,
+        val stepsCount: Long,
+        override val distance: Length,
+        override val elevationGained: Length,
+        val exerciseRoute: ExerciseRoute,
+    ) : GenericActivity(activityType = ActivityType.WALK), FullMetrics
+
+    @Serializable
+    data class RunSession(
+        override val basicActivity: BasicActivity,
+        override val totalEnergy: Energy,
+        override val activeEnergy: Energy,
+        //  @Serializable(with = ListStepsCadenceSampleSerializer::class) val cadenceRecord: List<@Contextual StepsCadenceRecord.Sample>,
+        @Serializable(with = ListSpeedRecordSampleSerializer::class) val speedSamples: List<@Contextual SpeedRecord.Sample>,
+        val stepsCount: Long,
+        override val distance: Length,
+        override val elevationGained: Length,
+        val exerciseRoute: ExerciseRoute,
+    ) : GenericActivity(activityType = ActivityType.RUN), FullMetrics
+
+    @Serializable
+    data class CyclingSession(
+        override val basicActivity: BasicActivity,
+        override val totalEnergy: Energy,
+        override val activeEnergy: Energy,
+
+        @Serializable(with = ListSpeedRecordSampleSerializer::class) val speedSamples: List<@Contextual SpeedRecord.Sample>,
+        @Serializable(with = ListCyclingPedalingCadenceRecordSample::class) val cyclingPedalingCadenceSamples: List<@Contextual CyclingPedalingCadenceRecord.Sample>,
+        override val distance: Length,
+        override val elevationGained: Length,
+        val exerciseRoute: ExerciseRoute,
+    ) : GenericActivity(activityType = ActivityType.CYCLING), FullMetrics
+
+
+    @Serializable
+    data class LiftSession(
+        override val basicActivity: BasicActivity,
+
+        override val activeEnergy: Energy,
+        override val totalEnergy: Energy,
+
+        @Serializable(with = ListExerciseSegmentSerializer::class) val exerciseSegment: List<@Contextual ExerciseSegment>,
+        @Serializable(with = ListExerciseLapSerializer::class) val exerciseLap: List<@Contextual ExerciseLap>,
+    ) : GenericActivity(activityType = ActivityType.LIFT), EnergyMetrics
+
+    @Serializable
+    data class TrainSession(
+        override val basicActivity: BasicActivity,
+        override val totalEnergy: Energy,
+        override val activeEnergy: Energy,
+
+        @Serializable(with = ListExerciseSegmentSerializer::class) val exerciseSegment: List<@Contextual ExerciseSegment>,
+        @Serializable(with = ListExerciseLapSerializer::class) val exerciseLap: List<@Contextual ExerciseLap>,
+    ) : GenericActivity(activityType = ActivityType.TRAIN), EnergyMetrics
+
+    @Serializable
     data class YogaSession(
         override val basicActivity: BasicActivity,
-        val totalEnergy: Energy,
-        val activeEnergy: Energy,
+        override val totalEnergy: Energy,
+        override val activeEnergy: Energy,
 
         @Serializable(with = ListExerciseSegmentSerializer::class) val exerciseSegment: List<@Contextual ExerciseSegment>,
         @Serializable(with = ListExerciseLapSerializer::class) val exerciseLap: List<@Contextual ExerciseLap>,
@@ -93,91 +164,30 @@ sealed class GenericActivity(
 
 
     @Serializable
-    data class WalkSession(
-        override val basicActivity: BasicActivity,
-        val totalEnergy: Energy,
-        val activeEnergy: Energy,
-//    @Serializable(with = ListStepsCadenceSampleSerializer::class) val cadenceRecord: List<@Contextual StepsCadenceRecord.Sample>,
-        @Serializable(with = ListSpeedRecordSampleSerializer::class) val speedSamples: List<@Contextual SpeedRecord.Sample>,
-        val stepsCount: Long,
-        val distance: Length,
-        val elevationGained: Length,
-        val exerciseRoute: ExerciseRoute,
-    ) : GenericActivity(activityType = ActivityType.WALK), DistanceMetrics, EnergyMetrics
-
-
-    @Serializable
-    data class TrainSession(
-        override val basicActivity: BasicActivity,
-        val totalEnergy: Energy,
-        val activeEnergy: Energy,
-
-        @Serializable(with = ListExerciseSegmentSerializer::class) val exerciseSegment: List<@Contextual ExerciseSegment>,
-        @Serializable(with = ListExerciseLapSerializer::class) val exerciseLap: List<@Contextual ExerciseLap>,
-    ) : GenericActivity(activityType = ActivityType.TRAIN), EnergyMetrics
-
-    @Serializable
-    data class RunSession(
-        override val basicActivity: BasicActivity,
-        val totalEnergy: Energy,
-        val activeEnergy: Energy,
-        //  @Serializable(with = ListStepsCadenceSampleSerializer::class) val cadenceRecord: List<@Contextual StepsCadenceRecord.Sample>,
-        @Serializable(with = ListSpeedRecordSampleSerializer::class) val speedSamples: List<@Contextual SpeedRecord.Sample>,
-        val stepsCount: Long,
-        val distance: Length,
-        val elevationGained: Length,
-        val exerciseRoute: ExerciseRoute,
-    ) : GenericActivity(activityType = ActivityType.RUN), DistanceMetrics, EnergyMetrics
-
-    @Serializable
     data class DriveSession(
         override val basicActivity: BasicActivity,
 
         @Serializable(with = ListSpeedRecordSampleSerializer::class) val speedSamples: List<@Contextual SpeedRecord.Sample>,
-        val distance: Length,
-        val elevationGained: Length,
+        override val distance: Length,
+        override val elevationGained: Length,
         val exerciseRoute: ExerciseRoute,
     ) : GenericActivity(activityType = ActivityType.DRIVE), DistanceMetrics
 
 
     @Serializable
-    data class CyclingSession(
-        override val basicActivity: BasicActivity,
-        val totalEnergy: Energy,
-        val activeEnergy: Energy,
-
-        @Serializable(with = ListSpeedRecordSampleSerializer::class) val speedSamples: List<@Contextual SpeedRecord.Sample>,
-        @Serializable(with = ListCyclingPedalingCadenceRecordSample::class) val cyclingPedalingCadenceSamples: List<@Contextual CyclingPedalingCadenceRecord.Sample>,
-        val distance: Length,
-        val elevationGained: Length,
-        val exerciseRoute: ExerciseRoute,
-    ) : GenericActivity(activityType = ActivityType.CYCLING), DistanceMetrics, EnergyMetrics
-
-    @Serializable
     data class SleepSession(
         override val basicActivity: BasicActivity,
-    ) : GenericActivity(ActivityType.SLEEP)
+    ) : GenericActivity(activityType = ActivityType.SLEEP), StaticMetric
 
     @Serializable
     data class SitSession(
         override val basicActivity: BasicActivity,
         val volume: Volume
-    ) : GenericActivity(activityType = ActivityType.SIT)
+    ) : GenericActivity(activityType = ActivityType.SIT), StaticMetric
 
     @Serializable
     data class ListenSession(
         override val basicActivity: BasicActivity,
-    ) : GenericActivity(activityType = ActivityType.LISTEN)
-
-    @Serializable
-    data class LiftSession(
-        override val basicActivity: BasicActivity,
-
-        val activeEnergy: Energy,
-        val totalEnergy: Energy,
-
-        @Serializable(with = ListExerciseSegmentSerializer::class) val exerciseSegment: List<@Contextual ExerciseSegment>,
-        @Serializable(with = ListExerciseLapSerializer::class) val exerciseLap: List<@Contextual ExerciseLap>,
-    ) : GenericActivity(activityType = ActivityType.LIFT), EnergyMetrics
+    ) : GenericActivity(activityType = ActivityType.LISTEN), StaticMetric
 
 }
