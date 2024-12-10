@@ -15,17 +15,6 @@ import ir.ehsannarmani.compose_charts.models.Bars
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-sealed class ChartError {
-    data class DataError(val message: String) : ChartError()
-    data object NoData : ChartError()
-}
-
-sealed class ChartState {
-    data object Loading : ChartState()
-    data class Success(val data: List<Bars>) : ChartState()
-    data class Error(val error: ChartError) : ChartState()
-}
-
 class ViewModelCharts(
     private val viewModelRecords: ViewModelRecords
 ) : ViewModel() {
@@ -53,7 +42,7 @@ class ViewModelCharts(
                 } else {
                     _chartState.postValue(
                         ChartState.Success(
-                            generateBarsList(
+                            buildBarsList(
                                 activities,
                                 selectedMetric
                             )
@@ -77,7 +66,7 @@ class ViewModelCharts(
         Log.d("Charts", "Cambio metrica: $selectedMetric")
 
         // Update chartState with new data
-        _chartState.value = ChartState.Success(generateBarsList(activities, selectedMetric))
+        _chartState.value = ChartState.Success(buildBarsList(activities, selectedMetric))
     }
 
 
@@ -110,7 +99,7 @@ class ViewModelCharts(
     /**
      * Genera la lista delle barre mensili per le attività selezionate.
      */
-    private fun generateBarsList(
+    private fun buildBarsList(
         activities: List<GenericActivity>,
         selectedMetric: LabelMetrics
     ): List<Bars> {
@@ -145,7 +134,18 @@ class ViewModelCharts(
     }
 }
 
-fun availableMetricsFilter(activityType: ActivityType) =
+sealed class ChartError {
+    data class DataError(val message: String) : ChartError()
+    data object NoData : ChartError()
+}
+
+sealed class ChartState {
+    data object Loading : ChartState()
+    data class Success(val data: List<Bars>) : ChartState()
+    data class Error(val error: ChartError) : ChartState()
+}
+
+fun getAvailableMetricsForActivity(activityType: ActivityType) =
     when {
         activityType.fullEnergyDistanceMetrics -> LabelMetrics.entries
         activityType.distanceMetrics -> LabelMetrics.entries.filter { it != LabelMetrics.ACTIVE_CALORIES && it != LabelMetrics.TOTAL_CALORIES }

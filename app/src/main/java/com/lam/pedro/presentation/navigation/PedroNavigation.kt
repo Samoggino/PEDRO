@@ -83,7 +83,6 @@ fun PedroNavigation(
         {
             fadeOut(animationSpec = tween(600)) // Aggiungi un'animazione di uscita, se desiderato
         }
-
     val slideInH: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? =
         {
             slideInHorizontally(

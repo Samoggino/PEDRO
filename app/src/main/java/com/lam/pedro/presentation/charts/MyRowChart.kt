@@ -14,18 +14,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ir.ehsannarmani.compose_charts.ColumnChart
+import ir.ehsannarmani.compose_charts.RowChart
 import ir.ehsannarmani.compose_charts.models.AnimationMode
 import ir.ehsannarmani.compose_charts.models.BarProperties
 import ir.ehsannarmani.compose_charts.models.Bars
-import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.PopupProperties
+import ir.ehsannarmani.compose_charts.models.VerticalIndicatorProperties
 import kotlinx.datetime.Month
 
 @Composable
-fun BarChart(
+fun MyRowChart(
     chartData: List<Bars>,
     modifier: Modifier = Modifier
         .height(300.dp)
@@ -51,7 +51,7 @@ fun BarChart(
         it * 75L
     }
 
-    ColumnChart(
+    RowChart(
         modifier = modifier,
         data = chartData,
         barProperties = BarProperties(
@@ -74,7 +74,7 @@ fun BarChart(
         popupProperties = PopupProperties(
             textStyle = textStyle,
         ),
-        indicatorProperties = HorizontalIndicatorProperties(
+        indicatorProperties = VerticalIndicatorProperties(
             textStyle = textStyle,
             padding = 10.dp,
         ),
@@ -87,5 +87,4 @@ fun BarChart(
 
         }
     )
-
 }

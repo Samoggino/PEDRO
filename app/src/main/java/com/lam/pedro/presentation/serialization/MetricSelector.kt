@@ -1,124 +1,80 @@
 package com.lam.pedro.presentation.serialization
 
-import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.Icon
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.lam.pedro.data.activity.ActivityType
-import com.lam.pedro.presentation.charts.availableMetricsFilter
+import com.lam.pedro.presentation.charts.LabelMetrics
+import com.lam.pedro.presentation.charts.getAvailableMetricsForActivity
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MetricSelector(
-    onMetricChange: (String) -> Unit,
+    onMetricChange: (LabelMetrics) -> Unit,
     activityType: ActivityType
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var selectedMetric by remember { mutableStateOf("") }
-
-    LaunchedEffect(true) {
-        Log.d("Charts", "MetricSelector avviato")
+    var selectedMetric by remember {
+        mutableStateOf(
+            getAvailableMetricsForActivity(activityType).firstOrNull() ?: LabelMetrics.DURATION
+        )
     }
 
-    val availableMetrics = availableMetricsFilter(activityType)
+    val availableMetrics = getAvailableMetricsForActivity(activityType)
 
-    if (availableMetrics.isEmpty()) {
-        Text(text = "No metrics available")
-        return
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onTap = {
-                        if (expanded) {
-                            expanded = false
-                        }
-                    }
-                )
-            }
-    ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = selectedMetric.ifEmpty { "Select Metric" },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { expanded = !expanded }
-                    .padding(16.dp)
-                    .background(activityType.color, shape = RoundedCornerShape(8.dp))
-                    .border(
-                        1.dp,
-                        activityType.color.copy(alpha = 0.12f),
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .shadow(4.dp, shape = RoundedCornerShape(8.dp))
-            )
-            Icon(
-                imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(end = 16.dp)
-                    .clickable { expanded = !expanded }
-            )
+    when {
+        availableMetrics.isEmpty() -> {
+            Text(text = "No metrics available")
+            return
         }
+    }
 
-        AnimatedVisibility(visible = expanded) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(activityType.color, shape = RoundedCornerShape(8.dp))
-                    .border(
-                        1.dp,
-                        activityType.color.copy(alpha = 0.12f),
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                    .shadow(4.dp, shape = RoundedCornerShape(8.dp))
-            ) {
-                items(availableMetrics) { metric ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                selectedMetric = metric.toString()
-                                onMetricChange(selectedMetric)
-                                expanded = false
-                            }
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = metric.toString(),
-                        )
-                    }
-                }
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
+        TextField(
+            readOnly = true,
+            value = selectedMetric.toString(),
+            onValueChange = { },
+            label = { Text("Metric") }, // Add a label for accessibility
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            modifier = Modifier
+                .menuAnchor(
+                    type = MenuAnchorType.PrimaryNotEditable,
+                    enabled = true
+                )
+                .fillMaxWidth()
+                .padding(8.dp)
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            availableMetrics.forEach { metric ->
+                DropdownMenuItem(
+                    text = { Text(metric.toString()) },
+                    onClick = {
+                        selectedMetric = metric
+                        onMetricChange(metric)
+                        expanded = false
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                )
             }
         }
     }
