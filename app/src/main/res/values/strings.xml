@@ -175,5 +175,9 @@
     <string name="profile_screen">Profile</string>
     <string name="location_permission_description">To track the route and obtain accurate data, the location permission is required. Without this permission, the feature will not be available.</string>
     <string name="location_permission_title">Location required</string>
+    <string name="request_permission">Request permission</string>
+    <string name="go_to_settings">Go to settings</string>
+    <string name="activity_recognition_permission_title">Activity required</string>
+    <string name="activity_recognition_permission_description">To track steps, the activity recognition permission is required. Without this permission, the feature will not be available.</string>
 
 </resources>

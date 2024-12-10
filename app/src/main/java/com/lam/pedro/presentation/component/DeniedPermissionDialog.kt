@@ -29,7 +29,8 @@ fun DeniedPermissionDialog(
     color: Color = MaterialTheme.colorScheme.primary,
     title: Int,
     icon: Int,
-    text: Int
+    text: Int,
+    buttonText: Int
 ) {
     if (showDialog) {
         Dialog(onDismissRequest = onDismiss) {
@@ -63,7 +64,9 @@ fun DeniedPermissionDialog(
                         onDismiss()
                         onGoToSettings()
                     }) {
-                        Text("Go to settings")
+                        Text(
+                            text = stringResource(buttonText),
+                        )
                     }
                 }
             }

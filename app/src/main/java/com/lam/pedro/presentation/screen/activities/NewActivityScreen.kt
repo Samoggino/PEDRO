@@ -9,37 +9,19 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
@@ -52,33 +34,27 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.SpeedRecord
-import androidx.health.connect.client.units.Energy
-import androidx.health.connect.client.units.Length
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lam.pedro.R
-import com.lam.pedro.data.activitySession.RunSession
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.component.DeniedPermissionDialog
 import com.lam.pedro.presentation.component.NewActivityControlButtons
 import com.lam.pedro.presentation.component.NewActivitySaveAlertDialog
 import com.lam.pedro.presentation.component.NewActivityTopAppBar
-import com.lam.pedro.presentation.component.PlayPauseButton
-import com.lam.pedro.presentation.component.StatsRow
-import com.lam.pedro.presentation.component.StopButton
 import com.lam.pedro.presentation.component.TimerStatsDisplay
-import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModelFactory
 import com.lam.pedro.util.LocationTracker
@@ -89,7 +65,6 @@ import com.lam.pedro.util.updateDistance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.maplibre.android.geometry.LatLng
@@ -111,13 +86,17 @@ fun NewActivityScreen(
     val sessionJob = remember { Job() }
     val sessionScope = remember { CoroutineScope(sessionJob + Dispatchers.Default) }
     val snackbarHostState = remember { SnackbarHostState() }
-    var showLocationPermissionDialog by remember { mutableStateOf(false) }
     val stepCounter = remember { StepCounter(context) }
     var steps by remember { mutableFloatStateOf(0f) }
     var averageSpeed by remember { mutableDoubleStateOf(0.0) }
     var speedCounter by remember { mutableIntStateOf(0) }
     var totalSpeed by remember { mutableDoubleStateOf(0.0) }
 
+    var showLocationPermissionDialog by remember { mutableStateOf(false) }
+    var showActivityRecognitionPermissionDialog by remember { mutableStateOf(false) }
+    var requestLocationPermissionCounter by remember { mutableIntStateOf(0) }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     var hasLocationPermission by remember {
         mutableStateOf(
@@ -162,16 +141,99 @@ fun NewActivityScreen(
         } else {
             //TODO: Handle permission denied, the app won't work
             Log.d(TAG, "-----------------GPS Permission denied-----------------")
+            requestLocationPermissionCounter++
             showLocationPermissionDialog = true
         }
     }
 
-    /*---------------------------------------------------------------------------------------------------------*/
 
-    //TODO: coming back from settings you're able to start the activity without permissions
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> {
+                    // Controlla se i permessi sono concessi quando lo screen torna attivo
+                    if (ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        //if (!isFirstTimeRequest) {
+                            hasLocationPermission = true
+                            showLocationPermissionDialog = false
+                        //}
+                    } else {
+                        // Se il permesso non è stato concesso, mostriamo il dialog
+                        showLocationPermissionDialog = true
+                    }
+                }
+                else -> Unit
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> {
+                    // Controlla se il permesso di ACTIVITY_RECOGNITION è stato concesso
+                    if (ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.ACTIVITY_RECOGNITION
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        hasActivityRecognitionPermission = true
+                        showActivityRecognitionPermissionDialog = false
+                    } else {
+                        // Mostra il dialog se il permesso non è stato concesso
+                        showActivityRecognitionPermissionDialog = true
+                    }
+                }
+                else -> Unit
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     DeniedPermissionDialog(
         showDialog = showLocationPermissionDialog,
-        onDismiss = { showLocationPermissionDialog = false },
+        onDismiss = {
+            if (hasLocationPermission) {
+                showLocationPermissionDialog = false
+            }
+        },
+        onGoToSettings = {
+            if (requestLocationPermissionCounter < 2) {
+                requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            } else {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri = Uri.fromParts("package", context.packageName, null)
+                intent.data = uri
+                context.startActivity(intent)
+            }
+        },
+        color = MaterialTheme.colorScheme.primary,
+        title = R.string.location_permission_title,
+        icon = R.drawable.location_icon,
+        text = R.string.location_permission_description,
+        buttonText = if (requestLocationPermissionCounter < 2) R.string.request_permission else R.string.go_to_settings
+    )
+
+    DeniedPermissionDialog(
+        showDialog = showActivityRecognitionPermissionDialog,
+        onDismiss = {
+            if (hasActivityRecognitionPermission) {
+                showActivityRecognitionPermissionDialog = false
+            }
+        },
         onGoToSettings = {
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
             val uri = Uri.fromParts("package", context.packageName, null)
@@ -179,10 +241,14 @@ fun NewActivityScreen(
             context.startActivity(intent)
         },
         color = MaterialTheme.colorScheme.primary,
-        title = R.string.location_permission_title,
-        icon = R.drawable.location_icon,
-        text = R.string.location_permission_description
+        title = R.string.activity_recognition_permission_title,
+        icon = R.drawable.steps_icon,
+        text = R.string.activity_recognition_permission_description,
+        buttonText = R.string.go_to_settings
     )
+
+
+    /*------------------------------------------------------------------------------------------------------------------*/
 
     Scaffold(
         topBar = {
@@ -251,7 +317,6 @@ fun NewActivityScreen(
                 visible = visible,
                 color = color, // Colore personalizzato
                 onPlayPauseClick = {
-                    requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                     if (visible) {
                         isPaused = !isPaused
                     } else {
