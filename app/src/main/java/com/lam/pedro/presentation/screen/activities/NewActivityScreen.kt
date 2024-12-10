@@ -71,14 +71,20 @@ import com.lam.pedro.R
 import com.lam.pedro.data.activitySession.RunSession
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.component.DeniedPermissionDialog
+import com.lam.pedro.presentation.component.NewActivityControlButtons
+import com.lam.pedro.presentation.component.NewActivitySaveAlertDialog
 import com.lam.pedro.presentation.component.NewActivityTopAppBar
+import com.lam.pedro.presentation.component.PlayPauseButton
 import com.lam.pedro.presentation.component.StatsRow
+import com.lam.pedro.presentation.component.StopButton
+import com.lam.pedro.presentation.component.TimerStatsDisplay
 import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModelFactory
 import com.lam.pedro.util.LocationTracker
 import com.lam.pedro.util.SpeedTracker
 import com.lam.pedro.util.StepCounter
+import com.lam.pedro.util.stopActivity
 import com.lam.pedro.util.updateDistance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -203,7 +209,6 @@ fun NewActivityScreen(
             var elapsedTime by remember { mutableIntStateOf(0) }
 
             var startTime: ZonedDateTime by remember { mutableStateOf(ZonedDateTime.now()) }
-            var endTime: ZonedDateTime
             val speedTracker = SpeedTracker(LocalContext.current)
             val locationTracker = LocationTracker(LocalContext.current)
 
@@ -230,227 +235,89 @@ fun NewActivityScreen(
             Spacer(modifier = Modifier.height(40.dp))
 
             AnimatedVisibility(visible = timerRunning || !isPaused) {
-                val minutes = (elapsedTime / 60000) % 60
-                val seconds = (elapsedTime / 1000) % 60
-                val centiseconds = (elapsedTime % 1000) / 10
-
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-
-                    Text(
-                        String.format("%02d:%02d:%02d", minutes, seconds, centiseconds),
-                        style = MaterialTheme.typography.headlineLarge.copy(fontSize = 60.sp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentWidth(Alignment.CenterHorizontally)
-                    )
-
-                    Spacer(modifier = Modifier.height(20.dp))
-
-                    StatsRow(
-                        steps = steps,
-                        speed = averageSpeed,
-                        distance = distance,
-                        color = color,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
+                TimerStatsDisplay(
+                    elapsedTime = elapsedTime,
+                    steps = steps,
+                    averageSpeed = averageSpeed,
+                    distance = distance,
+                    color = color
+                )
             }
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(26.dp))
-                        .size(140.dp)
-                        .background(color)
-                ) {
-                    IconButton(
-                        onClick = {
-                            requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-                            if (visible) {
-                                isPaused = !isPaused
-                            } else {
-                                isStopAction = false
-                                showDialog = true
-                            }
-                        },
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Image(
-                            painter = painterResource(id = if (!isPaused) R.drawable.pause_icon else R.drawable.play_icon),
-                            contentDescription = if (visible) "Pause" else "Play",
-                            modifier = Modifier.size(60.dp)
-                        )
+            NewActivityControlButtons(
+                isPaused = isPaused,
+                visible = visible,
+                color = color, // Colore personalizzato
+                onPlayPauseClick = {
+                    requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    if (visible) {
+                        isPaused = !isPaused
+                    } else {
+                        isStopAction = false
+                        showDialog = true
                     }
-                }
+                },
+                onStopClick = {
+                    isStopAction = true
+                    showDialog = true
+                },
+                density = density
+            )
 
-                AnimatedVisibility(
-                    visible = visible,
-                    enter = slideInHorizontally { with(density) { -40.dp.roundToPx() } } + fadeIn(),
-                    exit = slideOutHorizontally { with(density) { -40.dp.roundToPx() } } + fadeOut()
-                ) {
-                    Row() {
-                        Spacer(modifier = Modifier.width(20.dp))
-                        IconButton(
-                            onClick = {
-                                isStopAction = true
-                                showDialog = true
-                            },
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(26.dp))
-                                .size(140.dp)
-                                .background(Color(0xFFF44336))
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.stop_icon),
-                                contentDescription = "Stop",
-                                modifier = Modifier.size(60.dp)
-                            )
-                        }
-                    }
-                }
-            }
 
             if (showDialog) {
-                AlertDialog(
+                NewActivitySaveAlertDialog(
+                    showDialog = showDialog,
                     onDismissRequest = { showDialog = false },
-                    title = { Text(text = "Confirm", color = color) },
-                    text = {
-                        Column {
-                            Text(
-                                if (isStopAction) "Want to stop the activity? (you can change these while stopping)" else if (visible) "Want to pause?" else "Want to start?"
-                            )
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            OutlinedTextField(
-                                value = activityTitle,
-                                onValueChange = {
-                                    activityTitle = it
-                                    isTitleEmpty = activityTitle.isBlank()
-                                },
-                                label = { Text("Titolo") },
-                                isError = isTitleEmpty,
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(26.dp),
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    focusedIndicatorColor = color,
-                                    cursorColor = color,
-                                    focusedLabelColor = color,
-                                )
-                            )
-
-                            if (isTitleEmpty) {
-                                Text(
-                                    text = "Title is required",
-                                    color = Color.Red,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            OutlinedTextField(
-                                value = notes,
-                                onValueChange = { notes = it },
-                                label = { Text("Note (optional)") },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(26.dp),
-                                colors = TextFieldDefaults.colors(
-                                    focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent,
-                                    focusedIndicatorColor = color,
-                                    cursorColor = color,
-                                    focusedLabelColor = color,
-                                )
-                            )
-                        }
+                    isStopAction = isStopAction,
+                    visible = visible,
+                    color = color,
+                    activityTitle = activityTitle,
+                    onTitleChange = {
+                        activityTitle = it
+                        isTitleEmpty = activityTitle.isBlank()
                     },
-                    confirmButton = {
-                        TextButton(
-                            onClick = {
-
-                                if (activityTitle.isNotBlank()) {
-                                    coroutineScope.launch {
-                                        if (isStopAction) {
-                                            timerRunning = false
-                                            visible = false
-                                            isPaused = true
-
-                                            val minutes = (elapsedTime / 60000) % 60
-                                            val seconds = (elapsedTime / 1000) % 60
-                                            val centiseconds = (elapsedTime % 1000) / 10
-                                            timerResults.add(
-                                                String.format(
-                                                    "%02d:%02d:%02d",
-                                                    minutes,
-                                                    seconds,
-                                                    centiseconds
-                                                )
-                                            )
-                                            Log.d(TAG, "------------Timer results: $timerResults")
-
-                                            endTime = ZonedDateTime.now()
-
-                                            if (titleId == Screen.RunSessionScreen.titleId) {
-                                                val runSession = RunSession(
-                                                    startTime = startTime.toInstant(),
-                                                    endTime = endTime.toInstant(),
-                                                    title = activityTitle,
-                                                    notes = notes,
-                                                    speedSamples = speedSamples,
-                                                    stepsCount = steps.toLong(),
-                                                    totalEnergy = Energy.calories(profileViewModel.weight.toDouble()),
-                                                    activeEnergy = Energy.calories(3.0),
-                                                    distance = Length.meters(distance.value),
-                                                    elevationGained = Length.meters(3.0),
-                                                    exerciseRoute = ExerciseRoute(exerciseRoute)
-                                                )
-                                                Log.d(TAG, "------------Run session: $runSession")
-                                                viewModel.saveRunSession(runSession)
-
-                                                sessionJob.cancelAndJoin()
-                                            }
-
-                                            viewModel.fetchExerciseSessions(activityType)
-
-                                            elapsedTime = 0
-
-                                            navController.popBackStack()
-                                        } else {
-                                            visible = !visible
-
-                                            if (visible) {
-                                                isPaused = false
-                                                timerRunning = true
-                                            }
-                                        }
-                                        showDialog = false
-                                    }
+                    isTitleEmpty = isTitleEmpty,
+                    notes = notes,
+                    onNotesChange = { notes = it },
+                    onConfirm = {
+                        coroutineScope.launch {
+                            if (activityTitle.isNotBlank()) {
+                                if (isStopAction) {
+                                    // Logica per interrompere l'attività
+                                    stopActivity(
+                                        timerRunning = mutableStateOf(timerRunning),
+                                        visible = mutableStateOf(visible),
+                                        isPaused = mutableStateOf(isPaused),
+                                        elapsedTime = elapsedTime,
+                                        timerResults = timerResults,
+                                        startTime = startTime,
+                                        activityTitle = activityTitle,
+                                        notes = notes,
+                                        speedSamples = speedSamples,
+                                        steps = steps,
+                                        profileViewModel = profileViewModel,
+                                        distance = mutableDoubleStateOf(distance.value),
+                                        exerciseRoute = exerciseRoute,
+                                        titleId = titleId,
+                                        viewModel = viewModel,
+                                        sessionJob = sessionJob,
+                                        navController = navController,
+                                        activityType = activityType
+                                    )
                                 } else {
-                                    isTitleEmpty = true
+                                    visible = !visible
+                                    if (visible) {
+                                        isPaused = false
+                                        timerRunning = true
+                                    }
                                 }
+                                showDialog = false
+                            } else {
+                                isTitleEmpty = true
                             }
-                        ) {
-                            Text(text = "Yes", color = color)
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(
-                            onClick = { showDialog = false }
-                        ) {
-                            Text(text = "Dismiss", color = color)
                         }
                     }
                 )
