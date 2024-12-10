@@ -95,6 +95,8 @@ fun NewActivityScreen(
     var showLocationPermissionDialog by remember { mutableStateOf(false) }
     var showActivityRecognitionPermissionDialog by remember { mutableStateOf(false) }
     var requestLocationPermissionCounter by remember { mutableIntStateOf(0) }
+    var hasBeenAskedForLocationPermission by remember { mutableStateOf(false) }
+    var hasBeenAskedForActivityRecognitionPermission by remember { mutableStateOf(false) }
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -127,7 +129,8 @@ fun NewActivityScreen(
         } else {
             //TODO: Handle permission denied, inform the user
             Log.d(TAG, "-----------------Activity Recognition Permission denied-----------------")
-            //showActivityRecognitionPermissionDialog = true
+            hasBeenAskedForActivityRecognitionPermission = true
+            showActivityRecognitionPermissionDialog = true
         }
     }
 
@@ -141,11 +144,11 @@ fun NewActivityScreen(
         } else {
             //TODO: Handle permission denied, the app won't work
             Log.d(TAG, "-----------------GPS Permission denied-----------------")
+            hasBeenAskedForLocationPermission = true
             requestLocationPermissionCounter++
             showLocationPermissionDialog = true
         }
     }
-
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -158,14 +161,16 @@ fun NewActivityScreen(
                         ) == PackageManager.PERMISSION_GRANTED
                     ) {
                         //if (!isFirstTimeRequest) {
-                            hasLocationPermission = true
-                            showLocationPermissionDialog = false
+                        hasLocationPermission = true
+                        showLocationPermissionDialog = false
+                        requestActivityRecognitionPermissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
                         //}
                     } else {
-                        // Se il permesso non è stato concesso, mostriamo il dialog
-                        showLocationPermissionDialog = true
+                        if (hasBeenAskedForLocationPermission)
+                            showLocationPermissionDialog = true
                     }
                 }
+
                 else -> Unit
             }
         }
@@ -190,9 +195,11 @@ fun NewActivityScreen(
                         showActivityRecognitionPermissionDialog = false
                     } else {
                         // Mostra il dialog se il permesso non è stato concesso
-                        showActivityRecognitionPermissionDialog = true
+                        if (hasBeenAskedForActivityRecognitionPermission)
+                            showActivityRecognitionPermissionDialog = true
                     }
                 }
+
                 else -> Unit
             }
         }
@@ -317,6 +324,7 @@ fun NewActivityScreen(
                 visible = visible,
                 color = color, // Colore personalizzato
                 onPlayPauseClick = {
+                    requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                     if (visible) {
                         isPaused = !isPaused
                     } else {
