@@ -1,9 +1,9 @@
 package com.lam.pedro.presentation.navigation
 
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -26,6 +27,7 @@ import com.example.healthconnectsample.data.HealthConnectManager
 import com.example.healthconnectsample.presentation.screen.HealthConnectScreen
 import com.lam.pedro.data.activity.ActivityType
 import com.lam.pedro.presentation.charts.ScreenCharts
+import com.lam.pedro.presentation.charts.viewModelChartsFactory
 import com.lam.pedro.presentation.following.FollowScreen
 import com.lam.pedro.presentation.screen.AboutScreen
 import com.lam.pedro.presentation.screen.ActivitiesScreen
@@ -56,13 +58,13 @@ import com.lam.pedro.presentation.screen.sleepsession.SleepSessionScreen
 import com.lam.pedro.presentation.screen.sleepsession.SleepSessionViewModel
 import com.lam.pedro.presentation.screen.sleepsession.SleepSessionViewModelFactory
 import com.lam.pedro.presentation.serialization.MyScreenRecords
+import com.lam.pedro.presentation.serialization.ViewModelRecordFactory
 import com.lam.pedro.showExceptionSnackbar
 import kotlinx.coroutines.launch
 
 /**
  * Provides the navigation in the app.
  */
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun PedroNavigation(
     navController: NavHostController,
@@ -71,56 +73,62 @@ fun PedroNavigation(
     topBarTitle: Int
 ) {
 
+    val fadeInTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? =
+        {
+            fadeIn(
+                animationSpec = tween(700) // Personalizza la durata dell'animazione
+            )
+        }
+    val fadeOutTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? =
+        {
+            fadeOut(animationSpec = tween(600)) // Aggiungi un'animazione di uscita, se desiderato
+        }
+
+    val slideInH: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? =
+        {
+            slideInHorizontally(
+                initialOffsetX = { fullWidth -> fullWidth }, // Entra da destra
+                animationSpec = tween(700) // Durata dell'animazione
+            )
+        }
+    val slideOutH: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? =
+        {
+            slideOutHorizontally(
+                targetOffsetX = { fullWidth -> fullWidth }, // Esce verso destra
+                animationSpec = tween(600) // Durata dell'uscita
+            )
+        }
+
     val scope = rememberCoroutineScope()
     NavHost(navController = navController,
         startDestination = Screen.MyScreenRecords.route,
         enterTransition = { EnterTransition.None },
         exitTransition = { ExitTransition.None }) {
         val availability by healthConnectManager.availability
-        composable(Screen.HomeScreen.route, enterTransition = {
-            fadeIn(
-                animationSpec = tween(700) // Personalizza la durata dell'animazione
-            )
-        },
-            exitTransition = {
-                fadeOut(animationSpec = tween(600)) // Aggiungi un'animazione di uscita, se desiderato
-            }) {
+
+        composable(
+            Screen.HomeScreen.route, enterTransition = fadeInTransition,
+            exitTransition = fadeOutTransition
+        ) {
             HomeScreen()
         }
-        composable(Screen.ActivitiesScreen.route, enterTransition = {
-            fadeIn(
-                animationSpec = tween(700) // Personalizza la durata dell'animazione
-            )
-        },
-            exitTransition = {
-                fadeOut(animationSpec = tween(600)) // Aggiungi un'animazione di uscita, se desiderato
-            }) {
+        composable(
+            Screen.ActivitiesScreen.route, enterTransition = fadeInTransition,
+            exitTransition = fadeOutTransition
+        ) {
             ActivitiesScreen(navController)
         }
-        composable(Screen.MoreScreen.route, enterTransition = {
-            fadeIn(
-                animationSpec = tween(700) // Personalizza la durata dell'animazione
-            )
-        },
-            exitTransition = {
-                fadeOut(animationSpec = tween(600)) // Aggiungi un'animazione di uscita, se desiderato
-            }) {
+        composable(
+            Screen.MoreScreen.route, enterTransition = fadeInTransition,
+            exitTransition = fadeOutTransition
+        ) {
             MoreScreen(navController)
         }
+
         composable(
             Screen.AboutScreen.route,
-            enterTransition = {
-                slideInHorizontally(
-                    initialOffsetX = { fullWidth -> fullWidth }, // Entra da destra
-                    animationSpec = tween(700) // Durata dell'animazione
-                )
-            },
-            exitTransition = {
-                slideOutHorizontally(
-                    targetOffsetX = { fullWidth -> fullWidth }, // Esce verso destra
-                    animationSpec = tween(600) // Durata dell'uscita
-                )
-            },
+            enterTransition = slideInH,
+            exitTransition = slideOutH,
         ) {
             AboutScreen(navController = navController, titleId = topBarTitle)
         }
@@ -141,31 +149,27 @@ fun PedroNavigation(
 
         composable(
             route = Screen.ChartsScreen.route + "/{activityType}",
-            arguments = listOf(navArgument("activityType") { type = NavType.StringType }),
-            content = {
-                val activityTypeProp =
-                    ActivityType.valueOf(it.arguments?.getString("activityType")!!)
-
-                ScreenCharts(
-                    activityType = activityTypeProp
-                )
-            }
-        )
+            arguments = listOf(navArgument("activityType") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val activityTypeProp =
+                ActivityType.valueOf(backStackEntry.arguments?.getString("activityType") ?: "")
+            ScreenCharts(
+                activityType = activityTypeProp,
+                viewModelCharts = viewModel(
+                    factory = viewModelChartsFactory(
+                        viewModelRecords = viewModel(
+                            factory = ViewModelRecordFactory()
+                        )
+                    )
+                ),
+                navController = navController
+            )
+        }
 
         composable(
             route = Screen.PrivacyPolicy.route,
-            enterTransition = {
-                slideInHorizontally(
-                    initialOffsetX = { fullWidth -> fullWidth }, // Entra da destra
-                    animationSpec = tween(700) // Durata dell'animazione
-                )
-            },
-            exitTransition = {
-                slideOutHorizontally(
-                    targetOffsetX = { fullWidth -> fullWidth }, // Esce verso destra
-                    animationSpec = tween(600) // Durata dell'uscita
-                )
-            },
+            enterTransition = slideInH,
+            exitTransition = slideOutH,
             deepLinks = listOf(
                 navDeepLink {
                     action = "androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE"
@@ -174,19 +178,10 @@ fun PedroNavigation(
         ) {
             PrivacyPolicyScreen(navController = navController, titleId = topBarTitle)
         }
-        composable(Screen.HealthConnectScreen.route,
-            enterTransition = {
-                slideInHorizontally(
-                    initialOffsetX = { fullWidth -> fullWidth }, // Entra da destra
-                    animationSpec = tween(700) // Durata dell'animazione
-                )
-            },
-            exitTransition = {
-                slideOutHorizontally(
-                    targetOffsetX = { fullWidth -> fullWidth }, // Esce verso destra
-                    animationSpec = tween(600) // Durata dell'uscita
-                )
-            }
+        composable(
+            Screen.HealthConnectScreen.route,
+            enterTransition = slideInH,
+            exitTransition = slideOutH
         ) {
             HealthConnectScreen(
                 healthConnectAvailability = availability,
@@ -198,19 +193,10 @@ fun PedroNavigation(
                 revokeAllPermissions = { scope.launch { healthConnectManager.revokeAllPermissions() } }
             )
         }
-        composable(Screen.SettingScreen.route,
-            enterTransition = {
-                slideInHorizontally(
-                    initialOffsetX = { fullWidth -> fullWidth }, // Entra da destra
-                    animationSpec = tween(700) // Durata dell'animazione
-                )
-            },
-            exitTransition = {
-                slideOutHorizontally(
-                    targetOffsetX = { fullWidth -> fullWidth }, // Esce verso destra
-                    animationSpec = tween(600) // Durata dell'uscita
-                )
-            }
+        composable(
+            Screen.SettingScreen.route,
+            enterTransition = slideInH,
+            exitTransition = slideOutH
         ) {
             SettingsScreen(
                 navController = navController,
@@ -327,15 +313,21 @@ fun PedroNavigation(
                 }
             )
         }
-        composable(Screen.SleepSessions.route,
-            enterTransition = {
+        val scaleIn: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? =
+            {
                 scaleIn(
                     animationSpec = tween(1000) // Personalizza la durata dell'animazione
                 )
-            },
-            exitTransition = {
+            }
+        val shrinkOut: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? =
+            {
                 shrinkOut(animationSpec = tween(1000)) // Aggiungi un'animazione di uscita, se desiderato
-            }) {
+            }
+        composable(
+            Screen.SleepSessions.route,
+            enterTransition = scaleIn,
+            exitTransition = shrinkOut
+        ) {
             val viewModel: SleepSessionViewModel = viewModel(
                 factory = SleepSessionViewModelFactory(
                     healthConnectManager = healthConnectManager

@@ -38,7 +38,7 @@ object SessionCreator {
 
     fun createYogaSession(): YogaSession {
         return YogaSession(
-            basicActivity = basicActivity("Yoga Title", "Yoga Notes"),
+            basicActivity = createBasicActivity("Yoga Title", "Yoga Notes"),
             totalEnergy = energy,
             activeEnergy = energy,
             exerciseSegment = exerciseSegmentList(),
@@ -48,7 +48,7 @@ object SessionCreator {
 
     fun createRunSession(): RunSession {
         return RunSession(
-            basicActivity = basicActivity("Run Title", "Run Notes"),
+            basicActivity = createBasicActivity("Run Title", "Run Notes"),
             totalEnergy = energy,
             activeEnergy = energy,
             speedSamples = speedRecordSampleList(),
@@ -59,25 +59,25 @@ object SessionCreator {
         )
     }
 
-    fun listenSessionCreator() = ListenSession(
-        basicActivity = basicActivity("Listen Title", "Listen Notes")
+    fun createListenSession() = ListenSession(
+        basicActivity = createBasicActivity("Listen Title", "Listen Notes")
     )
 
-    fun liftSessionCreator() = LiftSession(
-        basicActivity = basicActivity("Lift Title", "Lift Notes"),
+    fun createLiftSession() = LiftSession(
+        basicActivity = createBasicActivity("Lift Title", "Lift Notes"),
         totalEnergy = energy,
         activeEnergy = energy,
         exerciseSegment = exerciseSegmentList(),
         exerciseLap = exerciseLapList()
     )
 
-    fun sitSessionCreator() = SitSession(
-        basicActivity = basicActivity("Sit Title", "Sit Notes"),
+    fun createSitSession() = SitSession(
+        basicActivity = createBasicActivity("Sit Title", "Sit Notes"),
         volume = Volume.liters(100.0)
     )
 
-    fun cyclingSessionCreator() = CyclingSession(
-        basicActivity = basicActivity("Cycling Title", "Cycling Notes"),
+    fun createCyclingSession() = CyclingSession(
+        basicActivity = createBasicActivity("Cycling Title", "Cycling Notes"),
         totalEnergy = energy,
         activeEnergy = energy,
         distance = length,
@@ -96,8 +96,8 @@ object SessionCreator {
         )
     )
 
-    fun driveSessionCreator() = DriveSession(
-        basicActivity = basicActivity("Drive Title", "Drive Notes"),
+    fun createDriveSession() = DriveSession(
+        basicActivity = createBasicActivity("Drive Title", "Drive Notes"),
         distance = length,
         elevationGained = length,
         exerciseRoute = exerciseRouteCreator(),
@@ -113,12 +113,12 @@ object SessionCreator {
         )
     )
 
-    fun sleepSessionCreator() = SleepSession(
-        basicActivity = basicActivity("Sleep Title", "Sleep Notes"),
+    fun createSleepSession() = SleepSession(
+        basicActivity = createBasicActivity("Sleep Title", "Sleep Notes"),
     )
 
-    fun walkSessionCreator() = WalkSession(
-        basicActivity = basicActivity("Walk Title", "Walk Notes"),
+    fun createWalkSession() = WalkSession(
+        basicActivity = createBasicActivity("Walk Title", "Walk Notes"),
         totalEnergy = energy,
         activeEnergy = energy,
         distance = length,
@@ -128,15 +128,15 @@ object SessionCreator {
         stepsCount = 1000
     )
 
-    fun trainSessionCreator() = TrainSession(
-        basicActivity = basicActivity("Train Title", "Train Notes"),
+    fun createTrainSession() = TrainSession(
+        basicActivity = createBasicActivity("Train Title", "Train Notes"),
         totalEnergy = energy,
         activeEnergy = energy,
         exerciseSegment = exerciseSegmentList(),
         exerciseLap = exerciseLapList()
     )
 
-    private fun basicActivity(title: String, notes: String): BasicActivity {
+    private fun createBasicActivity(title: String, notes: String): BasicActivity {
 
         val randomMonth = Month.entries[Random.nextInt(Month.entries.size)]
         val randomDay = Random.nextInt(1, randomMonth.length(false) + 1)
@@ -223,35 +223,35 @@ object SessionCreator {
         ),
         ActivityType.LISTEN to ActivityConfig(
             responseType = ListenSession::class,
-            sessionCreator = ::listenSessionCreator
+            sessionCreator = ::createListenSession
         ),
         ActivityType.LIFT to ActivityConfig(
             responseType = LiftSession::class,
-            sessionCreator = ::liftSessionCreator
+            sessionCreator = ::createLiftSession
         ),
         ActivityType.SIT to ActivityConfig(
             responseType = SitSession::class,
-            sessionCreator = ::sitSessionCreator
+            sessionCreator = ::createSitSession
         ),
         ActivityType.CYCLING to ActivityConfig(
             responseType = CyclingSession::class,
-            sessionCreator = ::cyclingSessionCreator
+            sessionCreator = ::createCyclingSession
         ),
         ActivityType.TRAIN to ActivityConfig(
             responseType = TrainSession::class,
-            sessionCreator = ::trainSessionCreator
+            sessionCreator = ::createTrainSession
         ),
         ActivityType.DRIVE to ActivityConfig(
             responseType = DriveSession::class,
-            sessionCreator = ::driveSessionCreator
+            sessionCreator = ::createDriveSession
         ),
         ActivityType.SLEEP to ActivityConfig(
             responseType = SleepSession::class,
-            sessionCreator = ::sleepSessionCreator
+            sessionCreator = ::createSleepSession
         ),
         ActivityType.WALK to ActivityConfig(
             responseType = WalkSession::class,
-            sessionCreator = ::walkSessionCreator
+            sessionCreator = ::createWalkSession
         )
     )
 
