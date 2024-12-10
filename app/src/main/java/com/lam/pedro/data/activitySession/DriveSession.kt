@@ -19,5 +19,5 @@ data class DriveSession(
     val distance: Length,
     val elevationGained: Length,
     val exerciseRoute: ExerciseRoute
-) : ActivitySession(startTime, endTime, title, notes)
+) : ActivitySession(startTime, endTime, title = title, notes = notes)
 

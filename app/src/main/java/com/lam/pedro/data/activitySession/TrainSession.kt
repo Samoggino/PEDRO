@@ -18,5 +18,5 @@ data class TrainSession(
     val activeEnergy: Energy,
     val exerciseSegment: List<ExerciseSegment>,
     val exerciseLap: List<ExerciseLap>
-) : ActivitySession(startTime, endTime, title, notes)
+) : ActivitySession(startTime, endTime, title = title, notes = notes)
 

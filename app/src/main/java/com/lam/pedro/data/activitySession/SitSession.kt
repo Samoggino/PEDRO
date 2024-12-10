@@ -10,7 +10,7 @@ data class SitSession(
     override val title: String = "My Sit #${Random.nextInt(0, Int.MAX_VALUE)}",
     override val notes: String,
     val volume: Volume
-) : ActivitySession(startTime, endTime, title, notes)
+) : ActivitySession(startTime, endTime, title = title, notes = notes)
 
 
 

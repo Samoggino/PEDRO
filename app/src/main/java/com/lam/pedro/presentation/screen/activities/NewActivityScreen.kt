@@ -70,7 +70,6 @@ import kotlinx.coroutines.launch
 import org.maplibre.android.geometry.LatLng
 import java.time.ZonedDateTime
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewActivityScreen(
     navController: NavController,

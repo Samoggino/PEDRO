@@ -13,6 +13,7 @@ data class CycleSession(
     override val endTime: Instant,
     override val title: String = "My Cycle #${Random.nextInt(0, Int.MAX_VALUE)}",
     override val notes: String,
+
     val speedSamples: List<SpeedRecord.Sample>,
     val cyclingPedalingCadenceSamples: List<CyclingPedalingCadenceRecord.Sample>,
     val totalEnergy: Energy,
@@ -20,5 +21,5 @@ data class CycleSession(
     val distance: Length,
     val elevationGained: Length,
     val exerciseRoute: ExerciseRoute
-) : ActivitySession(startTime, endTime, title, notes)
+) : ActivitySession(startTime, endTime, title = title, notes = notes)
 
