@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -50,6 +51,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lam.pedro.R
 import com.lam.pedro.presentation.TAG
+import com.lam.pedro.presentation.component.CustomSnackbarHost
 import com.lam.pedro.presentation.component.DeniedPermissionDialog
 import com.lam.pedro.presentation.component.NewActivityControlButtons
 import com.lam.pedro.presentation.component.NewActivitySaveAlertDialog
@@ -58,6 +60,7 @@ import com.lam.pedro.presentation.component.TimerStatsDisplay
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModelFactory
 import com.lam.pedro.util.LocationTracker
+import com.lam.pedro.util.SnackbarViewModel
 import com.lam.pedro.util.SpeedTracker
 import com.lam.pedro.util.StepCounter
 import com.lam.pedro.util.stopActivity
@@ -65,9 +68,11 @@ import com.lam.pedro.util.updateDistance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.maplibre.android.geometry.LatLng
+import java.time.Duration
 import java.time.ZonedDateTime
 
 @Composable
@@ -77,14 +82,14 @@ fun NewActivityScreen(
     color: Color,
     viewModel: ActivitySessionViewModel,
     activityType: Int,
-    profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModelFactory(LocalContext.current))
+    profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModelFactory(LocalContext.current)),
+    snackbarViewModel: SnackbarViewModel = viewModel()
 ) {
     // variables
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val sessionJob = remember { Job() }
     val sessionScope = remember { CoroutineScope(sessionJob + Dispatchers.Default) }
-    val snackbarHostState = remember { SnackbarHostState() }
     val stepCounter = remember { StepCounter(context) }
     var steps by remember { mutableFloatStateOf(0f) }
     var averageSpeed by remember { mutableDoubleStateOf(0.0) }
@@ -98,6 +103,9 @@ fun NewActivityScreen(
     var hasBeenAskedForActivityRecognitionPermission by remember { mutableStateOf(false) }
 
     val lifecycleOwner = LocalLifecycleOwner.current
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
 
     var hasLocationPermission by remember {
         mutableStateOf(
@@ -256,6 +264,7 @@ fun NewActivityScreen(
 
     /*------------------------------------------------------------------------------------------------------------------*/
 
+
     Scaffold(
         topBar = {
             NewActivityTopAppBar(
@@ -263,7 +272,7 @@ fun NewActivityScreen(
                 navController = navController
             )
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = { CustomSnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -272,7 +281,7 @@ fun NewActivityScreen(
                 .fillMaxSize()
         ) {
             val density = LocalDensity.current
-            var showDialog by remember { mutableStateOf(false) }
+            var showConfirmDialog by remember { mutableStateOf(false) }
             var isStopAction by remember { mutableStateOf(false) }
             var visible by remember { mutableStateOf(false) }
             var isPaused by remember { mutableStateOf(true) }
@@ -295,6 +304,7 @@ fun NewActivityScreen(
             var activityTitle by remember { mutableStateOf("") }
             var notes by remember { mutableStateOf("") }
             var isTitleEmpty by remember { mutableStateOf(false) }
+
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -328,21 +338,20 @@ fun NewActivityScreen(
                         isPaused = !isPaused
                     } else {
                         isStopAction = false
-                        showDialog = true
+                        showConfirmDialog = true
                     }
                 },
                 onStopClick = {
                     isStopAction = true
-                    showDialog = true
+                    showConfirmDialog = true
                 },
                 density = density
             )
 
-
-            if (showDialog) {
+            if (showConfirmDialog) {
                 NewActivitySaveAlertDialog(
-                    showDialog = showDialog,
-                    onDismissRequest = { showDialog = false },
+                    showDialog = showConfirmDialog,
+                    onDismissRequest = { showConfirmDialog = false },
                     isStopAction = isStopAction,
                     visible = visible,
                     color = color,
@@ -358,27 +367,46 @@ fun NewActivityScreen(
                         coroutineScope.launch {
                             if (activityTitle.isNotBlank()) {
                                 if (isStopAction) {
-                                    // Logica per interrompere l'attività
-                                    stopActivity(
-                                        timerRunning = mutableStateOf(timerRunning),
-                                        visible = mutableStateOf(visible),
-                                        isPaused = mutableStateOf(isPaused),
-                                        elapsedTime = elapsedTime,
-                                        timerResults = timerResults,
-                                        startTime = startTime,
-                                        activityTitle = activityTitle,
-                                        notes = notes,
-                                        speedSamples = speedSamples,
-                                        steps = steps,
-                                        profileViewModel = profileViewModel,
-                                        distance = mutableDoubleStateOf(distance.value),
-                                        exerciseRoute = exerciseRoute,
-                                        titleId = titleId,
-                                        viewModel = viewModel,
-                                        sessionJob = sessionJob,
-                                        navController = navController,
-                                        activityType = activityType
-                                    )
+                                    val endTime = ZonedDateTime.now()
+                                    val duration = Duration.between(startTime, endTime).toMinutes()
+                                    if (duration < 1) {
+                                        showConfirmDialog = false
+                                        coroutineScope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                message = "Activity must be at least 1 minute",
+                                                actionLabel = "OK",
+                                                duration = SnackbarDuration.Long // Short, Long o Indefinite
+                                            )
+                                        }
+                                    } else {
+                                        stopActivity(
+                                            timerRunning = mutableStateOf(timerRunning),
+                                            visible = mutableStateOf(visible),
+                                            isPaused = mutableStateOf(isPaused),
+                                            elapsedTime = elapsedTime,
+                                            timerResults = timerResults,
+                                            duration = duration,
+                                            startTime = startTime,
+                                            endTime = endTime,
+                                            activityTitle = activityTitle,
+                                            notes = notes,
+                                            speedSamples = speedSamples,
+                                            steps = steps,
+                                            profileViewModel = profileViewModel,
+                                            distance = mutableDoubleStateOf(distance.doubleValue),
+                                            exerciseRoute = exerciseRoute,
+                                            titleId = titleId,
+                                            viewModel = viewModel,
+                                            sessionJob = sessionJob,
+                                            navController = navController,
+                                            activityType = activityType
+                                        )
+                                    }
+                                    //coroutineScope.launch {
+                                        sessionJob.cancelAndJoin()  // Cancella il sessionJob in background
+                                    //}
+                                    navController.popBackStack()
+
                                 } else {
                                     visible = !visible
                                     if (visible) {
@@ -386,7 +414,7 @@ fun NewActivityScreen(
                                         timerRunning = true
                                     }
                                 }
-                                showDialog = false
+                                showConfirmDialog = false
                             } else {
                                 isTitleEmpty = true
                             }

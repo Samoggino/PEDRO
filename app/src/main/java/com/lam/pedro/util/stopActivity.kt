@@ -22,7 +22,9 @@ suspend fun stopActivity(
     isPaused: MutableState<Boolean>,
     elapsedTime: Int,
     timerResults: MutableList<String>,
+    duration: Long,
     startTime: ZonedDateTime,
+    endTime: ZonedDateTime,
     activityTitle: String,
     notes: String,
     speedSamples: List<SpeedRecord.Sample>,
@@ -53,9 +55,6 @@ suspend fun stopActivity(
     )
     Log.d("TAG", "------------Timer results: $timerResults")
 
-    var endTime = ZonedDateTime.now()
-
-    val duration = Duration.between(startTime, endTime).toMinutes()
     val averageSpeed = calculateAverageSpeed(speedSamples)
 
     if (titleId == Screen.RunSessionScreen.titleId) {
@@ -85,10 +84,8 @@ suspend fun stopActivity(
         Log.d("TAG", "------------Run session: $runSession")
         viewModel.saveRunSession(runSession)
 
-        sessionJob.cancelAndJoin()
     }
 
     viewModel.fetchExerciseSessions(activityType)
 
-    navController.popBackStack()
 }

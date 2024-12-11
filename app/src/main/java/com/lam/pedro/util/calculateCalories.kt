@@ -1,48 +1,47 @@
 package com.lam.pedro.util
 
+/*
+* This function calculates the active calories burned by the user based on
+* 3 different methods returning the average value and using it to calculate
+* the total calories burned value
+* */
 fun calculateCalories(
-    weight: Double, // in kg
-    height: Double, // in cm
-    age: Int, // in anni
-    sex: String, // "male" o "female"
-    distance: Double, // in metri
-    steps: Int, // numero di passi
-    duration: Long, // in minuti
+    weight: Double,
+    height: Double,
+    age: Int,
+    sex: String,
+    distance: Double,
+    steps: Int,
+    durationInMinutes: Long,
     averageSpeed: Double // in m/s
-): Pair<Double, Double> { // Restituisce (calorieTotali, calorieAttive)
-    // Calcola il MET base in base alla velocità media
-    val met = when {
-        averageSpeed <= 2.2 -> 3.5 // Camminata lenta
-        averageSpeed <= 3.6 -> 5.0 // Camminata veloce
-        averageSpeed <= 5.6 -> 8.3 // Corsa leggera (~8 km/h)
-        else -> 11.5 // Corsa intensa (~12 km/h)
-    }
-
-    // Calcola il BMR (Metabolismo Basale)
-    val bmr = if (sex.lowercase() == "male") {
-        88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)
+): Pair<Double, Double> {
+    // Calcolo del BMR
+    val bmr = if (sex == "male") {
+        88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
     } else {
-        447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)
+        447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age)
     }
 
-    // Calcola calorie per passo in base all'intensità (MET)
-    val caloriesPerStep = met * (weight / 2000)
+    // 1. MET Method
+    val met = when {
+        averageSpeed <= 2.2 -> 3.5 // Slow walk
+        averageSpeed <= 3.6 -> 5.0 // Fast walk
+        averageSpeed <= 5.6 -> 8.3 // Slow run
+        else -> 11.5 // Fast run
+    }
+    val activeCaloriesMet = met * weight * (durationInMinutes / 60.0)
 
-    // Calcola calorie dai passi
-    val caloriesFromSteps = steps * caloriesPerStep
+    // 2. Distance method
+    val caloriesByDistance = distance * weight * if (averageSpeed < 3.0) 0.035 else 0.045
 
-    // Converti la durata in ore
-    val durationInHours = duration / 60.0
+    // 3. Steps method
+    val caloriesBySteps = steps * weight * if (averageSpeed < 3.0) 0.04 else 0.06
 
-    // Calcola le calorie totali con MET (basate su peso e durata)
-    val totalCaloriesFromMET = met * weight * durationInHours
+    // Active calories mean
+    val activeCalories = (activeCaloriesMet + caloriesByDistance + caloriesBySteps) / 3.0
 
-    // Fai una media ponderata tra calorie basate su passi e su MET/distanza
-    val totalCalories = 0.6 * totalCaloriesFromMET + 0.4 * caloriesFromSteps
-
-    // Calcola le calorie attive sottraendo il metabolismo basale (BMR)
-    val activeCalories = totalCalories - (bmr * durationInHours)
+    // Total calories using BMR
+    val totalCalories = (bmr / 1440.0) * durationInMinutes + activeCalories
 
     return Pair(totalCalories, activeCalories)
-} //FIXME: usa durationInMinutes
-
+}
