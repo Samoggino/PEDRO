@@ -18,7 +18,7 @@ data class RunSession(
     val totalEnergy: Energy,
     val activeEnergy: Energy,
     val distance: Length,
-    val elevationGained: Length,
+    //val elevationGained: Length,
     val exerciseRoute: ExerciseRoute
 ) : ActivitySession(startTime, endTime, title = title, notes = notes)
 

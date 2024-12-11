@@ -94,7 +94,7 @@ fun ShowSessionDetails(session: ActivitySession, color: Color) {
                     Text(text = "Energia totale: ${session.totalEnergy}")
                     Text(text = "Energia attiva: ${session.activeEnergy}")
                     Text(text = "Distance: ${session.distance}")
-                    Text(text = "Elevazione guadagnata: ${session.elevationGained}")
+                    //Text(text = "Elevazione guadagnata: ${session.elevationGained}")
                     MapComponent(
                         modifier = Modifier
                             .fillMaxWidth()

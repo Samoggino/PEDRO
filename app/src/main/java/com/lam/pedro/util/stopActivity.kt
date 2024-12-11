@@ -13,6 +13,7 @@ import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
+import java.time.Duration
 import java.time.ZonedDateTime
 
 suspend fun stopActivity(
@@ -54,7 +55,20 @@ suspend fun stopActivity(
 
     var endTime = ZonedDateTime.now()
 
+    val duration = Duration.between(startTime, endTime).toMinutes()
+    val averageSpeed = calculateAverageSpeed(speedSamples)
+
     if (titleId == Screen.RunSessionScreen.titleId) {
+        val (totalCalories, activeCalories) = calculateCalories(
+            profileViewModel.weight.toDouble(),
+            profileViewModel.height.toDouble(),
+            profileViewModel.age.toInt(),
+            profileViewModel.sex,
+            distance.value,
+            steps.toInt(),
+            duration,
+            averageSpeed
+        )
         val runSession = RunSession(
             startTime = startTime.toInstant(),
             endTime = endTime.toInstant(),
@@ -62,10 +76,10 @@ suspend fun stopActivity(
             notes = notes,
             speedSamples = speedSamples,
             stepsCount = steps.toLong(),
-            totalEnergy = Energy.calories(profileViewModel.weight.toDouble()),
-            activeEnergy = Energy.calories(3.0),
+            totalEnergy = Energy.calories(totalCalories),
+            activeEnergy = Energy.calories(activeCalories),
             distance = Length.meters(distance.value),
-            elevationGained = Length.meters(3.0),
+            //elevationGained = Length.meters(3.0),
             exerciseRoute = ExerciseRoute(exerciseRoute)
         )
         Log.d("TAG", "------------Run session: $runSession")

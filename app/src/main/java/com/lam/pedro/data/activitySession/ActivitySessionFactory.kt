@@ -72,7 +72,7 @@ object ActivitySessionFactory {
                 totalEnergy = Energy.calories(0.0), // Fallback
                 activeEnergy = Energy.calories(0.0), // Fallback
                 distance = Length.meters(0.0), // Fallback
-                elevationGained = Length.meters(0.0), // Fallback
+                //elevationGained = Length.meters(0.0), // Fallback
                 exerciseRoute = exerciseRouteSamples //Fallback
             )
         },
