@@ -397,8 +397,6 @@ fun NewActivityScreen(
                                             exerciseRoute = exerciseRoute,
                                             titleId = titleId,
                                             viewModel = viewModel,
-                                            sessionJob = sessionJob,
-                                            navController = navController,
                                             activityType = activityType
                                         )
                                     }

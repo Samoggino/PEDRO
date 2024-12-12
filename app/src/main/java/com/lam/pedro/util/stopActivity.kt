@@ -34,8 +34,6 @@ suspend fun stopActivity(
     exerciseRoute: List<ExerciseRoute.Location>,
     titleId: Int,
     viewModel: ActivitySessionViewModel,
-    sessionJob: Job,
-    navController: NavController,
     activityType: Int
 ) {
     timerRunning.value = false

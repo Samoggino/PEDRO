@@ -203,7 +203,7 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
     }
 
     suspend fun saveRunSession(
-        /*
+/*
         startTime: Instant,
         endTime: Instant,
         title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
@@ -216,27 +216,28 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
         distance: Length,
         elevationGained: Length,
         exerciseRoute: ExerciseRoute
-         */
+*/
         runSession: RunSession
     ) {
-        sessionsList.value += runSession
-        /*
-        healthConnectManager.insertRunSession(
-            runSession.startTime,
-            runSession.endTime,
-            runSession.title,
-            runSession.notes,
-            runSession.speedSamples,
-            //stepsCadenceSamples,
-            runSession.stepsCount,
-            runSession.totalEnergy,
-            runSession.activeEnergy,
-            runSession.distance,
-            runSession.elevationGained,
-            runSession.exerciseRoute
-        )
+        // To keep it in RAM (for debugging)
+        //sessionsList.value += runSession
 
-         */
+        runSession.exerciseRoute?.let {
+            healthConnectManager.insertRunSession(
+                runSession.startTime,
+                runSession.endTime,
+                runSession.title,
+                runSession.notes,
+                runSession.speedSamples,
+                //runSession.stepsCadenceSamples,
+                runSession.stepsCount,
+                runSession.totalEnergy,
+                runSession.activeEnergy,
+                runSession.distance,
+                //runSession.elevationGained,
+                it
+            )
+        }
     }
 
     suspend fun saveTrainSession(
@@ -452,15 +453,10 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
         val start = Instant.EPOCH // 1st January 1970
         val now = Instant.now()
 
-        // Chiamata al metodo del manager per leggere i dati da Health Connect
-        val records = healthConnectManager.readExerciseSessions(start, now, exerciseType)
+        sessionsList.value = healthConnectManager.fetchAndBuildActivitySession(start, now, exerciseType)
 
-        /*
-        sessionsList.value = records.map { record ->
-            ActivitySessionFactory.create(exerciseType, record)
-        }
 
-         */
+
     }
 
 

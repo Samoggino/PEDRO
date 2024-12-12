@@ -87,7 +87,7 @@ fun ShowSessionDetails(session: ActivitySession, color: Color) {
             is RunSession -> {
                 item {
                     val positions =
-                        session.exerciseRoute.route.map { LatLng(it.latitude, it.longitude) }
+                        session.exerciseRoute?.route?.map { LatLng(it.latitude, it.longitude) }
 
                     Text(text = "Average speed: ${calculateAverageSpeed(session.speedSamples)}")
                     Text(text = "Steps: ${session.stepsCount}")
@@ -95,14 +95,16 @@ fun ShowSessionDetails(session: ActivitySession, color: Color) {
                     Text(text = "Energia attiva: ${session.activeEnergy}")
                     Text(text = "Distance: ${session.distance}")
                     //Text(text = "Elevazione guadagnata: ${session.elevationGained}")
-                    MapComponent(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp)
-                            .clip(RoundedCornerShape(26.dp)),
-                        positions = positions,
-                        color = color
-                    )
+                    if (positions != null) {
+                        MapComponent(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(300.dp)
+                                .clip(RoundedCornerShape(26.dp)),
+                            positions = positions,
+                            color = color
+                        )
+                    }
                 }
             }
 

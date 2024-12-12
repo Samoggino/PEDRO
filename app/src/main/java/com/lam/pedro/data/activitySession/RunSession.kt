@@ -1,6 +1,7 @@
 package com.lam.pedro.data.activitySession
 
 import androidx.health.connect.client.records.ExerciseRoute
+import androidx.health.connect.client.records.ExerciseRouteResult
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
@@ -19,6 +20,6 @@ data class RunSession(
     val activeEnergy: Energy,
     val distance: Length,
     //val elevationGained: Length,
-    val exerciseRoute: ExerciseRoute
+    val exerciseRoute: ExerciseRoute?
 ) : ActivitySession(startTime, endTime, title = title, notes = notes)
 
