@@ -17,7 +17,6 @@ data class DriveSession(
     override val notes: String,
     val speedSamples: List<SpeedRecord.Sample>,
     val distance: Length,
-    val elevationGained: Length,
     val exerciseRoute: ExerciseRoute
 ) : ActivitySession(startTime, endTime, title = title, notes = notes)
 

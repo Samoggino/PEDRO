@@ -1,5 +1,6 @@
 package com.lam.pedro.data.activitySession
 
+import androidx.health.connect.client.records.CyclingPedalingCadenceRecord
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.units.Energy
@@ -7,6 +8,7 @@ import androidx.health.connect.client.units.Length
 import androidx.health.connect.client.units.Volume
 import java.time.Instant
 
+/*
 // Factory per creare le sessioni
 object ActivitySessionFactory {
     private val exerciseRouteSamples = ExerciseRoute(listOf(ExerciseRoute.Location(Instant.now(), 1.0, 1.0)))
@@ -14,18 +16,15 @@ object ActivitySessionFactory {
     private val creators: Map<Int, (ExerciseSessionRecord) -> ActivitySession> = mapOf(
 
         ExerciseSessionRecord.EXERCISE_TYPE_BIKING to { record ->
-
             CycleSession(
                 startTime = record.startTime,
                 endTime = record.endTime,
                 title = record.title ?: "My Cycling Activity",
                 notes = record.notes ?: "",
                 speedSamples = emptyList(), // Non disponibile in ExerciseSessionRecord
-                cyclingPedalingCadenceSamples = emptyList(), // Non disponibile
                 totalEnergy = Energy.calories(0.0), // Fallback
                 activeEnergy = Energy.calories(0.0), // Fallback
                 distance = Length.meters(0.0), // Fallback
-                elevationGained = Length.meters(0.0), // Fallback
                 exerciseRoute = exerciseRouteSamples //Fallback
             )
         },
@@ -37,7 +36,6 @@ object ActivitySessionFactory {
                 notes = record.notes ?: "",
                 speedSamples = emptyList(), // Non disponibile
                 distance = Length.meters(0.0), // Fallback
-                elevationGained = Length.meters(0.0), // Fallback
                 exerciseRoute = exerciseRouteSamples //Fallback
             )
         },
@@ -144,3 +142,5 @@ object ActivitySessionFactory {
             ?: throw IllegalArgumentException("Unsupported exercise type: $exerciseType")
     }
 }
+
+ */

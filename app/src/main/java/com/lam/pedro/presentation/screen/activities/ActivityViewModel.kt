@@ -25,7 +25,6 @@ import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.SessionState
 import com.lam.pedro.data.activitySession.ActivitySession
-import com.lam.pedro.data.activitySession.ActivitySessionFactory
 import com.lam.pedro.data.activitySession.CycleSession
 import com.lam.pedro.data.activitySession.DriveSession
 import com.lam.pedro.data.activitySession.LiftSession
@@ -193,51 +192,46 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
             cycleSession.title,
             cycleSession.notes,
             cycleSession.speedSamples,
-            cycleSession.cyclingPedalingCadenceSamples,
             cycleSession.totalEnergy,
             cycleSession.activeEnergy,
             cycleSession.distance,
-            cycleSession.elevationGained,
             cycleSession.exerciseRoute
         )
     }
 
     suspend fun saveRunSession(
-/*
-        startTime: Instant,
-        endTime: Instant,
-        title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
-        notes: String,
-        speedSamples: List<SpeedRecord.Sample>,
-        //stepsCadenceSamples: List<StepsCadenceRecord.Sample>,
-        stepsCount: Long,
-        totalEnergy: Energy,
-        activeEnergy: Energy,
-        distance: Length,
-        elevationGained: Length,
-        exerciseRoute: ExerciseRoute
-*/
+        /*
+                startTime: Instant,
+                endTime: Instant,
+                title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
+                notes: String,
+                speedSamples: List<SpeedRecord.Sample>,
+                //stepsCadenceSamples: List<StepsCadenceRecord.Sample>,
+                stepsCount: Long,
+                totalEnergy: Energy,
+                activeEnergy: Energy,
+                distance: Length,
+                elevationGained: Length,
+                exerciseRoute: ExerciseRoute
+        */
         runSession: RunSession
     ) {
         // To keep it in RAM (for debugging)
         //sessionsList.value += runSession
-
-        runSession.exerciseRoute?.let {
-            healthConnectManager.insertRunSession(
-                runSession.startTime,
-                runSession.endTime,
-                runSession.title,
-                runSession.notes,
-                runSession.speedSamples,
-                //runSession.stepsCadenceSamples,
-                runSession.stepsCount,
-                runSession.totalEnergy,
-                runSession.activeEnergy,
-                runSession.distance,
-                //runSession.elevationGained,
-                it
-            )
-        }
+        healthConnectManager.insertRunSession(
+            runSession.startTime,
+            runSession.endTime,
+            runSession.title,
+            runSession.notes,
+            runSession.speedSamples,
+            //runSession.stepsCadenceSamples,
+            runSession.stepsCount,
+            runSession.totalEnergy,
+            runSession.activeEnergy,
+            runSession.distance,
+            //runSession.elevationGained,
+            runSession.exerciseRoute
+        )
     }
 
     suspend fun saveTrainSession(
@@ -288,12 +282,10 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
             walkSession.title,
             walkSession.notes,
             walkSession.speedSamples,
-            walkSession.stepsCadenceSamples,
             walkSession.stepsCount,
             walkSession.totalEnergy,
             walkSession.activeEnergy,
             walkSession.distance,
-            walkSession.elevationGained,
             walkSession.exerciseRoute
         )
     }
@@ -343,7 +335,6 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
             driveSession.notes,
             driveSession.speedSamples,
             driveSession.distance,
-            driveSession.elevationGained,
             driveSession.exerciseRoute
         )
     }
@@ -453,12 +444,11 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
         val start = Instant.EPOCH // 1st January 1970
         val now = Instant.now()
 
-        sessionsList.value = healthConnectManager.fetchAndBuildActivitySession(start, now, exerciseType)
-
+        sessionsList.value =
+            healthConnectManager.fetchAndBuildActivitySession(start, now, exerciseType)
 
 
     }
-
 
 
     /**

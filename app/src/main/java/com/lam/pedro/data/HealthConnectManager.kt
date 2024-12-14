@@ -40,6 +40,8 @@ import androidx.health.connect.client.units.Mass
 import androidx.health.connect.client.units.Volume
 import com.lam.pedro.R
 import com.lam.pedro.data.activitySession.ActivitySession
+import com.lam.pedro.data.activitySession.RunSession
+import com.lam.pedro.data.activitySession.activityFactoryHealthConnect.ActivitySessionFactoryFromHealthConnectProvider
 import com.lam.pedro.presentation.TAG
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -223,11 +225,9 @@ class HealthConnectManager(private val context: Context) {
         title: String,
         notes: String,
         speedSamples: List<SpeedRecord.Sample>,
-        cyclingPedalingCadenceSamples: List<CyclingPedalingCadenceRecord.Sample>,
         totalEnergy: Energy,
         activeEnergy: Energy,
         distance: Length,
-        elevationGained: Length,
         exerciseRoute: ExerciseRoute
     ) {
 
@@ -257,21 +257,6 @@ class HealthConnectManager(private val context: Context) {
             endZoneOffset = ZoneOffset.UTC,
             distance = distance
         )
-        val elevationGainedRecord = ElevationGainedRecord(
-            startTime = startTime,
-            startZoneOffset = ZoneOffset.UTC,
-            endTime = endTime,
-            endZoneOffset = ZoneOffset.UTC,
-            elevation = elevationGained
-        )
-
-        val cyclingPedalingCadenceRecord = CyclingPedalingCadenceRecord(
-            startTime = startTime,
-            startZoneOffset = ZoneOffset.UTC,
-            endTime = endTime,
-            endZoneOffset = ZoneOffset.UTC,
-            samples = cyclingPedalingCadenceSamples
-        )
 
         val speedRecord = SpeedRecord(
             startTime = startTime,
@@ -296,9 +281,7 @@ class HealthConnectManager(private val context: Context) {
                     exerciseSessionRecord,
                     activeCaloriesBurnedRecord,
                     distanceRecord,
-                    elevationGainedRecord,
                     speedRecord,
-                    cyclingPedalingCadenceRecord,
                     totalCaloriesBurnedRecord
                 )
 
@@ -401,12 +384,10 @@ class HealthConnectManager(private val context: Context) {
         title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
         notes: String,
         speedSamples: List<SpeedRecord.Sample>,
-        stepsCadenceSamples: List<StepsCadenceRecord.Sample>,
         stepsCount: Long,
         totalEnergy: Energy,
         activeEnergy: Energy,
         distance: Length,
-        elevationGained: Length,
         exerciseRoute: ExerciseRoute
     ) {
 
@@ -437,26 +418,12 @@ class HealthConnectManager(private val context: Context) {
             endZoneOffset = ZoneOffset.UTC,
             distance = distance
         )
-        val elevationGainedRecord = ElevationGainedRecord(
-            startTime = startTime,
-            startZoneOffset = ZoneOffset.UTC,
-            endTime = endTime,
-            endZoneOffset = ZoneOffset.UTC,
-            elevation = elevationGained
-        )
         val speedRecord = SpeedRecord(
             startTime = startTime,
             startZoneOffset = ZoneOffset.UTC,
             endTime = endTime,
             endZoneOffset = ZoneOffset.UTC,
             samples = speedSamples
-        )
-        val stepsCadenceRecord = StepsCadenceRecord(
-            startTime = startTime,
-            startZoneOffset = ZoneOffset.UTC,
-            endTime = endTime,
-            endZoneOffset = ZoneOffset.UTC,
-            samples = stepsCadenceSamples
         )
         val stepsRecord = StepsRecord(
             startTime = startTime,
@@ -480,9 +447,7 @@ class HealthConnectManager(private val context: Context) {
                     exerciseSessionRecord,
                     activeCaloriesBurnedRecord,
                     distanceRecord,
-                    elevationGainedRecord,
                     speedRecord,
-                    stepsCadenceRecord,
                     stepsRecord,
                     totalCaloriesBurnedRecord
                 )
@@ -551,11 +516,10 @@ class HealthConnectManager(private val context: Context) {
     suspend fun insertDriveSession(
         startTime: Instant,
         endTime: Instant,
-        title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
+        title: String,
         notes: String,
         speedSamples: List<SpeedRecord.Sample>,
         distance: Length,
-        elevationGained: Length,
         exerciseRoute: ExerciseRoute
     ) {
 
@@ -577,13 +541,6 @@ class HealthConnectManager(private val context: Context) {
             endZoneOffset = ZoneOffset.UTC,
             distance = distance
         )
-        val elevationGainedRecord = ElevationGainedRecord(
-            startTime = startTime,
-            startZoneOffset = ZoneOffset.UTC,
-            endTime = endTime,
-            endZoneOffset = ZoneOffset.UTC,
-            elevation = elevationGained
-        )
         val speedRecord = SpeedRecord(
             startTime = startTime,
             startZoneOffset = ZoneOffset.UTC,
@@ -599,7 +556,6 @@ class HealthConnectManager(private val context: Context) {
                 listOf(
                     exerciseSessionRecord,
                     distanceRecord,
-                    elevationGainedRecord,
                     speedRecord
                 )
             )
@@ -815,16 +771,18 @@ class HealthConnectManager(private val context: Context) {
 
         // For each ExerciseSessionRecord, fetch the related Health Connect record and build the ActivitySession-s
         return records.map { record ->
-            buildActivitySession(healthConnectClient, record)
+            buildActivitySession(healthConnectClient, record, exerciseType)
+            ActivitySessionFactoryFromHealthConnectProvider.createSession(exerciseType, healthConnectClient, record)
         }
     }
 
     /**
      * Reads aggregated data and raw data for selected data types, for a given [ExerciseSessionRecord].
      */
+    /*
     suspend fun readAssociatedSessionData(
         uid: String
-    ): ExerciseSessionData {
+    ): ActivitySession {
         val exerciseSession = healthConnectClient.readRecord(ExerciseSessionRecord::class, uid)
         // Use the start time and end time from the session, for reading raw and aggregate data.
         val timeRangeFilter = TimeRangeFilter.between(
@@ -833,12 +791,11 @@ class HealthConnectManager(private val context: Context) {
         )
         val aggregateDataTypes = setOf(
             ExerciseSessionRecord.EXERCISE_DURATION_TOTAL,
-            StepsRecord.COUNT_TOTAL,
             DistanceRecord.DISTANCE_TOTAL,
+            SpeedRecord.SPEED_AVG,
+            StepsRecord.COUNT_TOTAL,
             TotalCaloriesBurnedRecord.ENERGY_TOTAL,
-            HeartRateRecord.BPM_AVG,
-            HeartRateRecord.BPM_MAX,
-            HeartRateRecord.BPM_MIN,
+            ActiveCaloriesBurnedRecord.ACTIVE_CALORIES_TOTAL
         )
         // Limit the data read to just the application that wrote the session. This may or may not
         // be desirable depending on the use case: In some cases, it may be useful to combine with
@@ -851,7 +808,8 @@ class HealthConnectManager(private val context: Context) {
         )
         val aggregateData = healthConnectClient.aggregate(aggregateRequest)
 
-        return ExerciseSessionData(
+        return RunSession(
+            /*
             uid = uid,
             totalActiveTime = aggregateData[ExerciseSessionRecord.EXERCISE_DURATION_TOTAL],
             totalSteps = aggregateData[StepsRecord.COUNT_TOTAL],
@@ -860,8 +818,22 @@ class HealthConnectManager(private val context: Context) {
             minHeartRate = aggregateData[HeartRateRecord.BPM_MIN],
             maxHeartRate = aggregateData[HeartRateRecord.BPM_MAX],
             avgHeartRate = aggregateData[HeartRateRecord.BPM_AVG],
+
+             */
+            title = title ?: "My Run #${exerciseRecord.hashCode()}",
+            notes = notes?: "",
+            startTime = startTime,
+            endTime = endTime,
+            speedSamples = speedRecord.samples,
+            stepsCount = stepsRecord.count,
+            totalEnergy = totalCaloriesBurnedRecord.energy,
+            activeEnergy = activeCaloriesBurnedRecord?.energy ?: Energy.calories(0.0),
+            distance = distanceRecord.distance,
+            exerciseRoute = exerciseRoute
         )
     }
+
+     */
 
     /**
      * Deletes all existing sleep data.

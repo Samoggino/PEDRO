@@ -16,12 +16,10 @@ data class WalkSession(
     override val title: String = "My Walk #${Random.nextInt(0, Int.MAX_VALUE)}",
     override val notes: String,
     val speedSamples: List<SpeedRecord.Sample>,
-    val stepsCadenceSamples: List<StepsCadenceRecord.Sample>,
     val stepsCount: Long,
     val totalEnergy: Energy,
     val activeEnergy: Energy,
     val distance: Length,
-    val elevationGained: Length,
     val exerciseRoute: ExerciseRoute
 ) : ActivitySession(startTime, endTime, title = title, notes = notes)
 

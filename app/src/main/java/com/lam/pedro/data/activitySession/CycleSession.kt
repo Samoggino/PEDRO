@@ -15,11 +15,9 @@ data class CycleSession(
     override val notes: String,
 
     val speedSamples: List<SpeedRecord.Sample>,
-    val cyclingPedalingCadenceSamples: List<CyclingPedalingCadenceRecord.Sample>,
     val totalEnergy: Energy,
     val activeEnergy: Energy,
     val distance: Length,
-    val elevationGained: Length,
     val exerciseRoute: ExerciseRoute
 ) : ActivitySession(startTime, endTime, title = title, notes = notes)
 

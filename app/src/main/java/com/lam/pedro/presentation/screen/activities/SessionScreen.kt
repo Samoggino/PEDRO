@@ -197,7 +197,7 @@ fun SessionScreen(
                                 }
                             }
                         }
-                        Spacer(modifier = Modifier.height(30.dp))
+                        Spacer(modifier = Modifier.height(90.dp))
                     }
                 }
             }

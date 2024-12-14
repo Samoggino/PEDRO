@@ -76,11 +76,9 @@ fun ShowSessionDetails(session: ActivitySession, color: Color) {
             is CycleSession -> {
                 item {
                     Text(text = "Distanza: ${session.distance}")
-                    Text(text = "Cadenza pedalata: ${session.cyclingPedalingCadenceSamples}")
                     Text(text = "Velocità: ${session.speedSamples}")
                     Text(text = "Energia totale: ${session.totalEnergy}")
                     Text(text = "Energia attiva: ${session.activeEnergy}")
-                    Text(text = "Elevazione guadagnata: ${session.elevationGained}")
                 }
             }
 
@@ -121,11 +119,9 @@ fun ShowSessionDetails(session: ActivitySession, color: Color) {
                 item {
                     Text(text = "Distanza: ${session.distance}")
                     Text(text = "Passi: ${session.stepsCount}")
-                    Text(text = "Cadenza passi: ${session.stepsCadenceSamples}")
                     Text(text = "Velocità media: ${session.speedSamples}")
                     Text(text = "Energia totale: ${session.totalEnergy}")
                     Text(text = "Energia attiva: ${session.activeEnergy}")
-                    Text(text = "Elevazione guadagnata: ${session.elevationGained}")
                 }
             }
 
@@ -142,7 +138,6 @@ fun ShowSessionDetails(session: ActivitySession, color: Color) {
                 item {
                     Text(text = "Distanza: ${session.distance}")
                     Text(text = "Velocità media: ${session.speedSamples}")
-                    Text(text = "Elevazione guadagnata: ${session.elevationGained}")
                 }
             }
 
