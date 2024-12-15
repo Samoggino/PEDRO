@@ -9,11 +9,14 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -43,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.health.connect.client.records.ExerciseRoute
+import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -56,7 +60,9 @@ import com.lam.pedro.presentation.component.DeniedPermissionDialog
 import com.lam.pedro.presentation.component.NewActivityControlButtons
 import com.lam.pedro.presentation.component.NewActivitySaveAlertDialog
 import com.lam.pedro.presentation.component.NewActivityTopAppBar
-import com.lam.pedro.presentation.component.TimerStatsDisplay
+import com.lam.pedro.presentation.component.StatsDisplay
+import com.lam.pedro.presentation.component.TimerDisplay
+import com.lam.pedro.presentation.component.WaterGlass
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModelFactory
 import com.lam.pedro.util.LocationTracker
@@ -92,6 +98,7 @@ fun NewActivityScreen(
     val sessionScope = remember { CoroutineScope(sessionJob + Dispatchers.Default) }
     val stepCounter = remember { StepCounter(context) }
     var steps by remember { mutableFloatStateOf(0f) }
+    var hydrationVolume by remember { mutableDoubleStateOf(0.0) }
     var averageSpeed by remember { mutableDoubleStateOf(0.0) }
     var speedCounter by remember { mutableIntStateOf(0) }
     var totalSpeed by remember { mutableDoubleStateOf(0.0) }
@@ -317,13 +324,32 @@ fun NewActivityScreen(
             Spacer(modifier = Modifier.height(40.dp))
 
             AnimatedVisibility(visible = timerRunning || !isPaused) {
-                TimerStatsDisplay(
-                    elapsedTime = elapsedTime,
-                    steps = steps,
-                    averageSpeed = averageSpeed,
-                    distance = distance,
-                    color = color
-                )
+
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    TimerDisplay(
+                        elapsedTime = elapsedTime,
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    if (activityType == ExerciseSessionRecord.EXERCISE_TYPE_RUNNING) {
+                        StatsDisplay(
+                            steps = steps,
+                            averageSpeed = averageSpeed,
+                            distance = distance,
+                            color = color
+                        )
+                    } else {
+                        WaterGlass(hydrationVolume = hydrationVolume) { addedVolume ->
+                            hydrationVolume += addedVolume
+                        }
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(40.dp))
@@ -392,16 +418,16 @@ fun NewActivityScreen(
                                             notes = notes,
                                             speedSamples = speedSamples,
                                             steps = steps,
+                                            hydrationVolume = hydrationVolume,
                                             profileViewModel = profileViewModel,
                                             distance = mutableDoubleStateOf(distance.doubleValue),
                                             exerciseRoute = exerciseRoute,
-                                            titleId = titleId,
                                             viewModel = viewModel,
                                             activityType = activityType
                                         )
                                     }
                                     //coroutineScope.launch {
-                                        sessionJob.cancelAndJoin()  // Cancella il sessionJob in background
+                                    sessionJob.cancelAndJoin()  // Cancella il sessionJob in background
                                     //}
                                     navController.popBackStack()
 

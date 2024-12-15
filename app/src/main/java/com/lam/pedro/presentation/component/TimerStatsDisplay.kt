@@ -18,33 +18,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun TimerStatsDisplay(
-    elapsedTime: Int,
+fun StatsDisplay(
     steps: Float,
     averageSpeed: Double,
     distance: MutableState<Double>,
     color: Color
 ) {
-    val minutes = (elapsedTime / 60000) % 60
-    val seconds = (elapsedTime / 1000) % 60
-    val centiseconds = (elapsedTime % 1000) / 10
-
     Column(
+        /*
         modifier = Modifier
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
+         */
     ) {
-        Text(
-            text = String.format("%02d:%02d:%02d", minutes, seconds, centiseconds),
-            style = MaterialTheme.typography.headlineLarge.copy(fontSize = 55.sp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentWidth(Alignment.CenterHorizontally)
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
         StatsRow(
             steps = steps,
             speed = averageSpeed,
@@ -53,4 +40,19 @@ fun TimerStatsDisplay(
             modifier = Modifier.weight(1f)
         )
     }
+}
+
+@Composable
+fun TimerDisplay(elapsedTime: Int) {
+    val minutes = (elapsedTime / 60000) % 60
+    val seconds = (elapsedTime / 1000) % 60
+    val centiseconds = (elapsedTime % 1000) / 10
+
+    Text(
+        text = String.format("%02d:%02d:%02d", minutes, seconds, centiseconds),
+        style = MaterialTheme.typography.headlineLarge.copy(fontSize = 55.sp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentWidth(Alignment.CenterHorizontally)
+    )
 }
