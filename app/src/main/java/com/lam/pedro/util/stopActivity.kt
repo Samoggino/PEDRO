@@ -35,6 +35,8 @@ suspend fun stopActivity(
     speedSamples: List<SpeedRecord.Sample>,
     steps: Float,
     hydrationVolume: Double,
+    trainIntensity: String,
+    yogaStyle: String,
     profileViewModel: ProfileViewModel,
     distance: MutableState<Double>,
     exerciseRoute: List<ExerciseRoute.Location>,
@@ -111,14 +113,12 @@ suspend fun stopActivity(
         Log.d("TAG", "------------Walk session: $walkSession")
         viewModel.saveWalkSession(walkSession)
     } else if (activityType == ExerciseSessionRecord.EXERCISE_TYPE_BIKING) {
-        //FIXME: calcolo calorie per bicicletta
-        val (totalCalories, activeCalories) = calculateCalories(
+        val (totalCalories, activeCalories) = calculateCyclingCalories(
             profileViewModel.weight.toDouble(),
             profileViewModel.height.toDouble(),
             profileViewModel.age.toInt(),
             profileViewModel.sex,
             distance.value,
-            steps.toInt(),
             duration,
             averageSpeed
         )
@@ -176,16 +176,13 @@ suspend fun stopActivity(
         Log.d("TAG", "------------Sleep session: $sleepSession")
         viewModel.saveSleepSession(sleepSession)
     } else if (activityType == ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT) {
-        //FIXME: calcolo calorie per train
-        val (totalCalories, activeCalories) = calculateCalories(
+        val (totalCalories, activeCalories) = calculateTrainCalories(
             profileViewModel.weight.toDouble(),
             profileViewModel.height.toDouble(),
             profileViewModel.age.toInt(),
             profileViewModel.sex,
-            distance.value,
-            steps.toInt(),
             duration,
-            averageSpeed
+            trainIntensity
         )
         val trainSession = TrainSession(
             startTime = startTime.toInstant(),
@@ -200,16 +197,13 @@ suspend fun stopActivity(
         Log.d("TAG", "------------Train session: $trainSession")
         viewModel.saveTrainSession(trainSession)
     } else if (activityType == ExerciseSessionRecord.EXERCISE_TYPE_YOGA) {
-        //FIXME: calcolo calorie per yoga
-        val (totalCalories, activeCalories) = calculateCalories(
+        val (totalCalories, activeCalories) = calculateYogaCalories(
             profileViewModel.weight.toDouble(),
             profileViewModel.height.toDouble(),
             profileViewModel.age.toInt(),
             profileViewModel.sex,
-            distance.value,
-            steps.toInt(),
             duration,
-            averageSpeed
+            yogaStyle
         )
         val yogaSession = YogaSession(
             startTime = startTime.toInstant(),

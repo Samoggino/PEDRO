@@ -62,11 +62,12 @@ import com.lam.pedro.presentation.component.NewActivitySaveAlertDialog
 import com.lam.pedro.presentation.component.NewActivityTopAppBar
 import com.lam.pedro.presentation.component.StatsDisplay
 import com.lam.pedro.presentation.component.TimerDisplay
+import com.lam.pedro.presentation.component.TrainIntensitySelector
 import com.lam.pedro.presentation.component.WaterGlass
+import com.lam.pedro.presentation.component.YogaStyleSelector
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModelFactory
 import com.lam.pedro.util.LocationTracker
-import com.lam.pedro.util.SnackbarViewModel
 import com.lam.pedro.util.SpeedTracker
 import com.lam.pedro.util.StepCounter
 import com.lam.pedro.util.stopActivity
@@ -88,8 +89,7 @@ fun NewActivityScreen(
     color: Color,
     viewModel: ActivitySessionViewModel,
     activityType: Int,
-    profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModelFactory(LocalContext.current)),
-    snackbarViewModel: SnackbarViewModel = viewModel()
+    profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModelFactory(LocalContext.current))
 ) {
     // variables
     val context = LocalContext.current
@@ -99,9 +99,12 @@ fun NewActivityScreen(
     val stepCounter = remember { StepCounter(context) }
     var steps by remember { mutableFloatStateOf(0f) }
     var hydrationVolume by remember { mutableDoubleStateOf(0.0) }
+    var yogaStyle by remember { mutableStateOf("Yin (gentle)") }
+    var trainIntensity by remember { mutableStateOf("moderate") }
     var averageSpeed by remember { mutableDoubleStateOf(0.0) }
     var speedCounter by remember { mutableIntStateOf(0) }
     var totalSpeed by remember { mutableDoubleStateOf(0.0) }
+
 
     var showLocationPermissionDialog by remember { mutableStateOf(false) }
     var showActivityRecognitionPermissionDialog by remember { mutableStateOf(false) }
@@ -344,6 +347,18 @@ fun NewActivityScreen(
                             distance = distance,
                             color = color
                         )
+                    } else if (activityType == ExerciseSessionRecord.EXERCISE_TYPE_YOGA) {
+                        YogaStyleSelector(
+                            yogaStyle = yogaStyle,
+                            onYogaStyleChange = { newStyle -> yogaStyle = newStyle },
+                            color = color
+                        )
+                    } else if (activityType == ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT) {
+                        TrainIntensitySelector(
+                            trainIntensity = trainIntensity,
+                            onTrainIntensityChange = { newStyle -> trainIntensity = newStyle },
+                            color = color
+                        )
                     } else {
                         WaterGlass(hydrationVolume = hydrationVolume) { addedVolume ->
                             hydrationVolume += addedVolume
@@ -419,6 +434,8 @@ fun NewActivityScreen(
                                             speedSamples = speedSamples,
                                             steps = steps,
                                             hydrationVolume = hydrationVolume,
+                                            trainIntensity = trainIntensity,
+                                            yogaStyle = yogaStyle,
                                             profileViewModel = profileViewModel,
                                             distance = mutableDoubleStateOf(distance.doubleValue),
                                             exerciseRoute = exerciseRoute,

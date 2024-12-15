@@ -25,12 +25,6 @@ fun StatsDisplay(
     color: Color
 ) {
     Column(
-        /*
-        modifier = Modifier
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-         */
     ) {
         StatsRow(
             steps = steps,
