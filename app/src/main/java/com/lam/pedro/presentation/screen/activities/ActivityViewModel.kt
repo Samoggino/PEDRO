@@ -1,40 +1,22 @@
 package com.lam.pedro.presentation.screen.activities
 
+//import com.lam.pedro.data.ExerciseSession
 import android.os.RemoteException
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.health.connect.client.records.CyclingPedalingCadenceRecord
-import androidx.health.connect.client.records.ExerciseLap
 import androidx.health.connect.client.records.ExerciseRoute
-import androidx.health.connect.client.records.ExerciseSegment
-import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
-import androidx.health.connect.client.records.StepsCadenceRecord
-import androidx.health.connect.client.units.Energy
-import androidx.health.connect.client.units.Length
-import androidx.health.connect.client.units.Volume
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-//import com.lam.pedro.data.ExerciseSession
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.SessionState
 import com.lam.pedro.data.activitySession.ActivitySession
-import com.lam.pedro.data.activitySession.CycleSession
-import com.lam.pedro.data.activitySession.DriveSession
-import com.lam.pedro.data.activitySession.LiftSession
-import com.lam.pedro.data.activitySession.ListenSession
-import com.lam.pedro.data.activitySession.RunSession
-import com.lam.pedro.data.activitySession.SitSession
-import com.lam.pedro.data.activitySession.SleepSession
-import com.lam.pedro.data.activitySession.TrainSession
-import com.lam.pedro.data.activitySession.WalkSession
-import com.lam.pedro.data.activitySession.YogaSession
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.cyclingscreen.CycleSessionViewModel
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.runscreen.RunSessionViewModel
 import com.lam.pedro.presentation.screen.activities.dynamicactivities.trainscreen.TrainSessionViewModel
@@ -45,6 +27,7 @@ import com.lam.pedro.presentation.screen.activities.staticactivities.liftscreen.
 import com.lam.pedro.presentation.screen.activities.staticactivities.listenscreen.ListenSessionViewModel
 import com.lam.pedro.presentation.screen.activities.staticactivities.sitscreen.SitSessionViewModel
 import com.lam.pedro.presentation.screen.activities.staticactivities.sleepscreen.SleepSessionViewModel
+import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -56,12 +39,12 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.util.UUID
-import kotlin.random.Random
 
 
 abstract class ActivitySessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ViewModel() {
 
+    abstract val actualSession: ActivitySession
     private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
     /*Define here the required permissions for the Health Connect usage*/
@@ -72,6 +55,8 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
 
     var sessionsList: MutableState<List<ActivitySession>> = mutableStateOf(listOf())
         private set
+
+    abstract val activityType: Int
 
     var uiState: UiState by mutableStateOf(UiState.Uninitialized)
         private set
@@ -84,6 +69,7 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
     private var lastPauseTime: ZonedDateTime? = null
     private val _sessionState = MutableStateFlow(SessionState.IDLE)
     private var timerJob: Job? = null
+
     val sessionState: StateFlow<SessionState> get() = _sessionState
 
     private val _selectedSession = MutableLiveData<ActivitySession>()
@@ -170,262 +156,33 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
         )
     }
 
-    suspend fun saveCycleSession(
-        /*
-        startTime: Instant,
-        endTime: Instant,
-        title: String = "My Cycle #${Random.nextInt(0, Int.MAX_VALUE)}",
+    abstract suspend fun saveSession(activitySession: ActivitySession)
+
+    abstract fun createSession(
+        duration: Long,
+        startTime: ZonedDateTime,
+        endTime: ZonedDateTime,
+        activityTitle: String,
         notes: String,
         speedSamples: List<SpeedRecord.Sample>,
-        cyclingPedalingCadenceSamples: List<CyclingPedalingCadenceRecord.Sample>,
-        totalEnergy: Energy,
-        activeEnergy: Energy,
-        distance: Length,
-        elevationGained: Length,
-        exerciseRoute: ExerciseRoute
-         */
-        cycleSession: CycleSession
-    ) {
-        healthConnectManager.insertCycleSession(
-            cycleSession.startTime,
-            cycleSession.endTime,
-            cycleSession.title,
-            cycleSession.notes,
-            cycleSession.speedSamples,
-            cycleSession.totalEnergy,
-            cycleSession.activeEnergy,
-            cycleSession.distance,
-            cycleSession.exerciseRoute
-        )
-    }
-
-    suspend fun saveRunSession(
-        /*
-                startTime: Instant,
-                endTime: Instant,
-                title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
-                notes: String,
-                speedSamples: List<SpeedRecord.Sample>,
-                //stepsCadenceSamples: List<StepsCadenceRecord.Sample>,
-                stepsCount: Long,
-                totalEnergy: Energy,
-                activeEnergy: Energy,
-                distance: Length,
-                elevationGained: Length,
-                exerciseRoute: ExerciseRoute
-        */
-        runSession: RunSession
-    ) {
-        // To keep it in RAM (for debugging)
-        //sessionsList.value += runSession
-        healthConnectManager.insertRunSession(
-            runSession.startTime,
-            runSession.endTime,
-            runSession.title,
-            runSession.notes,
-            runSession.speedSamples,
-            //runSession.stepsCadenceSamples,
-            runSession.stepsCount,
-            runSession.totalEnergy,
-            runSession.activeEnergy,
-            runSession.distance,
-            //runSession.elevationGained,
-            runSession.exerciseRoute
-        )
-    }
-
-    suspend fun saveTrainSession(
-        /*
-        startTime: Instant,
-        endTime: Instant,
-        title: String = "My Train #${Random.nextInt(0, Int.MAX_VALUE)}",
-        notes: String,
-        totalEnergy: Energy,
-        activeEnergy: Energy,
-        exerciseSegment: List<ExerciseSegment>,
-        exerciseLap: List<ExerciseLap>
-         */
-        trainSession: TrainSession
-    ) {
-        healthConnectManager.insertTrainSession(
-            trainSession.startTime,
-            trainSession.endTime,
-            trainSession.title,
-            trainSession.notes,
-            trainSession.totalEnergy,
-            trainSession.activeEnergy,
-            trainSession.exerciseSegment,
-            trainSession.exerciseLap
-        )
-    }
-
-    suspend fun saveWalkSession(
-        /*
-        startTime: Instant,
-        endTime: Instant,
-        title: String = "My Walk #${Random.nextInt(0, Int.MAX_VALUE)}",
-        notes: String,
-        speedSamples: List<SpeedRecord.Sample>,
-        stepsCadenceSamples: List<StepsCadenceRecord.Sample>,
-        stepsCount: Long,
-        totalEnergy: Energy,
-        activeEnergy: Energy,
-        distance: Length,
-        elevationGained: Length,
-        exerciseRoute: ExerciseRoute
-         */
-        walkSession: WalkSession
-    ) {
-        healthConnectManager.insertWalkSession(
-            walkSession.startTime,
-            walkSession.endTime,
-            walkSession.title,
-            walkSession.notes,
-            walkSession.speedSamples,
-            walkSession.stepsCount,
-            walkSession.totalEnergy,
-            walkSession.activeEnergy,
-            walkSession.distance,
-            walkSession.exerciseRoute
-        )
-    }
-
-    suspend fun saveYogaSession(
-        /*
-        startTime: Instant,
-        endTime: Instant,
-        title: String = "My Yoga #${Random.nextInt(0, Int.MAX_VALUE)}",
-        notes: String,
-        totalEnergy: Energy,
-        activeEnergy: Energy,
-        exerciseSegment: List<ExerciseSegment>,
-        exerciseLap: List<ExerciseLap>
-         */
-        yogaSession: YogaSession
-    ) {
-        healthConnectManager.insertYogaSession(
-            yogaSession.startTime,
-            yogaSession.endTime,
-            yogaSession.title,
-            yogaSession.notes,
-            yogaSession.totalEnergy,
-            yogaSession.activeEnergy,
-            yogaSession.exerciseSegment,
-            yogaSession.exerciseLap
-        )
-    }
-
-    suspend fun saveDriveSession(
-        /*
-        startTime: Instant,
-        endTime: Instant,
-        title: String = "My Drive #${Random.nextInt(0, Int.MAX_VALUE)}",
-        notes: String,
-        speedSamples: List<SpeedRecord.Sample>,
-        distance: Length,
-        elevationGained: Length,
-        exerciseRoute: ExerciseRoute
-         */
-        driveSession: DriveSession
-    ) {
-        healthConnectManager.insertDriveSession(
-            driveSession.startTime,
-            driveSession.endTime,
-            driveSession.title,
-            driveSession.notes,
-            driveSession.speedSamples,
-            driveSession.distance,
-            driveSession.exerciseRoute
-        )
-    }
-
-    suspend fun saveLiftSession(
-        /*
-        startTime: Instant,
-        endTime: Instant,
-        title: String = "My Lift #${Random.nextInt(0, Int.MAX_VALUE)}",
-        notes: String,
-        totalEnergy: Energy,
-        activeEnergy: Energy,
-        exerciseSegment: List<ExerciseSegment>,
-        exerciseLap: List<ExerciseLap>
-         */
-        liftSession: LiftSession
-    ) {
-        healthConnectManager.insertLiftSession(
-            liftSession.startTime,
-            liftSession.endTime,
-            liftSession.title,
-            liftSession.notes,
-            liftSession.totalEnergy,
-            liftSession.activeEnergy,
-            liftSession.exerciseSegment,
-            liftSession.exerciseLap
-        )
-    }
-
-    suspend fun saveListenSession(
-        /*
-        startTime: Instant,
-        endTime: Instant,
-        title: String = "My Listen #${Random.nextInt(0, Int.MAX_VALUE)}",
-        notes: String
-         */
-        listenSession: ListenSession
-    ) {
-        healthConnectManager.insertListenSession(
-            listenSession.startTime,
-            listenSession.endTime,
-            listenSession.title,
-            listenSession.notes
-        )
-    }
-
-    suspend fun saveSitSession(
-        /*
-        startTime: Instant,
-        endTime: Instant,
-        title: String = "My Sit #${Random.nextInt(0, Int.MAX_VALUE)}",
-        notes: String,
-        volume: Volume
-         */
-        sitSession: SitSession
-    ) {
-        healthConnectManager.insertSitSession(
-            sitSession.startTime,
-            sitSession.endTime,
-            sitSession.title,
-            sitSession.notes,
-            sitSession.volume
-        )
-    }
-
-    suspend fun saveSleepSession(
-        /*
-        startTime: Instant,
-        endTime: Instant,
-        title: String = "My Sleep #${Random.nextInt(0, Int.MAX_VALUE)}",
-        notes: String
-         */
-        sleepSession: SleepSession
-    ) {
-        healthConnectManager.insertSleepSession(
-            sleepSession.startTime,
-            sleepSession.endTime,
-            sleepSession.title,
-            sleepSession.notes
-        )
-    }
+        steps: Float,
+        hydrationVolume: Double,
+        trainIntensity: String,
+        yogaStyle: String,
+        profileViewModel: ProfileViewModel,
+        distance: MutableState<Double>,
+        exerciseRoute: List<ExerciseRoute.Location>,
+    )
 
     fun initialLoad(exerciseType: Int) {
         viewModelScope.launch {
             tryWithPermissionsCheck {
-                fetchExerciseSessions(exerciseType)
+                fetchSessions(exerciseType)
             }
         }
     }
 
-    fun startRecording(exerciseType: Int, title: String, notes: String) {
+    fun startRecording(title: String, notes: String) {
         viewModelScope.launch {
             tryWithPermissionsCheck {
                 val startOfSession = ZonedDateTime.now()
@@ -433,21 +190,21 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
 
                 // Avvia la sessione di esercizio e registra i dati necessari
                 healthConnectManager.insertExerciseSession(
-                    startOfSession.toInstant(), endOfSession.toInstant(), exerciseType, title, notes
+                    startOfSession.toInstant(), endOfSession.toInstant(), activityType, title, notes
                 )
-                //fetchExerciseSessions(exerciseType)  // aggiorna la lista delle sessioni
+                fetchSessions(activityType)  // aggiorna la lista delle sessioni
             }
         }
     }
 
-    suspend fun fetchExerciseSessions(exerciseType: Int) {
+    suspend fun fetchSessions(exerciseType: Int) {
         val start = Instant.EPOCH // 1st January 1970
         val now = Instant.now()
 
         sessionsList.value =
             healthConnectManager.fetchAndBuildActivitySession(start, now, exerciseType)
 
-
+        Log.d("SESSION LIST", "${sessionsList.value}")
     }
 
 

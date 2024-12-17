@@ -7,7 +7,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
+import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSessionRecord
+import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.units.Mass
 import androidx.lifecycle.ViewModel
@@ -15,15 +17,23 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.WeightData
+import com.lam.pedro.data.activitySession.ActivitySession
+import com.lam.pedro.data.activitySession.LiftSession
+import com.lam.pedro.data.activitySession.YogaSession
 import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
+import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.time.ZonedDateTime
 import java.util.UUID
 
 class LiftSessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ActivitySessionViewModel(healthConnectManager), MutableState<ActivitySessionViewModel?> {
 
     //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
+
+    override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_WEIGHTLIFTING
+    override lateinit var actualSession: LiftSession
 
     /*Define here the required permissions for the Health Connect usage*/
     override val permissions = setOf(
@@ -55,6 +65,43 @@ class LiftSessionViewModel(private val healthConnectManager: HealthConnectManage
         HealthPermission.getWritePermission(ActiveCaloriesBurnedRecord::class),
 
     )
+
+
+    override suspend fun saveSession(activitySession: ActivitySession) {
+        if (activitySession is LiftSession) {
+            healthConnectManager.insertYogaSession(
+                activitySession.startTime,
+                activitySession.endTime,
+                activitySession.title,
+                activitySession.notes,
+                activitySession.totalEnergy,
+                activitySession.activeEnergy,
+                activitySession.exerciseSegment,
+                activitySession.exerciseLap
+            )
+        } else {
+            throw IllegalArgumentException("Invalid session type for LiftSessionViewModel")
+        }
+    }
+
+    override fun createSession(
+        duration: Long,
+        startTime: ZonedDateTime,
+        endTime: ZonedDateTime,
+        activityTitle: String,
+        notes: String,
+        speedSamples: List<SpeedRecord.Sample>,
+        steps: Float,
+        hydrationVolume: Double,
+        trainIntensity: String,
+        yogaStyle: String,
+        profileViewModel: ProfileViewModel,
+        distance: MutableState<Double>,
+        exerciseRoute: List<ExerciseRoute.Location>
+    ) {
+        TODO("Not yet implemented")
+    }
+
     override var value: ActivitySessionViewModel?
         get() = TODO("Not yet implemented")
         set(value) {}

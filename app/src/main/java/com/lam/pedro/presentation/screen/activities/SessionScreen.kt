@@ -1,5 +1,6 @@
 package com.lam.pedro.presentation.screen.activities
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,7 +55,7 @@ fun SessionScreen(
     titleId: Int,
     color: Color,
     image: Int,
-    viewModel: ActivitySessionViewModel // Usa un tipo di ViewModel comune){}){}
+    viewModel: ActivitySessionViewModel
 ) {
     val errorId = rememberSaveable { mutableStateOf(UUID.randomUUID()) }
     val sessionList by viewModel.sessionsList
@@ -170,6 +171,7 @@ fun SessionScreen(
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp),
                         ) {
+                            Log.d("TEST SESSION LIST", sessionList.toString())
                             if (sessionList.isEmpty()) {
                                 item {
                                     Box(

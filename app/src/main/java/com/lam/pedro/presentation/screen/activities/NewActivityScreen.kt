@@ -13,15 +13,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -88,10 +84,10 @@ fun NewActivityScreen(
     titleId: Int,
     color: Color,
     viewModel: ActivitySessionViewModel,
-    activityType: Int,
     profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModelFactory(LocalContext.current))
 ) {
     // variables
+    val activityType = viewModel.activityType
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val sessionJob = remember { Job() }
@@ -340,28 +336,40 @@ fun NewActivityScreen(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    if (activityType == ExerciseSessionRecord.EXERCISE_TYPE_RUNNING) {
-                        StatsDisplay(
-                            steps = steps,
-                            averageSpeed = averageSpeed,
-                            distance = distance,
-                            color = color
-                        )
-                    } else if (activityType == ExerciseSessionRecord.EXERCISE_TYPE_YOGA) {
-                        YogaStyleSelector(
-                            yogaStyle = yogaStyle,
-                            onYogaStyleChange = { newStyle -> yogaStyle = newStyle },
-                            color = color
-                        )
-                    } else if (activityType == ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT) {
-                        TrainIntensitySelector(
-                            trainIntensity = trainIntensity,
-                            onTrainIntensityChange = { newStyle -> trainIntensity = newStyle },
-                            color = color
-                        )
-                    } else {
-                        WaterGlass(hydrationVolume = hydrationVolume) { addedVolume ->
-                            hydrationVolume += addedVolume
+                    when (activityType) {
+                        ExerciseSessionRecord.EXERCISE_TYPE_RUNNING, ExerciseSessionRecord.EXERCISE_TYPE_WALKING -> {
+                            StatsDisplay(
+                                steps = steps,
+                                averageSpeed = averageSpeed,
+                                distance = distance,
+                                color = color
+                            )
+                        }
+                        ExerciseSessionRecord.EXERCISE_TYPE_BIKING, ExerciseSessionRecord.EXERCISE_TYPE_SURFING -> {
+                            StatsDisplay(
+                                averageSpeed = averageSpeed,
+                                distance = distance,
+                                color = color
+                            )
+                        }
+                        ExerciseSessionRecord.EXERCISE_TYPE_YOGA -> {
+                            YogaStyleSelector(
+                                yogaStyle = yogaStyle,
+                                onYogaStyleChange = { newStyle -> yogaStyle = newStyle },
+                                color = color
+                            )
+                        }
+                        ExerciseSessionRecord.EXERCISE_TYPE_EXERCISE_CLASS -> {
+                            TrainIntensitySelector(
+                                trainIntensity = trainIntensity,
+                                onTrainIntensityChange = { newStyle -> trainIntensity = newStyle },
+                                color = color
+                            )
+                        }
+                        ExerciseSessionRecord.EXERCISE_TYPE_WHEELCHAIR -> {
+                            WaterGlass(hydrationVolume = hydrationVolume) { addedVolume ->
+                                hydrationVolume += addedVolume
+                            }
                         }
                     }
                 }
@@ -439,8 +447,7 @@ fun NewActivityScreen(
                                             profileViewModel = profileViewModel,
                                             distance = mutableDoubleStateOf(distance.doubleValue),
                                             exerciseRoute = exerciseRoute,
-                                            viewModel = viewModel,
-                                            activityType = activityType
+                                            viewModel = viewModel
                                         )
                                     }
                                     //coroutineScope.launch {

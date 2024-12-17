@@ -10,17 +10,27 @@ import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.CyclingPedalingCadenceRecord
 import androidx.health.connect.client.records.DistanceRecord
+import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
+import androidx.health.connect.client.units.Energy
+import androidx.health.connect.client.units.Length
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.SleepSessionData
+import com.lam.pedro.data.activitySession.ActivitySession
+import com.lam.pedro.data.activitySession.WalkSession
+import com.lam.pedro.data.activitySession.YogaSession
 import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
+import com.lam.pedro.presentation.screen.profile.ProfileViewModel
+import com.lam.pedro.util.calculateAverageSpeed
+import com.lam.pedro.util.calculateCalories
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.time.ZonedDateTime
 import java.util.UUID
 
 
@@ -28,6 +38,9 @@ class YogaSessionViewModel(private val healthConnectManager: HealthConnectManage
     ActivitySessionViewModel(healthConnectManager), MutableState<ActivitySessionViewModel?> {
 
     //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
+
+    override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_YOGA
+    override lateinit var actualSession: YogaSession
 
     /*Define here the required permissions for the Health Connect usage*/
     override val permissions = setOf(
@@ -58,7 +71,63 @@ class YogaSessionViewModel(private val healthConnectManager: HealthConnectManage
         * ExerciseLap - no permissions needed, it split exercise sessions into segments such as laps or exercise series
         * */
 
+    )
+
+    override fun createSession(
+        duration: Long,
+        startTime: ZonedDateTime,
+        endTime: ZonedDateTime,
+        activityTitle: String,
+        notes: String,
+        speedSamples: List<SpeedRecord.Sample>,
+        steps: Float,
+        hydrationVolume: Double,
+        trainIntensity: String,
+        yogaStyle: String,
+        profileViewModel: ProfileViewModel,
+        distance: MutableState<Double>,
+        exerciseRoute: List<ExerciseRoute.Location>,
+    ) {
+        val averageSpeed = calculateAverageSpeed(speedSamples)
+        val (totalCalories, activeCalories) = calculateCalories(
+            profileViewModel.weight.toDouble(),
+            profileViewModel.height.toDouble(),
+            profileViewModel.age.toInt(),
+            profileViewModel.sex,
+            distance.value,
+            steps.toInt(),
+            duration,
+            averageSpeed
         )
+        this.actualSession = YogaSession(
+            startTime = startTime.toInstant(),
+            endTime = endTime.toInstant(),
+            title = activityTitle,
+            notes = notes,
+            totalEnergy = Energy.calories(totalCalories),
+            activeEnergy = Energy.calories(activeCalories),
+            exerciseSegment = listOf(),//TODO
+            exerciseLap = listOf()//TODO
+        )
+    }
+
+    override suspend fun saveSession(activitySession: ActivitySession) {
+        if (activitySession is YogaSession) {
+            healthConnectManager.insertYogaSession(
+                activitySession.startTime,
+                activitySession.endTime,
+                activitySession.title,
+                activitySession.notes,
+                activitySession.totalEnergy,
+                activitySession.activeEnergy,
+                activitySession.exerciseSegment,
+                activitySession.exerciseLap
+            )
+        } else {
+            throw IllegalArgumentException("Invalid session type for YogaSessionViewModel")
+        }
+    }
+
     override var value: ActivitySessionViewModel?
         get() = TODO("Not yet implemented")
         set(value) {}

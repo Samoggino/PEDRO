@@ -11,19 +11,31 @@ import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.CyclingPedalingCadenceRecord
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ElevationGainedRecord
+import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.StepsCadenceRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
+import androidx.health.connect.client.units.Energy
+import androidx.health.connect.client.units.Length
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.SleepSessionData
+import com.lam.pedro.data.activitySession.ActivitySession
+import com.lam.pedro.data.activitySession.TrainSession
+import com.lam.pedro.data.activitySession.WalkSession
 import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
+import com.lam.pedro.presentation.screen.profile.ProfileViewModel
+import com.lam.pedro.util.calculateAverageSpeed
+import com.lam.pedro.util.calculateCalories
+import com.lam.pedro.util.calculateTrainCalories
+import com.lam.pedro.util.calculateYogaCalories
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.time.ZonedDateTime
 import java.util.UUID
 
 /*
@@ -171,6 +183,9 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
 
     //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
+    override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_WALKING
+    override lateinit var actualSession: WalkSession
+
     /*Define here the required permissions for the Health Connect usage*/
     override val permissions = setOf(
 
@@ -227,6 +242,63 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
         HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
 
         )
+
+    override fun createSession(
+        duration: Long,
+        startTime: ZonedDateTime,
+        endTime: ZonedDateTime,
+        activityTitle: String,
+        notes: String,
+        speedSamples: List<SpeedRecord.Sample>,
+        steps: Float,
+        hydrationVolume: Double,
+        trainIntensity: String,
+        yogaStyle: String,
+        profileViewModel: ProfileViewModel,
+        distance: MutableState<Double>,
+        exerciseRoute: List<ExerciseRoute.Location>,
+    ) {
+        val (totalCalories, activeCalories) = calculateYogaCalories(
+            profileViewModel.weight.toDouble(),
+            profileViewModel.height.toDouble(),
+            profileViewModel.age.toInt(),
+            profileViewModel.sex,
+            duration,
+            yogaStyle
+        )
+        this.actualSession = WalkSession(
+            startTime = startTime.toInstant(),
+            endTime = endTime.toInstant(),
+            title = activityTitle,
+            notes = notes,
+            speedSamples = speedSamples,
+            stepsCount = steps.toLong(),
+            totalEnergy = Energy.calories(totalCalories),
+            activeEnergy = Energy.calories(activeCalories),
+            distance = Length.meters(distance.value),
+            exerciseRoute = ExerciseRoute(exerciseRoute)
+        )
+    }
+
+    override suspend fun saveSession(activitySession: ActivitySession) {
+        if (activitySession is WalkSession) {
+            healthConnectManager.insertWalkSession(
+                activitySession.startTime,
+                activitySession.endTime,
+                activitySession.title,
+                activitySession.notes,
+                activitySession.speedSamples,
+                activitySession.stepsCount,
+                activitySession.totalEnergy,
+                activitySession.activeEnergy,
+                activitySession.distance,
+                activitySession.exerciseRoute
+            )
+        } else {
+            throw IllegalArgumentException("Invalid session type for WalkSessionViewModel")
+        }
+    }
+
     override var value: ActivitySessionViewModel?
         get() = TODO("Not yet implemented")
         set(value) {}

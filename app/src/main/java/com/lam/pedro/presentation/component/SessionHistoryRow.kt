@@ -1,5 +1,6 @@
 package com.lam.pedro.presentation.component
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -100,6 +101,7 @@ fun SessionHistoryRow(
                 sheetState = sheetState,
                 containerColor = MaterialTheme.colorScheme.secondaryContainer
             ) {
+                Log.d("TEST SESSION TYPE", session.toString())
                 ShowSessionDetails(session, color)
             }
         }

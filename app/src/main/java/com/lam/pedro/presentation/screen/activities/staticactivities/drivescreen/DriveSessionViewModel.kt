@@ -9,24 +9,37 @@ import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ElevationGainedRecord
+import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
+import androidx.health.connect.client.units.Energy
+import androidx.health.connect.client.units.Length
 import androidx.health.connect.client.units.Mass
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.WeightData
+import com.lam.pedro.data.activitySession.ActivitySession
+import com.lam.pedro.data.activitySession.DriveSession
+import com.lam.pedro.data.activitySession.WalkSession
+import com.lam.pedro.data.activitySession.YogaSession
 import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
+import com.lam.pedro.presentation.screen.profile.ProfileViewModel
+import com.lam.pedro.util.calculateYogaCalories
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.time.ZonedDateTime
 import java.util.UUID
 
 class DriveSessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ActivitySessionViewModel(healthConnectManager), MutableState<ActivitySessionViewModel?> {
 
     //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
+
+    override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_SURFING
+    override lateinit var actualSession: DriveSession
 
     /*Define here the required permissions for the Health Connect usage*/
     override val permissions = setOf(
@@ -55,7 +68,51 @@ class DriveSessionViewModel(private val healthConnectManager: HealthConnectManag
         HealthPermission.getReadPermission(ElevationGainedRecord::class),
         HealthPermission.getWritePermission(ElevationGainedRecord::class),
 
-    )
+        )
+
+    override fun createSession(
+        duration: Long,
+        startTime: ZonedDateTime,
+        endTime: ZonedDateTime,
+        activityTitle: String,
+        notes: String,
+        speedSamples: List<SpeedRecord.Sample>,
+        steps: Float,
+        hydrationVolume: Double,
+        trainIntensity: String,
+        yogaStyle: String,
+        profileViewModel: ProfileViewModel,
+        distance: MutableState<Double>,
+        exerciseRoute: List<ExerciseRoute.Location>,
+    ) {
+        this.actualSession = DriveSession(
+            startTime = startTime.toInstant(),
+            endTime = endTime.toInstant(),
+            title = activityTitle,
+            notes = notes,
+            speedSamples = speedSamples,
+            distance = Length.meters(distance.value),
+            exerciseRoute = ExerciseRoute(exerciseRoute)
+        )
+    }
+
+    override suspend fun saveSession(activitySession: ActivitySession) {
+        if (activitySession is DriveSession) {
+            healthConnectManager.insertDriveSession(
+                activitySession.startTime,
+                activitySession.endTime,
+                activitySession.title,
+                activitySession.notes,
+                activitySession.speedSamples,
+                activitySession.distance,
+                activitySession.exerciseRoute
+            )
+        } else {
+            throw IllegalArgumentException("Invalid session type for DriveSessionViewModel")
+        }
+    }
+
+
     override var value: ActivitySessionViewModel?
         get() = TODO("Not yet implemented")
         set(value) {}

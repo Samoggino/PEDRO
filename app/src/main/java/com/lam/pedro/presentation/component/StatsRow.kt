@@ -28,13 +28,6 @@ fun StatsColumn(icon: Int, unit: String, value: String, color: Color) {
         horizontalAlignment = Alignment.CenterHorizontally, // Centra gli elementi nella colonna
         modifier = Modifier.width(100.dp) // Imposta una larghezza specifica
     ) {
-        /*
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineMedium.copy(fontSize = 20.sp),
-            fontWeight = FontWeight.Bold
-        )
-         */
         Image(
             painter = painterResource(id = icon),
             contentDescription = null,
@@ -55,6 +48,7 @@ fun StatsColumn(icon: Int, unit: String, value: String, color: Color) {
     }
 }
 
+/*
 @Composable
 fun StatsRow(steps: Float, speed: Double, distance: MutableState<Double>, color: Color, modifier: Modifier) {
     Row(
@@ -86,3 +80,68 @@ fun StatsRow(steps: Float, speed: Double, distance: MutableState<Double>, color:
     }
 }
 
+@Composable
+fun StatsRowWithoutSteps(speed: Double, distance: MutableState<Double>, color: Color, modifier: Modifier) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp), // Aggiungi padding se necessario
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        StatsColumn(
+            icon = R.drawable.speed_icon,
+            unit = "(m/s)",
+            value = String.format("%.2f", speed), // Arrotonda a 2 decimali
+            color = color
+        )
+        Spacer(modifier = Modifier.weight(1f)) // Distribuisci lo spazio in modo uniforme
+        StatsColumn(
+            icon = R.drawable.distance_icon,
+            unit = "(m)",
+            value = String.format("%.2f", distance.value), // Arrotonda a 2 decimali
+            color = color
+        )
+    }
+}
+
+ */
+
+@Composable
+fun StatsRow(
+    steps: Float? = null, // Parametro opzionale
+    speed: Double,
+    distance: MutableState<Double>,
+    color: Color
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp), // Aggiungi padding se necessario
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Mostra il campo dei passi solo se `steps` è fornito
+        steps?.let {
+            StatsColumn(
+                icon = R.drawable.steps_icon,
+                unit = "",
+                value = "${steps.toInt()}", // Mostra solo la parte intera
+                color = color
+            )
+            Spacer(modifier = Modifier.weight(1f)) // Distribuisci lo spazio in modo uniforme
+        }
+
+        StatsColumn(
+            icon = R.drawable.speed_icon,
+            unit = "(m/s)",
+            value = String.format("%.2f", speed), // Arrotonda a 2 decimali
+            color = color
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        StatsColumn(
+            icon = R.drawable.distance_icon,
+            unit = "(m)",
+            value = String.format("%.2f", distance.value), // Arrotonda a 2 decimali
+            color = color
+        )
+    }
+}

@@ -1,29 +1,24 @@
 package com.lam.pedro.presentation.screen.activities.staticactivities.listenscreen
 
-import android.os.RemoteException
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.health.connect.client.permission.HealthPermission
-import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
+import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSessionRecord
-import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
-import androidx.health.connect.client.units.Mass
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.health.connect.client.records.SpeedRecord
 import com.lam.pedro.data.HealthConnectManager
-import com.lam.pedro.data.WeightData
+import com.lam.pedro.data.activitySession.ActivitySession
+import com.lam.pedro.data.activitySession.ListenSession
 import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
-import kotlinx.coroutines.launch
-import java.io.IOException
-import java.util.UUID
+import com.lam.pedro.presentation.screen.profile.ProfileViewModel
+import java.time.ZonedDateTime
 
 class ListenSessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ActivitySessionViewModel(healthConnectManager), MutableState<ActivitySessionViewModel?> {
 
     //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
+
+    override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_GUIDED_BREATHING
+    override lateinit var actualSession: ListenSession
 
     /*Define here the required permissions for the Health Connect usage*/
     override val permissions = setOf(
@@ -35,6 +30,43 @@ class ListenSessionViewModel(private val healthConnectManager: HealthConnectMana
         HealthPermission.getWritePermission(ExerciseSessionRecord::class),
 
         )
+
+    override suspend fun saveSession(activitySession: ActivitySession) {
+        if (activitySession is ListenSession) {
+            healthConnectManager.insertListenSession(
+                activitySession.startTime,
+                activitySession.endTime,
+                activitySession.title,
+                activitySession.notes
+            )
+        } else {
+            throw IllegalArgumentException("Invalid session type for ListenSessionViewModel")
+        }
+    }
+
+    override fun createSession(
+        duration: Long,
+        startTime: ZonedDateTime,
+        endTime: ZonedDateTime,
+        activityTitle: String,
+        notes: String,
+        speedSamples: List<SpeedRecord.Sample>,
+        steps: Float,
+        hydrationVolume: Double,
+        trainIntensity: String,
+        yogaStyle: String,
+        profileViewModel: ProfileViewModel,
+        distance: MutableState<Double>,
+        exerciseRoute: List<ExerciseRoute.Location>
+    ) {
+        this.actualSession = ListenSession(
+            startTime = startTime.toInstant(),
+            endTime = endTime.toInstant(),
+            title = activityTitle,
+            notes = notes
+        )
+    }
+
     override var value: ActivitySessionViewModel?
         get() = TODO("Not yet implemented")
         set(value) {}
