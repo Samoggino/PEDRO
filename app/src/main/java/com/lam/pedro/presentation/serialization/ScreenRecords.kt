@@ -62,9 +62,9 @@ fun MyScreenRecords(
                 ActivityRow(
                     activityEnum = activityType,
                     onInsertClick = {
-                        viewModel.insertActivitySession(
-                            activityEnum = activityType
-                        )
+//                        viewModel.insertActivitySession(
+//                            activityEnum = activityType
+//                        )
                     },
                     onGetClick = {
                         navController.navigate(Screen.ChartsScreen.route + "/${activityType.name}")
