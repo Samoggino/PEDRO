@@ -160,6 +160,7 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
         }
     }
 
+
     fun startRecording(title: String, notes: String) {
         viewModelScope.launch {
             tryWithPermissionsCheck {
