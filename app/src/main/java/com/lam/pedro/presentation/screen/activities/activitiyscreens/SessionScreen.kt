@@ -1,0 +1,208 @@
+package com.lam.pedro.presentation.screen.activities.activitiyscreens
+
+import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.lam.pedro.R
+import com.lam.pedro.data.CarouselItem
+import com.lam.pedro.presentation.component.ActivityScreenHeader
+import com.lam.pedro.presentation.component.DisplayGraph
+import com.lam.pedro.presentation.component.PermissionRequired
+import com.lam.pedro.presentation.component.SessionHistoryRow
+import com.lam.pedro.presentation.navigation.Screen
+import java.util.UUID
+
+@Composable
+fun SessionScreen(
+    permissions: Set<String>,
+    permissionsGranted: Boolean,
+    uiState: ActivitySessionViewModel.UiState,
+    onError: (Throwable?) -> Unit = {},
+    onPermissionsResult: () -> Unit = {},
+    onPermissionsLaunch: (Set<String>) -> Unit = {},
+    navController: NavController,
+    titleId: Int,
+    color: Color,
+    image: Int,
+    viewModel: ActivitySessionViewModel
+) {
+    Log.d("TIPO DELLO SCREEN", "---- TIPO DELLO SCREEN: ${viewModel.activityType}")
+    val errorId = rememberSaveable { mutableStateOf(UUID.randomUUID()) }
+    val sessionList by viewModel.sessionsList
+
+    LaunchedEffect(uiState) {
+        if (uiState is ActivitySessionViewModel.UiState.Uninitialized) {
+            onPermissionsResult()
+        }
+        if (uiState is ActivitySessionViewModel.UiState.Error && errorId.value != uiState.uuid) {
+            onError(uiState.exception)
+            errorId.value = uiState.uuid
+        }
+    }
+
+    Scaffold(
+        floatingActionButton = {
+            if (permissionsGranted) {
+                ExtendedFloatingActionButton(
+                    onClick = {
+                        navController.navigate(Screen.NewActivityScreen.route) {
+                            navController.graph.startDestinationRoute?.let { route ->
+                                popUpTo(route) {
+                                    saveState = true
+                                }
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    icon = { Icon(Icons.Filled.Add, contentDescription = "Add Activity") },
+                    text = { Text("Start Session") },
+                    shape = RoundedCornerShape(26.dp),
+                    containerColor = color,
+                    contentColor = Color.White
+                )
+            }
+        }
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 0.dp, bottom = paddingValues.calculateBottomPadding()),
+            horizontalAlignment = if (!permissionsGranted) {
+                Alignment.CenterHorizontally
+            } else {
+                Alignment.Start
+            }
+        ) {
+            item { ActivityScreenHeader(titleId, color, image) }
+
+            if (!permissionsGranted) {
+                item { Spacer(modifier = Modifier.height(30.dp)) }
+                item {
+                    PermissionRequired(
+                        color = color,
+                        permissions = permissions,
+                        onPermissionLaunch = onPermissionsLaunch
+                    )
+                }
+
+            } else {
+                item {
+                    Column() {
+                        Spacer(modifier = Modifier.height(30.dp))
+                        //-------------------------------------------------
+                        Text(
+                            text = "Statistics",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        /*
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(26.dp))
+                                .height(180.dp)
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                        ) {
+                            // TODO: graph
+                        }
+
+                         */
+                        val items = remember {
+                            listOf(
+                                CarouselItem(0, "Chart one"),
+                                CarouselItem(1, "Chart two"),
+                                CarouselItem(2, "Chart three"),
+                                CarouselItem(3, "Chart four"),
+                                CarouselItem(4, "Chart five"),
+                            )
+                        }
+
+                        DisplayGraph(items)
+
+                        Spacer(modifier = Modifier.height(30.dp))
+                        //-------------------------------------------------
+
+                        Text(
+                            text = stringResource(R.string.activity_history),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        LazyColumn(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(26.dp))
+                                .height(350.dp)
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                        ) {
+                            Log.d("TEST SESSION LIST", sessionList.toString())
+                            if (sessionList.isEmpty()) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize(), // Riempi tutto lo spazio disponibile
+                                        contentAlignment = Alignment.Center, // Centra sia orizzontalmente che verticalmente
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.empty_history),
+                                            style = MaterialTheme.typography.bodyLarge, // Aggiungi lo stile desiderato
+                                            color = MaterialTheme.colorScheme.onSecondaryContainer, // Imposta un colore opzionale
+                                            modifier = Modifier.padding(16.dp)
+                                        )
+                                    }
+                                }
+                            } else {
+                                items(sessionList) { session ->
+                                    SessionHistoryRow(color, image, session, viewModel)
+                                    HorizontalDivider(
+                                        thickness = 1.dp,
+                                        color = Color(0xFF606060)
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(90.dp))
+                    }
+                }
+            }
+        }
+
+    }
+}

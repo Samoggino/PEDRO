@@ -17,6 +17,7 @@ import java.time.ZoneOffset
 import kotlin.random.Random
 
 suspend fun insertRunSessionUtil(
+    activityType: Int,
     healthConnectClient: HealthConnectClient,
     startTime: Instant,
     endTime: Instant,
@@ -38,7 +39,7 @@ suspend fun insertRunSessionUtil(
         startZoneOffset = ZoneOffset.UTC,
         endTime = endTime,
         endZoneOffset = ZoneOffset.UTC,
-        exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_RUNNING,
+        exerciseType = activityType,
         title = title,
         notes = notes,
         exerciseRoute = exerciseRoute

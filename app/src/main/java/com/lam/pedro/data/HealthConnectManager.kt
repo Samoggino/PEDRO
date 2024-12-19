@@ -7,6 +7,7 @@ import android.content.res.Resources.NotFoundException
 import android.os.Build
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectClient.Companion.SDK_UNAVAILABLE
@@ -93,11 +94,11 @@ class HealthConnectManager(private val context: Context) {
         }
     }
 
-    var availability = mutableStateOf(SDK_UNAVAILABLE)
+    var availability = mutableIntStateOf(SDK_UNAVAILABLE)
         private set
 
     fun checkAvailability() {
-        availability.value = HealthConnectClient.getSdkStatus(context)
+        availability.intValue = HealthConnectClient.getSdkStatus(context)
     }
 
     init {
@@ -220,6 +221,7 @@ class HealthConnectManager(private val context: Context) {
     }
 
     suspend fun insertCycleSession(
+        activityType: Int,
         startTime: Instant,
         endTime: Instant,
         title: String,
@@ -237,7 +239,7 @@ class HealthConnectManager(private val context: Context) {
             startZoneOffset = ZoneOffset.UTC,
             endTime = endTime,
             endZoneOffset = ZoneOffset.UTC,
-            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_BIKING,
+            exerciseType = activityType,
             title = title,
             notes = notes,
             exerciseRoute = exerciseRoute
@@ -293,6 +295,7 @@ class HealthConnectManager(private val context: Context) {
     }
 
     suspend fun insertRunSession(
+        activityType: Int,
         startTime: Instant,
         endTime: Instant,
         title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
@@ -307,6 +310,7 @@ class HealthConnectManager(private val context: Context) {
         exerciseRoute: ExerciseRoute
     ) {
         insertRunSessionUtil(
+            activityType,
             healthConnectClient,
             startTime,
             endTime,
@@ -324,6 +328,7 @@ class HealthConnectManager(private val context: Context) {
     }
 
     suspend fun insertTrainSession(
+        activityType: Int,
         startTime: Instant,
         endTime: Instant,
         title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
@@ -340,7 +345,7 @@ class HealthConnectManager(private val context: Context) {
             startZoneOffset = ZoneOffset.UTC,
             endTime = endTime,
             endZoneOffset = ZoneOffset.UTC,
-            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_EXERCISE_CLASS,
+            exerciseType = activityType,
             title = title,
             notes = notes,
             segments = exerciseSegment,
@@ -379,6 +384,7 @@ class HealthConnectManager(private val context: Context) {
     }
 
     suspend fun insertWalkSession(
+        activityType: Int,
         startTime: Instant,
         endTime: Instant,
         title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
@@ -397,7 +403,7 @@ class HealthConnectManager(private val context: Context) {
             startZoneOffset = ZoneOffset.UTC,
             endTime = endTime,
             endZoneOffset = ZoneOffset.UTC,
-            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_WALKING,
+            exerciseType = activityType,
             title = title,
             notes = notes,
             exerciseRoute = exerciseRoute
@@ -459,6 +465,7 @@ class HealthConnectManager(private val context: Context) {
     }
 
     suspend fun insertYogaSession(
+        activityType: Int,
         startTime: Instant,
         endTime: Instant,
         title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
@@ -475,7 +482,7 @@ class HealthConnectManager(private val context: Context) {
             startZoneOffset = ZoneOffset.UTC,
             endTime = endTime,
             endZoneOffset = ZoneOffset.UTC,
-            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_YOGA,
+            exerciseType = activityType,
             title = title,
             notes = notes,
             segments = exerciseSegment,
@@ -514,6 +521,7 @@ class HealthConnectManager(private val context: Context) {
     }
 
     suspend fun insertDriveSession(
+        activityType: Int,
         startTime: Instant,
         endTime: Instant,
         title: String,
@@ -529,7 +537,7 @@ class HealthConnectManager(private val context: Context) {
             startZoneOffset = ZoneOffset.UTC,
             endTime = endTime,
             endZoneOffset = ZoneOffset.UTC,
-            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT,
+            exerciseType = activityType,
             title = title,
             notes = notes,
             exerciseRoute = exerciseRoute
@@ -566,6 +574,7 @@ class HealthConnectManager(private val context: Context) {
     }
 
     suspend fun insertLiftSession(
+        activityType: Int,
         startTime: Instant,
         endTime: Instant,
         title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
@@ -582,7 +591,7 @@ class HealthConnectManager(private val context: Context) {
             startZoneOffset = ZoneOffset.UTC,
             endTime = endTime,
             endZoneOffset = ZoneOffset.UTC,
-            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_WEIGHTLIFTING,
+            exerciseType = activityType,
             title = title,
             notes = notes,
             segments = exerciseSegment,
@@ -621,6 +630,7 @@ class HealthConnectManager(private val context: Context) {
     }
 
     suspend fun insertListenSession(
+        activityType: Int,
         startTime: Instant,
         endTime: Instant,
         title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
@@ -633,7 +643,7 @@ class HealthConnectManager(private val context: Context) {
             startZoneOffset = ZoneOffset.UTC,
             endTime = endTime,
             endZoneOffset = ZoneOffset.UTC,
-            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT,
+            exerciseType = activityType,
             title = title,
             notes = notes
         )
@@ -653,6 +663,7 @@ class HealthConnectManager(private val context: Context) {
     }
 
     suspend fun insertSitSession(
+        activityType: Int,
         startTime: Instant,
         endTime: Instant,
         title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
@@ -666,7 +677,7 @@ class HealthConnectManager(private val context: Context) {
             startZoneOffset = ZoneOffset.UTC,
             endTime = endTime,
             endZoneOffset = ZoneOffset.UTC,
-            exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT,
+            exerciseType = activityType,
             title = title,
             notes = notes
         )
@@ -677,7 +688,6 @@ class HealthConnectManager(private val context: Context) {
             endZoneOffset = ZoneOffset.UTC,
             volume = volume
         )
-
 
         // Insert the records into Health Connect
         try {
@@ -762,12 +772,16 @@ class HealthConnectManager(private val context: Context) {
         )
 
         // Leggi i record dalle API
-        val response = healthConnectClient.readRecords(request)
+        val response = healthConnectClient.readRecords(request)//drive, 72, no results
+
+        Log.d("RESPONSE HC API", "Response: ${response.records}")
 
         // Filtra i record in base all'exerciseType
         val records = response.records.filter { record ->
             record.exerciseType == exerciseType
         }
+
+        Log.d("FETCH RECORD FILTRATI", "Records: $records")
 
         // For each ExerciseSessionRecord, fetch the related Health Connect record and build the ActivitySession-s
         return records.map { record ->

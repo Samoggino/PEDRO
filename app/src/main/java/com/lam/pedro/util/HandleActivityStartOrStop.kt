@@ -1,9 +1,5 @@
 package com.lam.pedro.util
 
-import android.util.Log
-import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
-import com.lam.pedro.presentation.screen.profile.ProfileViewModel
-
 /*
 fun handleActivityStartOrStop(
     title: String,

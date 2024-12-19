@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.SpeedRecord
-import com.lam.pedro.presentation.screen.activities.ActivitySessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import java.time.ZonedDateTime
 
