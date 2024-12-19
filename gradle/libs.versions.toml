@@ -1,6 +1,7 @@
 [versions]
 accompanistDrawablepainter = "0.36.0"
 agp = "8.7.3"
+androidSdk = "11.6.1"
 concurrentFuturesKtx = "1.2.0"
 connectClient = "1.1.0-alpha09"
 desugar_jdk_libs = "2.1.2"
@@ -31,13 +32,13 @@ uiCompose = "1.7.0-alpha07"
 composeAnimation = "1.7.0-alpha07"
 foundationCompose = "1.7.0-alpha07"
 benchmarkCommon = "1.3.3"
-runtimeLivedata = "1.7.5"
 playServicesLocation = "21.3.0"
 core = "1.46.0"
 playServicesMaps = "19.0.0"
 
 [libraries]
 accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanistPlaceholderMaterial" }
+mapLibre = { module = "org.maplibre.gl:android-sdk", version.ref = "androidSdk" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }
@@ -65,7 +66,6 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 androidx-constraintlayout-compose = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 storage-kt = { module = "io.github.jan-tennert.supabase:storage-kt", version.ref = "storageKt" }
-androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
 
 ### charts
 compose-charts = { module = "io.github.ehsannarmani:compose-charts", version.ref = "composeCharts" }

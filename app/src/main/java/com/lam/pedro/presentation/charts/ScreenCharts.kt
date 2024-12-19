@@ -37,8 +37,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.lam.pedro.data.activity.ActivityType
-import com.lam.pedro.placeholder
 import com.lam.pedro.presentation.serialization.MetricSelector
+import com.lam.pedro.util.placeholder
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)

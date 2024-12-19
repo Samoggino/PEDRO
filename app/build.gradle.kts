@@ -26,7 +26,11 @@ android {
 
         buildConfigField("String", "SUPABASE_KEY", "\"${properties.getProperty("SUPABASE_KEY")}\"")
         buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
-        buildConfigField("String", "SUPABASE_SERVICE_ROLE", "\"${properties.getProperty("SUPABASE_SERVICE_ROLE")}\"")
+        buildConfigField(
+            "String",
+            "SUPABASE_SERVICE_ROLE",
+            "\"${properties.getProperty("SUPABASE_SERVICE_ROLE")}\""
+        )
 
     }
 
@@ -100,14 +104,14 @@ dependencies {
 
     //noinspection UseTomlInstead
     implementation("androidx.health.connect:connect-client:1.1.0-alpha10")
- implementation(libs.androidx.compose.animation)
+//    implementation(libs.androidx.compose.animation)
 
-    implementation("androidx.compose.ui:ui:1.7.0-alpha07")
-    implementation("androidx.compose.animation:animation:1.7.0-alpha07")
+//    implementation("androidx.compose.ui:ui:1.7.0-alpha07")
+//    implementation("androidx.compose.animation:animation:1.7.0-alpha07")
 
-    implementation("com.airbnb.android:lottie-compose:4.2.0")
+//    implementation("com.airbnb.android:lottie-compose:4.2.0")
 
-    implementation ("org.maplibre.gl:android-sdk:11.6.1")
+    implementation(libs.mapLibre)
     // AirBnB Lottie
     implementation(libs.lottie.compose)
 

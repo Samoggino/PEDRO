@@ -8,15 +8,11 @@ import android.os.Build
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.HealthConnectClient.Companion.SDK_UNAVAILABLE
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.changes.Change
-import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
-import androidx.health.connect.client.records.CyclingPedalingCadenceRecord
 import androidx.health.connect.client.records.DistanceRecord
-import androidx.health.connect.client.records.ElevationGainedRecord
 import androidx.health.connect.client.records.ExerciseLap
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSegment
@@ -26,24 +22,21 @@ import androidx.health.connect.client.records.HydrationRecord
 import androidx.health.connect.client.records.Record
 import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
-import androidx.health.connect.client.records.StepsCadenceRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.records.WeightRecord
 import androidx.health.connect.client.request.AggregateRequest
 import androidx.health.connect.client.request.ChangesTokenRequest
 import androidx.health.connect.client.request.ReadRecordsRequest
-import androidx.health.connect.client.response.InsertRecordsResponse
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import androidx.health.connect.client.units.Mass
 import androidx.health.connect.client.units.Volume
 import com.lam.pedro.R
+import com.lam.pedro.data.activity.SleepSessionData
 import com.lam.pedro.data.activitySession.ActivitySession
-import com.lam.pedro.data.activitySession.RunSession
 import com.lam.pedro.data.activitySession.activityFactoryHealthConnect.ActivitySessionFactoryFromHealthConnectProvider
-import com.lam.pedro.presentation.TAG
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
@@ -142,52 +135,6 @@ class HealthConnectManager(private val context: Context) {
 
      */
 
-
-    /**
-     * Writes an [ExerciseSessionRecord] to Health Connect, and additionally writes underlying data for
-     * the session too, such as [StepsRecord], [DistanceRecord] etc.
-     */
-    suspend fun writeRunSession(
-        start: ZonedDateTime,
-        end: ZonedDateTime,
-        title: String = "My Run #${Random.nextInt(0, 60)}",
-        notes: String
-    ): InsertRecordsResponse {
-
-        return healthConnectClient.insertRecords(
-            listOf(
-                ExerciseSessionRecord(
-                    startTime = start.toInstant(),
-                    startZoneOffset = start.offset,
-                    endTime = end.toInstant(),
-                    endZoneOffset = end.offset,
-                    exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_RUNNING,
-                    title = title,
-                ),
-                StepsRecord(
-                    startTime = start.toInstant(),
-                    startZoneOffset = start.offset,
-                    endTime = end.toInstant(),
-                    endZoneOffset = end.offset,
-                    count = (1000 + 1000 * Random.nextInt(3)).toLong()
-                ),
-                DistanceRecord(
-                    startTime = start.toInstant(),
-                    startZoneOffset = start.offset,
-                    endTime = end.toInstant(),
-                    endZoneOffset = end.offset,
-                    distance = Length.meters((1000 + 100 * Random.nextInt(20)).toDouble())
-                ),
-                TotalCaloriesBurnedRecord(
-                    startTime = start.toInstant(),
-                    startZoneOffset = start.offset,
-                    endTime = end.toInstant(),
-                    endZoneOffset = end.offset,
-                    energy = Energy.calories(140 + (Random.nextInt(20)) * 0.01)
-                )
-            )
-        )
-    }
 
     suspend fun insertExerciseSession(
         startTime: Instant,
@@ -793,7 +740,7 @@ class HealthConnectManager(private val context: Context) {
     /**
      * Reads aggregated data and raw data for selected data types, for a given [ExerciseSessionRecord].
      */
-    /*
+    /**
     suspend fun readAssociatedSessionData(
         uid: String
     ): ActivitySession {

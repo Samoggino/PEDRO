@@ -13,6 +13,7 @@ import com.lam.pedro.data.datasource.SecurePreferencesManager.saveTokens
 import com.lam.pedro.data.datasource.SupabaseClient.supabase
 import com.lam.pedro.data.datasource.SupabaseClient.userSession
 import com.lam.pedro.presentation.navigation.Screen
+import com.lam.pedro.presentation.screen.loginscreen.User
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -245,7 +246,7 @@ class SupabaseAuthViewModel : ViewModel() {
         }
     }
 
-    fun checkUserLoggedIn(navController: NavController, fromLogin: Boolean) {
+    fun checkUserLoggedIn(fromLogin: Boolean) {
         viewModelScope.launch {
             val session = userSession()
             if (session != null) {

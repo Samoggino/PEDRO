@@ -1,5 +1,6 @@
 package com.lam.pedro.data.activity
 
+import android.service.voice.VoiceInteractionSession.ActivityId
 import androidx.compose.ui.graphics.Color
 import com.lam.pedro.presentation.theme.CyclingColor
 import com.lam.pedro.presentation.theme.DriveColor
@@ -18,7 +19,8 @@ enum class ActivityType(
     val color: Color,
     val energyMetrics: Boolean = false,
     val distanceMetrics: Boolean = false,
-    val fullEnergyDistanceMetrics: Boolean = false
+    val fullEnergyDistanceMetrics: Boolean = false,
+    val activityId: ActivityId? = null
 ) {
     CYCLING(CyclingColor, fullEnergyDistanceMetrics = true),
     RUN(RunColor, fullEnergyDistanceMetrics = true),
