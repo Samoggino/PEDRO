@@ -52,7 +52,7 @@ fun Int.toMonthString(): String {
 
 @Serializable
 sealed class GenericActivity(
-    open val activityType: ActivityType
+    open val activityEnum: ActivityEnum
 ) {
     abstract val basicActivity: BasicActivity
 
@@ -102,7 +102,7 @@ sealed class GenericActivity(
         override val distance: Length,
         override val elevationGained: Length,
         val exerciseRoute: ExerciseRoute,
-    ) : GenericActivity(activityType = ActivityType.WALK), FullMetrics
+    ) : GenericActivity(activityEnum = ActivityEnum.WALK), FullMetrics
 
     @Serializable
     data class RunSession(
@@ -115,7 +115,7 @@ sealed class GenericActivity(
         override val distance: Length,
         override val elevationGained: Length,
         val exerciseRoute: ExerciseRoute,
-    ) : GenericActivity(activityType = ActivityType.RUN), FullMetrics
+    ) : GenericActivity(activityEnum = ActivityEnum.RUN), FullMetrics
 
     @Serializable
     data class CyclingSession(
@@ -128,7 +128,7 @@ sealed class GenericActivity(
         override val distance: Length,
         override val elevationGained: Length,
         val exerciseRoute: ExerciseRoute,
-    ) : GenericActivity(activityType = ActivityType.CYCLING), FullMetrics
+    ) : GenericActivity(activityEnum = ActivityEnum.CYCLING), FullMetrics
 
 
     @Serializable
@@ -140,7 +140,7 @@ sealed class GenericActivity(
 
         @Serializable(with = ListExerciseSegmentSerializer::class) val exerciseSegment: List<@Contextual ExerciseSegment>,
         @Serializable(with = ListExerciseLapSerializer::class) val exerciseLap: List<@Contextual ExerciseLap>,
-    ) : GenericActivity(activityType = ActivityType.LIFT), EnergyMetrics
+    ) : GenericActivity(activityEnum = ActivityEnum.LIFT), EnergyMetrics
 
     @Serializable
     data class TrainSession(
@@ -150,7 +150,7 @@ sealed class GenericActivity(
 
         @Serializable(with = ListExerciseSegmentSerializer::class) val exerciseSegment: List<@Contextual ExerciseSegment>,
         @Serializable(with = ListExerciseLapSerializer::class) val exerciseLap: List<@Contextual ExerciseLap>,
-    ) : GenericActivity(activityType = ActivityType.TRAIN), EnergyMetrics
+    ) : GenericActivity(activityEnum = ActivityEnum.TRAIN), EnergyMetrics
 
     @Serializable
     data class YogaSession(
@@ -160,7 +160,7 @@ sealed class GenericActivity(
 
         @Serializable(with = ListExerciseSegmentSerializer::class) val exerciseSegment: List<@Contextual ExerciseSegment>,
         @Serializable(with = ListExerciseLapSerializer::class) val exerciseLap: List<@Contextual ExerciseLap>,
-    ) : GenericActivity(activityType = ActivityType.YOGA), EnergyMetrics
+    ) : GenericActivity(activityEnum = ActivityEnum.YOGA), EnergyMetrics
 
 
     @Serializable
@@ -171,23 +171,23 @@ sealed class GenericActivity(
         override val distance: Length,
         override val elevationGained: Length,
         val exerciseRoute: ExerciseRoute,
-    ) : GenericActivity(activityType = ActivityType.DRIVE), DistanceMetrics
+    ) : GenericActivity(activityEnum = ActivityEnum.DRIVE), DistanceMetrics
 
 
     @Serializable
     data class SleepSession(
         override val basicActivity: BasicActivity,
-    ) : GenericActivity(activityType = ActivityType.SLEEP), StaticMetric
+    ) : GenericActivity(activityEnum = ActivityEnum.SLEEP), StaticMetric
 
     @Serializable
     data class SitSession(
         override val basicActivity: BasicActivity,
         val volume: Volume
-    ) : GenericActivity(activityType = ActivityType.SIT), StaticMetric
+    ) : GenericActivity(activityEnum = ActivityEnum.SIT), StaticMetric
 
     @Serializable
     data class ListenSession(
         override val basicActivity: BasicActivity,
-    ) : GenericActivity(activityType = ActivityType.LISTEN), StaticMetric
+    ) : GenericActivity(activityEnum = ActivityEnum.LISTEN), StaticMetric
 
 }

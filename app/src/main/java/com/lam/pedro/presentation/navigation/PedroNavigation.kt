@@ -32,7 +32,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.example.healthconnectsample.presentation.screen.HealthConnectScreen
 import com.lam.pedro.data.HealthConnectManager
-import com.lam.pedro.data.activity.ActivityType
+import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.presentation.charts.ScreenCharts
 import com.lam.pedro.presentation.charts.viewModelChartsFactory
 import com.lam.pedro.presentation.following.FollowScreen
@@ -41,26 +41,17 @@ import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.MoreScreen
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.GeneralActivityViewModelFactory
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.cyclingscreen.CycleSessionScreen
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.cyclingscreen.CycleSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.runscreen.RunSessionScreen
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.runscreen.RunSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.trainscreen.TrainSessionScreen
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.trainscreen.TrainSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.walkscreen.WalkSessionScreen
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.walkscreen.WalkSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.yogascreen.YogaSessionScreen
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.yogascreen.YogaSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.drivescreen.DriveSessionScreen
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.drivescreen.DriveSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.liftscreen.LiftSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.liftscreen.WeightSessionScreen
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.listenscreen.ListenSessionScreen
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.listenscreen.ListenSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.sitscreen.SitSessionScreen
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.sitscreen.SitSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.sleepscreen.SleepSessionScreen
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.sleepscreen.SleepSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.SessionScreen
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.CycleSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.RunSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.TrainSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.WalkSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.YogaSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.DriveSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.LiftSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.ListenSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.SitSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.SleepSessionViewModel
 import com.lam.pedro.presentation.screen.activities.newActivity.NewActivityScreen
 import com.lam.pedro.presentation.screen.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.more.AboutScreen
@@ -284,9 +275,7 @@ fun PedroNavigation(
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
-                    viewModel.initialLoad(
-                        viewModel.activityType /*Screen.RunSessionScreen.activityType*/
-                    )
+                    viewModel.initialLoad()
                 }
 
                 val permissionsLauncher =
@@ -296,24 +285,19 @@ fun PedroNavigation(
 
                 screenStack.add(Screen.RunSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                RunSessionScreen(
+                SessionScreen(
                     permissions = permissions,
                     permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
-                    onInsertClick = { viewModel.startRecording("My Run", "Notes") },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
                     },
                     onPermissionsResult = {
-                        viewModel.initialLoad(
-                            viewModel.activityType /*Screen.RunSessionScreen.activityType*/
-                        )
+                        viewModel.initialLoad()
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.RunSessionScreen.color,
-                    image = Screen.RunSessionScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -340,9 +324,7 @@ fun PedroNavigation(
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
-                    viewModel.initialLoad(
-                        viewModel.activityType /*Screen.SleepSessions.activityType*/
-                    )
+                    viewModel.initialLoad()
                 }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
@@ -350,24 +332,19 @@ fun PedroNavigation(
                     }
                 screenStack.add(Screen.SleepSessions.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                SleepSessionScreen(
+                SessionScreen(
                     permissions = permissions,
                     permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
-                    onInsertClick = { viewModel.startRecording("My Sleep", "Notes") },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
                     },
                     onPermissionsResult = {
-                        viewModel.initialLoad(
-                            viewModel.activityType /*Screen.SleepSessions.activityType*/
-                        )
+                        viewModel.initialLoad()
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.SleepSessions.color,
-                    image = Screen.SleepSessions.image,
                     viewModel = viewModel
                 )
             }
@@ -388,15 +365,13 @@ fun PedroNavigation(
                 sharedViewModel = viewModel
                 sharedColor = Screen.WalkSessionScreen.color
                 sharedTitle = Screen.WalkSessionScreen.titleId
-                // sharedActivityType = Screen.WalkSessionScreen.activityType
+                // sharedActivityType = Screen.WalkSessionScreen.activityEnum.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
-                    viewModel.initialLoad(
-                        viewModel.activityType /*Screen.WalkSessionScreen.activityType*/
-                    )
+                    viewModel.initialLoad()
                 }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
@@ -404,24 +379,19 @@ fun PedroNavigation(
                     }
                 screenStack.add(Screen.WalkSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                WalkSessionScreen(
+                SessionScreen(
                     permissions = permissions,
                     permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
-                    onInsertClick = { viewModel.startRecording("My Walk", "Notes") },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
                     },
                     onPermissionsResult = {
-                        viewModel.initialLoad(
-                            viewModel.activityType /*Screen.WalkSessionScreen.activityType*/
-                        )
+                        viewModel.initialLoad()
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.WalkSessionScreen.color,
-                    image = Screen.WalkSessionScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -442,15 +412,13 @@ fun PedroNavigation(
                 sharedViewModel = viewModel
                 sharedColor = Screen.DriveSessionScreen.color
                 sharedTitle = Screen.DriveSessionScreen.titleId
-                // sharedActivityType = Screen.DriveSessionScreen.activityType
+                // sharedActivityType = Screen.DriveSessionScreen.activityEnum.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
-                    viewModel.initialLoad(
-                        viewModel.activityType /*Screen.DriveSessionScreen.activityType*/
-                    )
+                    viewModel.initialLoad()
                 }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
@@ -458,25 +426,19 @@ fun PedroNavigation(
                     }
                 screenStack.add(Screen.DriveSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                DriveSessionScreen(
+                SessionScreen(
                     permissions = permissions,
                     permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
-                    onInsertClick = { viewModel.startRecording("My Drive", "Notes") },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
                     },
                     onPermissionsResult = {
-                        viewModel.initialLoad(
-                            viewModel
-                                .activityType /*Screen.DriveSessionScreen.activityType*/
-                        )
+                        viewModel.initialLoad()
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.DriveSessionScreen.color,
-                    image = Screen.DriveSessionScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -497,15 +459,13 @@ fun PedroNavigation(
                 sharedViewModel = viewModel
                 sharedColor = Screen.SitSessionScreen.color
                 sharedTitle = Screen.SitSessionScreen.titleId
-                // sharedActivityType = Screen.SitSessionScreen.activityType
+                // sharedActivityType = Screen.SitSessionScreen.activityEnum.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
-                    viewModel.initialLoad(
-                        viewModel.activityType /*Screen.SitSessionScreen.activityType*/
-                    )
+                    viewModel.initialLoad()
                 }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
@@ -513,24 +473,19 @@ fun PedroNavigation(
                     }
                 screenStack.add(Screen.SitSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                SitSessionScreen(
+                SessionScreen(
                     permissions = permissions,
                     permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
-                    onInsertClick = { viewModel.startRecording("My Sit", "Notes") },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
                     },
                     onPermissionsResult = {
-                        viewModel.initialLoad(
-                            viewModel.activityType /*Screen.SitSessionScreen.activityType*/
-                        )
+                        viewModel.initialLoad()
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.SitSessionScreen.color,
-                    image = Screen.SitSessionScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -551,15 +506,13 @@ fun PedroNavigation(
                 sharedViewModel = viewModel
                 sharedColor = Screen.ListenSessionScreen.color
                 sharedTitle = Screen.ListenSessionScreen.titleId
-                // sharedActivityType = Screen.ListenSessionScreen.activityType
+                // sharedActivityType = Screen.ListenSessionScreen.activityEnum.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
-                    viewModel.initialLoad(
-                        viewModel.activityType /*Screen.ListenSessionScreen.activityType*/
-                    )
+                    viewModel.initialLoad()
                 }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
@@ -567,25 +520,19 @@ fun PedroNavigation(
                     }
                 screenStack.add(Screen.ListenSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                ListenSessionScreen(
+                SessionScreen(
                     permissions = permissions,
                     permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
-                    onInsertClick = { viewModel.startRecording("My Listen", "Notes") },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
                     },
                     onPermissionsResult = {
-                        viewModel.initialLoad(
-                            viewModel
-                                .activityType /*Screen.ListenSessionScreen.activityType*/
-                        )
+                        viewModel.initialLoad()
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.ListenSessionScreen.color,
-                    image = Screen.ListenSessionScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -602,16 +549,14 @@ fun PedroNavigation(
                 sharedViewModel = viewModel
                 sharedColor = Screen.WeightScreen.color
                 sharedTitle = Screen.WeightScreen.titleId
-                // sharedActivityType = Screen.WeightScreen.activityType
+                // sharedActivityType = Screen.WeightScreen.activityEnum.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val permissions = viewModel.permissions
                 val sessionsList by viewModel.sessionsList
 
                 val onPermissionsResult = {
-                    viewModel.initialLoad(
-                        viewModel.activityType /*Screen.WeightScreen.activityType*/
-                    )
+                    viewModel.initialLoad()
                 }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
@@ -619,24 +564,19 @@ fun PedroNavigation(
                     }
                 screenStack.add(Screen.WeightScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                WeightSessionScreen(
+                SessionScreen(
                     permissions = permissions,
                     permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
-                    onInsertClick = { viewModel.startRecording("My Lift", "Notes") },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
                     },
                     onPermissionsResult = {
-                        viewModel.initialLoad(
-                            viewModel.activityType /*Screen.WeightScreen.activityType*/
-                        )
+                        viewModel.initialLoad()
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.WeightScreen.color,
-                    image = Screen.WeightScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -657,15 +597,13 @@ fun PedroNavigation(
                 sharedViewModel = viewModel
                 sharedColor = Screen.YogaSessionScreen.color
                 sharedTitle = Screen.YogaSessionScreen.titleId
-                // sharedActivityType = Screen.YogaSessionScreen.activityType
+                // sharedActivityType = Screen.YogaSessionScreen.activityEnum.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
-                    viewModel.initialLoad(
-                        viewModel.activityType /*Screen.YogaSessionScreen.activityType*/
-                    )
+                    viewModel.initialLoad()
                 }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
@@ -673,24 +611,19 @@ fun PedroNavigation(
                     }
                 screenStack.add(Screen.YogaSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                YogaSessionScreen(
+                SessionScreen(
                     permissions = permissions,
                     permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
-                    onInsertClick = { viewModel.startRecording("My Yoga", "Notes") },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
                     },
                     onPermissionsResult = {
-                        viewModel.initialLoad(
-                            viewModel.activityType /*Screen.YogaSessionScreen.activityType*/
-                        )
+                        viewModel.initialLoad()
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.YogaSessionScreen.color,
-                    image = Screen.YogaSessionScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -711,15 +644,13 @@ fun PedroNavigation(
                 sharedViewModel = viewModel
                 sharedColor = Screen.CycleSessionScreen.color
                 sharedTitle = Screen.CycleSessionScreen.titleId
-                // sharedActivityType = Screen.CycleSessionScreen.activityType
+                // sharedActivityType = Screen.CycleSessionScreen.activityEnum.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
-                    viewModel.initialLoad(
-                        viewModel.activityType /*Screen.CycleSessionScreen.activityType*/
-                    )
+                    viewModel.initialLoad()
                 }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
@@ -727,25 +658,19 @@ fun PedroNavigation(
                     }
                 screenStack.add(Screen.CycleSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                CycleSessionScreen(
+                SessionScreen(
                     permissions = permissions,
                     permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
-                    onInsertClick = { viewModel.startRecording("My Cycle", "Notes") },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
                     },
                     onPermissionsResult = {
-                        viewModel.initialLoad(
-                            viewModel
-                                .activityType /*Screen.CycleSessionScreen.activityType*/
-                        )
+                        viewModel.initialLoad()
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.CycleSessionScreen.color,
-                    image = Screen.CycleSessionScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -766,15 +691,13 @@ fun PedroNavigation(
                 sharedViewModel = viewModel
                 sharedColor = Screen.TrainSessionScreen.color
                 sharedTitle = Screen.TrainSessionScreen.titleId
-                // sharedActivityType = Screen.TrainSessionScreen.activityType
+                // sharedActivityType = Screen.TrainSessionScreen.activityEnum.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
-                    viewModel.initialLoad(
-                        viewModel.activityType /*Screen.TrainSessionScreen.activityType*/
-                    )
+                    viewModel.initialLoad()
                 }
                 val permissionsLauncher =
                     rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
@@ -782,25 +705,19 @@ fun PedroNavigation(
                     }
                 screenStack.add(Screen.TrainSessionScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                TrainSessionScreen(
+                SessionScreen(
                     permissions = permissions,
                     permissionsGranted = permissionsGranted,
                     uiState = viewModel.uiState,
-                    onInsertClick = { viewModel.startRecording("My Train", "Notes") },
                     onError = { exception ->
                         showExceptionSnackbar(snackbarHostState, scope, exception)
                     },
                     onPermissionsResult = {
-                        viewModel.initialLoad(
-                            viewModel
-                                .activityType /*Screen.TrainSessionScreen.activityType*/
-                        )
+                        viewModel.initialLoad()
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
                     titleId = topBarTitle,
-                    color = Screen.TrainSessionScreen.color,
-                    image = Screen.TrainSessionScreen.image,
                     viewModel = viewModel
                 )
             }
@@ -812,12 +729,12 @@ fun PedroNavigation(
                 route = Screen.ChartsScreen.route + "/{activityType}",
                 arguments = listOf(navArgument("activityType") { type = NavType.StringType })
             ) { backStackEntry ->
-                val activityTypeProp =
-                    ActivityType.valueOf(
+                val activityEnumProp =
+                    ActivityEnum.valueOf(
                         backStackEntry.arguments?.getString("activityType") ?: ""
                     )
                 ScreenCharts(
-                    activityType = activityTypeProp,
+                    activityEnum = activityEnumProp,
                     viewModelCharts =
                     viewModel(
                         factory =

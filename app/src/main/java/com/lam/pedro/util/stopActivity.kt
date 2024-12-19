@@ -68,7 +68,7 @@ suspend fun stopActivity(
 
     viewModel.saveSession(viewModel.actualSession)
 
-    viewModel.fetchSessions(viewModel.activityType)
+    viewModel.fetchSessions()
 
     /*
     when (viewModel.activityType) {

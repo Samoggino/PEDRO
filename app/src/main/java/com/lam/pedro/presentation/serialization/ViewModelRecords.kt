@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.lam.pedro.data.activity.ActivityType
+import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.SupabaseClient.safeRpcCall
@@ -25,10 +25,10 @@ class ViewModelRecords : ViewModel() {
 
     @OptIn(InternalSerializationApi::class)
     suspend fun getActivitySession(
-        activityType: ActivityType
+        activityEnum: ActivityEnum
     ): List<GenericActivity> {
-        Log.d("Supabase", "Recupero delle attività di tipo $activityType")
-        val config = activityConfigs[activityType] as? SessionCreator.ActivityConfig<*>
+        Log.d("Supabase", "Recupero delle attività di tipo $activityEnum")
+        val config = activityConfigs[activityEnum] as? SessionCreator.ActivityConfig<*>
 
         if (config != null) {
             return withContext(Dispatchers.IO) {
@@ -36,7 +36,7 @@ class ViewModelRecords : ViewModel() {
                 try {
                     val responseJson = (
                             safeRpcCall(
-                                rpcFunctionName = "get_${activityType.name.lowercase()}_session",
+                                rpcFunctionName = "get_${activityEnum.name.lowercase()}_session",
                                 jsonFinal = buildJsonObject {
                                     put("user_uuid", Json.encodeToJsonElement(uuid))
                                 }) as? PostgrestResult
@@ -54,19 +54,19 @@ class ViewModelRecords : ViewModel() {
                 }
             }
         } else {
-            Log.e("Supabase", "Configurazione non trovata per $activityType")
+            Log.e("Supabase", "Configurazione non trovata per $activityEnum")
             return emptyList()
         }
     }
 
     /**
      * Inserisce una sessione di attività nel database in base al tipo passato in input
-     * @param activityType il tipo di attività da inserire
+     * @param activityEnum il tipo di attività da inserire
      */
-    fun insertActivitySession(activityType: ActivityType) {
+    fun insertActivitySession(activityEnum: ActivityEnum) {
         viewModelScope.launch(Dispatchers.IO) {
             val uuid = getUUID().toString()
-            val config = activityConfigs[activityType]
+            val config = activityConfigs[activityEnum]
 
             if (config != null) {
                 try {
@@ -83,7 +83,7 @@ class ViewModelRecords : ViewModel() {
                     Log.d("Supabase", "Inserimento della sessione: $jsonFinal")
 
                     // Inserisci la sessione nel database come oggetto JSON
-                    safeRpcCall("insert_${activityType.name.lowercase()}_session", jsonFinal)
+                    safeRpcCall("insert_${activityEnum.name.lowercase()}_session", jsonFinal)
 
                     Log.d("Supabase", "Sessione inserita con successo: $newSession")
 
@@ -94,7 +94,7 @@ class ViewModelRecords : ViewModel() {
                     )
                 }
             } else {
-                Log.e("Supabase", "Configurazione non trovata per $activityType")
+                Log.e("Supabase", "Configurazione non trovata per $activityEnum")
             }
         }
     }

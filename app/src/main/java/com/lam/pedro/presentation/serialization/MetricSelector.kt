@@ -16,7 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.lam.pedro.data.activity.ActivityType
+import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.presentation.charts.LabelMetrics
 import com.lam.pedro.presentation.charts.getAvailableMetricsForActivity
 
@@ -24,16 +24,16 @@ import com.lam.pedro.presentation.charts.getAvailableMetricsForActivity
 @Composable
 fun MetricSelector(
     onMetricChange: (LabelMetrics) -> Unit,
-    activityType: ActivityType
+    activityEnum: ActivityEnum
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selectedMetric by remember {
         mutableStateOf(
-            getAvailableMetricsForActivity(activityType).firstOrNull() ?: LabelMetrics.DURATION
+            getAvailableMetricsForActivity(activityEnum).firstOrNull() ?: LabelMetrics.DURATION
         )
     }
 
-    val availableMetrics = getAvailableMetricsForActivity(activityType)
+    val availableMetrics = getAvailableMetricsForActivity(activityEnum)
 
     when {
         availableMetrics.isEmpty() -> {

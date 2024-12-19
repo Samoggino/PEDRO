@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.cyclingscreen
+package com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities
 
 import androidx.compose.runtime.MutableState
 import androidx.health.connect.client.permission.HealthPermission
@@ -12,6 +12,7 @@ import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import com.lam.pedro.data.HealthConnectManager
+import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activitySession.ActivitySession
 import com.lam.pedro.data.activitySession.CycleSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
@@ -26,8 +27,10 @@ class CycleSessionViewModel(private val healthConnectManager: HealthConnectManag
 
     //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
-    override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_BIKING
+    //override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_BIKING
     override lateinit var actualSession: CycleSession
+
+    override val activityEnum = ActivityEnum.CYCLING
 
     /*Define here the required permissions for the Health Connect usage*/
     override val permissions = setOf(
@@ -115,7 +118,7 @@ class CycleSessionViewModel(private val healthConnectManager: HealthConnectManag
     override suspend fun saveSession(activitySession: ActivitySession) {
         if (activitySession is CycleSession) {
             healthConnectManager.insertCycleSession(
-                activityType,
+                activityEnum.activityType,
                 activitySession.startTime,
                 activitySession.endTime,
                 activitySession.title,

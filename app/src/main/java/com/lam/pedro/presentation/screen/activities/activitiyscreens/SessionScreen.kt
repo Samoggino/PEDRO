@@ -53,11 +53,9 @@ fun SessionScreen(
     onPermissionsLaunch: (Set<String>) -> Unit = {},
     navController: NavController,
     titleId: Int,
-    color: Color,
-    image: Int,
     viewModel: ActivitySessionViewModel
 ) {
-    Log.d("TIPO DELLO SCREEN", "---- TIPO DELLO SCREEN: ${viewModel.activityType}")
+    Log.d("TIPO DELLO SCREEN", "---- TIPO DELLO SCREEN: ${viewModel.activityEnum.activityType}")
     val errorId = rememberSaveable { mutableStateOf(UUID.randomUUID()) }
     val sessionList by viewModel.sessionsList
 
@@ -89,7 +87,7 @@ fun SessionScreen(
                     icon = { Icon(Icons.Filled.Add, contentDescription = "Add Activity") },
                     text = { Text("Start Session") },
                     shape = RoundedCornerShape(26.dp),
-                    containerColor = color,
+                    containerColor = viewModel.activityEnum.color,
                     contentColor = Color.White
                 )
             }
@@ -105,13 +103,13 @@ fun SessionScreen(
                 Alignment.Start
             }
         ) {
-            item { ActivityScreenHeader(titleId, color, image) }
+            item { ActivityScreenHeader(titleId, viewModel.activityEnum.color, viewModel.activityEnum.image) }
 
             if (!permissionsGranted) {
                 item { Spacer(modifier = Modifier.height(30.dp)) }
                 item {
                     PermissionRequired(
-                        color = color,
+                        color = viewModel.activityEnum.color,
                         permissions = permissions,
                         onPermissionLaunch = onPermissionsLaunch
                     )
@@ -190,7 +188,7 @@ fun SessionScreen(
                                 }
                             } else {
                                 items(sessionList) { session ->
-                                    SessionHistoryRow(color, image, session, viewModel)
+                                    SessionHistoryRow(viewModel.activityEnum.color, viewModel.activityEnum.image, session, viewModel)
                                     HorizontalDivider(
                                         thickness = 1.dp,
                                         color = Color(0xFF606060)

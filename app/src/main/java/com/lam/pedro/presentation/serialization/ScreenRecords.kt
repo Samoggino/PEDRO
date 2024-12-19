@@ -23,7 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.lam.pedro.data.activity.ActivityType
+import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.presentation.navigation.Screen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,12 +58,12 @@ fun MyScreenRecords(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // List of activities
-            ActivityType.entries.forEach { activityType ->
+            ActivityEnum.entries.forEach { activityType ->
                 ActivityRow(
-                    activityType = activityType,
+                    activityEnum = activityType,
                     onInsertClick = {
                         viewModel.insertActivitySession(
-                            activityType = activityType
+                            activityEnum = activityType
                         )
                     },
                     onGetClick = {
@@ -95,7 +95,7 @@ fun NavButtons(navController: NavController) {
 
 @Composable
 fun ActivityRow(
-    activityType: ActivityType,
+    activityEnum: ActivityEnum,
     onInsertClick: () -> Unit,
     onGetClick: () -> Unit
 ) {
@@ -106,19 +106,19 @@ fun ActivityRow(
         Button(
             onClick = onInsertClick,
             colors = ButtonDefaults.buttonColors(
-                containerColor = activityType.color // Cambia il colore del bottone
+                containerColor = activityEnum.color // Cambia il colore del bottone
             )
         ) {
-            Text("Insert ${activityType.name}")
+            Text("Insert ${activityEnum.name}")
         }
 
         Button(
             onClick = onGetClick,
             colors = ButtonDefaults.buttonColors(
-                containerColor = activityType.color // Cambia il colore del bottone
+                containerColor = activityEnum.color // Cambia il colore del bottone
             )
         ) {
-            Text("Get ${activityType.name}")
+            Text("Get ${activityEnum.name}")
         }
     }
 }

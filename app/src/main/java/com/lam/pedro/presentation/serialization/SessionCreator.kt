@@ -9,7 +9,7 @@ import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import androidx.health.connect.client.units.Velocity
 import androidx.health.connect.client.units.Volume
-import com.lam.pedro.data.activity.ActivityType
+import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.GenericActivity.BasicActivity
 import com.lam.pedro.data.activity.GenericActivity.CyclingSession
@@ -213,43 +213,43 @@ object SessionCreator {
 
     // Configura i tuoi tipi di attività
     val activityConfigs = mapOf(
-        ActivityType.YOGA to ActivityConfig(
+        ActivityEnum.YOGA to ActivityConfig(
             responseType = YogaSession::class,
             sessionCreator = ::createYogaSession
         ),
-        ActivityType.RUN to ActivityConfig(
+        ActivityEnum.RUN to ActivityConfig(
             responseType = RunSession::class,
             sessionCreator = ::createRunSession
         ),
-        ActivityType.LISTEN to ActivityConfig(
+        ActivityEnum.LISTEN to ActivityConfig(
             responseType = ListenSession::class,
             sessionCreator = ::createListenSession
         ),
-        ActivityType.LIFT to ActivityConfig(
+        ActivityEnum.LIFT to ActivityConfig(
             responseType = LiftSession::class,
             sessionCreator = ::createLiftSession
         ),
-        ActivityType.SIT to ActivityConfig(
+        ActivityEnum.SIT to ActivityConfig(
             responseType = SitSession::class,
             sessionCreator = ::createSitSession
         ),
-        ActivityType.CYCLING to ActivityConfig(
+        ActivityEnum.CYCLING to ActivityConfig(
             responseType = CyclingSession::class,
             sessionCreator = ::createCyclingSession
         ),
-        ActivityType.TRAIN to ActivityConfig(
+        ActivityEnum.TRAIN to ActivityConfig(
             responseType = TrainSession::class,
             sessionCreator = ::createTrainSession
         ),
-        ActivityType.DRIVE to ActivityConfig(
+        ActivityEnum.DRIVE to ActivityConfig(
             responseType = DriveSession::class,
             sessionCreator = ::createDriveSession
         ),
-        ActivityType.SLEEP to ActivityConfig(
+        ActivityEnum.SLEEP to ActivityConfig(
             responseType = SleepSession::class,
             sessionCreator = ::createSleepSession
         ),
-        ActivityType.WALK to ActivityConfig(
+        ActivityEnum.WALK to ActivityConfig(
             responseType = WalkSession::class,
             sessionCreator = ::createWalkSession
         )

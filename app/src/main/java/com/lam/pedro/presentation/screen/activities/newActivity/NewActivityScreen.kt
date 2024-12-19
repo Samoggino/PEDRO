@@ -91,9 +91,9 @@ fun NewActivityScreen(
     profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModelFactory(LocalContext.current))
 ) {
 
-    Log.d("TIPO DEL NEW ACTIVITY SCREEN", "---- TIPO DEL NEW ACTIVITY SCREEN: ${viewModel.activityType}")
+    Log.d("TIPO DEL NEW ACTIVITY SCREEN", "---- TIPO DEL NEW ACTIVITY SCREEN: ${viewModel.activityEnum.activityType}")
     // variables
-    val activityType = viewModel.activityType
+    val activityType = viewModel.activityEnum.activityType
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val sessionJob = remember { Job() }

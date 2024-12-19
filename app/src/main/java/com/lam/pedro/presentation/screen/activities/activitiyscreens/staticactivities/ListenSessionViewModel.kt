@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.listenscreen
+package com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities
 
 import androidx.compose.runtime.MutableState
 import androidx.health.connect.client.permission.HealthPermission
@@ -6,6 +6,7 @@ import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import com.lam.pedro.data.HealthConnectManager
+import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activitySession.ActivitySession
 import com.lam.pedro.data.activitySession.ListenSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
@@ -17,8 +18,10 @@ class ListenSessionViewModel(private val healthConnectManager: HealthConnectMana
 
     //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
-    override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_GUIDED_BREATHING
+    //override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_GUIDED_BREATHING
     override lateinit var actualSession: ListenSession
+
+    override val activityEnum = ActivityEnum.LISTEN
 
     /*Define here the required permissions for the Health Connect usage*/
     override val permissions = setOf(
@@ -34,7 +37,7 @@ class ListenSessionViewModel(private val healthConnectManager: HealthConnectMana
     override suspend fun saveSession(activitySession: ActivitySession) {
         if (activitySession is ListenSession) {
             healthConnectManager.insertListenSession(
-                activityType,
+                activityEnum.activityType,
                 activitySession.startTime,
                 activitySession.endTime,
                 activitySession.title,

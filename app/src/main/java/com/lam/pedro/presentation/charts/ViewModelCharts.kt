@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.lam.pedro.data.activity.ActivityType
+import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.toMonthNumber
 import com.lam.pedro.presentation.serialization.ViewModelRecords
@@ -32,11 +32,11 @@ class ViewModelCharts(
     /**
      * Carica i dati iniziali e salva la lista di attività in cache
      */
-    fun loadActivityData(activityType: ActivityType) {
+    fun loadActivityData(activityEnum: ActivityEnum) {
         _chartState.value = ChartState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                activities = viewModelRecords.getActivitySession(activityType)
+                activities = viewModelRecords.getActivitySession(activityEnum)
                 if (activities.isEmpty()) {
                     _chartState.postValue(ChartState.Error(ChartError.NoData))
                 } else {
@@ -123,8 +123,8 @@ class ViewModelCharts(
                         value = values.sum(),
                         color = Brush.verticalGradient(
                             colors = listOf(
-                                activities[0].activityType.color,
-                                activities[0].activityType.color
+                                activities[0].activityEnum.color,
+                                activities[0].activityEnum.color
                             )
                         )
                     )
@@ -145,11 +145,11 @@ sealed class ChartState {
     data class Error(val error: ChartError) : ChartState()
 }
 
-fun getAvailableMetricsForActivity(activityType: ActivityType) =
+fun getAvailableMetricsForActivity(activityEnum: ActivityEnum) =
     when {
-        activityType.fullEnergyDistanceMetrics -> LabelMetrics.entries
-        activityType.distanceMetrics -> LabelMetrics.entries.filter { it != LabelMetrics.ACTIVE_CALORIES && it != LabelMetrics.TOTAL_CALORIES }
-        activityType.energyMetrics -> LabelMetrics.entries.filter { it != LabelMetrics.DISTANCE && it != LabelMetrics.ELEVATION }
+        activityEnum.fullEnergyDistanceMetrics -> LabelMetrics.entries
+        activityEnum.distanceMetrics -> LabelMetrics.entries.filter { it != LabelMetrics.ACTIVE_CALORIES && it != LabelMetrics.TOTAL_CALORIES }
+        activityEnum.energyMetrics -> LabelMetrics.entries.filter { it != LabelMetrics.DISTANCE && it != LabelMetrics.ELEVATION }
         else -> LabelMetrics.entries.filter { it == LabelMetrics.DURATION }
     }
 

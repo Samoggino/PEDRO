@@ -36,7 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.lam.pedro.data.activity.ActivityType
+import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.presentation.serialization.MetricSelector
 import com.lam.pedro.util.placeholder
 import kotlinx.coroutines.delay
@@ -44,21 +44,21 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenCharts(
-    activityType: ActivityType,
+    activityEnum: ActivityEnum,
     viewModelCharts: ViewModelCharts,
     navController: NavController
 ) {
     val chartState by viewModelCharts.chartState.observeAsState(ChartState.Loading)
 
-    LaunchedEffect(activityType) {
-        Log.i("Charts", "ScreenCharts for $activityType")
-        viewModelCharts.loadActivityData(activityType)
+    LaunchedEffect(activityEnum) {
+        Log.i("Charts", "ScreenCharts for $activityEnum")
+        viewModelCharts.loadActivityData(activityEnum)
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = activityType.name) },
+                title = { Text(text = activityEnum.name) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -75,7 +75,7 @@ fun ScreenCharts(
                 .fillMaxSize()
                 .padding(paddingValues),
             onRefresh = {
-                viewModelCharts.loadActivityData(activityType)
+                viewModelCharts.loadActivityData(activityEnum)
             },
             isRefreshing = chartState is ChartState.Loading
         ) {
@@ -86,9 +86,9 @@ fun ScreenCharts(
                     onMetricChange = { metric ->
                         viewModelCharts.changeMetric(metric)
                     },
-                    activityType = activityType
+                    activityEnum = activityEnum
                 )
-                ChartContent(chartState = chartState, activityType = activityType)
+                ChartContent(chartState = chartState, activityEnum = activityEnum)
             }
         }
     }
@@ -96,7 +96,7 @@ fun ScreenCharts(
 
 @Composable
 fun ChartContent(
-    activityType: ActivityType,
+    activityEnum: ActivityEnum,
     chartState: ChartState,
     modifier: Modifier =
         Modifier
@@ -105,7 +105,7 @@ fun ChartContent(
             .placeholder(
                 isLoading = chartState is ChartState.Loading,
                 showShimmerAnimation = true,
-                backgroundColor = activityType.color
+                backgroundColor = activityEnum.color
             )
 ) {
     Box(

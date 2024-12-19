@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.runscreen
+package com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities
 
 import androidx.compose.runtime.MutableState
 import androidx.health.connect.client.permission.HealthPermission
@@ -14,6 +14,7 @@ import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import com.lam.pedro.data.HealthConnectManager
+import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activitySession.ActivitySession
 import com.lam.pedro.data.activitySession.RunSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
@@ -27,8 +28,9 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
 
     //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
-    override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_RUNNING
     override lateinit var actualSession: RunSession
+
+    override val activityEnum = ActivityEnum.RUN
 
 
     /*Define here the required permissions for the Health Connect usage*/
@@ -133,7 +135,7 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
     override suspend fun saveSession(activitySession: ActivitySession) {
         if (activitySession is RunSession) {
             healthConnectManager.insertRunSession(
-                activityType,
+                activityEnum.activityType,
                 activitySession.startTime,
                 activitySession.endTime,
                 activitySession.title,

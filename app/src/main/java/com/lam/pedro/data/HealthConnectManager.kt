@@ -711,7 +711,7 @@ class HealthConnectManager(private val context: Context) {
     suspend fun fetchAndBuildActivitySession(
         start: Instant,
         end: Instant,
-        exerciseType: Int
+        activityType: Int
     ): List<ActivitySession> {
         val request = ReadRecordsRequest(
             recordType = ExerciseSessionRecord::class,
@@ -723,17 +723,17 @@ class HealthConnectManager(private val context: Context) {
 
         Log.d("RESPONSE HC API", "Response: ${response.records}")
 
-        // Filtra i record in base all'exerciseType
+        // Filtra i record in base all'activityType
         val records = response.records.filter { record ->
-            record.exerciseType == exerciseType
+            record.exerciseType == activityType
         }
 
         Log.d("FETCH RECORD FILTRATI", "Records: $records")
 
         // For each ExerciseSessionRecord, fetch the related Health Connect record and build the ActivitySession-s
         return records.map { record ->
-            buildActivitySession(healthConnectClient, record, exerciseType)
-            ActivitySessionFactoryFromHealthConnectProvider.createSession(exerciseType, healthConnectClient, record)
+            buildActivitySession(healthConnectClient, record, activityType)
+            ActivitySessionFactoryFromHealthConnectProvider.createSession(activityType, healthConnectClient, record)
         }
     }
 
