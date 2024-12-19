@@ -66,7 +66,6 @@ import com.lam.pedro.presentation.screen.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.more.AboutScreen
 import com.lam.pedro.presentation.screen.more.PrivacyPolicyScreen
 import com.lam.pedro.presentation.screen.more.SettingsScreen
-import com.lam.pedro.presentation.screen.more.loginscreen.LandingScreen
 import com.lam.pedro.presentation.screen.profile.ProfileScreen
 import com.lam.pedro.presentation.serialization.MyScreenRecords
 import com.lam.pedro.presentation.serialization.ViewModelRecordFactory
@@ -198,11 +197,7 @@ fun PedroNavigation(
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 LoginScreen(navController)
             }
-            composable(Screen.LandingScreen.route) {
-                screenStack.add(Screen.LandingScreen.route)
-                logScreenStack() // Log dello stack dopo aver aperto la schermata
-                LandingScreen()
-            }
+
             composable(
                 route = Screen.PrivacyPolicy.route,
                 enterTransition = slideInH,
@@ -809,8 +804,6 @@ fun PedroNavigation(
                     viewModel = viewModel
                 )
             }
-            composable(Screen.LandingScreen.route) { LandingScreen() }
-
             composable(Screen.MyScreenRecords.route) { MyScreenRecords(navController) }
 
             composable(Screen.FollowScreen.route) { FollowScreen() }
