@@ -1,28 +1,9 @@
 package com.lam.pedro.data
 
 import androidx.health.connect.client.HealthConnectClient
-import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
-import androidx.health.connect.client.records.DistanceRecord
-import androidx.health.connect.client.records.ExerciseRouteResult
 import androidx.health.connect.client.records.ExerciseSessionRecord
-import androidx.health.connect.client.records.SpeedRecord
-import androidx.health.connect.client.records.StepsRecord
-import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
-import androidx.health.connect.client.request.ReadRecordsRequest
-import androidx.health.connect.client.time.TimeRangeFilter
-import androidx.health.connect.client.units.Energy
-import androidx.health.connect.client.units.Volume
 import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.data.activitySession.ActivitySession
-import com.lam.pedro.data.activitySession.CycleSession
-import com.lam.pedro.data.activitySession.DriveSession
-import com.lam.pedro.data.activitySession.ListenSession
-import com.lam.pedro.data.activitySession.RunSession
-import com.lam.pedro.data.activitySession.SitSession
-import com.lam.pedro.data.activitySession.TrainSession
-import com.lam.pedro.data.activitySession.WalkSession
-import com.lam.pedro.data.activitySession.YogaSession
-import com.lam.pedro.data.activitySession.activityFactoryHealthConnect.ActivitySessionFactoryFromHealthConnectProvider
+import com.lam.pedro.data.activity.activityFactoryHealthConnect.ActivitySessionFactoryFromHealthConnectProvider
 
 suspend fun buildActivitySession(
     healthConnectClient: HealthConnectClient,

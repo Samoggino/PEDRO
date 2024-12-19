@@ -12,7 +12,6 @@
 
 package com.lam.pedro.data.activity
 
-import androidx.health.connect.client.records.CyclingPedalingCadenceRecord
 import androidx.health.connect.client.records.ExerciseLap
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSegment
@@ -22,7 +21,6 @@ import androidx.health.connect.client.units.Length
 import androidx.health.connect.client.units.Volume
 import com.lam.pedro.data.serializers.activity.ExerciseLapSerializer
 import com.lam.pedro.data.serializers.activity.ExerciseRouteSerializer
-import com.lam.pedro.data.serializers.lists.ListCyclingPedalingCadenceRecordSample
 import com.lam.pedro.data.serializers.lists.ListExerciseLapSerializer
 import com.lam.pedro.data.serializers.lists.ListExerciseSegmentSerializer
 import com.lam.pedro.data.serializers.lists.ListSpeedRecordSampleSerializer

@@ -1,10 +1,10 @@
-package com.lam.pedro.data.activitySession.activityFactoryHealthConnect
+package com.lam.pedro.data.activity.activityFactoryHealthConnect
 
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import com.lam.pedro.data.activity.GenericActivity
 
-class RunSessionFactory : ActivitySessionFactoryFromHealthConnect() {
+class WalkSessionFactory : ActivitySessionFactoryFromHealthConnect() {
     override suspend fun createSession(
         healthConnectClient: HealthConnectClient,
         exerciseRecord: ExerciseSessionRecord
@@ -24,12 +24,13 @@ class RunSessionFactory : ActivitySessionFactoryFromHealthConnect() {
 
         val exerciseRoute = getRoute(exerciseRecord)
 
-        return GenericActivity.RunSession(
-            basicActivity = GenericActivity.BasicActivity(
-            title = exerciseRecord.title ?: "My Run #${exerciseRecord.hashCode()}",
-            notes = exerciseRecord.notes ?: "",
-            startTime = startTime,
-            endTime = endTime),
+        return GenericActivity.WalkSession(
+            GenericActivity.BasicActivity(
+                title = exerciseRecord.title ?: "My Walk #${exerciseRecord.hashCode()}",
+                notes = exerciseRecord.notes ?: "",
+                startTime = startTime,
+                endTime = endTime
+            ),
             speedSamples = speedSamples,
             stepsCount = steps,
             distance = distance,

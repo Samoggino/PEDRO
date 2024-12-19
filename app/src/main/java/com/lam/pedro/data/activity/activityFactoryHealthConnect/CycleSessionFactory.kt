@@ -1,12 +1,10 @@
-package com.lam.pedro.data.activitySession.activityFactoryHealthConnect
+package com.lam.pedro.data.activity.activityFactoryHealthConnect
 
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.data.activitySession.ActivitySession
-import com.lam.pedro.data.activitySession.TrainSession
 
-class TrainSessionFactory : ActivitySessionFactoryFromHealthConnect() {
+class CycleSessionFactory : ActivitySessionFactoryFromHealthConnect() {
     override suspend fun createSession(
         healthConnectClient: HealthConnectClient,
         exerciseRecord: ExerciseSessionRecord
@@ -14,21 +12,28 @@ class TrainSessionFactory : ActivitySessionFactoryFromHealthConnect() {
         val startTime = exerciseRecord.startTime
         val endTime = exerciseRecord.endTime
 
+        val distance = getDistance(healthConnectClient, startTime, endTime)
+
+        val speedSamples = getSpeedSamples(healthConnectClient, startTime, endTime)
+
         val totalCaloriesBurned = getTotalCaloriesBurned(healthConnectClient, startTime, endTime)
 
         val activeCaloriesBurned = getActiveCaloriesBurned(healthConnectClient, startTime, endTime)
 
-        return GenericActivity.TrainSession(
-            GenericActivity.BasicActivity(
-                title = exerciseRecord.title ?: "My Train #${exerciseRecord.hashCode()}",
+        val exerciseRoute = getRoute(exerciseRecord)
+
+        return GenericActivity.CyclingSession(
+            basicActivity = GenericActivity.BasicActivity(
+                title = exerciseRecord.title ?: "My Cycle #${exerciseRecord.hashCode()}",
                 notes = exerciseRecord.notes ?: "",
                 startTime = startTime,
-                endTime = endTime
+                endTime = endTime,
             ),
+            speedSamples = speedSamples,
+            distance = distance,
             totalEnergy = totalCaloriesBurned,
             activeEnergy = activeCaloriesBurned,
-            exerciseSegment = exerciseRecord.segments,
-            exerciseLap = exerciseRecord.laps
+            exerciseRoute = exerciseRoute ?: throw IllegalArgumentException("Exercise route is null")
         )
     }
 }

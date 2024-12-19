@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.GenericActivity.*
-import com.lam.pedro.data.activitySession.CycleSession
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.util.calculateAverageSpeed
 import org.maplibre.android.geometry.LatLng

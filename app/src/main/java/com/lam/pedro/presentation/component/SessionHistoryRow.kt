@@ -35,7 +35,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.data.activitySession.ActivitySession
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

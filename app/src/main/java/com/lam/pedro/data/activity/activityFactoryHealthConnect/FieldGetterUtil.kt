@@ -1,4 +1,4 @@
-package com.lam.pedro.data.activitySession.activityFactoryHealthConnect
+package com.lam.pedro.data.activity.activityFactoryHealthConnect
 
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord

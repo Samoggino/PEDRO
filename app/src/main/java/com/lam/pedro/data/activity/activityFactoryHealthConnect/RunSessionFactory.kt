@@ -1,12 +1,10 @@
-package com.lam.pedro.data.activitySession.activityFactoryHealthConnect
+package com.lam.pedro.data.activity.activityFactoryHealthConnect
 
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.data.activitySession.ActivitySession
-import com.lam.pedro.data.activitySession.CycleSession
 
-class CycleSessionFactory : ActivitySessionFactoryFromHealthConnect() {
+class RunSessionFactory : ActivitySessionFactoryFromHealthConnect() {
     override suspend fun createSession(
         healthConnectClient: HealthConnectClient,
         exerciseRecord: ExerciseSessionRecord
@@ -18,24 +16,27 @@ class CycleSessionFactory : ActivitySessionFactoryFromHealthConnect() {
 
         val speedSamples = getSpeedSamples(healthConnectClient, startTime, endTime)
 
+        val steps = getSteps(healthConnectClient, startTime, endTime)
+
         val totalCaloriesBurned = getTotalCaloriesBurned(healthConnectClient, startTime, endTime)
 
         val activeCaloriesBurned = getActiveCaloriesBurned(healthConnectClient, startTime, endTime)
 
         val exerciseRoute = getRoute(exerciseRecord)
 
-        return GenericActivity.CyclingSession(
+        return GenericActivity.RunSession(
             basicActivity = GenericActivity.BasicActivity(
-                title = exerciseRecord.title ?: "My Cycle #${exerciseRecord.hashCode()}",
-                notes = exerciseRecord.notes ?: "",
-                startTime = startTime,
-                endTime = endTime,
-            ),
+            title = exerciseRecord.title ?: "My Run #${exerciseRecord.hashCode()}",
+            notes = exerciseRecord.notes ?: "",
+            startTime = startTime,
+            endTime = endTime),
             speedSamples = speedSamples,
+            stepsCount = steps,
             distance = distance,
             totalEnergy = totalCaloriesBurned,
             activeEnergy = activeCaloriesBurned,
-            exerciseRoute = exerciseRoute ?: throw IllegalArgumentException("Exercise route is null")
+            exerciseRoute = exerciseRoute
+                ?: throw IllegalArgumentException("Exercise route is null")
         )
     }
 }

@@ -1,6 +1,5 @@
 package com.lam.pedro.data.activity
 
-import android.service.voice.VoiceInteractionSession.ActivityId
 import androidx.compose.ui.graphics.Color
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import com.lam.pedro.R

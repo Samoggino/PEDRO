@@ -36,8 +36,7 @@ import androidx.health.connect.client.units.Volume
 import com.lam.pedro.R
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.SleepSessionData
-import com.lam.pedro.data.activitySession.ActivitySession
-import com.lam.pedro.data.activitySession.activityFactoryHealthConnect.ActivitySessionFactoryFromHealthConnectProvider
+import com.lam.pedro.data.activity.activityFactoryHealthConnect.ActivitySessionFactoryFromHealthConnectProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
