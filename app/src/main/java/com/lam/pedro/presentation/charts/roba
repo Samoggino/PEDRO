@@ -1,0 +1,230 @@
+  /**
+    // general layout
+    Column(
+    modifier = Modifier
+    .fillMaxWidth()
+    .padding(16.dp)
+    ) {
+    LineChart(
+    modifier = Modifier
+    .height(200.dp)
+    .fillMaxWidth()
+    .padding(horizontal = 22.dp),
+    data = remember {
+    listOf(
+    Line(
+    label = "Windows",
+    values = values,
+    color = SolidColor(Color(0xFF23af92)),
+    firstGradientFillColor = Color(0xFF2BC0A1).copy(alpha = .5f),
+    secondGradientFillColor = Color.Transparent,
+    strokeAnimationSpec = tween(750, easing = EaseInOutCubic),
+    gradientAnimationDelay = 10,
+    drawStyle = DrawStyle.Stroke(width = 2.dp),
+    )
+    )
+    },
+    animationMode = AnimationMode.Together(delayBuilder = {
+    it * 500L
+    }),
+    )
+
+    ColumnChart(
+    modifier = Modifier
+    .height(200.dp)
+    .fillMaxWidth()
+    .padding(horizontal = 22.dp),
+    data = remember {
+    listOf(
+    Bars(
+    label = "Jan",
+    values = listOf(
+    Bars.Data(
+    label = "Linux", value = 50.0,
+    color = Brush.verticalGradient(
+    colors = listOf(
+    Color.Black, Color.Red
+    )
+    ),
+    ),
+    Bars.Data(
+    label = "Windows", value = 80.0,
+    color = Brush.verticalGradient(
+    colors = listOf(Color.Blue, Color.Green)
+    ),
+    ),
+    Bars.Data(
+    label = "Mac", value = 70.0,
+    color = SolidColor(Color.Red)
+    ),
+    ),
+    ),
+    Bars(
+    label = "Feb",
+    values = listOf(
+    Bars.Data(
+    label = "Linux", value = 50.0,
+    color = Brush.verticalGradient(
+    colors = listOf(
+    Color.Black, Color.Red
+    )
+    ),
+    ),
+    Bars.Data(
+    label = "Windows", value = 70.0,
+    color = SolidColor(Color.Red)
+    ),
+    )
+    ),
+    Bars(
+    label = "Mar",
+    values = listOf(
+    Bars.Data(
+    label = "Linux", value = 50.0,
+    color = Brush.verticalGradient(
+    colors = listOf(
+    Color.Black, Color.Red
+    )
+    ),
+    ),
+    Bars.Data(
+    label = "Windows", value = 70.0,
+    color = SolidColor(Color.Red)
+    ),
+    )
+    ),
+    Bars(
+    label = "Apr",
+    values = listOf(
+    Bars.Data(
+    label = "Linux", value = 50.0,
+    color = Brush.verticalGradient(
+    colors = listOf(
+    Color.Black, Color.Red
+    )
+    ),
+    ),
+    Bars.Data(
+    label = "Windows", value = 70.0,
+    color = SolidColor(Color.Red)
+    ),
+    )
+    )
+    )
+    },
+    barProperties = BarProperties(
+    cornerRadius = Bars.Data.Radius.Rectangle(topRight = 6.dp, topLeft = 6.dp),
+    spacing = 3.dp,
+    thickness = 20.dp
+    ),
+    animationSpec = spring(
+    dampingRatio = Spring.DampingRatioMediumBouncy,
+    stiffness = Spring.StiffnessLow
+    ),
+    )
+
+    RowChart(
+    modifier = Modifier
+    .height(200.dp)
+    .fillMaxWidth()
+    .padding(horizontal = 22.dp),
+    data = remember {
+    listOf(
+    Bars(
+    label = "Jan",
+    values = listOf(
+    Bars.Data(
+    label = "Linux", value = 50.0,
+    color = Brush.verticalGradient(
+    colors = listOf(
+    Color.Black, Color.Red
+    )
+    ),
+    ),
+    Bars.Data(
+    label = "Windows",
+    value = 70.0,
+    color = SolidColor(Color.Red)
+    ),
+    )
+    ),
+    Bars(
+    label = "Feb",
+    values = listOf(
+    Bars.Data(
+    label = "Linux", value = 50.0,
+    color = Brush.verticalGradient(
+    colors = listOf(
+    Color.Black, Color.Red
+    )
+    ),
+    ),
+    Bars.Data(
+    label = "Windows",
+    value = 70.0,
+    color = SolidColor(Color.Red)
+    ),
+    )
+    )
+    )
+    },
+    barProperties = BarProperties(
+    cornerRadius = Bars.Data.Radius.Rectangle(topRight = 6.dp, topLeft = 6.dp),
+    spacing = 3.dp,
+    thickness = 20.dp
+    ),
+    animationSpec = spring(
+    dampingRatio = Spring.DampingRatioMediumBouncy,
+    stiffness = Spring.StiffnessLow
+    ),
+    )
+
+    var data by remember {
+    mutableStateOf(
+    listOf(
+    Pie(
+    label = "Android",
+    data = 20.0,
+    color = Color.Red,
+    selectedColor = Color.Green
+    ),
+    Pie(
+    label = "Windows",
+    data = 45.0,
+    color = Color.Cyan,
+    selectedColor = Color.Blue
+    ),
+    Pie(
+    label = "Linux",
+    data = 35.0,
+    color = Color.Gray,
+    selectedColor = Color.Yellow
+    ),
+    )
+    )
+    }
+    PieChart(
+    modifier = Modifier.size(200.dp),
+    data = data,
+    onPieClick = {
+    println("${it.label} Clicked")
+    val pieIndex = data.indexOf(it)
+    data =
+    data.mapIndexed { mapIndex, pie -> pie.copy(selected = pieIndex == mapIndex) }
+    },
+    selectedScale = 1.2f,
+    scaleAnimEnterSpec = spring<Float>(
+    dampingRatio = Spring.DampingRatioMediumBouncy,
+    stiffness = Spring.StiffnessLow
+    ),
+    colorAnimEnterSpec = tween(300),
+    colorAnimExitSpec = tween(300),
+    scaleAnimExitSpec = tween(300),
+    spaceDegreeAnimExitSpec = tween(300),
+    spaceDegree = 7f,
+    selectedPaddingDegree = 4f,
+    style = Pie.Style.Stroke(width = 40.dp),
+
+    )
+    }
+     */

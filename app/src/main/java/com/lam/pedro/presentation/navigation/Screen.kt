@@ -59,5 +59,8 @@ enum class Screen(val route: String, val titleId: Int, val image: Int, val color
     YogaSessionScreen("yoga_session_screen", R.string.yoga_session_screen, R.drawable.yoga_icon, Color(0xFFad71c9), ExerciseSessionRecord.EXERCISE_TYPE_YOGA, false),
     CycleSessionScreen("cycle_session_screen", R.string.cycle_session_screen, R.drawable.bicycling_icon, Color(0xFFC9B271), ExerciseSessionRecord.EXERCISE_TYPE_BIKING, false),
     TrainSessionScreen("train_session_screen", R.string.train_session_screen, R.drawable.stretching_icon, Color(0xFFC97187), ExerciseSessionRecord.EXERCISE_TYPE_EXERCISE_CLASS, false),
-    NewActivityScreen("new_activity_screen", R.string.new_activity_screen, 1, Color(0xFFfaaf5a), 1, false)
+    NewActivityScreen("new_activity_screen", R.string.new_activity_screen, 1, Color(0xFFfaaf5a), 1, false),
+    MyScreenRecords("my_screen_records", R.string.my_screen_records, false),
+    FollowScreen("follow_screen", R.string.follow_screen, false),
+    ChartsScreen("charts_screen", R.string.charts_screen, false),
 }

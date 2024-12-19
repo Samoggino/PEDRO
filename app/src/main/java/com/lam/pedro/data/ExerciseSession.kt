@@ -1,5 +1,6 @@
 package com.lam.pedro.data
 
+import com.example.healthconnectsample.data.HealthConnectAppInfo
 import java.time.ZonedDateTime
 
 /**

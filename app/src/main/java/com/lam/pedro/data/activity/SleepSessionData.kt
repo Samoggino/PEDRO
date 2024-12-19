@@ -1,13 +1,10 @@
-package com.lam.pedro.data
+package com.lam.pedro.data.activity
 
 import androidx.health.connect.client.records.SleepSessionRecord
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset
 
-/**
- * Represents sleep data, raw, aggregated and sleep stages, for a given [SleepSessionRecord].
- */
 data class SleepSessionData(
     val uid: String,
     val title: String?,
@@ -19,3 +16,4 @@ data class SleepSessionData(
     val duration: Duration?,
     val stages: List<SleepSessionRecord.Stage> = listOf()
 )
+

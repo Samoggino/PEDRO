@@ -24,13 +24,9 @@ android {
             load(project.rootProject.file("local.properties").inputStream())
         }
 
-        buildConfigField(
-            "String",
-            "SUPABASE_KEY",
-            "\"${properties.getProperty("SUPABASE_KEY")}\""
-        )
-        buildConfigField("String", "SECRET", "\"${properties.getProperty("SECRET")}\"")
+        buildConfigField("String", "SUPABASE_KEY", "\"${properties.getProperty("SUPABASE_KEY")}\"")
         buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
+        buildConfigField("String", "SUPABASE_SERVICE_ROLE", "\"${properties.getProperty("SUPABASE_SERVICE_ROLE")}\"")
 
     }
 
@@ -59,6 +55,7 @@ android {
 
 dependencies {
 
+    // Kotlin
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -74,6 +71,10 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.core)
     implementation(libs.play.services.maps)
+    implementation(libs.androidx.security.crypto)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.storage)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -88,14 +89,18 @@ dependencies {
     // Supabase
     //noinspection UseTomlInstead
     implementation(platform("io.github.jan-tennert.supabase:bom:3.0.1"))
+    implementation(libs.storage.kt)
     implementation(libs.github.postgrest.kt)
     implementation(libs.auth.kt)  // Non è necessario specificare la versione, usa semplicemente libs.auth.kt
     implementation(libs.github.realtime.kt)
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.okhttp)
+    implementation(libs.coil.compose)
 
+
+    //noinspection UseTomlInstead
     implementation("androidx.health.connect:connect-client:1.1.0-alpha10")
-    implementation(libs.androidx.compose.animation)
+ implementation(libs.androidx.compose.animation)
 
     implementation("androidx.compose.ui:ui:1.7.0-alpha07")
     implementation("androidx.compose.animation:animation:1.7.0-alpha07")
@@ -103,7 +108,14 @@ dependencies {
     implementation("com.airbnb.android:lottie-compose:4.2.0")
 
     implementation ("org.maplibre.gl:android-sdk:11.6.1")
+    // AirBnB Lottie
+    implementation(libs.lottie.compose)
 
+    // Accompanist
+    implementation(libs.accompanist.placeholder.material)
+
+    // charts
+    implementation(libs.compose.charts)
 }
 
 
