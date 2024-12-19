@@ -168,7 +168,7 @@ fun PedroNavigation(
             ) {
                 screenStack.add(Screen.MoreScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                MoreScreen(navController)
+                MoreScreen(navController, healthConnectManager)
             }
             composable(
                 Screen.ProfileScreen.route,
