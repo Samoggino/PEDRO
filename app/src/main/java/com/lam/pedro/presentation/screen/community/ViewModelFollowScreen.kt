@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.following
+package com.lam.pedro.presentation.screen.community
 
 import android.content.Context
 import android.net.Uri

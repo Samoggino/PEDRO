@@ -58,12 +58,12 @@ fun PedroApp(healthConnectManager: HealthConnectManager) {
         val scope = rememberCoroutineScope()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
-        val availability by healthConnectManager.availability
 
         // Definire le schermate in cui la BottomBar deve essere visibile
         val showBottomNotTop = when (currentRoute) {
             Screen.HomeScreen.route,
             Screen.MoreScreen.route,
+                Screen.CommunityScreen.route,
             Screen.ActivitiesScreen.route,
 
             Screen.SleepSessions.route,
@@ -84,6 +84,7 @@ fun PedroApp(healthConnectManager: HealthConnectManager) {
             /* BottomBar */
             Screen.HomeScreen.route -> Screen.HomeScreen.titleId
             Screen.ActivitiesScreen.route -> Screen.ActivitiesScreen.titleId
+            Screen.CommunityScreen.route -> Screen.CommunityScreen.titleId
             Screen.MoreScreen.route -> Screen.MoreScreen.titleId
 
             /* Profile */

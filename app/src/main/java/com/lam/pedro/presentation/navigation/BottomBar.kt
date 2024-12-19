@@ -18,6 +18,7 @@ package com.lam.pedro.presentation.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.PeopleAlt
 import androidx.compose.material.icons.filled.SpaceDashboard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -49,7 +50,7 @@ fun BottomBar(
         containerColor = Color.White.copy(alpha = 0.05f),
         contentColor = MaterialTheme.colorScheme.primary
     ) {
-        Screen.entries.filter { it.hasMenuItem }.forEach { item ->
+        Screen.entries.filter { (it.hasMenuItem) }.forEach { item ->
 
             val selected = item.route == currentRoute
             NavigationBarItem(
@@ -64,6 +65,11 @@ fun BottomBar(
                         R.string.activity_list -> Icon(
                             Icons.Filled.SpaceDashboard,
                             contentDescription = "Activities",
+                        )
+
+                        R.string.community_screen -> Icon(
+                            Icons.Filled.PeopleAlt,
+                            contentDescription = "Community",
                         )
 
                         R.string.more_screen -> Icon(

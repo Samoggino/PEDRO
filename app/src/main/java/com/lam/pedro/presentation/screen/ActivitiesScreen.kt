@@ -51,6 +51,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.lam.pedro.R
+import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.component.DeniedPermissionDialog
 import com.lam.pedro.presentation.navigation.Screen
@@ -60,19 +61,19 @@ fun ActivitiesScreen(
     navController: NavHostController
 ) {
     val staticActivities = listOf(
-        ActivityItem("Sleeping", painterResource(id = Screen.SleepSessions.image), 90.dp, Screen.SleepSessions.route, Screen.SleepSessions.color),
-        ActivityItem("Driving", painterResource(id = Screen.DriveSessionScreen.image), 100.dp, Screen.DriveSessionScreen.route, Screen.DriveSessionScreen.color),
-        ActivityItem("Sitting", painterResource(id = Screen.SitSessionScreen.image), 90.dp, Screen.SitSessionScreen.route, Screen.SitSessionScreen.color),
-        ActivityItem("Lifting", painterResource(id = Screen.WeightScreen.image), 90.dp, Screen.WeightScreen.route, Screen.WeightScreen.color),
-        ActivityItem("Listening", painterResource(id = Screen.ListenSessionScreen.image), 90.dp, Screen.ListenSessionScreen.route, Screen.ListenSessionScreen.color)
+        ActivityItem("Sleeping", painterResource(id = ActivityEnum.SLEEP.image), 90.dp, Screen.SleepSessions.route, ActivityEnum.SLEEP.color),
+        ActivityItem("Driving", painterResource(id = ActivityEnum.DRIVE.image), 100.dp, Screen.DriveSessionScreen.route, ActivityEnum.DRIVE.color),
+        ActivityItem("Sitting", painterResource(id = ActivityEnum.SIT.image), 90.dp, Screen.SitSessionScreen.route, ActivityEnum.SIT.color),
+        ActivityItem("Lifting", painterResource(id = ActivityEnum.LIFT.image), 90.dp, Screen.WeightScreen.route, ActivityEnum.LIFT.color),
+        ActivityItem("Listening", painterResource(id = ActivityEnum.LISTEN.image), 90.dp, Screen.ListenSessionScreen.route, ActivityEnum.LISTEN.color)
     )
 
     val dynamicActivities = listOf(
-        ActivityItem("Running", painterResource(id = Screen.RunSessionScreen.image), 90.dp, Screen.RunSessionScreen.route, Screen.RunSessionScreen.color),
-        ActivityItem("Walking", painterResource(id = Screen.WalkSessionScreen.image), 90.dp, Screen.WalkSessionScreen.route, Screen.WalkSessionScreen.color),
-        ActivityItem("Yoga", painterResource(id = Screen.YogaSessionScreen.image), 90.dp, Screen.YogaSessionScreen.route, Screen.YogaSessionScreen.color),
-        ActivityItem("Cycling", painterResource(id = Screen.CycleSessionScreen.image), 90.dp, Screen.CycleSessionScreen.route, Screen.CycleSessionScreen.color),
-        ActivityItem("Training", painterResource(id = Screen.TrainSessionScreen.image), 90.dp, Screen.TrainSessionScreen.route, Screen.TrainSessionScreen.color)
+        ActivityItem("Running", painterResource(id = ActivityEnum.RUN.image), 90.dp, Screen.RunSessionScreen.route, ActivityEnum.RUN.color),
+        ActivityItem("Walking", painterResource(id = ActivityEnum.WALK.image), 90.dp, Screen.WalkSessionScreen.route, ActivityEnum.WALK.color),
+        ActivityItem("Yoga", painterResource(id = ActivityEnum.YOGA.image), 90.dp, Screen.YogaSessionScreen.route, ActivityEnum.YOGA.color),
+        ActivityItem("Cycling", painterResource(id = ActivityEnum.CYCLING.image), 90.dp, Screen.CycleSessionScreen.route, ActivityEnum.CYCLING.color),
+        ActivityItem("Training", painterResource(id = ActivityEnum.TRAIN.image), 90.dp, Screen.TrainSessionScreen.route, ActivityEnum.TRAIN.color)
     )
 
     LazyColumn(

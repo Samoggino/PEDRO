@@ -35,7 +35,6 @@ import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.presentation.charts.ScreenCharts
 import com.lam.pedro.presentation.charts.viewModelChartsFactory
-import com.lam.pedro.presentation.following.FollowScreen
 import com.lam.pedro.presentation.screen.ActivitiesScreen
 import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.MoreScreen
@@ -53,6 +52,7 @@ import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactiv
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.SitSessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.SleepSessionViewModel
 import com.lam.pedro.presentation.screen.activities.newActivity.NewActivityScreen
+import com.lam.pedro.presentation.screen.community.CommunityScreen
 import com.lam.pedro.presentation.screen.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.more.AboutScreen
 import com.lam.pedro.presentation.screen.more.PrivacyPolicyScreen
@@ -151,6 +151,15 @@ fun PedroNavigation(
                 screenStack.add(Screen.ActivitiesScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 ActivitiesScreen(navController)
+            }
+            composable(
+                Screen.CommunityScreen.route,
+                enterTransition = fadeInTransition,
+                exitTransition = fadeOutTransition
+            ) {
+                screenStack.add(Screen.CommunityScreen.route)
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
+                CommunityScreen(navController)
             }
             composable(
                 Screen.MoreScreen.route,
@@ -267,9 +276,7 @@ fun PedroNavigation(
                     )
 
                 sharedViewModel = viewModel
-                sharedColor = Screen.RunSessionScreen.color
                 sharedTitle = Screen.RunSessionScreen.titleId
-                // sharedActivityType = Screen.RunSessionScreen.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
@@ -316,9 +323,7 @@ fun PedroNavigation(
                     )
 
                 sharedViewModel = viewModel
-                sharedColor = Screen.SleepSessions.color
                 sharedTitle = Screen.SleepSessions.titleId
-                // sharedActivityType = Screen.SleepSessions.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
@@ -363,9 +368,7 @@ fun PedroNavigation(
                     )
 
                 sharedViewModel = viewModel
-                sharedColor = Screen.WalkSessionScreen.color
                 sharedTitle = Screen.WalkSessionScreen.titleId
-                // sharedActivityType = Screen.WalkSessionScreen.activityEnum.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
@@ -410,9 +413,7 @@ fun PedroNavigation(
                     )
 
                 sharedViewModel = viewModel
-                sharedColor = Screen.DriveSessionScreen.color
                 sharedTitle = Screen.DriveSessionScreen.titleId
-                // sharedActivityType = Screen.DriveSessionScreen.activityEnum.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
@@ -457,9 +458,7 @@ fun PedroNavigation(
                     )
 
                 sharedViewModel = viewModel
-                sharedColor = Screen.SitSessionScreen.color
                 sharedTitle = Screen.SitSessionScreen.titleId
-                // sharedActivityType = Screen.SitSessionScreen.activityEnum.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
@@ -504,9 +503,7 @@ fun PedroNavigation(
                     )
 
                 sharedViewModel = viewModel
-                sharedColor = Screen.ListenSessionScreen.color
                 sharedTitle = Screen.ListenSessionScreen.titleId
-                // sharedActivityType = Screen.ListenSessionScreen.activityEnum.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
@@ -547,9 +544,7 @@ fun PedroNavigation(
                     )
 
                 sharedViewModel = viewModel
-                sharedColor = Screen.WeightScreen.color
                 sharedTitle = Screen.WeightScreen.titleId
-                // sharedActivityType = Screen.WeightScreen.activityEnum.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val permissions = viewModel.permissions
@@ -595,9 +590,7 @@ fun PedroNavigation(
                     )
 
                 sharedViewModel = viewModel
-                sharedColor = Screen.YogaSessionScreen.color
                 sharedTitle = Screen.YogaSessionScreen.titleId
-                // sharedActivityType = Screen.YogaSessionScreen.activityEnum.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
@@ -642,9 +635,7 @@ fun PedroNavigation(
                     )
 
                 sharedViewModel = viewModel
-                sharedColor = Screen.CycleSessionScreen.color
                 sharedTitle = Screen.CycleSessionScreen.titleId
-                // sharedActivityType = Screen.CycleSessionScreen.activityEnum.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
@@ -689,9 +680,7 @@ fun PedroNavigation(
                     )
 
                 sharedViewModel = viewModel
-                sharedColor = Screen.TrainSessionScreen.color
                 sharedTitle = Screen.TrainSessionScreen.titleId
-                // sharedActivityType = Screen.TrainSessionScreen.activityEnum.activityType
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val sessionsList by viewModel.sessionsList
@@ -722,8 +711,6 @@ fun PedroNavigation(
                 )
             }
             composable(Screen.MyScreenRecords.route) { MyScreenRecords(navController) }
-
-            composable(Screen.FollowScreen.route) { FollowScreen() }
 
             composable(
                 route = Screen.ChartsScreen.route + "/{activityType}",

@@ -183,5 +183,6 @@
     <string name="my_screen_records">pagina per testare la serializzazione</string>
     <string name="follow_screen">pagina per i followers</string>
     <string name="charts_screen">charts screen</string>
+    <string name="community_screen">Community</string>
 
 </resources>

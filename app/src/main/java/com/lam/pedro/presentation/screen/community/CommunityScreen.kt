@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.following
+package com.lam.pedro.presentation.screen.community
 
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -33,21 +33,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import com.lam.pedro.presentation.component.UserCard
+import com.lam.pedro.presentation.component.UserPlaceholder
 import com.lam.pedro.presentation.screen.loginscreen.User
 import kotlinx.coroutines.launch
 
-@Preview(showBackground = true)
-@Composable
-fun FollowScreenPreview() {
-    FollowScreen()
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FollowScreen() {
+fun CommunityScreen(
+    navController: NavHostController
+) {
     var isRefreshing by remember { mutableStateOf(false) }
     val viewModel: ViewModelFollowScreen = viewModel(factory = ViewModelFollowScreenFactory())
     val userFollowMap by viewModel.userFollowMap.collectAsState() // Osserva il Flow

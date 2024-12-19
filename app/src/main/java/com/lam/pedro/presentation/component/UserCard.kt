@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.following
+package com.lam.pedro.presentation.component
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.EaseInOut

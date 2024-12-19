@@ -29,179 +29,123 @@ import com.lam.pedro.R
 enum class Screen(
     val route: String,
     val titleId: Int,
-    val image: Int = 1,
-    val color: Color = Color(0xFFfaaf5a),
-    val hasMenuItem: Boolean = true,
+    val hasMenuItem: Boolean = false,
 ) {
     WelcomeScreen(
         route = "welcome_screen",
         titleId = R.string.welcome_screen,
-        hasMenuItem = false
     ),
     HomeScreen(
         route = "home_screen",
         titleId = R.string.home_screen,
-    ),
-    ProfileScreen(
-        route = "profile_screen",
-        titleId = R.string.profile_screen,
-
-        hasMenuItem = false
-    ),
-    ExerciseSessions(
-        route = "exercise_sessions",
-        titleId = R.string.exercise_sessions,
-
-        hasMenuItem = false
-    ),
-    ExerciseSessionDetail(
-        route = "exercise_session_detail",
-        titleId = R.string.exercise_session_detail,
-
-        hasMenuItem = false
-    ),
-    SleepSessions(
-        route = "sleep_sessions",
-        titleId = R.string.sleep_sessions,
-        R.drawable.sleeping_icon,
-        color = Color(0xff74c9c6),
-        hasMenuItem = false
-    ),
-    SleepSessionDetail(
-        route = "sleep_session_detail",
-        titleId = R.string.sleep_session_detail,
-        color = Color(0xff74c9c6),
-        hasMenuItem = false
-    ),
-    WeightScreen(
-        route = "weight_screen",
-        titleId = R.string.input_readings,
-        R.drawable.dumbells_icon,
-        color = Color(0xFF7771C9),
-        hasMenuItem = false
-    ),
-    DriveSessionScreen(
-        route = "drive_screen",
-        titleId = R.string.drive_screen,
-        R.drawable.car_icon,
-        color = Color(0xFF61a6f1),
-        hasMenuItem = false
-    ),
-    DifferentialChanges(
-        route = "differential_changes",
-        titleId = R.string.differential_changes,
-
-        hasMenuItem = false
-    ),
-    PrivacyPolicy(
-        route = "privacy_policy",
-        titleId = R.string.privacy_policy,
-
-        hasMenuItem = false
-    ),
-    HealthConnectScreen(
-        route = "health_connect_screen",
-        titleId = R.string.health_connect,
-
-        hasMenuItem = false
+        hasMenuItem = true
     ),
     ActivitiesScreen(
         route = "activity_list",
         titleId = R.string.activity_list,
+        hasMenuItem = true
+    ),
+    CommunityScreen(
+        route = "community_screen",
+        titleId = R.string.community_screen,
+        hasMenuItem = true
     ),
     MoreScreen(
         route = "more_screen",
         titleId = R.string.more_screen,
+        hasMenuItem = true
+    ),
+    ProfileScreen(
+        route = "profile_screen",
+        titleId = R.string.profile_screen
+    ),
+    ExerciseSessions(
+        route = "exercise_sessions",
+        titleId = R.string.exercise_sessions
+    ),
+    ExerciseSessionDetail(
+        route = "exercise_session_detail",
+        titleId = R.string.exercise_session_detail
+    ),
+    SleepSessions(
+        route = "sleep_sessions",
+        titleId = R.string.sleep_sessions
+    ),
+    SleepSessionDetail(
+        route = "sleep_session_detail",
+        titleId = R.string.sleep_session_detail
+    ),
+    WeightScreen(
+        route = "weight_screen",
+        titleId = R.string.input_readings
+    ),
+    DriveSessionScreen(
+        route = "drive_screen",
+        titleId = R.string.drive_screen
+    ),
+    DifferentialChanges(
+        route = "differential_changes",
+        titleId = R.string.differential_changes
+    ),
+    PrivacyPolicy(
+        route = "privacy_policy",
+        titleId = R.string.privacy_policy
+    ),
+    HealthConnectScreen(
+        route = "health_connect_screen",
+        titleId = R.string.health_connect
     ),
     RecordListScreen(
         route = "record_list",
-        titleId = R.string.record_list,
-
-        hasMenuItem = false
+        titleId = R.string.record_list
     ),
     AboutScreen(
         route = "about_screen",
-        titleId = R.string.about_screen,
-
-        hasMenuItem = false
+        titleId = R.string.about_screen
     ),
     SettingScreen(
         route = "setting_screen",
-        titleId = R.string.setting_screen,
-
-        hasMenuItem = false
-    ),
-    LandingScreen(
-        route = "landing_screen",
-        titleId = R.string.landing_screen,
-
-        hasMenuItem = false
+        titleId = R.string.setting_screen
     ),
     LoginScreen(
         route = "login_screen",
-        titleId = R.string.login_screen,
-
-        hasMenuItem = false
+        titleId = R.string.login_screen
     ),
     WalkSessionScreen(
         route = "walk_session_screen",
-        titleId = R.string.walk_session_screen,
-        R.drawable.walking_icon,
-        color = Color(0xFFfaaf5a),
-        hasMenuItem = false
+        titleId = R.string.walk_session_screen
     ),
     RunSessionScreen(
         route = "run_session_screen",
-        titleId = R.string.run_session_screen,
-        R.drawable.running_icon,
-        color = Color(0xFFf87757),
-        hasMenuItem = false
+        titleId = R.string.run_session_screen
     ),
     SitSessionScreen(
         route = "sit_session_screen",
-        titleId = R.string.sit_session_screen,
-        R.drawable.armchair_icon,
-        color = Color(0xff71c97b),
-        hasMenuItem = false
+        titleId = R.string.sit_session_screen
     ),
     ListenSessionScreen(
         route = "listen_session_screen",
-        titleId = R.string.listen_session_screen,
-        R.drawable.headphones_icon,
-        color = Color(0xFF7199C9),
-        hasMenuItem = false
+        titleId = R.string.listen_session_screen
     ),
     YogaSessionScreen(
         route = "yoga_session_screen",
-        titleId = R.string.yoga_session_screen,
-        R.drawable.yoga_icon,
-        color = Color(0xFFad71c9),
-        hasMenuItem = false
+        titleId = R.string.yoga_session_screen
     ),
     CycleSessionScreen(
         route = "cycle_session_screen",
-        titleId = R.string.cycle_session_screen,
-        R.drawable.bicycling_icon,
-        color = Color(0xFFC9B271),
-        hasMenuItem = false
+        titleId = R.string.cycle_session_screen
     ),
     TrainSessionScreen(
         route = "train_session_screen",
-        titleId = R.string.train_session_screen,
-        R.drawable.stretching_icon,
-        color = Color(0xFFC97187),
-        hasMenuItem = false
+        titleId = R.string.train_session_screen
     ),
     NewActivityScreen(
         route = "new_activity_screen",
-        titleId = R.string.new_activity_screen,
-
-        hasMenuItem = false
+        titleId = R.string.new_activity_screen
     ),
     MyScreenRecords(
         route = "my_screen_records",
-        titleId = R.string.my_screen_records,
-        hasMenuItem = false
+        titleId = R.string.my_screen_records
     ),
     FollowScreen(route = "follow_screen", titleId = R.string.follow_screen, hasMenuItem = false),
     ChartsScreen(route = "charts_screen", titleId = R.string.charts_screen, hasMenuItem = false),
