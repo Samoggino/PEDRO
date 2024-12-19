@@ -12,6 +12,7 @@ import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Volume
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activitySession.ActivitySession
 import com.lam.pedro.data.activitySession.CycleSession
 import com.lam.pedro.data.activitySession.DriveSession
@@ -27,7 +28,7 @@ suspend fun buildActivitySession(
     healthConnectClient: HealthConnectClient,
     exerciseRecord: ExerciseSessionRecord,
     exerciseType: Int
-): ActivitySession? {
+): GenericActivity? {
     return ActivitySessionFactoryFromHealthConnectProvider.createSession(exerciseType, healthConnectClient, exerciseRecord)
 }
 

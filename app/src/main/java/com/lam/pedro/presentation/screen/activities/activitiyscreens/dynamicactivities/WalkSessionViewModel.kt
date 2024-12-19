@@ -15,10 +15,12 @@ import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activitySession.ActivitySession
-import com.lam.pedro.data.activitySession.WalkSession
+import com.lam.pedro.data.activity.GenericActivity.WalkSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
+import com.lam.pedro.presentation.serialization.SessionCreator
 import com.lam.pedro.util.calculateYogaCalories
 import java.time.ZonedDateTime
 
@@ -112,7 +114,7 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
             duration,
             yogaStyle
         )
-        this.actualSession = WalkSession(
+        this.actualSession = SessionCreator.createWalkSession(
             startTime = startTime.toInstant(),
             endTime = endTime.toInstant(),
             title = activityTitle,
@@ -126,14 +128,14 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
         )
     }
 
-    override suspend fun saveSession(activitySession: ActivitySession) {
+    override suspend fun saveSession(activitySession: GenericActivity) {
         if (activitySession is WalkSession) {
             healthConnectManager.insertWalkSession(
                 activityEnum.activityType,
-                activitySession.startTime,
-                activitySession.endTime,
-                activitySession.title,
-                activitySession.notes,
+                activitySession.basicActivity.startTime,
+                activitySession.basicActivity.endTime,
+                activitySession.basicActivity.title,
+                activitySession.basicActivity.notes,
                 activitySession.speedSamples,
                 activitySession.stepsCount,
                 activitySession.totalEnergy,

@@ -7,10 +7,12 @@ import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activitySession.ActivitySession
-import com.lam.pedro.data.activitySession.ListenSession
+import com.lam.pedro.data.activity.GenericActivity.ListenSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
+import com.lam.pedro.presentation.serialization.SessionCreator
 import java.time.ZonedDateTime
 
 class ListenSessionViewModel(private val healthConnectManager: HealthConnectManager) :
@@ -34,14 +36,14 @@ class ListenSessionViewModel(private val healthConnectManager: HealthConnectMana
 
         )
 
-    override suspend fun saveSession(activitySession: ActivitySession) {
+    override suspend fun saveSession(activitySession: GenericActivity) {
         if (activitySession is ListenSession) {
             healthConnectManager.insertListenSession(
                 activityEnum.activityType,
-                activitySession.startTime,
-                activitySession.endTime,
-                activitySession.title,
-                activitySession.notes
+                activitySession.basicActivity.startTime,
+                activitySession.basicActivity.endTime,
+                activitySession.basicActivity.title,
+                activitySession.basicActivity.notes
             )
         } else {
             throw IllegalArgumentException("Invalid session type for ListenSessionViewModel")
@@ -63,7 +65,7 @@ class ListenSessionViewModel(private val healthConnectManager: HealthConnectMana
         distance: MutableState<Double>,
         exerciseRoute: List<ExerciseRoute.Location>
     ) {
-        this.actualSession = ListenSession(
+        this.actualSession = SessionCreator.createListenSession(
             startTime = startTime.toInstant(),
             endTime = endTime.toInstant(),
             title = activityTitle,

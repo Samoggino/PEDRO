@@ -9,8 +9,8 @@ import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
-import com.lam.pedro.data.activitySession.ActivitySession
-import com.lam.pedro.data.activitySession.LiftSession
+import com.lam.pedro.data.activity.GenericActivity
+import com.lam.pedro.data.activity.GenericActivity.LiftSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import java.time.ZonedDateTime
@@ -57,14 +57,14 @@ class LiftSessionViewModel(private val healthConnectManager: HealthConnectManage
     )
 
 
-    override suspend fun saveSession(activitySession: ActivitySession) {
+    override suspend fun saveSession(activitySession: GenericActivity) {
         if (activitySession is LiftSession) {
             healthConnectManager.insertYogaSession(
                 activityEnum.activityType,
-                activitySession.startTime,
-                activitySession.endTime,
-                activitySession.title,
-                activitySession.notes,
+                activitySession.basicActivity.startTime,
+                activitySession.basicActivity.endTime,
+                activitySession.basicActivity.title,
+                activitySession.basicActivity.notes,
                 activitySession.totalEnergy,
                 activitySession.activeEnergy,
                 activitySession.exerciseSegment,

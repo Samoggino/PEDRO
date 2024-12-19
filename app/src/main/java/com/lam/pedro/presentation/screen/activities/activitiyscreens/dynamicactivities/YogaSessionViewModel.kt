@@ -10,10 +10,12 @@ import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.units.Energy
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activitySession.ActivitySession
-import com.lam.pedro.data.activitySession.YogaSession
+import com.lam.pedro.data.activity.GenericActivity.YogaSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
+import com.lam.pedro.presentation.serialization.SessionCreator
 import com.lam.pedro.util.calculateAverageSpeed
 import com.lam.pedro.util.calculateCalories
 import java.time.ZonedDateTime
@@ -86,7 +88,7 @@ class YogaSessionViewModel(private val healthConnectManager: HealthConnectManage
             duration,
             averageSpeed
         )
-        this.actualSession = YogaSession(
+        this.actualSession = SessionCreator.createYogaSession(
             startTime = startTime.toInstant(),
             endTime = endTime.toInstant(),
             title = activityTitle,
@@ -98,14 +100,14 @@ class YogaSessionViewModel(private val healthConnectManager: HealthConnectManage
         )
     }
 
-    override suspend fun saveSession(activitySession: ActivitySession) {
+    override suspend fun saveSession(activitySession: GenericActivity) {
         if (activitySession is YogaSession) {
             healthConnectManager.insertYogaSession(
                 activityEnum.activityType,
-                activitySession.startTime,
-                activitySession.endTime,
-                activitySession.title,
-                activitySession.notes,
+                activitySession.basicActivity.startTime,
+                activitySession.basicActivity.endTime,
+                activitySession.basicActivity.title,
+                activitySession.basicActivity.notes,
                 activitySession.totalEnergy,
                 activitySession.activeEnergy,
                 activitySession.exerciseSegment,

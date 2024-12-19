@@ -11,7 +11,7 @@ class DriveSessionFactory : ActivitySessionFactoryFromHealthConnect() {
     override suspend fun createSession(
         healthConnectClient: HealthConnectClient,
         exerciseRecord: ExerciseSessionRecord
-    ): ActivitySession {
+    ): GenericActivity {
         val startTime = exerciseRecord.startTime
         val endTime = exerciseRecord.endTime
 
@@ -28,11 +28,8 @@ class DriveSessionFactory : ActivitySessionFactoryFromHealthConnect() {
             endTime = endTime,
         )
 
-        return DriveSession(
-            title = exerciseRecord.title ?: "My Drive #${exerciseRecord.hashCode()}",
-            notes = exerciseRecord.notes ?: "",
-            startTime = startTime,
-            endTime = endTime,
+        return GenericActivity.DriveSession(
+            basicActivity,
             speedSamples = speedSamples,
             distance = distance,
             exerciseRoute = exerciseRoute ?: throw IllegalArgumentException("Exercise route is null")

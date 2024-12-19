@@ -9,10 +9,11 @@ import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.units.Volume
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
-import com.lam.pedro.data.activitySession.ActivitySession
-import com.lam.pedro.data.activitySession.SitSession
+import com.lam.pedro.data.activity.GenericActivity
+import com.lam.pedro.data.activity.GenericActivity.SitSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
+import com.lam.pedro.presentation.serialization.SessionCreator
 import java.time.ZonedDateTime
 
 class SitSessionViewModel(private val healthConnectManager: HealthConnectManager) :
@@ -57,7 +58,7 @@ class SitSessionViewModel(private val healthConnectManager: HealthConnectManager
         distance: MutableState<Double>,
         exerciseRoute: List<ExerciseRoute.Location>,
     ) {
-        this.actualSession = SitSession(
+        this.actualSession = SessionCreator.createSitSession(
             startTime = startTime.toInstant(),
             endTime = endTime.toInstant(),
             title = activityTitle,
@@ -66,14 +67,14 @@ class SitSessionViewModel(private val healthConnectManager: HealthConnectManager
         )
     }
 
-    override suspend fun saveSession(activitySession: ActivitySession) {
+    override suspend fun saveSession(activitySession: GenericActivity) {
         if (activitySession is SitSession) {
             healthConnectManager.insertSitSession(
                 activityEnum.activityType,
-                activitySession.startTime,
-                activitySession.endTime,
-                activitySession.title,
-                activitySession.notes,
+                activitySession.basicActivity.startTime,
+                activitySession.basicActivity.endTime,
+                activitySession.basicActivity.title,
+                activitySession.basicActivity.notes,
                 activitySession.volume
             )
         } else {

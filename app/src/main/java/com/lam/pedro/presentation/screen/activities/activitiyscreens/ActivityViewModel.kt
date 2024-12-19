@@ -17,6 +17,7 @@ import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.SessionState
 import com.lam.pedro.data.activity.ActivityEnum
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activitySession.ActivitySession
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.CycleSessionViewModel
@@ -46,7 +47,7 @@ import java.util.UUID
 abstract class ActivitySessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ViewModel() {
 
-    abstract val actualSession: ActivitySession
+    abstract val actualSession: GenericActivity
     private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
     /*Define here the required permissions for the Health Connect usage*/
@@ -57,7 +58,7 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
     var permissionsGranted = mutableStateOf(false)
         private set
 
-    var sessionsList: MutableState<List<ActivitySession>> = mutableStateOf(listOf())
+    var sessionsList: MutableState<List<GenericActivity>> = mutableStateOf(listOf())
         private set
 
 
@@ -75,10 +76,10 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
 
     val sessionState: StateFlow<SessionState> get() = _sessionState
 
-    private val _selectedSession = MutableLiveData<ActivitySession>()
-    val selectedSession: LiveData<ActivitySession> = _selectedSession
+    private val _selectedSession = MutableLiveData<GenericActivity>()
+    val selectedSession: LiveData<GenericActivity> = _selectedSession
 
-    fun selectSession(session: ActivitySession) {
+    fun selectSession(session: GenericActivity) {
         //TODO: contact healthConnectManager to obtain the session data
         _selectedSession.value = session
     }
@@ -134,7 +135,7 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
         timerJob = null
     }
 
-    abstract suspend fun saveSession(activitySession: ActivitySession)
+    abstract suspend fun saveSession(activitySession: GenericActivity)
 
     abstract fun createSession(
         duration: Long,

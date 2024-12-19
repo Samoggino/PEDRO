@@ -19,17 +19,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.health.connect.client.records.ExerciseSessionRecord
-import com.lam.pedro.data.activitySession.ActivitySession
+import com.lam.pedro.data.activity.GenericActivity
+import com.lam.pedro.data.activity.GenericActivity.*
 import com.lam.pedro.data.activitySession.CycleSession
-import com.lam.pedro.data.activitySession.DriveSession
-import com.lam.pedro.data.activitySession.LiftSession
-import com.lam.pedro.data.activitySession.ListenSession
-import com.lam.pedro.data.activitySession.RunSession
-import com.lam.pedro.data.activitySession.SitSession
-import com.lam.pedro.data.activitySession.SleepSession
-import com.lam.pedro.data.activitySession.TrainSession
-import com.lam.pedro.data.activitySession.WalkSession
-import com.lam.pedro.data.activitySession.YogaSession
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.util.calculateAverageSpeed
 import org.maplibre.android.geometry.LatLng
@@ -37,7 +29,7 @@ import java.time.Duration
 import java.time.ZoneId
 
 @Composable
-fun ShowSessionDetails(session: ActivitySession, color: Color) {
+fun ShowSessionDetails(session: GenericActivity, color: Color) {
     LazyColumn(
         modifier = Modifier
             .padding(16.dp)
@@ -45,26 +37,42 @@ fun ShowSessionDetails(session: ActivitySession, color: Color) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
-            Text(text = "Session details", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+            Text(
+                text = "Session details",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold
+            )
             Spacer(modifier = Modifier.height(20.dp))
-            Text(text = session.title, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            Text(
+                text = session.basicActivity.title,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
             Spacer(modifier = Modifier.height(10.dp))
-            Text(text = session.notes.ifEmpty { "There is no note" }, style = MaterialTheme.typography.headlineMedium)
+            Text(
+                text = session.basicActivity.notes.ifEmpty { "There is no note" },
+                style = MaterialTheme.typography.headlineMedium
+            )
             Spacer(modifier = Modifier.height(10.dp))
-            Text(text = "${session.startTime.atZone(ZoneId.systemDefault()).toLocalDate()}")
+            Text(
+                text = "${
+                    session.basicActivity.startTime.atZone(ZoneId.systemDefault()).toLocalDate()
+                }"
+            )
             Spacer(modifier = Modifier.height(10.dp))
-            val duration = Duration.between(session.startTime, session.endTime)
+            val duration =
+                Duration.between(session.basicActivity.startTime, session.basicActivity.endTime)
             val hours = duration.toHours()
             val minutes = duration.toMinutes() % 60
             val seconds = duration.seconds % 60
             Text(text = "$hours:$minutes:$seconds", style = MaterialTheme.typography.headlineSmall)
             Spacer(modifier = Modifier.height(10.dp))
-            val zonedDateStartTime = session.startTime.atZone(ZoneId.systemDefault())
+            val zonedDateStartTime = session.basicActivity.startTime.atZone(ZoneId.systemDefault())
             val startHours = zonedDateStartTime.hour
             val startMinutes = zonedDateStartTime.minute
             val startSeconds = zonedDateStartTime.second
             Text(text = "Start: $startHours:$startMinutes:$startSeconds")
-            val zonedDateEndTime = session.endTime.atZone(ZoneId.systemDefault())
+            val zonedDateEndTime = session.basicActivity.endTime.atZone(ZoneId.systemDefault())
             val endHours = zonedDateEndTime.hour
             val endMinutes = zonedDateEndTime.minute
             val endSeconds = zonedDateEndTime.second
@@ -73,7 +81,7 @@ fun ShowSessionDetails(session: ActivitySession, color: Color) {
 
 
         when (session) {
-            is CycleSession -> {
+            is CyclingSession -> {
                 item {
                     Text(text = "Distanza: ${session.distance}")
                     Text(text = "Velocità: ${session.speedSamples}")

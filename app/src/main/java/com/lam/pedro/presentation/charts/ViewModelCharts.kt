@@ -83,8 +83,11 @@ class ViewModelCharts(
             LabelMetrics.DISTANCE -> (activity as? GenericActivity.DistanceMetrics)?.distance?.inMeters
                 ?: 0.0
 
+            /*
             LabelMetrics.ELEVATION -> (activity as? GenericActivity.DistanceMetrics)?.elevationGained?.inMeters
                 ?: 0.0
+
+             */
 
             LabelMetrics.TOTAL_CALORIES -> (activity as? GenericActivity.EnergyMetrics)?.totalEnergy?.inKilocalories
                 ?: 0.0
@@ -149,7 +152,7 @@ fun getAvailableMetricsForActivity(activityEnum: ActivityEnum) =
     when {
         activityEnum.fullEnergyDistanceMetrics -> LabelMetrics.entries
         activityEnum.distanceMetrics -> LabelMetrics.entries.filter { it != LabelMetrics.ACTIVE_CALORIES && it != LabelMetrics.TOTAL_CALORIES }
-        activityEnum.energyMetrics -> LabelMetrics.entries.filter { it != LabelMetrics.DISTANCE && it != LabelMetrics.ELEVATION }
+        activityEnum.energyMetrics -> LabelMetrics.entries.filter { it != LabelMetrics.DISTANCE }
         else -> LabelMetrics.entries.filter { it == LabelMetrics.DURATION }
     }
 

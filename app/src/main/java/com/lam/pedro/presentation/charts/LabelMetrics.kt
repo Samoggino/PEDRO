@@ -4,6 +4,5 @@ enum class LabelMetrics {
     DURATION,
     ACTIVE_CALORIES,
     TOTAL_CALORIES,
-    ELEVATION,
     DISTANCE,
 }

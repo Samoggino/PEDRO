@@ -34,6 +34,7 @@ import androidx.health.connect.client.units.Length
 import androidx.health.connect.client.units.Mass
 import androidx.health.connect.client.units.Volume
 import com.lam.pedro.R
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.SleepSessionData
 import com.lam.pedro.data.activitySession.ActivitySession
 import com.lam.pedro.data.activitySession.activityFactoryHealthConnect.ActivitySessionFactoryFromHealthConnectProvider
@@ -712,7 +713,7 @@ class HealthConnectManager(private val context: Context) {
         start: Instant,
         end: Instant,
         activityType: Int
-    ): List<ActivitySession> {
+    ): List<GenericActivity> {
         val request = ReadRecordsRequest(
             recordType = ExerciseSessionRecord::class,
             timeRangeFilter = TimeRangeFilter.between(start, end)

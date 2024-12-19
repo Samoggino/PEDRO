@@ -2,6 +2,7 @@ package com.lam.pedro.data.activitySession.activityFactoryHealthConnect
 
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.records.ExerciseSessionRecord
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activitySession.ActivitySession
 import com.lam.pedro.data.activitySession.CycleSession
 
@@ -9,7 +10,7 @@ class CycleSessionFactory : ActivitySessionFactoryFromHealthConnect() {
     override suspend fun createSession(
         healthConnectClient: HealthConnectClient,
         exerciseRecord: ExerciseSessionRecord
-    ): ActivitySession {
+    ): GenericActivity {
         val startTime = exerciseRecord.startTime
         val endTime = exerciseRecord.endTime
 
@@ -23,11 +24,13 @@ class CycleSessionFactory : ActivitySessionFactoryFromHealthConnect() {
 
         val exerciseRoute = getRoute(exerciseRecord)
 
-        return CycleSession(
-            title = exerciseRecord.title ?: "My Cycle #${exerciseRecord.hashCode()}",
-            notes = exerciseRecord.notes ?: "",
-            startTime = startTime,
-            endTime = endTime,
+        return GenericActivity.CyclingSession(
+            basicActivity = GenericActivity.BasicActivity(
+                title = exerciseRecord.title ?: "My Cycle #${exerciseRecord.hashCode()}",
+                notes = exerciseRecord.notes ?: "",
+                startTime = startTime,
+                endTime = endTime,
+            ),
             speedSamples = speedSamples,
             distance = distance,
             totalEnergy = totalCaloriesBurned,

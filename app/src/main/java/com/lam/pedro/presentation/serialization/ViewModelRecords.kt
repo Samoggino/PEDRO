@@ -8,7 +8,7 @@ import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.SupabaseClient.safeRpcCall
-import com.lam.pedro.presentation.serialization.SessionCreator.activityConfigs
+//import com.lam.pedro.presentation.serialization.SessionCreator.activityConfigs
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,8 +28,9 @@ class ViewModelRecords : ViewModel() {
         activityEnum: ActivityEnum
     ): List<GenericActivity> {
         Log.d("Supabase", "Recupero delle attività di tipo $activityEnum")
-        val config = activityConfigs[activityEnum] as? SessionCreator.ActivityConfig<*>
+        //val config = activityConfigs[activityEnum] as? SessionCreator.ActivityConfig<*>
 
+        /*
         if (config != null) {
             return withContext(Dispatchers.IO) {
                 val uuid = getUUID()
@@ -56,7 +57,8 @@ class ViewModelRecords : ViewModel() {
         } else {
             Log.e("Supabase", "Configurazione non trovata per $activityEnum")
             return emptyList()
-        }
+        }*/
+        return emptyList() //FIXME
     }
 
     /**
@@ -66,8 +68,9 @@ class ViewModelRecords : ViewModel() {
     fun insertActivitySession(activityEnum: ActivityEnum) {
         viewModelScope.launch(Dispatchers.IO) {
             val uuid = getUUID().toString()
-            val config = activityConfigs[activityEnum]
+            //val config = activityConfigs[activityEnum]
 
+            /*
             if (config != null) {
                 try {
                     // Crea la nuova sessione usando il creator specifico
@@ -96,6 +99,7 @@ class ViewModelRecords : ViewModel() {
             } else {
                 Log.e("Supabase", "Configurazione non trovata per $activityEnum")
             }
+            */
         }
     }
 }

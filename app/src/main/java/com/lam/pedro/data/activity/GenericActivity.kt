@@ -58,7 +58,6 @@ sealed class GenericActivity(
 
     interface DistanceMetrics {
         val distance: Length
-        val elevationGained: Length
     }
 
     interface EnergyMetrics {
@@ -100,7 +99,6 @@ sealed class GenericActivity(
         @Serializable(with = ListSpeedRecordSampleSerializer::class) val speedSamples: List<@Contextual SpeedRecord.Sample>,
         val stepsCount: Long,
         override val distance: Length,
-        override val elevationGained: Length,
         val exerciseRoute: ExerciseRoute,
     ) : GenericActivity(activityEnum = ActivityEnum.WALK), FullMetrics
 
@@ -113,7 +111,6 @@ sealed class GenericActivity(
         @Serializable(with = ListSpeedRecordSampleSerializer::class) val speedSamples: List<@Contextual SpeedRecord.Sample>,
         val stepsCount: Long,
         override val distance: Length,
-        override val elevationGained: Length,
         val exerciseRoute: ExerciseRoute,
     ) : GenericActivity(activityEnum = ActivityEnum.RUN), FullMetrics
 
@@ -124,9 +121,8 @@ sealed class GenericActivity(
         override val activeEnergy: Energy,
 
         @Serializable(with = ListSpeedRecordSampleSerializer::class) val speedSamples: List<@Contextual SpeedRecord.Sample>,
-        @Serializable(with = ListCyclingPedalingCadenceRecordSample::class) val cyclingPedalingCadenceSamples: List<@Contextual CyclingPedalingCadenceRecord.Sample>,
+        //@Serializable(with = ListCyclingPedalingCadenceRecordSample::class) val cyclingPedalingCadenceSamples: List<@Contextual CyclingPedalingCadenceRecord.Sample>,
         override val distance: Length,
-        override val elevationGained: Length,
         val exerciseRoute: ExerciseRoute,
     ) : GenericActivity(activityEnum = ActivityEnum.CYCLING), FullMetrics
 
@@ -169,7 +165,6 @@ sealed class GenericActivity(
 
         @Serializable(with = ListSpeedRecordSampleSerializer::class) val speedSamples: List<@Contextual SpeedRecord.Sample>,
         override val distance: Length,
-        override val elevationGained: Length,
         val exerciseRoute: ExerciseRoute,
     ) : GenericActivity(activityEnum = ActivityEnum.DRIVE), DistanceMetrics
 

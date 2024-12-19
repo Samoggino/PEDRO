@@ -8,10 +8,12 @@ import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activitySession.ActivitySession
-import com.lam.pedro.data.activitySession.SleepSession
+import com.lam.pedro.data.activity.GenericActivity.SleepSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
+import com.lam.pedro.presentation.serialization.SessionCreator
 import java.time.ZonedDateTime
 
 class SleepSessionViewModel(private val healthConnectManager: HealthConnectManager) :
@@ -56,7 +58,7 @@ class SleepSessionViewModel(private val healthConnectManager: HealthConnectManag
         distance: MutableState<Double>,
         exerciseRoute: List<ExerciseRoute.Location>,
     ) {
-        this.actualSession = SleepSession(
+        this.actualSession = SessionCreator.createSleepSession(
             startTime = startTime.toInstant(),
             endTime = endTime.toInstant(),
             title = activityTitle,
@@ -64,13 +66,13 @@ class SleepSessionViewModel(private val healthConnectManager: HealthConnectManag
         )
     }
 
-    override suspend fun saveSession(activitySession: ActivitySession) {
+    override suspend fun saveSession(activitySession: GenericActivity) {
         if (activitySession is SleepSession) {
             healthConnectManager.insertSleepSession(
-                activitySession.startTime,
-                activitySession.endTime,
-                activitySession.title,
-                activitySession.notes,
+                activitySession.basicActivity.startTime,
+                activitySession.basicActivity.endTime,
+                activitySession.basicActivity.title,
+                activitySession.basicActivity.notes,
             )
         } else {
             throw IllegalArgumentException("Invalid session type for SleepSessionViewModel")

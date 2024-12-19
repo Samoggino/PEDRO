@@ -15,10 +15,12 @@ import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activitySession.ActivitySession
-import com.lam.pedro.data.activitySession.RunSession
+import com.lam.pedro.data.activity.GenericActivity.RunSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
+import com.lam.pedro.presentation.serialization.SessionCreator
 import com.lam.pedro.util.calculateAverageSpeed
 import com.lam.pedro.util.calculateCalories
 import java.time.ZonedDateTime
@@ -118,7 +120,7 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
             duration,
             averageSpeed
         )
-        this.actualSession = RunSession(
+        this.actualSession = SessionCreator.createRunSession(
             startTime = startTime.toInstant(),
             endTime = endTime.toInstant(),
             title = activityTitle,
@@ -132,14 +134,14 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
         )
     }
 
-    override suspend fun saveSession(activitySession: ActivitySession) {
+    override suspend fun saveSession(activitySession: GenericActivity) {
         if (activitySession is RunSession) {
             healthConnectManager.insertRunSession(
                 activityEnum.activityType,
-                activitySession.startTime,
-                activitySession.endTime,
-                activitySession.title,
-                activitySession.notes,
+                activitySession.basicActivity.startTime,
+                activitySession.basicActivity.endTime,
+                activitySession.basicActivity.title,
+                activitySession.basicActivity.notes,
                 activitySession.speedSamples,
                 activitySession.stepsCount,
                 activitySession.totalEnergy,

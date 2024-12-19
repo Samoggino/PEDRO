@@ -2,6 +2,7 @@ package com.lam.pedro.data.activitySession.activityFactoryHealthConnect
 
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.records.ExerciseSessionRecord
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activitySession.ActivitySession
 import com.lam.pedro.data.activitySession.WalkSession
 
@@ -9,7 +10,7 @@ class WalkSessionFactory : ActivitySessionFactoryFromHealthConnect() {
     override suspend fun createSession(
         healthConnectClient: HealthConnectClient,
         exerciseRecord: ExerciseSessionRecord
-    ): ActivitySession {
+    ): GenericActivity {
         val startTime = exerciseRecord.startTime
         val endTime = exerciseRecord.endTime
 
@@ -25,17 +26,20 @@ class WalkSessionFactory : ActivitySessionFactoryFromHealthConnect() {
 
         val exerciseRoute = getRoute(exerciseRecord)
 
-        return WalkSession(
-            title = exerciseRecord.title ?: "My Walk #${exerciseRecord.hashCode()}",
-            notes = exerciseRecord.notes ?: "",
-            startTime = startTime,
-            endTime = endTime,
+        return GenericActivity.WalkSession(
+            GenericActivity.BasicActivity(
+                title = exerciseRecord.title ?: "My Walk #${exerciseRecord.hashCode()}",
+                notes = exerciseRecord.notes ?: "",
+                startTime = startTime,
+                endTime = endTime
+            ),
             speedSamples = speedSamples,
             stepsCount = steps,
             distance = distance,
             totalEnergy = totalCaloriesBurned,
             activeEnergy = activeCaloriesBurned,
-            exerciseRoute = exerciseRoute ?: throw IllegalArgumentException("Exercise route is null")
+            exerciseRoute = exerciseRoute
+                ?: throw IllegalArgumentException("Exercise route is null")
         )
     }
 }

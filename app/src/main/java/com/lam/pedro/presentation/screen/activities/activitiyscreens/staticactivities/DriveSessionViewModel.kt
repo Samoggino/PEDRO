@@ -11,10 +11,11 @@ import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.units.Length
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
-import com.lam.pedro.data.activitySession.ActivitySession
-import com.lam.pedro.data.activitySession.DriveSession
+import com.lam.pedro.data.activity.GenericActivity
+import com.lam.pedro.data.activity.GenericActivity.DriveSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
+import com.lam.pedro.presentation.serialization.SessionCreator
 import java.time.ZonedDateTime
 
 class DriveSessionViewModel(private val healthConnectManager: HealthConnectManager) :
@@ -71,7 +72,7 @@ class DriveSessionViewModel(private val healthConnectManager: HealthConnectManag
         distance: MutableState<Double>,
         exerciseRoute: List<ExerciseRoute.Location>,
     ) {
-        this.actualSession = DriveSession(
+        this.actualSession = SessionCreator.createDriveSession(
             startTime = startTime.toInstant(),
             endTime = endTime.toInstant(),
             title = activityTitle,
@@ -83,15 +84,15 @@ class DriveSessionViewModel(private val healthConnectManager: HealthConnectManag
         Log.d("ACTUAL SESSION", "$actualSession")
     }
 
-    override suspend fun saveSession(activitySession: ActivitySession) {
+    override suspend fun saveSession(activitySession: GenericActivity) {
         if (activitySession is DriveSession) {
             Log.d("SAVE SESSION", "$activitySession")
             healthConnectManager.insertDriveSession(
                 activityEnum.activityType,
-                activitySession.startTime,
-                activitySession.endTime,
-                activitySession.title,
-                activitySession.notes,
+                activitySession.basicActivity.startTime,
+                activitySession.basicActivity.endTime,
+                activitySession.basicActivity.title,
+                activitySession.basicActivity.notes,
                 activitySession.speedSamples,
                 activitySession.distance,
                 activitySession.exerciseRoute

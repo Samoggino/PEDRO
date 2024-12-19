@@ -2,6 +2,7 @@ package com.lam.pedro.data.activitySession.activityFactoryHealthConnect
 
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.records.ExerciseSessionRecord
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activitySession.ActivitySession
 
 object ActivitySessionFactoryFromHealthConnectProvider {
@@ -21,7 +22,7 @@ object ActivitySessionFactoryFromHealthConnectProvider {
         exerciseType: Int,
         healthConnectClient: HealthConnectClient,
         exerciseRecord: ExerciseSessionRecord
-    ): ActivitySession {
+    ): GenericActivity {
         return factories[exerciseType]?.createSession(healthConnectClient, exerciseRecord)?: throw IllegalArgumentException("Unknown exercise type: $exerciseType")
     }
 }

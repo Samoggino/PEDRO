@@ -13,10 +13,12 @@ import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activitySession.ActivitySession
-import com.lam.pedro.data.activitySession.CycleSession
+import com.lam.pedro.data.activity.GenericActivity.CyclingSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
+import com.lam.pedro.presentation.serialization.SessionCreator
 import com.lam.pedro.util.calculateAverageSpeed
 import com.lam.pedro.util.calculateCyclingCalories
 import java.time.ZonedDateTime
@@ -28,7 +30,7 @@ class CycleSessionViewModel(private val healthConnectManager: HealthConnectManag
     //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
     //override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_BIKING
-    override lateinit var actualSession: CycleSession
+    override lateinit var actualSession: CyclingSession
 
     override val activityEnum = ActivityEnum.CYCLING
 
@@ -102,7 +104,7 @@ class CycleSessionViewModel(private val healthConnectManager: HealthConnectManag
             duration,
             averageSpeed
         )
-        this.actualSession = CycleSession(
+        this.actualSession = SessionCreator.createCyclingSession(
             startTime = startTime.toInstant(),
             endTime = endTime.toInstant(),
             title = activityTitle,
@@ -115,14 +117,14 @@ class CycleSessionViewModel(private val healthConnectManager: HealthConnectManag
         )
     }
 
-    override suspend fun saveSession(activitySession: ActivitySession) {
-        if (activitySession is CycleSession) {
+    override suspend fun saveSession(activitySession: GenericActivity) {
+        if (activitySession is CyclingSession) {
             healthConnectManager.insertCycleSession(
                 activityEnum.activityType,
-                activitySession.startTime,
-                activitySession.endTime,
-                activitySession.title,
-                activitySession.notes,
+                activitySession.basicActivity.startTime,
+                activitySession.basicActivity.endTime,
+                activitySession.basicActivity.title,
+                activitySession.basicActivity.notes,
                 activitySession.speedSamples,
                 activitySession.totalEnergy,
                 activitySession.activeEnergy,

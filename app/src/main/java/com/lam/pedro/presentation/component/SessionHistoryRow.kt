@@ -34,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activitySession.ActivitySession
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,7 +42,7 @@ import com.lam.pedro.data.activitySession.ActivitySession
 fun SessionHistoryRow(
     color: Color,
     image: Int,
-    session: ActivitySession,
+    session: GenericActivity,
     viewModel: ActivitySessionViewModel
 ) {
 
@@ -68,7 +69,7 @@ fun SessionHistoryRow(
                 colorFilter = ColorFilter.tint(color)
             )
             Spacer(modifier = Modifier.width(10.dp))
-            Text(text = session.title.toString(), modifier = Modifier.weight(1f))
+            Text(text = session.basicActivity.title.toString(), modifier = Modifier.weight(1f))
             Icon(
                 Icons.Filled.TouchApp,
                 contentDescription = null,
