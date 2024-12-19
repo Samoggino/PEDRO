@@ -64,6 +64,7 @@ import com.lam.pedro.presentation.component.YogaStyleSelector
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.newActivity.strategyForNewScreen.GpsFunctionality
 import com.lam.pedro.presentation.screen.activities.newActivity.strategyForNewScreen.ScreenContext
+import com.lam.pedro.presentation.screen.activities.newActivity.strategyForNewScreen.StepCounterFunctionality
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModelFactory
 import com.lam.pedro.util.LocationTracker
@@ -106,17 +107,19 @@ fun NewActivityScreen(
     var speedCounter by remember { mutableIntStateOf(0) }
     var totalSpeed by remember { mutableDoubleStateOf(0.0) }
 
+    /*
     var showLocationPermissionDialog by remember { mutableStateOf(false) }
     var showActivityRecognitionPermissionDialog by remember { mutableStateOf(false) }
     var requestLocationPermissionCounter by remember { mutableIntStateOf(0) }
     var hasBeenAskedForLocationPermission by remember { mutableStateOf(false) }
     var hasBeenAskedForActivityRecognitionPermission by remember { mutableStateOf(false) }
+     */
 
     val lifecycleOwner = LocalLifecycleOwner.current
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-
+/*
     var hasLocationPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(
@@ -270,10 +273,19 @@ fun NewActivityScreen(
         text = R.string.activity_recognition_permission_description,
         buttonText = R.string.go_to_settings
     )
+     */
 
 
     /*------------------------------------------------------------------------------------------------------------------*/
 
+    // Crea la lista di funzionalità
+    val functionalities = listOf(GpsFunctionality(context), StepCounterFunctionality(context))
+
+    // Crea il contesto con le funzionalità
+    val screenContext = remember { ScreenContext(functionalities) }
+
+    // Esegui tutte le funzionalità
+    screenContext.ExecuteFunctionalities()
 
     Scaffold(
         topBar = {
@@ -386,7 +398,7 @@ fun NewActivityScreen(
                 visible = visible,
                 color = color, // Colore personalizzato
                 onPlayPauseClick = {
-                    requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                    //requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                     if (visible) {
                         isPaused = !isPaused
                     } else {
@@ -528,23 +540,5 @@ fun NewActivityScreen(
         }
     }
 
-    /*
-    val context = LocalContext.current
 
-    // Crea la lista di funzionalità
-    val functionalities = listOf(GpsFunctionality(context))
-
-    // Crea il contesto con le funzionalità
-    val screenContext = remember { ScreenContext(functionalities) }
-
-    // Esegui tutte le funzionalità
-    screenContext.ExecuteFunctionalities()
-
-    // UI aggiuntiva
-    Column {
-        Text("Questo è il mio schermo GPS")
-        // Altri componenti della UI
-    }
-
-     */
 }

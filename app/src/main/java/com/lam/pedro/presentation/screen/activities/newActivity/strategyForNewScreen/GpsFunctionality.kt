@@ -41,12 +41,9 @@ class GpsFunctionality(private val context: Context) : ScreenFunctionality {
         }
     }
 
-    // Metodo di composable per gestire la UI dei permessi
     @Composable
     override fun Execute() {
         val lifecycleOwner = LocalLifecycleOwner.current
-
-        checkPermissions()
 
         // Launcher per richiedere il permesso di ACCESS_FINE_LOCATION
         val requestLocationPermissionLauncher = rememberLauncherForActivityResult(
@@ -63,17 +60,40 @@ class GpsFunctionality(private val context: Context) : ScreenFunctionality {
             }
         }
 
-        // Gestiamo il ciclo di vita per gestire i permessi quando lo screen è visibile
+        checkPermissions()
+
+        // Avvia la richiesta del permesso solo se non è stato ancora concesso
+        if (!hasLocationPermission) {
+            LaunchedEffect(Unit) {
+                requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+        }
+
         DisposableEffect(lifecycleOwner) {
-            val lifecycleObserver = LifecycleEventObserver { _, event ->
-                if (event == Lifecycle.Event.ON_RESUME) {
-                    checkPermissions()
+            val observer = LifecycleEventObserver { _, event ->
+                when (event) {
+                    Lifecycle.Event.ON_RESUME -> {
+                        // Controlla se i permessi sono concessi quando lo screen torna attivo
+                        if (ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.ACCESS_FINE_LOCATION
+                            ) == PackageManager.PERMISSION_GRANTED
+                        ) {
+                            hasLocationPermission = true
+                            showLocationPermissionDialog = false
+                        } else {
+                            if (hasBeenAskedForLocationPermission)
+                                showLocationPermissionDialog = true
+                        }
+                    }
+
+                    else -> Unit
                 }
             }
-            lifecycleOwner.lifecycle.addObserver(lifecycleObserver)
+            lifecycleOwner.lifecycle.addObserver(observer)
 
             onDispose {
-                lifecycleOwner.lifecycle.removeObserver(lifecycleObserver)
+                lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
 
@@ -103,5 +123,6 @@ class GpsFunctionality(private val context: Context) : ScreenFunctionality {
             buttonText = if (requestLocationPermissionCounter < 2) R.string.request_permission else R.string.go_to_settings
         )
     }
+
 }
 
