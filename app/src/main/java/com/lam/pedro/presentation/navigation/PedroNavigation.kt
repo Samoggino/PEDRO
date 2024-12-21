@@ -129,7 +129,7 @@ fun PedroNavigation(
     SharedTransitionLayout {
         NavHost(
             navController = navController,
-            startDestination = Screen.HomeScreen.route,
+            startDestination = Screen.MyScreenRecords.route,
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None }
         ) {

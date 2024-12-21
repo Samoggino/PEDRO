@@ -1,0 +1,222 @@
+[
+  {
+    "id": "f69146a3-89e7-48e3-83e8-253ebc37270c",
+    "activity_type": "CYCLING",
+    "start_time": "2024-04-03T22:00:00+00:00",
+    "end_time": "2024-04-03T22:15:00+00:00",
+    "user_id": "0539f7b7-ec21-4bd1-a8fe-bc8deb5e5260",
+    "JSON": {
+      "distance": 500.0,
+      "totalEnergy": 100.0,
+      "activeEnergy": 100.0,
+      "speedSamples": [
+        {
+          "time": "2024-12-21T19:19:05.851819Z",
+          "speed": 10.0
+        },
+        {
+          "time": "2024-12-21T20:16:25.908506Z",
+          "speed": 10.0
+        }
+      ],
+      "exerciseRoute": {
+        "route": [
+          {
+            "time": "2024-12-21T19:16:25.908501Z",
+            "altitude": 500.0,
+            "latitude": 0.0,
+            "longitude": 0.0,
+            "verticalAccuracy": 500.0,
+            "horizontalAccuracy": 500.0
+          },
+          {
+            "time": "2024-12-21T20:16:25.908506Z",
+            "altitude": 500.0,
+            "latitude": 0.0,
+            "longitude": 0.0,
+            "verticalAccuracy": 500.0,
+            "horizontalAccuracy": 500.0
+          }
+        ]
+      }
+    },
+    "notes": "Cycling Notes",
+    "title": "Cycling Title"
+  },
+  {
+    "id": "249136f0-629b-4c46-8dc0-bd697d71f5bf",
+    "activity_type": "CYCLING",
+    "start_time": "2024-08-27T22:00:00+00:00",
+    "end_time": "2024-08-27T22:15:00+00:00",
+    "user_id": "0539f7b7-ec21-4bd1-a8fe-bc8deb5e5260",
+    "JSON": {
+      "distance": 500.0,
+      "totalEnergy": 100.0,
+      "activeEnergy": 100.0,
+      "speedSamples": [
+        {
+          "time": "2024-12-21T19:19:05.854999Z",
+          "speed": 10.0
+        },
+        {
+          "time": "2024-12-21T20:16:25.908506Z",
+          "speed": 10.0
+        }
+      ],
+      "exerciseRoute": {
+        "route": [
+          {
+            "time": "2024-12-21T19:16:25.908501Z",
+            "altitude": 500.0,
+            "latitude": 0.0,
+            "longitude": 0.0,
+            "verticalAccuracy": 500.0,
+            "horizontalAccuracy": 500.0
+          },
+          {
+            "time": "2024-12-21T20:16:25.908506Z",
+            "altitude": 500.0,
+            "latitude": 0.0,
+            "longitude": 0.0,
+            "verticalAccuracy": 500.0,
+            "horizontalAccuracy": 500.0
+          }
+        ]
+      }
+    },
+    "notes": "Cycling Notes",
+    "title": "Cycling Title"
+  },
+  {
+    "id": "d08803c0-5b66-4172-89a4-ab8712d18a2f",
+    "activity_type": "CYCLING",
+    "start_time": "2024-09-30T22:00:00+00:00",
+    "end_time": "2024-09-30T22:30:00+00:00",
+    "user_id": "0539f7b7-ec21-4bd1-a8fe-bc8deb5e5260",
+    "JSON": {
+      "distance": 500.0,
+      "totalEnergy": 100.0,
+      "activeEnergy": 100.0,
+      "speedSamples": [
+        {
+          "time": "2024-12-21T19:19:05.856663Z",
+          "speed": 10.0
+        },
+        {
+          "time": "2024-12-21T20:16:25.908506Z",
+          "speed": 10.0
+        }
+      ],
+      "exerciseRoute": {
+        "route": [
+          {
+            "time": "2024-12-21T19:16:25.908501Z",
+            "altitude": 500.0,
+            "latitude": 0.0,
+            "longitude": 0.0,
+            "verticalAccuracy": 500.0,
+            "horizontalAccuracy": 500.0
+          },
+          {
+            "time": "2024-12-21T20:16:25.908506Z",
+            "altitude": 500.0,
+            "latitude": 0.0,
+            "longitude": 0.0,
+            "verticalAccuracy": 500.0,
+            "horizontalAccuracy": 500.0
+          }
+        ]
+      }
+    },
+    "notes": "Cycling Notes",
+    "title": "Cycling Title"
+  },
+  {
+    "id": "562ffb72-89eb-4433-bd6a-059efffdc789",
+    "activity_type": "CYCLING",
+    "start_time": "2024-11-28T23:00:00+00:00",
+    "end_time": "2024-11-28T23:15:00+00:00",
+    "user_id": "0539f7b7-ec21-4bd1-a8fe-bc8deb5e5260",
+    "JSON": {
+      "distance": 500.0,
+      "totalEnergy": 100.0,
+      "activeEnergy": 100.0,
+      "speedSamples": [
+        {
+          "time": "2024-12-21T19:19:05.858177Z",
+          "speed": 10.0
+        },
+        {
+          "time": "2024-12-21T20:16:25.908506Z",
+          "speed": 10.0
+        }
+      ],
+      "exerciseRoute": {
+        "route": [
+          {
+            "time": "2024-12-21T19:16:25.908501Z",
+            "altitude": 500.0,
+            "latitude": 0.0,
+            "longitude": 0.0,
+            "verticalAccuracy": 500.0,
+            "horizontalAccuracy": 500.0
+          },
+          {
+            "time": "2024-12-21T20:16:25.908506Z",
+            "altitude": 500.0,
+            "latitude": 0.0,
+            "longitude": 0.0,
+            "verticalAccuracy": 500.0,
+            "horizontalAccuracy": 500.0
+          }
+        ]
+      }
+    },
+    "notes": "Cycling Notes",
+    "title": "Cycling Title"
+  },
+  {
+    "id": "2af4515b-67b4-4cc1-8a30-6469254c2514",
+    "activity_type": "CYCLING",
+    "start_time": "2024-09-28T22:00:00+00:00",
+    "end_time": "2024-09-28T22:20:00+00:00",
+    "user_id": "0539f7b7-ec21-4bd1-a8fe-bc8deb5e5260",
+    "JSON": {
+      "distance": 500.0,
+      "totalEnergy": 100.0,
+      "activeEnergy": 100.0,
+      "speedSamples": [
+        {
+          "time": "2024-12-21T19:19:05.859736Z",
+          "speed": 10.0
+        },
+        {
+          "time": "2024-12-21T20:16:25.908506Z",
+          "speed": 10.0
+        }
+      ],
+      "exerciseRoute": {
+        "route": [
+          {
+            "time": "2024-12-21T19:16:25.908501Z",
+            "altitude": 500.0,
+            "latitude": 0.0,
+            "longitude": 0.0,
+            "verticalAccuracy": 500.0,
+            "horizontalAccuracy": 500.0
+          },
+          {
+            "time": "2024-12-21T20:16:25.908506Z",
+            "altitude": 500.0,
+            "latitude": 0.0,
+            "longitude": 0.0,
+            "verticalAccuracy": 500.0,
+            "horizontalAccuracy": 500.0
+          }
+        ]
+      }
+    },
+    "notes": "Cycling Notes",
+    "title": "Cycling Title"
+  }
+]

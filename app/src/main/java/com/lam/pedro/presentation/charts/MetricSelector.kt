@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.serialization
+package com.lam.pedro.presentation.charts
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,8 +17,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.lam.pedro.data.activity.ActivityEnum
-import com.lam.pedro.presentation.charts.LabelMetrics
-import com.lam.pedro.presentation.charts.getAvailableMetricsForActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

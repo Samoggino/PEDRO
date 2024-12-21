@@ -158,6 +158,7 @@ android {
             "SUPABASE_SERVICE_ROLE",
             "\"${properties.getProperty("SUPABASE_SERVICE_ROLE")}\""
         )
+        buildConfigField("String", "MAPLIBRE_ACCESS_TOKEN", "\"${properties.getProperty("MAPLIBRE_ACCESS_TOKEN")}\"")
 
     }
 

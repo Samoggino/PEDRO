@@ -62,15 +62,23 @@ fun MyScreenRecords(
                 ActivityRow(
                     activityEnum = activityType,
                     onInsertClick = {
-//                        viewModel.insertActivitySession(
-//                            activityEnum = activityType
-//                        )
+                        viewModel.insertActivitySession(
+                            activityEnum = activityType
+                        )
                     },
                     onGetClick = {
                         navController.navigate(Screen.ChartsScreen.route + "/${activityType.name}")
                     }
                 )
 
+            }
+
+            Button(
+                onClick = {
+                    viewModel.dumpActivitiesFromDB()
+                }
+            ) {
+                Text("Dump Activities from DB")
             }
 
             // Navigation buttons
@@ -85,6 +93,7 @@ fun NavButtons(navController: NavController) {
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
+
 
         NavigationButton(
             text = "Vai alla schermata dei follower",

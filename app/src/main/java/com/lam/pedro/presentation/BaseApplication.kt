@@ -16,6 +16,7 @@
 package com.lam.pedro.presentation
 
 import android.app.Application
+import com.lam.pedro.BuildConfig
 import com.lam.pedro.data.HealthConnectManager
 import org.maplibre.android.MapLibre
 import org.maplibre.android.WellKnownTileServer
@@ -31,7 +32,7 @@ class BaseApplication : Application() {
         // Inizializza MapLibre
         MapLibre.getInstance(
             this,
-            "msqZSA7524QKWRTD5Orh", // Sostituisci con una chiave API valida oppure usa null
+            BuildConfig.MAPLIBRE_ACCESS_TOKEN, // Sostituisci con una chiave API valida oppure usa null
             WellKnownTileServer.MapTiler // Usa il tile server appropriato
         )
     }
