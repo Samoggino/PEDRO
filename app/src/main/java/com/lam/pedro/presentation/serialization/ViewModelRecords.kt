@@ -1,6 +1,10 @@
 package com.lam.pedro.presentation.serialization
 
 import android.util.Log
+import androidx.health.connect.client.records.ExerciseLap
+import androidx.health.connect.client.records.ExerciseRoute
+import androidx.health.connect.client.records.ExerciseSegment
+import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.units.Energy
 import androidx.health.connect.client.units.Length
 import androidx.health.connect.client.units.Volume
@@ -29,7 +33,6 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.double
 import kotlinx.serialization.json.encodeToJsonElement
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.put
@@ -173,60 +176,70 @@ class ViewModelRecords : ViewModel() {
 
     private fun fromJsonToActivity(jsonObject: JsonObject): GenericActivity? {
 
+
+        var distance = Length.meters(0.0)
+        var totalEnergy = Energy.calories(0.0)
+        var activeEnergy = Energy.calories(0.0)
+        var speedSamples = emptyList<SpeedRecord.Sample>()
+        var stepsCount = 0L
+        var volume = Volume.liters(0.0)
+        var exerciseLap = emptyList<ExerciseLap>()
+        var exerciseSegment = emptyList<ExerciseSegment>()
+        var exerciseRoute: ExerciseRoute? = null
+
+
+        // Verifica che JSON sia un JsonObject
+        val jsonData = jsonObject["JSON"] as? JsonObject
+        if (jsonData != null) {
+            distance = Length.meters(
+                jsonData["distance"]?.jsonPrimitive?.double ?: 0.0
+            )
+            totalEnergy = Energy.calories(
+                jsonData["totalEnergy"]?.jsonPrimitive?.double ?: 0.0
+            )
+            activeEnergy = Energy.calories(
+                jsonData["activeEnergy"]?.jsonPrimitive?.double ?: 0.0
+            )
+            speedSamples = jsonData["speedSamples"]?.let {
+                Json.decodeFromJsonElement(
+                    ListSerializer(SpeedRecordSampleSerializer),
+                    it
+                )
+            } ?: emptyList()
+
+            stepsCount = jsonData["stepsCount"]?.jsonPrimitive?.long ?: 0L
+            volume = Volume.liters(
+                jsonData["volume"]?.jsonPrimitive?.double ?: 0.0
+            )
+
+            exerciseLap = jsonData["exerciseLap"]?.let {
+                Json.decodeFromJsonElement(ListSerializer(ExerciseLapSerializer), it)
+            } ?: emptyList()
+
+            exerciseSegment = jsonData["exerciseSegment"]?.let {
+                Json.decodeFromJsonElement(ListSerializer(ExerciseSegmentSerializer), it)
+            } ?: emptyList()
+
+            exerciseRoute = jsonData["exerciseRoute"]?.let {
+                Json.decodeFromJsonElement(ExerciseRouteSerializer, it)
+            }
+        } else {
+            Log.w(
+                "ActivityParser",
+                "Il campo JSON è null o non è un JsonObject per l'attività con ID: ${jsonObject["id"]}"
+            )
+        }
+        val activityEnum = ActivityEnum.valueOf(
+            jsonObject["activity_type"]?.jsonPrimitive?.content ?: return null
+        )
+
         val basicActivity = SessionCreator.createBasicActivity(
-            startTime = parseToInstant(
-                jsonObject["start_time"]?.jsonPrimitive?.content ?: return null
-            ),
-            endTime = parseToInstant(jsonObject["end_time"]?.jsonPrimitive?.content ?: return null),
+            startTime = parseToInstant(jsonObject["start_time"]!!.jsonPrimitive.content),
+            endTime = parseToInstant(jsonObject["end_time"]!!.jsonPrimitive.content),
             notes = jsonObject["notes"]?.jsonPrimitive?.content ?: "",
             title = jsonObject["title"]?.jsonPrimitive?.content ?: ""
         )
 
-        /**
-         * FIXME: le parti particolari delle attività sono sotto JSON,
-         * ad esempio oggetto{"JSON" :{ "distance": 1000.0, "activeEnergy": 100.0}}
-         */
-//        val distance = Length.meters(jsonObject["distance"]?.jsonPrimitive?.double ?: 0.0)
-
-        val distance = Length.meters(
-            jsonObject["JSON"]?.jsonObject?.get("distance")?.jsonPrimitive?.double ?: 0.0
-        )
-
-        val totalEnergy = Energy.calories(
-            jsonObject["JSON"]?.jsonObject?.get("totalEnergy")?.jsonPrimitive?.double ?: 0.0
-        )
-        val activeEnergy = Energy.calories(
-            jsonObject["JSON"]?.jsonObject?.get("activeEnergy")?.jsonPrimitive?.double ?: 0.0
-        )
-        val speedSamples = jsonObject["JSON"]?.jsonObject?.get("speedSamples")?.let {
-            Json.decodeFromJsonElement(
-                ListSerializer(SpeedRecordSampleSerializer),
-                it
-            )
-        } ?: emptyList()
-
-        val stepsCount =
-            jsonObject["JSON"]?.jsonObject?.get("stepsCount")?.jsonPrimitive?.long ?: 0L
-        val volume = Volume.liters(
-            jsonObject["JSON"]?.jsonObject?.get("volume")?.jsonPrimitive?.double ?: 0.0
-        )
-
-        val exerciseLap = jsonObject["JSON"]?.jsonObject?.get("exerciseLap")?.let {
-            Json.decodeFromJsonElement(ListSerializer(ExerciseLapSerializer), it)
-        } ?: emptyList()
-
-        val exerciseSegment = jsonObject["JSON"]?.jsonObject?.get("exerciseSegment")?.let {
-            Json.decodeFromJsonElement(ListSerializer(ExerciseSegmentSerializer), it)
-        } ?: emptyList()
-
-        val exerciseRoute = jsonObject["JSON"]?.jsonObject?.get("exerciseRoute")?.let {
-            Json.decodeFromJsonElement(ExerciseRouteSerializer, it)
-        }
-
-
-        val activityEnum = ActivityEnum.valueOf(
-            jsonObject["activity_type"]?.jsonPrimitive?.content ?: return null
-        )
         try {
             return when (activityEnum) {
                 ActivityEnum.CYCLING ->
@@ -303,22 +316,11 @@ class ViewModelRecords : ViewModel() {
                     )
 
                 ActivityEnum.SLEEP ->
-                    /**
-                     * FIXME: mi dà errore sleep, forse perchè non ha parametri
-                     */
                     SessionCreator.createSleepSession(
                         basicActivity = basicActivity
                     )
 
                 ActivityEnum.LISTEN ->
-
-                    /**
-                     * FIXME: mi dà errore listen, forse perchè non ha parametri,
-                     * però non capisco perchè dovrebbe dare errori.
-                     * java.lang.IllegalArgumentException: Element class kotlinx.serialization.json.JsonNull is not a JsonObject
-                     *
-                     */
-
                     SessionCreator.createListenSession(
                         basicActivity = basicActivity
                     )
