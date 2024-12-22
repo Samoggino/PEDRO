@@ -267,33 +267,29 @@ object SessionCreator {
     private val energy: Energy = Energy.kilocalories(100.0)
     private val length: Length = Length.meters(500.0)
 
-    fun createYogaSession(): YogaSession {
-        return YogaSession(
-            basicActivity = createBasicActivity("Yoga Title", "Yoga Notes"),
-            totalEnergy = energy,
-            activeEnergy = energy,
-            exerciseSegment = exerciseSegmentList(),
-            exerciseLap = exerciseLapList()
-        )
-    }
+    fun createYogaSession() = createYogaSession(
+        basicActivity = createBasicActivity("Yoga Title", "Yoga Notes"),
+        totalEnergy = energy,
+        activeEnergy = energy,
+        exerciseSegment = exerciseSegmentList(),
+        exerciseLap = exerciseLapList()
+    )
 
-    fun createRunSession(): RunSession {
-        return RunSession(
-            basicActivity = createBasicActivity("Run Title", "Run Notes"),
-            totalEnergy = energy,
-            activeEnergy = energy,
-            speedSamples = speedRecordSampleList(),
-            stepsCount = 1000,
-            distance = length,
-            exerciseRoute = exerciseRouteCreator()
-        )
-    }
+    fun createRunSession() = createRunSession(
+        basicActivity = createBasicActivity("Run Title", "Run Notes"),
+        totalEnergy = energy,
+        activeEnergy = energy,
+        speedSamples = speedRecordSampleList(),
+        stepsCount = 1000,
+        distance = length,
+        exerciseRoute = exerciseRouteCreator()
+    )
 
-    fun createListenSession() = ListenSession(
+    fun createListenSession() = createListenSession(
         basicActivity = createBasicActivity("Listen Title", "Listen Notes")
     )
 
-    fun createLiftSession() = LiftSession(
+    fun createLiftSession() = createLiftSession(
         basicActivity = createBasicActivity("Lift Title", "Lift Notes"),
         totalEnergy = energy,
         activeEnergy = energy,
@@ -301,12 +297,12 @@ object SessionCreator {
         exerciseLap = exerciseLapList()
     )
 
-    fun createSitSession() = SitSession(
+    fun createSitSession() = createSitSession(
         basicActivity = createBasicActivity("Sit Title", "Sit Notes"),
-        volume = Volume.liters(100.0)
+        volume = Volume.liters(1.0)
     )
 
-    fun createCyclingSession() = CyclingSession(
+    fun createCyclingSession() = createCyclingSession(
         basicActivity = createBasicActivity("Cycling Title", "Cycling Notes"),
         totalEnergy = energy,
         activeEnergy = energy,
@@ -315,27 +311,18 @@ object SessionCreator {
         speedSamples = speedRecordSampleList()
     )
 
-    fun createDriveSession() = DriveSession(
+    fun createDriveSession() = createDriveSession(
         basicActivity = createBasicActivity("Drive Title", "Drive Notes"),
         distance = length,
         exerciseRoute = exerciseRouteCreator(),
-        speedSamples = listOf(
-            SpeedRecord.Sample(
-                time = Instant.now(),
-                speed = Velocity.kilometersPerHour(10.0)
-            ),
-            SpeedRecord.Sample(
-                time = endTime,
-                speed = Velocity.kilometersPerHour(10.0)
-            )
-        )
+        speedSamples = speedRecordSampleList()
     )
 
-    fun createSleepSession() = SleepSession(
-        basicActivity = createBasicActivity("Sleep Title", "Sleep Notes"),
+    fun createSleepSession() = createSleepSession(
+        basicActivity = createBasicActivity("Sleep Title", "Sleep Notes")
     )
 
-    fun createWalkSession() = WalkSession(
+    fun createWalkSession() = createWalkSession(
         basicActivity = createBasicActivity("Walk Title", "Walk Notes"),
         totalEnergy = energy,
         activeEnergy = energy,
@@ -345,7 +332,7 @@ object SessionCreator {
         stepsCount = 1000
     )
 
-    fun createTrainSession() = TrainSession(
+    fun createTrainSession() = createTrainSession(
         basicActivity = createBasicActivity("Train Title", "Train Notes"),
         totalEnergy = energy,
         activeEnergy = energy,
@@ -353,7 +340,7 @@ object SessionCreator {
         exerciseLap = exerciseLapList()
     )
 
-    fun createBasicActivity(title: String, notes: String): BasicActivity {
+    private fun createBasicActivity(title: String, notes: String): BasicActivity {
 
         val randomMonth = Month.entries[Random.nextInt(Month.entries.size)]
         val randomDay = Random.nextInt(1, randomMonth.length(false) + 1)
@@ -365,12 +352,7 @@ object SessionCreator {
         // durata random ma non troppo lunga per evitare problemi con Instant
         val endTime = startTime.plusSeconds(3600 * 1 / Random.nextLong(1, 5))
 
-        return BasicActivity(
-            startTime = startTime,
-            endTime = endTime,
-            title = title,
-            notes = notes
-        )
+        return createBasicActivity(title, notes, startTime, endTime)
     }
 
     private fun exerciseSegmentList() = listOf(
@@ -431,8 +413,11 @@ object SessionCreator {
         distance: Length,
         exerciseRoute: ExerciseRoute
     ): RunSession {
-        return RunSession(
-            basicActivity = basicActivity,
+        return createRunSession(
+            startTime = basicActivity.startTime,
+            endTime = basicActivity.endTime,
+            title = basicActivity.title,
+            notes = basicActivity.notes,
             totalEnergy = totalEnergy,
             activeEnergy = activeEnergy,
             speedSamples = speedSamples,
@@ -444,8 +429,11 @@ object SessionCreator {
 
     fun createListenSession(
         basicActivity: BasicActivity
-    ) = ListenSession(
-        basicActivity = basicActivity
+    ) = createListenSession(
+        title = basicActivity.title,
+        notes = basicActivity.notes,
+        startTime = basicActivity.startTime,
+        endTime = basicActivity.endTime
     )
 
     fun createLiftSession(
@@ -454,8 +442,11 @@ object SessionCreator {
         activeEnergy: Energy,
         exerciseSegment: List<ExerciseSegment>,
         exerciseLap: List<ExerciseLap>
-    ) = LiftSession(
-        basicActivity = basicActivity,
+    ) = createLiftSession(
+        startTime = basicActivity.startTime,
+        endTime = basicActivity.endTime,
+        title = basicActivity.title,
+        notes = basicActivity.notes,
         totalEnergy = totalEnergy,
         activeEnergy = activeEnergy,
         exerciseSegment = exerciseSegment,
@@ -465,8 +456,11 @@ object SessionCreator {
     fun createSitSession(
         basicActivity: BasicActivity,
         volume: Volume
-    ) = SitSession(
-        basicActivity = basicActivity,
+    ) = createSitSession(
+        title = basicActivity.title,
+        notes = basicActivity.notes,
+        startTime = basicActivity.startTime,
+        endTime = basicActivity.endTime,
         volume = volume
     )
 
@@ -477,13 +471,16 @@ object SessionCreator {
         distance: Length,
         exerciseRoute: ExerciseRoute,
         speedSamples: List<SpeedRecord.Sample>
-    ) = CyclingSession(
-        basicActivity = basicActivity,
+    ) = createCyclingSession(
+        startTime = basicActivity.startTime,
+        endTime = basicActivity.endTime,
+        title = basicActivity.title,
+        notes = basicActivity.notes,
+        speedSamples = speedSamples,
         totalEnergy = totalEnergy,
         activeEnergy = activeEnergy,
         distance = distance,
-        exerciseRoute = exerciseRoute,
-        speedSamples = speedSamples
+        exerciseRoute = exerciseRoute
     )
 
     fun createDriveSession(
@@ -491,8 +488,11 @@ object SessionCreator {
         distance: Length,
         exerciseRoute: ExerciseRoute,
         speedSamples: List<SpeedRecord.Sample>
-    ) = DriveSession(
-        basicActivity = basicActivity,
+    ) = createDriveSession(
+        startTime = basicActivity.startTime,
+        endTime = basicActivity.endTime,
+        title = basicActivity.title,
+        notes = basicActivity.notes,
         distance = distance,
         exerciseRoute = exerciseRoute,
         speedSamples = speedSamples
@@ -500,8 +500,11 @@ object SessionCreator {
 
     fun createSleepSession(
         basicActivity: BasicActivity
-    ) = SleepSession(
-        basicActivity = basicActivity
+    ) = createSleepSession(
+        title = basicActivity.title,
+        notes = basicActivity.notes,
+        startTime = basicActivity.startTime,
+        endTime = basicActivity.endTime
     )
 
     fun createWalkSession(
@@ -512,14 +515,17 @@ object SessionCreator {
         exerciseRoute: ExerciseRoute,
         speedSamples: List<SpeedRecord.Sample>,
         stepsCount: Long
-    ) = WalkSession(
-        basicActivity = basicActivity,
+    ) = createWalkSession(
+        startTime = basicActivity.startTime,
+        endTime = basicActivity.endTime,
+        title = basicActivity.title,
+        notes = basicActivity.notes,
+        speedSamples = speedSamples,
+        stepsCount = stepsCount,
         totalEnergy = totalEnergy,
         activeEnergy = activeEnergy,
         distance = distance,
-        exerciseRoute = exerciseRoute,
-        speedSamples = speedSamples,
-        stepsCount = stepsCount
+        exerciseRoute = exerciseRoute
     )
 
     fun createTrainSession(
@@ -528,8 +534,11 @@ object SessionCreator {
         activeEnergy: Energy,
         exerciseSegment: List<ExerciseSegment>,
         exerciseLap: List<ExerciseLap>
-    ) = TrainSession(
-        basicActivity = basicActivity,
+    ) = createTrainSession(
+        startTime = basicActivity.startTime,
+        endTime = basicActivity.endTime,
+        title = basicActivity.title,
+        notes = basicActivity.notes,
         totalEnergy = totalEnergy,
         activeEnergy = activeEnergy,
         exerciseSegment = exerciseSegment,
@@ -542,15 +551,14 @@ object SessionCreator {
         activeEnergy: Energy,
         exerciseSegment: List<ExerciseSegment>,
         exerciseLap: List<ExerciseLap>
-    ): YogaSession {
-        return YogaSession(
-            basicActivity = basicActivity,
-            totalEnergy = totalEnergy,
-            activeEnergy = activeEnergy,
-            exerciseSegment = exerciseSegment,
-            exerciseLap = exerciseLap
-        )
-    }
-
-
+    ) = createYogaSession(
+        startTime = basicActivity.startTime,
+        endTime = basicActivity.endTime,
+        title = basicActivity.title,
+        notes = basicActivity.notes,
+        totalEnergy = totalEnergy,
+        activeEnergy = activeEnergy,
+        exerciseSegment = exerciseSegment,
+        exerciseLap = exerciseLap
+    )
 }

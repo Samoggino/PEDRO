@@ -1,13 +1,6 @@
 package com.lam.pedro.presentation.serialization
 
 import android.util.Log
-import androidx.health.connect.client.records.ExerciseLap
-import androidx.health.connect.client.records.ExerciseRoute
-import androidx.health.connect.client.records.ExerciseSegment
-import androidx.health.connect.client.records.SpeedRecord
-import androidx.health.connect.client.units.Energy
-import androidx.health.connect.client.units.Length
-import androidx.health.connect.client.units.Volume
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -16,10 +9,6 @@ import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.SupabaseClient.safeRpcCall
 import com.lam.pedro.data.datasource.SupabaseClient.supabase
-import com.lam.pedro.data.serializers.activity.ExerciseLapSerializer
-import com.lam.pedro.data.serializers.activity.ExerciseRouteSerializer
-import com.lam.pedro.data.serializers.lists.SpeedRecordSampleSerializer
-import com.lam.pedro.data.serializers.primitive.ExerciseSegmentSerializer
 import com.lam.pedro.presentation.serialization.SessionCreator.activityConfigs
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.result.PostgrestResult
@@ -31,10 +20,8 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.double
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.long
 import kotlinx.serialization.json.put
 import kotlinx.serialization.serializer
 import java.time.Instant
@@ -148,8 +135,8 @@ class ViewModelRecords : ViewModel() {
     }
 
 
-    fun dumpActivitiesFromDB(): List<GenericActivity> {
-        val genericActivities = mutableListOf<GenericActivity>()
+    fun exportFromDB(): List<GenericActivity> {
+
         viewModelScope.launch(Dispatchers.IO) {
 
             val json = supabase()
@@ -160,78 +147,42 @@ class ViewModelRecords : ViewModel() {
             Log.d(tag, "Attività recuperate con successo $json")
 
 
-            json.forEach {
-                val activity: GenericActivity? = fromJsonToActivity(it)
-                if (activity != null) {
-                    Log.d(tag, "Attività convertita con successo: $activity")
-                    genericActivities.add(activity)
-                } else {
-                    Log.e(tag, "Errore durante la conversione dell'attività")
-                }
-            }
+            jsonSimulation(json)
+            /***
+             * Salva il JSON in un file
+             */
+
+//             val file = File("activity.json")
+//             file.writeText(Json.encodeToString(ListSerializer(JsonObject.serializer()), json))
+
+//             Log.d(tag, "File salvato con successo: ${file.absolutePath}")
         }
 
         return emptyList()
     }
 
-    private fun fromJsonToActivity(jsonObject: JsonObject): GenericActivity? {
-
-
-        var distance = Length.meters(0.0)
-        var totalEnergy = Energy.calories(0.0)
-        var activeEnergy = Energy.calories(0.0)
-        var speedSamples = emptyList<SpeedRecord.Sample>()
-        var stepsCount = 0L
-        var volume = Volume.liters(0.0)
-        var exerciseLap = emptyList<ExerciseLap>()
-        var exerciseSegment = emptyList<ExerciseSegment>()
-        var exerciseRoute: ExerciseRoute? = null
-
-
-        // Verifica che JSON sia un JsonObject
-        val jsonData = jsonObject["JSON"] as? JsonObject
-        if (jsonData != null) {
-            distance = Length.meters(
-                jsonData["distance"]?.jsonPrimitive?.double ?: 0.0
-            )
-            totalEnergy = Energy.calories(
-                jsonData["totalEnergy"]?.jsonPrimitive?.double ?: 0.0
-            )
-            activeEnergy = Energy.calories(
-                jsonData["activeEnergy"]?.jsonPrimitive?.double ?: 0.0
-            )
-            speedSamples = jsonData["speedSamples"]?.let {
-                Json.decodeFromJsonElement(
-                    ListSerializer(SpeedRecordSampleSerializer),
-                    it
-                )
-            } ?: emptyList()
-
-            stepsCount = jsonData["stepsCount"]?.jsonPrimitive?.long ?: 0L
-            volume = Volume.liters(
-                jsonData["volume"]?.jsonPrimitive?.double ?: 0.0
-            )
-
-            exerciseLap = jsonData["exerciseLap"]?.let {
-                Json.decodeFromJsonElement(ListSerializer(ExerciseLapSerializer), it)
-            } ?: emptyList()
-
-            exerciseSegment = jsonData["exerciseSegment"]?.let {
-                Json.decodeFromJsonElement(ListSerializer(ExerciseSegmentSerializer), it)
-            } ?: emptyList()
-
-            exerciseRoute = jsonData["exerciseRoute"]?.let {
-                Json.decodeFromJsonElement(ExerciseRouteSerializer, it)
-            }
-        } else {
-            Log.w(
-                "ActivityParser",
-                "Il campo JSON è null o non è un JsonObject per l'attività con ID: ${jsonObject["id"]}"
-            )
+    fun importIntoDB(json: List<JsonObject>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            jsonSimulation(json)
         }
-        val activityEnum = ActivityEnum.valueOf(
-            jsonObject["activity_type"]?.jsonPrimitive?.content ?: return null
-        )
+    }
+
+    private fun jsonSimulation(
+        json: List<JsonObject>
+    ) {
+        val genericActivities = mutableListOf<GenericActivity>()
+        json.forEach {
+            val activity: GenericActivity? = fromJsonToActivity(it)
+            if (activity != null) {
+                Log.d(tag, "Attività convertita con successo: $activity")
+                genericActivities.add(activity)
+            } else {
+                Log.e(tag, "Errore durante la conversione dell'attività")
+            }
+        }
+    }
+
+    private fun fromJsonToActivity(jsonObject: JsonObject): GenericActivity? {
 
         val basicActivity = SessionCreator.createBasicActivity(
             startTime = parseToInstant(jsonObject["start_time"]!!.jsonPrimitive.content),
@@ -239,95 +190,14 @@ class ViewModelRecords : ViewModel() {
             notes = jsonObject["notes"]?.jsonPrimitive?.content ?: "",
             title = jsonObject["title"]?.jsonPrimitive?.content ?: ""
         )
+        val activityEnum = ActivityEnum.valueOf(
+            jsonObject["activity_type"]?.jsonPrimitive?.content ?: return null
+        )
 
-        try {
-            return when (activityEnum) {
-                ActivityEnum.CYCLING ->
-                    SessionCreator.createCyclingSession(
-                        basicActivity = basicActivity,
-                        distance = distance,
-                        totalEnergy = totalEnergy,
-                        activeEnergy = activeEnergy,
-                        speedSamples = speedSamples,
-                        exerciseRoute = exerciseRoute!!
-                    )
+        val jsonData = jsonObject["JSON"] as? JsonObject
 
-                ActivityEnum.RUN ->
-                    SessionCreator.createRunSession(
-                        basicActivity = basicActivity,
-                        speedSamples = speedSamples,
-                        stepsCount = stepsCount,
-                        totalEnergy = totalEnergy,
-                        activeEnergy = activeEnergy,
-                        distance = distance,
-                        exerciseRoute = exerciseRoute!!
-                    )
-
-                ActivityEnum.WALK ->
-                    SessionCreator.createWalkSession(
-                        basicActivity = basicActivity,
-                        speedSamples = speedSamples,
-                        stepsCount = stepsCount,
-                        totalEnergy = totalEnergy,
-                        activeEnergy = activeEnergy,
-                        distance = distance,
-                        exerciseRoute = exerciseRoute!!
-                    )
-
-                ActivityEnum.SIT ->
-                    SessionCreator.createSitSession(
-                        basicActivity = basicActivity,
-                        volume = volume
-                    )
-
-                ActivityEnum.YOGA ->
-                    SessionCreator.createYogaSession(
-                        basicActivity = basicActivity,
-                        totalEnergy = totalEnergy,
-                        activeEnergy = activeEnergy,
-                        exerciseSegment = exerciseSegment,
-                        exerciseLap = exerciseLap
-                    )
-
-                ActivityEnum.TRAIN ->
-                    SessionCreator.createTrainSession(
-                        basicActivity = basicActivity,
-                        totalEnergy = totalEnergy,
-                        activeEnergy = activeEnergy,
-                        exerciseSegment = exerciseSegment,
-                        exerciseLap = exerciseLap
-                    )
-
-                ActivityEnum.DRIVE ->
-                    SessionCreator.createDriveSession(
-                        basicActivity = basicActivity,
-                        distance = distance,
-                        exerciseRoute = exerciseRoute!!,
-                        speedSamples = speedSamples
-                    )
-
-                ActivityEnum.LIFT ->
-                    SessionCreator.createLiftSession(
-                        basicActivity = basicActivity,
-                        totalEnergy = totalEnergy,
-                        activeEnergy = activeEnergy,
-                        exerciseSegment = exerciseSegment,
-                        exerciseLap = exerciseLap
-                    )
-
-                ActivityEnum.SLEEP ->
-                    SessionCreator.createSleepSession(
-                        basicActivity = basicActivity
-                    )
-
-                ActivityEnum.LISTEN ->
-                    SessionCreator.createListenSession(
-                        basicActivity = basicActivity
-                    )
-            }
-        } catch (e: Exception) {
-            Log.e(tag, "Errore durante la conversione del JSON in attività $activityEnum : $e")
-            return null
+        return JsonDBManager.activityCreatorsJSON[activityEnum]?.let { creator ->
+            return creator(basicActivity, jsonData)
         }
     }
 

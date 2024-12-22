@@ -75,7 +75,7 @@ fun MyScreenRecords(
 
             Button(
                 onClick = {
-                    viewModel.dumpActivitiesFromDB()
+                    viewModel.exportFromDB()
                 }
             ) {
                 Text("Dump Activities from DB")
