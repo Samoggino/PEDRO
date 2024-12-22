@@ -15,7 +15,9 @@ object SecurePreferencesManager {
     private const val REFRESH_TOKEN_KEY = "REFRESH_TOKEN"
     private const val UUID = "UUID"
 
+
     private var encryptedPrefs: SharedPreferences? = null
+    var appContext: Context? = null
 
     /**
      * Inizializza il SecurePreferencesManager con l'application context.
@@ -24,13 +26,13 @@ object SecurePreferencesManager {
      */
     fun initialize(context: Context) {
         if (encryptedPrefs == null) {
-            val appContext = context.applicationContext
-            val masterKey = MasterKey.Builder(appContext)
+            appContext = context.applicationContext
+            val masterKey = MasterKey.Builder(appContext!!)
                 .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                 .build()
 
             encryptedPrefs = EncryptedSharedPreferences.create(
-                appContext,
+                appContext!!,
                 PREFS_NAME,
                 masterKey,
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,

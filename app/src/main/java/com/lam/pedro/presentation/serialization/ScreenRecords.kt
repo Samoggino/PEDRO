@@ -1,5 +1,9 @@
 package com.lam.pedro.presentation.serialization
 
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,7 +24,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -73,18 +81,25 @@ fun MyScreenRecords(
 
             }
 
-            Button(
-                onClick = {
-                    viewModel.exportFromDB()
-                }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Dump Activities from DB")
+                ExportButton(viewModel)
+                ImportButton(viewModel)
             }
 
             // Navigation buttons
             NavButtons(navController)
         }
     }
+}
+
+sealed class ResultState {
+    data object Idle : ResultState()
+    data object Loading : ResultState()
+    data object Success : ResultState()
+    data object Error : ResultState()
 }
 
 @Composable
@@ -94,10 +109,10 @@ fun NavButtons(navController: NavController) {
         modifier = Modifier.fillMaxWidth()
     ) {
 
-
-        NavigationButton(
-            text = "Vai alla schermata dei follower",
-            onClick = { navController.navigate(Screen.FollowScreen.route) }
+        Button(
+            onClick = { navController.navigate(Screen.CommunityScreen.route) },
+            content = { Text("Vai alla community dei gringos") },
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -133,11 +148,59 @@ fun ActivityRow(
 }
 
 @Composable
-fun NavigationButton(text: String, onClick: () -> Unit) {
+private fun ExportButton(viewModel: ViewModelRecords) {
+    val saveResult by viewModel.saveResult.observeAsState(ResultState.Idle)
+    val message by viewModel.messageEvent.observeAsState()
+
+    message?.let {
+        Toast.makeText(LocalContext.current, it, Toast.LENGTH_SHORT).show()
+        viewModel.dataMutable.value = null
+    }
+
+    Button(onClick = {
+        viewModel.exportFromDB()
+    }) {
+        Text("Dump Activities from DB")
+    }
+
+    if (saveResult == ResultState.Loading) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+private fun ImportButton(viewModel: ViewModelRecords) {
+    val importResult by viewModel.importResult.observeAsState(ResultState.Idle) // Osserva lo stato dell'import
+    val message by viewModel.messageEvent.observeAsState() // Messaggi da mostrare tramite Toast
+
+    // Mostra il messaggio, se presente
+    message?.let {
+        Toast.makeText(LocalContext.current, it, Toast.LENGTH_SHORT).show()
+        viewModel.dataMutable.value = null
+    }
+
+    // Launcher per aprire il file picker
+    val pickFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { selectedFileUri ->
+            viewModel.importJsonToDatabase(selectedFileUri)
+            Log.d("JSON", "Selected file: $selectedFileUri")
+        }
+    }
+
+    // Bottone per attivare il file picker
     Button(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+        onClick = {
+            pickFileLauncher.launch(input = "*/*")
+        },
+        enabled = importResult != ResultState.Loading
     ) {
-        Text(text)
+        Text("Import into DB")
+    }
+
+    // Mostra il loader se lo stato è Loading
+    if (importResult == ResultState.Loading) {
+        CircularProgressIndicator()
     }
 }

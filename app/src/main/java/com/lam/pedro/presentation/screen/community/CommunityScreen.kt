@@ -32,11 +32,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 import com.lam.pedro.presentation.component.UserCard
 import com.lam.pedro.presentation.component.UserPlaceholder
 import com.lam.pedro.presentation.screen.loginscreen.User
@@ -44,9 +41,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CommunityScreen(
-    navController: NavHostController
-) {
+fun CommunityScreen() {
     var isRefreshing by remember { mutableStateOf(false) }
     val viewModel: ViewModelFollowScreen = viewModel(factory = ViewModelFollowScreenFactory())
     val userFollowMap by viewModel.userFollowMap.collectAsState() // Osserva il Flow
@@ -152,18 +147,14 @@ fun UserFollowList(
 
 @Composable
 fun FileUploadButton(viewModel: ViewModelFollowScreen) {
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
 
     // Launcher per aprire il file picker
     val pickFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         uri?.let { selectedFileUri ->
-            coroutineScope.launch {
-                Log.i("Supabase", "FileUploadButton")
-                viewModel.uploadFileToSupabase(context, selectedFileUri)
-            }
+            Log.i("Supabase", "FileUploadButton")
+            viewModel.uploadFileToSupabase(selectedFileUri)
         }
     }
 

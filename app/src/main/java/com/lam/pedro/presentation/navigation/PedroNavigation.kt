@@ -117,7 +117,7 @@ fun PedroNavigation(
     val screenStack = remember { mutableStateListOf<String>() }
 
     var sharedViewModel: ActivitySessionViewModel? by remember { mutableStateOf(null) }
-    var sharedColor: Color? by remember { mutableStateOf(null) }
+    val sharedColor: Color? by remember { mutableStateOf(null) }
     var sharedTitle: Int? by remember { mutableStateOf(null) }
     // var sharedActivityType: Int? by remember { mutableStateOf(null) }
 
@@ -159,7 +159,7 @@ fun PedroNavigation(
             ) {
                 screenStack.add(Screen.CommunityScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                CommunityScreen(navController)
+                CommunityScreen()
             }
             composable(
                 Screen.MoreScreen.route,
@@ -279,7 +279,7 @@ fun PedroNavigation(
                 sharedTitle = Screen.RunSessionScreen.titleId
 
                 val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
+//                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
                     viewModel.initialLoad()
@@ -326,7 +326,7 @@ fun PedroNavigation(
                 sharedTitle = Screen.SleepSessions.titleId
 
                 val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
+//                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
                     viewModel.initialLoad()
@@ -371,7 +371,7 @@ fun PedroNavigation(
                 sharedTitle = Screen.WalkSessionScreen.titleId
 
                 val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
+//                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
                     viewModel.initialLoad()
@@ -416,7 +416,7 @@ fun PedroNavigation(
                 sharedTitle = Screen.DriveSessionScreen.titleId
 
                 val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
+//                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
                     viewModel.initialLoad()
@@ -461,7 +461,7 @@ fun PedroNavigation(
                 sharedTitle = Screen.SitSessionScreen.titleId
 
                 val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
+//                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
                     viewModel.initialLoad()
@@ -506,7 +506,7 @@ fun PedroNavigation(
                 sharedTitle = Screen.ListenSessionScreen.titleId
 
                 val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
+//                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
                     viewModel.initialLoad()
@@ -548,7 +548,7 @@ fun PedroNavigation(
 
                 val permissionsGranted by viewModel.permissionsGranted
                 val permissions = viewModel.permissions
-                val sessionsList by viewModel.sessionsList
+//                val sessionsList by viewModel.sessionsList
 
                 val onPermissionsResult = {
                     viewModel.initialLoad()
@@ -593,7 +593,7 @@ fun PedroNavigation(
                 sharedTitle = Screen.YogaSessionScreen.titleId
 
                 val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
+//                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
                     viewModel.initialLoad()
@@ -638,7 +638,7 @@ fun PedroNavigation(
                 sharedTitle = Screen.CycleSessionScreen.titleId
 
                 val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
+//                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
                     viewModel.initialLoad()
@@ -683,7 +683,7 @@ fun PedroNavigation(
                 sharedTitle = Screen.TrainSessionScreen.titleId
 
                 val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
+//                val sessionsList by viewModel.sessionsList
                 val permissions = viewModel.permissions
                 val onPermissionsResult = {
                     viewModel.initialLoad()

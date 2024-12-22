@@ -1,16 +1,21 @@
 package com.lam.pedro.presentation.serialization
 
+import android.net.Uri
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
+import com.lam.pedro.data.datasource.SecurePreferencesManager
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.SupabaseClient.safeRpcCall
 import com.lam.pedro.data.datasource.SupabaseClient.supabase
 import com.lam.pedro.presentation.serialization.SessionCreator.activityConfigs
 import io.github.jan.supabase.postgrest.from
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,41 +26,49 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.serializer
-import java.time.Instant
 
 class ViewModelRecords : ViewModel() {
 
-    val tag = "ViewModelRecords-Supabase"
+    val tag = "Supabase"
 
+    // LiveData per monitorare lo stato dell'import
+    private val _importResult = MutableLiveData<ResultState>(ResultState.Idle)
+    val importResult: LiveData<ResultState> = _importResult
+
+    // LiveData per monitorare lo stato del salvataggio
+    private val _saveResult = MutableLiveData<ResultState>(ResultState.Idle)
+    val saveResult: LiveData<ResultState> = _saveResult
+
+    // LiveData per il messaggio da visualizzare (es. Toast)
+    val dataMutable = MutableLiveData<String?>()
+    val messageEvent: LiveData<String?> = dataMutable
+
+    /**
+     * Recupera le sessioni di attività dal database in base al tipo di attività specificato.
+     * @param activityEnum Enum dell'attività da recuperare
+     * @return Lista di attività di tipo [GenericActivity]
+     */
     @OptIn(InternalSerializationApi::class)
-    suspend fun getActivitySession(
-        activityEnum: ActivityEnum
-    ): List<GenericActivity> {
+    suspend fun getActivitySession(activityEnum: ActivityEnum): List<GenericActivity> {
         Log.d(tag, "Recupero delle attività di tipo $activityEnum")
         val config = activityConfigs[activityEnum] as? SessionCreator.ActivityConfig<*>
 
-
         if (config != null) {
             return withContext(Dispatchers.IO) {
-                val uuid = getUUID()
                 try {
-                    val jsonFinal =
-                        buildJsonObject { put("user_uuid", Json.encodeToJsonElement(uuid)) }
-                    val responseJson = (
-                            safeRpcCall(
-                                rpcFunctionName = "get_${activityEnum.name.lowercase()}_session",
-                                jsonFinal = jsonFinal
-                            ) as? PostgrestResult
-                            )?.data
-
-                    val response: List<GenericActivity> = Json.decodeFromString(
+                    Json.decodeFromString(
                         ListSerializer(config.responseType.serializer()),
-                        responseJson!!
+                        (safeRpcCall(
+                            rpcFunctionName = "get_${activityEnum.name.lowercase()}_session",
+                            buildJsonObject {
+                                put("user_uuid", Json.encodeToJsonElement(getUUID()))
+                            }
+                        ) as? PostgrestResult)?.data!!
                     )
-                    response
                 } catch (e: Exception) {
                     Log.e(tag, "Errore durante il recupero delle attività: $e")
                     emptyList()
@@ -67,6 +80,12 @@ class ViewModelRecords : ViewModel() {
         }
     }
 
+    /**
+     * Inserisce una sessione di attività nel database.
+     * Funzione di debug per simulare l'inserimento di attività senza l'interfaccia utente e
+     * senza richiedere permessi.
+     * @param activityEnum Enum dell'attività da inserire
+     */
     fun insertActivitySession(activityEnum: ActivityEnum) {
         // crea un numero casuale di attività
         val activities = (0..(1..5).random()).map {
@@ -85,35 +104,21 @@ class ViewModelRecords : ViewModel() {
 
     }
 
+    /**
+     * Inserisce una lista di sessioni di attività nel database.
+     * @param genericActivities Lista di attività da inserire
+     */
     fun insertActivitySession(genericActivities: List<GenericActivity>) {
         viewModelScope.launch(Dispatchers.IO) {
-            val uuid = getUUID().toString()
-
             genericActivities.forEach { activity ->
                 try {
-                    Log.d(
-                        tag,
-                        "Preparazione dell'inserimento per l'attività: ${activity.activityEnum.name}"
-                    )
-
-                    val jsonPayload = createActivityJson(activity, uuid)
-                    Log.d(tag, "Payload JSON generato: $jsonPayload")
-
                     // Inserisci la sessione nel database
                     safeRpcCall(
                         rpcFunctionName = "insert_${activity.activityEnum.name.lowercase()}_session",
-                        jsonFinal = jsonPayload
-                    )
-
-                    Log.d(
-                        tag, "Sessione inserita con successo: ${activity.activityEnum.name}"
+                        createActivityJson(activity, getUUID()!!)
                     )
                 } catch (e: Exception) {
-                    Log.e(
-                        tag,
-                        "Errore durante l'inserimento della sessione: ${activity.activityEnum.name}",
-                        e
-                    )
+                    Log.e(tag, "Errore durante l'inserimento: ${activity.activityEnum.name}", e)
                 }
             }
         }
@@ -128,76 +133,72 @@ class ViewModelRecords : ViewModel() {
         }
     }
 
-    private fun parseToInstant(input: String): Instant {
-        // Corregge il formato rimuovendo il secondo offset ":00"
-        val correctedInput = input.replace("+00:00:00", "+00:00")
-        return Instant.parse(correctedInput)
-    }
 
-
-    fun exportFromDB(): List<GenericActivity> {
+    // Funzione per esportare i dati dal DB
+    fun exportFromDB() {
+        _saveResult.value = ResultState.Loading
 
         viewModelScope.launch(Dispatchers.IO) {
-
             val json = supabase()
                 .from("activity")
-                .select()
-                .decodeList<JsonObject>()
+                .select(
+                    columns = Columns.list(
+                        "user_id",
+                        "activity_type",
+                        "start_time",
+                        "end_time",
+                        "notes",
+                        "title",
+                        "JSON"
+                    )
+                ) {
+                    filter { eq("user_id", getUUID() ?: "") }
+                }
+                .decodeList<JsonObject>().toString()
 
-            Log.d(tag, "Attività recuperate con successo $json")
+            val isSuccess = JsonDBManager.saveExportedJSON(json)
 
+            _saveResult.postValue(
+                if (isSuccess) ResultState.Success else ResultState.Error
+            )
 
-            jsonSimulation(json)
-            /***
-             * Salva il JSON in un file
-             */
-
-//             val file = File("activity.json")
-//             file.writeText(Json.encodeToString(ListSerializer(JsonObject.serializer()), json))
-
-//             Log.d(tag, "File salvato con successo: ${file.absolutePath}")
+            // Aggiorna il messaggio da mostrare (Toast)
+            dataMutable.postValue(
+                if (isSuccess) "File salvato nella cartella Download" else "Errore durante il salvataggio"
+            )
         }
-
-        return emptyList()
     }
 
-    fun importIntoDB(json: List<JsonObject>) {
+    fun importJsonToDatabase(uri: Uri) {
+        _importResult.value = ResultState.Loading // Stato iniziale: caricamento
+
         viewModelScope.launch(Dispatchers.IO) {
-            jsonSimulation(json)
-        }
-    }
+            try {
+                val inputStream =
+                    SecurePreferencesManager.appContext!!.contentResolver.openInputStream(uri)
+                        ?: throw Exception("Impossibile leggere il file, URI non valido.")
 
-    private fun jsonSimulation(
-        json: List<JsonObject>
-    ) {
-        val genericActivities = mutableListOf<GenericActivity>()
-        json.forEach {
-            val activity: GenericActivity? = fromJsonToActivity(it)
-            if (activity != null) {
-                Log.d(tag, "Attività convertita con successo: $activity")
-                genericActivities.add(activity)
-            } else {
-                Log.e(tag, "Errore durante la conversione dell'attività")
+                val jsonObject =
+                    Json.parseToJsonElement(inputStream.bufferedReader().use { it.readText() })
+                        .jsonArray
+                        .map { it.jsonObject }
+
+                // Inserimento dati nel DB
+                insertActivitySession(JsonDBManager.fromJsonListToGenericActivityList(jsonObject))
+
+                withContext(Dispatchers.IO) {
+                    inputStream.close()
+                }
+
+                // Stato di successo
+                _importResult.postValue(ResultState.Success)
+                dataMutable.postValue("Import completato con successo")
+
+            } catch (e: Exception) {
+                // Stato di errore
+                _importResult.postValue(ResultState.Error)
+                dataMutable.postValue("Errore durante l'import: ${e.message}")
             }
-        }
-    }
-
-    private fun fromJsonToActivity(jsonObject: JsonObject): GenericActivity? {
-
-        val basicActivity = SessionCreator.createBasicActivity(
-            startTime = parseToInstant(jsonObject["start_time"]!!.jsonPrimitive.content),
-            endTime = parseToInstant(jsonObject["end_time"]!!.jsonPrimitive.content),
-            notes = jsonObject["notes"]?.jsonPrimitive?.content ?: "",
-            title = jsonObject["title"]?.jsonPrimitive?.content ?: ""
-        )
-        val activityEnum = ActivityEnum.valueOf(
-            jsonObject["activity_type"]?.jsonPrimitive?.content ?: return null
-        )
-
-        val jsonData = jsonObject["JSON"] as? JsonObject
-
-        return JsonDBManager.activityCreatorsJSON[activityEnum]?.let { creator ->
-            return creator(basicActivity, jsonData)
         }
     }
 

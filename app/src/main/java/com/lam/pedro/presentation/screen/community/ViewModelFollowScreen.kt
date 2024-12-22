@@ -1,10 +1,11 @@
 package com.lam.pedro.presentation.screen.community
 
-import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import com.lam.pedro.data.datasource.SecurePreferencesManager
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.SupabaseClient.supabase
 import com.lam.pedro.presentation.screen.loginscreen.User
@@ -15,6 +16,7 @@ import io.ktor.http.ContentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -70,32 +72,34 @@ class ViewModelFollowScreen : ViewModel() {
 
     /**
      * Metodo che carica un file nel bucket di Supabase.
-     * @param context il contesto dell'applicazione
      * @param fileUri l'uri del file da caricare
      */
-    suspend fun uploadFileToSupabase(context: Context, fileUri: Uri) {
-        try {
-            val inputStream = context.contentResolver.openInputStream(fileUri)
-                ?: throw Exception("Impossibile leggere il file, URI non valido.")
+    fun uploadFileToSupabase(fileUri: Uri) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val inputStream =
+                    SecurePreferencesManager.appContext!!.contentResolver.openInputStream(fileUri)
+                        ?: throw Exception("Impossibile leggere il file, URI non valido.")
 
-            val fileBytes = inputStream.readBytes()
-            withContext(Dispatchers.IO) {
-                inputStream.close()
+                val fileBytes = inputStream.readBytes()
+                withContext(Dispatchers.IO) {
+                    inputStream.close()
+                }
+
+                val bucket = supabase().storage.from("avatars")
+                val fileName = getUUID().toString()
+
+                // Specifica correttamente il content type
+                val result = bucket.upload(fileName, fileBytes) {
+                    upsert = true
+                    contentType = ContentType.Image.PNG
+                    contentType = ContentType.Image.JPEG
+                }
+
+                Log.i("Supabase", "File caricato con successo: $result")
+            } catch (e: Exception) {
+                Log.e("Supabase", "Errore durante il caricamento: ${e.message}", e)
             }
-
-            val bucket = supabase().storage.from("avatars")
-            val fileName = getUUID().toString()
-
-            // Specifica correttamente il content type
-            val result = bucket.upload(fileName, fileBytes) {
-                upsert = true
-                contentType = ContentType.Image.PNG
-                contentType = ContentType.Image.JPEG
-            }
-
-            Log.i("Supabase", "File caricato con successo: $result")
-        } catch (e: Exception) {
-            Log.e("Supabase", "Errore durante il caricamento: ${e.message}", e)
         }
     }
 }
