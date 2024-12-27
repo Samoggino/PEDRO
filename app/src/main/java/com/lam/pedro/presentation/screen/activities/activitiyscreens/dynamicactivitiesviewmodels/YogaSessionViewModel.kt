@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities
+package com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels
 
 import androidx.compose.runtime.MutableState
 import androidx.health.connect.client.permission.HealthPermission
@@ -11,30 +11,31 @@ import androidx.health.connect.client.units.Energy
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.data.activity.GenericActivity.TrainSession
+import com.lam.pedro.data.activity.GenericActivity.YogaSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.serialization.SessionCreator
-import com.lam.pedro.util.calculateTrainCalories
+import com.lam.pedro.util.calculateAverageSpeed
+import com.lam.pedro.util.calculateCalories
 import java.time.ZonedDateTime
 
-class TrainSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+
+class YogaSessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ActivitySessionViewModel(healthConnectManager), MutableState<ActivitySessionViewModel?> {
 
     //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
-    //override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_EXERCISE_CLASS
-    override lateinit var actualSession: TrainSession
+    //override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_YOGA
+    override lateinit var actualSession: YogaSession
 
-    override val activityEnum = ActivityEnum.TRAIN
-
+    override val activityEnum = ActivityEnum.YOGA
 
     /*Define here the required permissions for the Health Connect usage*/
     override val permissions = setOf(
 
         /*
-         * ExerciseSessionRecord
-         * */
+        * ExerciseSessionRecord
+        * */
         HealthPermission.getReadPermission(ExerciseSessionRecord::class),
         HealthPermission.getWritePermission(ExerciseSessionRecord::class),
 
@@ -45,15 +46,7 @@ class TrainSessionViewModel(private val healthConnectManager: HealthConnectManag
         HealthPermission.getWritePermission(ActiveCaloriesBurnedRecord::class),
 
         /*
-        * ExerciseCompletionGoal.RepetitionsGoal - permissions not needed, it doesn't use any sensors or personal data
-        * */
-
-        /*
-        *ExerciseCompletionGoal.DurationGoal - permissions not needed, it doesn't use any sensors or personal data
-        * */
-
-        /*
-        * ExerciseLap - no permissions needed, it split exercise sessions into segments such as laps or exercise series
+        * ExerciseCompletionGoal.DurationGoal - permissions not needed, it doesn't use any sensors or personal data
         * */
 
         /*
@@ -62,7 +55,11 @@ class TrainSessionViewModel(private val healthConnectManager: HealthConnectManag
         HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
         HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
 
-        )
+        /*
+        * ExerciseLap - no permissions needed, it split exercise sessions into segments such as laps or exercise series
+        * */
+
+    )
 
     override fun createSession(
         duration: Long,
@@ -79,15 +76,18 @@ class TrainSessionViewModel(private val healthConnectManager: HealthConnectManag
         distance: MutableState<Double>,
         exerciseRoute: List<ExerciseRoute.Location>,
     ) {
-        val (totalCalories, activeCalories) = calculateTrainCalories(
+        val averageSpeed = calculateAverageSpeed(speedSamples)
+        val (totalCalories, activeCalories) = calculateCalories(
             profileViewModel.weight.toDouble(),
             profileViewModel.height.toDouble(),
             profileViewModel.age.toInt(),
             profileViewModel.sex,
+            distance.value,
+            steps.toInt(),
             duration,
-            trainIntensity
+            averageSpeed
         )
-        this.actualSession = SessionCreator.createTrainSession(
+        this.actualSession = SessionCreator.createYogaSession(
             startTime = startTime.toInstant(),
             endTime = endTime.toInstant(),
             title = activityTitle,
@@ -100,8 +100,8 @@ class TrainSessionViewModel(private val healthConnectManager: HealthConnectManag
     }
 
     override suspend fun saveSession(activitySession: GenericActivity) {
-        if (activitySession is TrainSession) {
-            healthConnectManager.insertTrainSession(
+        if (activitySession is YogaSession) {
+            healthConnectManager.insertYogaSession(
                 activityEnum.activityType,
                 activitySession.basicActivity.startTime,
                 activitySession.basicActivity.endTime,
@@ -113,9 +113,8 @@ class TrainSessionViewModel(private val healthConnectManager: HealthConnectManag
                 activitySession.exerciseLap
             )
         } else {
-            throw IllegalArgumentException("Invalid session type for TrainSessionViewModel")
+            throw IllegalArgumentException("Invalid session type for YogaSessionViewModel")
         }
-
     }
 
     override var value: ActivitySessionViewModel?
@@ -133,7 +132,7 @@ class TrainSessionViewModel(private val healthConnectManager: HealthConnectManag
 }
 
 /*
-class TrainSessionViewModel(val healthConnectManager: HealthConnectManager) :
+class YogaSessionViewModel(val healthConnectManager: HealthConnectManager) :
     ViewModel() {
 
     /*Define here the required permissions for the Health Connect usage*/
@@ -152,15 +151,7 @@ class TrainSessionViewModel(val healthConnectManager: HealthConnectManager) :
         HealthPermission.getWritePermission(ActiveCaloriesBurnedRecord::class),
 
         /*
-        * ExerciseCompletionGoal.RepetitionsGoal - permissions not needed, it doesn't use any sensors or personal data
-        * */
-
-        /*
-        *ExerciseCompletionGoal.DurationGoal - permissions not needed, it doesn't use any sensors or personal data
-        * */
-
-        /*
-        * ExerciseLap - no permissions needed, it split exercise sessions into segments such as laps or exercise series
+        * ExerciseCompletionGoal.DurationGoal - permissions not needed, it doesn't use any sensors or personal data
         * */
 
         /*
@@ -169,7 +160,11 @@ class TrainSessionViewModel(val healthConnectManager: HealthConnectManager) :
         HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
         HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
 
-    )
+        /*
+        * ExerciseLap - no permissions needed, it split exercise sessions into segments such as laps or exercise series
+        * */
+
+        )
 
     var permissionsGranted = mutableStateOf(false)
         private set
@@ -248,13 +243,15 @@ class TrainSessionViewModel(val healthConnectManager: HealthConnectManager) :
     }
 }
 
-class TrainSessionViewModelFactory(
+ */
+/*
+class YogaSessionViewModelFactory(
     private val healthConnectManager: HealthConnectManager
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(TrainSessionViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(YogaSessionViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return TrainSessionViewModel(
+            return YogaSessionViewModel(
                 healthConnectManager = healthConnectManager
             ) as T
         }

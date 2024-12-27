@@ -41,16 +41,16 @@ import com.lam.pedro.presentation.screen.MoreScreen
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.GeneralActivityViewModelFactory
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.SessionScreen
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.CycleSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.RunSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.TrainSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.WalkSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.YogaSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.DriveSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.LiftSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.ListenSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.SitSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.SleepSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.CycleSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.RunSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.TrainSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.WalkSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.YogaSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.DriveSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.LiftSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.ListenSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.SitSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.SleepSessionViewModel
 import com.lam.pedro.presentation.screen.activities.newActivity.NewActivityScreen
 import com.lam.pedro.presentation.screen.community.CommunityScreen
 import com.lam.pedro.presentation.screen.loginscreen.LoginScreen
@@ -117,9 +117,7 @@ fun PedroNavigation(
     val screenStack = remember { mutableStateListOf<String>() }
 
     var sharedViewModel: ActivitySessionViewModel? by remember { mutableStateOf(null) }
-    var sharedColor: Color? by remember { mutableStateOf(null) }
     var sharedTitle: Int? by remember { mutableStateOf(null) }
-    // var sharedActivityType: Int? by remember { mutableStateOf(null) }
 
     // Funzione per loggare le schermate attive
     fun logScreenStack() {
@@ -239,29 +237,26 @@ fun PedroNavigation(
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 SettingsScreen(navController = navController, titleId = topBarTitle)
             }
-
-
             composable(
                 Screen.NewActivityScreen.route,
                 enterTransition = enterTransition,
                 exitTransition = exitTransition
             ) {
                 screenStack.add(Screen.NewActivityScreen.route)
-                logScreenStack() // Log dello stack dopo aver aperto la schermata
+                logScreenStack()
                 sharedViewModel?.let { it1 ->
-                    sharedColor?.let { it2 ->
-                        sharedTitle?.let { it3 ->
-                            NewActivityScreen(
-                                navController = navController,
-                                titleId = it3,
-                                color = it2,
-                                viewModel = it1
-                            )
-                        }
+                    sharedTitle?.let { it2 ->
+                        NewActivityScreen(
+                            navController = navController,
+                            titleId = it2,
+                            viewModel = it1
+                        )
                     }
+
                 }
             }
 
+            /*
             composable(
                 Screen.RunSessionScreen.route,
                 enterTransition = enterTransition,
@@ -309,6 +304,67 @@ fun PedroNavigation(
                 )
             }
 
+             */
+            composable(
+                Screen.RunSessionScreen.route,
+                enterTransition = enterTransition,
+                exitTransition = exitTransition
+            ) {
+                val activityViewModel: RunSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory(
+                        healthConnectManager = healthConnectManager
+                    )
+                )
+                SetupSessionScreen(
+                    screen = Screen.RunSessionScreen,
+                    activityViewModel = activityViewModel,
+                    navController = navController,
+                    snackbarHostState = snackbarHostState,
+                    scope = scope,
+                    topBarTitle = topBarTitle,
+                    //enterTransition = enterTransition,
+                    //exitTransition = exitTransition,
+                    screenStack = screenStack,
+                    onSharedViewModelChange = { viewModel ->
+                        sharedViewModel = viewModel
+                    },
+                    onSharedTitleChange = { titleId ->
+                        sharedTitle = titleId
+                    }
+                )
+            }
+            composable(
+                Screen.SleepSessions.route,
+                enterTransition = enterTransition,
+                exitTransition = exitTransition
+            ) {
+                val activityViewModel: SleepSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory(
+                        healthConnectManager = healthConnectManager
+                    )
+                )
+                SetupSessionScreen(
+                    screen = Screen.SleepSessions,
+                    activityViewModel = activityViewModel,
+                    navController = navController,
+                    snackbarHostState = snackbarHostState,
+                    scope = scope,
+                    topBarTitle = topBarTitle,
+                    //enterTransition = enterTransition,
+                    //exitTransition = exitTransition,
+                    screenStack = screenStack,
+                    onSharedViewModelChange = { viewModel ->
+                        sharedViewModel = viewModel
+                    },
+                    onSharedTitleChange = { titleId ->
+                        sharedTitle = titleId
+                    }
+                )
+            }
+
+
+
+            /*
             composable(
                 Screen.SleepSessions.route,
                 enterTransition = enterTransition,
@@ -354,6 +410,38 @@ fun PedroNavigation(
                 )
             }
 
+             */
+
+            composable(
+                Screen.WalkSessionScreen.route,
+                enterTransition = enterTransition,
+                exitTransition = exitTransition
+            ) {
+                val activityViewModel: WalkSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory(
+                        healthConnectManager = healthConnectManager
+                    )
+                )
+                SetupSessionScreen(
+                    screen = Screen.WalkSessionScreen,
+                    activityViewModel = activityViewModel,
+                    navController = navController,
+                    snackbarHostState = snackbarHostState,
+                    scope = scope,
+                    topBarTitle = topBarTitle,
+                    //enterTransition = enterTransition,
+                    //exitTransition = exitTransition,
+                    screenStack = screenStack,
+                    onSharedViewModelChange = { viewModel ->
+                        sharedViewModel = viewModel
+                    },
+                    onSharedTitleChange = { titleId ->
+                        sharedTitle = titleId
+                    }
+                )
+            }
+
+            /*
             composable(
                 Screen.WalkSessionScreen.route,
                 enterTransition = enterTransition,
@@ -399,6 +487,38 @@ fun PedroNavigation(
                 )
             }
 
+             */
+
+            composable(
+                Screen.DriveSessionScreen.route,
+                enterTransition = enterTransition,
+                exitTransition = exitTransition
+            ) {
+                val activityViewModel: DriveSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory(
+                        healthConnectManager = healthConnectManager
+                    )
+                )
+                SetupSessionScreen(
+                    screen = Screen.DriveSessionScreen,
+                    activityViewModel = activityViewModel,
+                    navController = navController,
+                    snackbarHostState = snackbarHostState,
+                    scope = scope,
+                    topBarTitle = topBarTitle,
+                    //enterTransition = enterTransition,
+                    //exitTransition = exitTransition,
+                    screenStack = screenStack,
+                    onSharedViewModelChange = { viewModel ->
+                        sharedViewModel = viewModel
+                    },
+                    onSharedTitleChange = { titleId ->
+                        sharedTitle = titleId
+                    }
+                )
+            }
+
+            /*
             composable(
                 Screen.DriveSessionScreen.route,
                 enterTransition = enterTransition,
@@ -444,6 +564,37 @@ fun PedroNavigation(
                 )
             }
 
+             */
+            composable(
+                Screen.SitSessionScreen.route,
+                enterTransition = enterTransition,
+                exitTransition = exitTransition
+            ) {
+                val activityViewModel: SitSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory(
+                        healthConnectManager = healthConnectManager
+                    )
+                )
+                SetupSessionScreen(
+                    screen = Screen.SitSessionScreen,
+                    activityViewModel = activityViewModel,
+                    navController = navController,
+                    snackbarHostState = snackbarHostState,
+                    scope = scope,
+                    topBarTitle = topBarTitle,
+                    //enterTransition = enterTransition,
+                    //exitTransition = exitTransition,
+                    screenStack = screenStack,
+                    onSharedViewModelChange = { viewModel ->
+                        sharedViewModel = viewModel
+                    },
+                    onSharedTitleChange = { titleId ->
+                        sharedTitle = titleId
+                    }
+                )
+            }
+
+/*
             composable(
                 Screen.SitSessionScreen.route,
                 enterTransition = enterTransition,
@@ -489,6 +640,38 @@ fun PedroNavigation(
                 )
             }
 
+ */
+
+            composable(
+                Screen.ListenSessionScreen.route,
+                enterTransition = enterTransition,
+                exitTransition = exitTransition
+            ) {
+                val activityViewModel: ListenSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory(
+                        healthConnectManager = healthConnectManager
+                    )
+                )
+                SetupSessionScreen(
+                    screen = Screen.ListenSessionScreen,
+                    activityViewModel = activityViewModel,
+                    navController = navController,
+                    snackbarHostState = snackbarHostState,
+                    scope = scope,
+                    topBarTitle = topBarTitle,
+                    //enterTransition = enterTransition,
+                    //exitTransition = exitTransition,
+                    screenStack = screenStack,
+                    onSharedViewModelChange = { viewModel ->
+                        sharedViewModel = viewModel
+                    },
+                    onSharedTitleChange = { titleId ->
+                        sharedTitle = titleId
+                    }
+                )
+            }
+
+            /*
             composable(
                 Screen.ListenSessionScreen.route,
                 enterTransition = enterTransition,
@@ -534,6 +717,37 @@ fun PedroNavigation(
                 )
             }
 
+             */
+
+            composable(
+                Screen.WeightScreen.route,
+                enterTransition = enterTransition,
+                exitTransition = exitTransition
+            ) {
+                val activityViewModel: LiftSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory(
+                        healthConnectManager = healthConnectManager
+                    )
+                )
+                SetupSessionScreen(
+                    screen = Screen.WeightScreen,
+                    activityViewModel = activityViewModel,
+                    navController = navController,
+                    snackbarHostState = snackbarHostState,
+                    scope = scope,
+                    topBarTitle = topBarTitle,
+                    //enterTransition = enterTransition,
+                    //exitTransition = exitTransition,
+                    screenStack = screenStack,
+                    onSharedViewModelChange = { viewModel ->
+                        sharedViewModel = viewModel
+                    },
+                    onSharedTitleChange = { titleId ->
+                        sharedTitle = titleId
+                    }
+                )
+            }
+            /*
             composable(Screen.WeightScreen.route) {
                 val viewModel: LiftSessionViewModel =
                     viewModel(
@@ -576,6 +790,37 @@ fun PedroNavigation(
                 )
             }
 
+             */
+
+            composable(
+                Screen.YogaSessionScreen.route,
+                enterTransition = enterTransition,
+                exitTransition = exitTransition
+            ) {
+                val activityViewModel: YogaSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory(
+                        healthConnectManager = healthConnectManager
+                    )
+                )
+                SetupSessionScreen(
+                    screen = Screen.YogaSessionScreen,
+                    activityViewModel = activityViewModel,
+                    navController = navController,
+                    snackbarHostState = snackbarHostState,
+                    scope = scope,
+                    topBarTitle = topBarTitle,
+                    //enterTransition = enterTransition,
+                    //exitTransition = exitTransition,
+                    screenStack = screenStack,
+                    onSharedViewModelChange = { viewModel ->
+                        sharedViewModel = viewModel
+                    },
+                    onSharedTitleChange = { titleId ->
+                        sharedTitle = titleId
+                    }
+                )
+            }
+            /*
             composable(
                 Screen.YogaSessionScreen.route,
                 enterTransition = enterTransition,
@@ -621,6 +866,38 @@ fun PedroNavigation(
                 )
             }
 
+             */
+
+            composable(
+                Screen.CycleSessionScreen.route,
+                enterTransition = enterTransition,
+                exitTransition = exitTransition
+            ) {
+                val activityViewModel: CycleSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory(
+                        healthConnectManager = healthConnectManager
+                    )
+                )
+                SetupSessionScreen(
+                    screen = Screen.CycleSessionScreen,
+                    activityViewModel = activityViewModel,
+                    navController = navController,
+                    snackbarHostState = snackbarHostState,
+                    scope = scope,
+                    topBarTitle = topBarTitle,
+                    //enterTransition = enterTransition,
+                    //exitTransition = exitTransition,
+                    screenStack = screenStack,
+                    onSharedViewModelChange = { viewModel ->
+                        sharedViewModel = viewModel
+                    },
+                    onSharedTitleChange = { titleId ->
+                        sharedTitle = titleId
+                    }
+                )
+            }
+
+            /*
             composable(
                 Screen.CycleSessionScreen.route,
                 enterTransition = enterTransition,
@@ -666,6 +943,38 @@ fun PedroNavigation(
                 )
             }
 
+             */
+
+            composable(
+                Screen.TrainSessionScreen.route,
+                enterTransition = enterTransition,
+                exitTransition = exitTransition
+            ) {
+                val activityViewModel: TrainSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory(
+                        healthConnectManager = healthConnectManager
+                    )
+                )
+                SetupSessionScreen(
+                    screen = Screen.TrainSessionScreen,
+                    activityViewModel = activityViewModel,
+                    navController = navController,
+                    snackbarHostState = snackbarHostState,
+                    scope = scope,
+                    topBarTitle = topBarTitle,
+                    //enterTransition = enterTransition,
+                    //exitTransition = exitTransition,
+                    screenStack = screenStack,
+                    onSharedViewModelChange = { viewModel ->
+                        sharedViewModel = viewModel
+                    },
+                    onSharedTitleChange = { titleId ->
+                        sharedTitle = titleId
+                    }
+                )
+            }
+
+            /*
             composable(
                 Screen.TrainSessionScreen.route,
                 enterTransition = enterTransition,
@@ -710,6 +1019,8 @@ fun PedroNavigation(
                     viewModel = viewModel
                 )
             }
+
+             */
             composable(Screen.MyScreenRecords.route) { MyScreenRecords(navController) }
 
             composable(

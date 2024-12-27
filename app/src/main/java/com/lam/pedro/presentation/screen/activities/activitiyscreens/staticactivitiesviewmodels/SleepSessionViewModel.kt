@@ -1,32 +1,29 @@
-package com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities
+package com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels
 
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.health.connect.client.permission.HealthPermission
-import androidx.health.connect.client.records.DistanceRecord
-import androidx.health.connect.client.records.ElevationGainedRecord
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSessionRecord
+import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
-import androidx.health.connect.client.units.Length
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.data.activity.GenericActivity.DriveSession
+import com.lam.pedro.data.activity.GenericActivity.SleepSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.serialization.SessionCreator
 import java.time.ZonedDateTime
 
-class DriveSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+class SleepSessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ActivitySessionViewModel(healthConnectManager), MutableState<ActivitySessionViewModel?> {
 
     //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
-    //override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_SURFING
-    override lateinit var actualSession: DriveSession
+        //override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT
+    override lateinit var actualSession: SleepSession
 
-    override val activityEnum = ActivityEnum.DRIVE
+    override val activityEnum = ActivityEnum.SLEEP
 
     /*Define here the required permissions for the Health Connect usage*/
     override val permissions = setOf(
@@ -38,22 +35,10 @@ class DriveSessionViewModel(private val healthConnectManager: HealthConnectManag
         HealthPermission.getWritePermission(ExerciseSessionRecord::class),
 
         /*
-        * DistanceRecord
+        * SleepSessionRecord
         * */
-        HealthPermission.getReadPermission(DistanceRecord::class),
-        HealthPermission.getWritePermission(DistanceRecord::class),
-
-        /*
-        * SpeedRecord
-        * */
-        HealthPermission.getReadPermission(SpeedRecord::class),
-        HealthPermission.getWritePermission(SpeedRecord::class),
-
-        /*
-        * ElevationGainedRecord
-        * */
-        HealthPermission.getReadPermission(ElevationGainedRecord::class),
-        HealthPermission.getWritePermission(ElevationGainedRecord::class),
+        HealthPermission.getReadPermission(SleepSessionRecord::class),
+        HealthPermission.getWritePermission(SleepSessionRecord::class)
 
         )
 
@@ -72,36 +57,26 @@ class DriveSessionViewModel(private val healthConnectManager: HealthConnectManag
         distance: MutableState<Double>,
         exerciseRoute: List<ExerciseRoute.Location>,
     ) {
-        this.actualSession = SessionCreator.createDriveSession(
+        this.actualSession = SessionCreator.createSleepSession(
             startTime = startTime.toInstant(),
             endTime = endTime.toInstant(),
             title = activityTitle,
-            notes = notes,
-            speedSamples = speedSamples,
-            distance = Length.meters(distance.value),
-            exerciseRoute = ExerciseRoute(exerciseRoute)
+            notes = notes
         )
-        Log.d("ACTUAL SESSION", "$actualSession")
     }
 
     override suspend fun saveSession(activitySession: GenericActivity) {
-        if (activitySession is DriveSession) {
-            Log.d("SAVE SESSION", "$activitySession")
-            healthConnectManager.insertDriveSession(
-                activityEnum.activityType,
+        if (activitySession is SleepSession) {
+            healthConnectManager.insertSleepSession(
                 activitySession.basicActivity.startTime,
                 activitySession.basicActivity.endTime,
                 activitySession.basicActivity.title,
                 activitySession.basicActivity.notes,
-                activitySession.speedSamples,
-                activitySession.distance,
-                activitySession.exerciseRoute
             )
         } else {
-            throw IllegalArgumentException("Invalid session type for DriveSessionViewModel")
+            throw IllegalArgumentException("Invalid session type for SleepSessionViewModel")
         }
     }
-
 
     override var value: ActivitySessionViewModel?
         get() = TODO("Not yet implemented")

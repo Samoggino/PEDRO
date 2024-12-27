@@ -86,13 +86,13 @@ import java.time.ZonedDateTime
 fun NewActivityScreen(
     navController: NavController,
     titleId: Int,
-    color: Color,
     viewModel: ActivitySessionViewModel,
     profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModelFactory(LocalContext.current))
 ) {
 
     Log.d("TIPO DEL NEW ACTIVITY SCREEN", "---- TIPO DEL NEW ACTIVITY SCREEN: ${viewModel.activityEnum.activityType}")
     // variables
+    val color = viewModel.activityEnum.color
     val activityType = viewModel.activityEnum.activityType
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
@@ -107,176 +107,7 @@ fun NewActivityScreen(
     var speedCounter by remember { mutableIntStateOf(0) }
     var totalSpeed by remember { mutableDoubleStateOf(0.0) }
 
-    /*
-    var showLocationPermissionDialog by remember { mutableStateOf(false) }
-    var showActivityRecognitionPermissionDialog by remember { mutableStateOf(false) }
-    var requestLocationPermissionCounter by remember { mutableIntStateOf(0) }
-    var hasBeenAskedForLocationPermission by remember { mutableStateOf(false) }
-    var hasBeenAskedForActivityRecognitionPermission by remember { mutableStateOf(false) }
-     */
-
-    val lifecycleOwner = LocalLifecycleOwner.current
-
     val snackbarHostState = remember { SnackbarHostState() }
-
-/*
-    var hasLocationPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        )
-    }
-
-    // Stato per il permesso di ACTIVITY_RECOGNITION
-    var hasActivityRecognitionPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACTIVITY_RECOGNITION
-            ) == PackageManager.PERMISSION_GRANTED
-        )
-    }
-
-    // Launcher per richiedere il permesso di ACTIVITY_RECOGNITION
-    val requestActivityRecognitionPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        hasActivityRecognitionPermission = isGranted
-        if (isGranted) {
-            Log.d(TAG, "-----------------Activity Recognition Permission granted-----------------")
-        } else {
-            //TODO: Handle permission denied, inform the user
-            Log.d(TAG, "-----------------Activity Recognition Permission denied-----------------")
-            hasBeenAskedForActivityRecognitionPermission = true
-            showActivityRecognitionPermissionDialog = true
-        }
-    }
-
-    val requestLocationPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        hasLocationPermission = isGranted
-        if (isGranted) {
-            Log.d(TAG, "-----------------GPS Permission granted-----------------")
-            requestActivityRecognitionPermissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
-        } else {
-            //TODO: Handle permission denied, the app won't work
-            Log.d(TAG, "-----------------GPS Permission denied-----------------")
-            hasBeenAskedForLocationPermission = true
-            requestLocationPermissionCounter++
-            showLocationPermissionDialog = true
-        }
-    }
-
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_RESUME -> {
-                    // Controlla se i permessi sono concessi quando lo screen torna attivo
-                    if (ContextCompat.checkSelfPermission(
-                            context,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        ) == PackageManager.PERMISSION_GRANTED
-                    ) {
-                        //if (!isFirstTimeRequest) {
-                        hasLocationPermission = true
-                        showLocationPermissionDialog = false
-                        requestActivityRecognitionPermissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
-                        //}
-                    } else {
-                        if (hasBeenAskedForLocationPermission)
-                            showLocationPermissionDialog = true
-                    }
-                }
-
-                else -> Unit
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
-
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_RESUME -> {
-                    // Controlla se il permesso di ACTIVITY_RECOGNITION è stato concesso
-                    if (ContextCompat.checkSelfPermission(
-                            context,
-                            Manifest.permission.ACTIVITY_RECOGNITION
-                        ) == PackageManager.PERMISSION_GRANTED
-                    ) {
-                        hasActivityRecognitionPermission = true
-                        showActivityRecognitionPermissionDialog = false
-                    } else {
-                        // Mostra il dialog se il permesso non è stato concesso
-                        if (hasBeenAskedForActivityRecognitionPermission)
-                            showActivityRecognitionPermissionDialog = true
-                    }
-                }
-
-                else -> Unit
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
-
-    DeniedPermissionDialog(
-        showDialog = showLocationPermissionDialog,
-        onDismiss = {
-            if (hasLocationPermission) {
-                showLocationPermissionDialog = false
-            }
-        },
-        onGoToSettings = {
-            if (requestLocationPermissionCounter < 2) {
-                requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-            } else {
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                val uri = Uri.fromParts("package", context.packageName, null)
-                intent.data = uri
-                context.startActivity(intent)
-            }
-        },
-        color = MaterialTheme.colorScheme.primary,
-        title = R.string.location_permission_title,
-        icon = R.drawable.location_icon,
-        text = R.string.location_permission_description,
-        buttonText = if (requestLocationPermissionCounter < 2) R.string.request_permission else R.string.go_to_settings
-    )
-
-    DeniedPermissionDialog(
-        showDialog = showActivityRecognitionPermissionDialog,
-        onDismiss = {
-            if (hasActivityRecognitionPermission) {
-                showActivityRecognitionPermissionDialog = false
-            }
-        },
-        onGoToSettings = {
-            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-            val uri = Uri.fromParts("package", context.packageName, null)
-            intent.data = uri
-            context.startActivity(intent)
-        },
-        color = MaterialTheme.colorScheme.primary,
-        title = R.string.activity_recognition_permission_title,
-        icon = R.drawable.steps_icon,
-        text = R.string.activity_recognition_permission_description,
-        buttonText = R.string.go_to_settings
-    )
-     */
-
-
-    /*------------------------------------------------------------------------------------------------------------------*/
 
     // Crea la lista di funzionalità
     val functionalities = listOf(GpsFunctionality(context), StepCounterFunctionality(context))

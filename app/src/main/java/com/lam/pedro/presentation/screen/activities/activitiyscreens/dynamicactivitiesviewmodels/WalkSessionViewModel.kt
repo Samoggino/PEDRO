@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities
+package com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels
 
 import androidx.compose.runtime.MutableState
 import androidx.health.connect.client.permission.HealthPermission
