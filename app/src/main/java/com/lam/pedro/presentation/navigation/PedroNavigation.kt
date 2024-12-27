@@ -256,55 +256,6 @@ fun PedroNavigation(
                 }
             }
 
-            /*
-            composable(
-                Screen.RunSessionScreen.route,
-                enterTransition = enterTransition,
-                exitTransition = exitTransition
-            ) {
-                val viewModel: RunSessionViewModel =
-                    viewModel(
-                        factory =
-                        GeneralActivityViewModelFactory(
-                            healthConnectManager = healthConnectManager
-                        )
-                    )
-
-                sharedViewModel = viewModel
-                sharedTitle = Screen.RunSessionScreen.titleId
-
-                val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
-                val permissions = viewModel.permissions
-                val onPermissionsResult = {
-                    viewModel.initialLoad()
-                }
-
-                val permissionsLauncher =
-                    rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                        onPermissionsResult()
-                    }
-
-                screenStack.add(Screen.RunSessionScreen.route)
-                logScreenStack() // Log dello stack dopo aver aperto la schermata
-                SessionScreen(
-                    permissions = permissions,
-                    permissionsGranted = permissionsGranted,
-                    uiState = viewModel.uiState,
-                    onError = { exception ->
-                        showExceptionSnackbar(snackbarHostState, scope, exception)
-                    },
-                    onPermissionsResult = {
-                        viewModel.initialLoad()
-                    },
-                    onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
-                    navController = navController,
-                    titleId = topBarTitle,
-                    viewModel = viewModel
-                )
-            }
-
-             */
             composable(
                 Screen.RunSessionScreen.route,
                 enterTransition = enterTransition,
@@ -362,56 +313,6 @@ fun PedroNavigation(
                 )
             }
 
-
-
-            /*
-            composable(
-                Screen.SleepSessions.route,
-                enterTransition = enterTransition,
-                exitTransition = exitTransition
-            ) {
-                val viewModel: SleepSessionViewModel =
-                    viewModel(
-                        factory =
-                        GeneralActivityViewModelFactory(
-                            healthConnectManager = healthConnectManager
-                        )
-                    )
-
-                sharedViewModel = viewModel
-                sharedTitle = Screen.SleepSessions.titleId
-
-                val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
-                val permissions = viewModel.permissions
-                val onPermissionsResult = {
-                    viewModel.initialLoad()
-                }
-                val permissionsLauncher =
-                    rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                        onPermissionsResult()
-                    }
-                screenStack.add(Screen.SleepSessions.route)
-                logScreenStack() // Log dello stack dopo aver aperto la schermata
-                SessionScreen(
-                    permissions = permissions,
-                    permissionsGranted = permissionsGranted,
-                    uiState = viewModel.uiState,
-                    onError = { exception ->
-                        showExceptionSnackbar(snackbarHostState, scope, exception)
-                    },
-                    onPermissionsResult = {
-                        viewModel.initialLoad()
-                    },
-                    onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
-                    navController = navController,
-                    titleId = topBarTitle,
-                    viewModel = viewModel
-                )
-            }
-
-             */
-
             composable(
                 Screen.WalkSessionScreen.route,
                 enterTransition = enterTransition,
@@ -440,54 +341,6 @@ fun PedroNavigation(
                     }
                 )
             }
-
-            /*
-            composable(
-                Screen.WalkSessionScreen.route,
-                enterTransition = enterTransition,
-                exitTransition = exitTransition
-            ) {
-                val viewModel: WalkSessionViewModel =
-                    viewModel(
-                        factory =
-                        GeneralActivityViewModelFactory(
-                            healthConnectManager = healthConnectManager
-                        )
-                    )
-
-                sharedViewModel = viewModel
-                sharedTitle = Screen.WalkSessionScreen.titleId
-
-                val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
-                val permissions = viewModel.permissions
-                val onPermissionsResult = {
-                    viewModel.initialLoad()
-                }
-                val permissionsLauncher =
-                    rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                        onPermissionsResult()
-                    }
-                screenStack.add(Screen.WalkSessionScreen.route)
-                logScreenStack() // Log dello stack dopo aver aperto la schermata
-                SessionScreen(
-                    permissions = permissions,
-                    permissionsGranted = permissionsGranted,
-                    uiState = viewModel.uiState,
-                    onError = { exception ->
-                        showExceptionSnackbar(snackbarHostState, scope, exception)
-                    },
-                    onPermissionsResult = {
-                        viewModel.initialLoad()
-                    },
-                    onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
-                    navController = navController,
-                    titleId = topBarTitle,
-                    viewModel = viewModel
-                )
-            }
-
-             */
 
             composable(
                 Screen.DriveSessionScreen.route,
@@ -518,53 +371,6 @@ fun PedroNavigation(
                 )
             }
 
-            /*
-            composable(
-                Screen.DriveSessionScreen.route,
-                enterTransition = enterTransition,
-                exitTransition = exitTransition
-            ) {
-                val viewModel: DriveSessionViewModel =
-                    viewModel(
-                        factory =
-                        GeneralActivityViewModelFactory(
-                            healthConnectManager = healthConnectManager
-                        )
-                    )
-
-                sharedViewModel = viewModel
-                sharedTitle = Screen.DriveSessionScreen.titleId
-
-                val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
-                val permissions = viewModel.permissions
-                val onPermissionsResult = {
-                    viewModel.initialLoad()
-                }
-                val permissionsLauncher =
-                    rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                        onPermissionsResult()
-                    }
-                screenStack.add(Screen.DriveSessionScreen.route)
-                logScreenStack() // Log dello stack dopo aver aperto la schermata
-                SessionScreen(
-                    permissions = permissions,
-                    permissionsGranted = permissionsGranted,
-                    uiState = viewModel.uiState,
-                    onError = { exception ->
-                        showExceptionSnackbar(snackbarHostState, scope, exception)
-                    },
-                    onPermissionsResult = {
-                        viewModel.initialLoad()
-                    },
-                    onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
-                    navController = navController,
-                    titleId = topBarTitle,
-                    viewModel = viewModel
-                )
-            }
-
-             */
             composable(
                 Screen.SitSessionScreen.route,
                 enterTransition = enterTransition,
@@ -593,54 +399,6 @@ fun PedroNavigation(
                     }
                 )
             }
-
-/*
-            composable(
-                Screen.SitSessionScreen.route,
-                enterTransition = enterTransition,
-                exitTransition = exitTransition
-            ) {
-                val viewModel: SitSessionViewModel =
-                    viewModel(
-                        factory =
-                        GeneralActivityViewModelFactory(
-                            healthConnectManager = healthConnectManager
-                        )
-                    )
-
-                sharedViewModel = viewModel
-                sharedTitle = Screen.SitSessionScreen.titleId
-
-                val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
-                val permissions = viewModel.permissions
-                val onPermissionsResult = {
-                    viewModel.initialLoad()
-                }
-                val permissionsLauncher =
-                    rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                        onPermissionsResult()
-                    }
-                screenStack.add(Screen.SitSessionScreen.route)
-                logScreenStack() // Log dello stack dopo aver aperto la schermata
-                SessionScreen(
-                    permissions = permissions,
-                    permissionsGranted = permissionsGranted,
-                    uiState = viewModel.uiState,
-                    onError = { exception ->
-                        showExceptionSnackbar(snackbarHostState, scope, exception)
-                    },
-                    onPermissionsResult = {
-                        viewModel.initialLoad()
-                    },
-                    onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
-                    navController = navController,
-                    titleId = topBarTitle,
-                    viewModel = viewModel
-                )
-            }
-
- */
 
             composable(
                 Screen.ListenSessionScreen.route,
@@ -671,54 +429,6 @@ fun PedroNavigation(
                 )
             }
 
-            /*
-            composable(
-                Screen.ListenSessionScreen.route,
-                enterTransition = enterTransition,
-                exitTransition = exitTransition
-            ) {
-                val viewModel: ListenSessionViewModel =
-                    viewModel(
-                        factory =
-                        GeneralActivityViewModelFactory(
-                            healthConnectManager = healthConnectManager
-                        )
-                    )
-
-                sharedViewModel = viewModel
-                sharedTitle = Screen.ListenSessionScreen.titleId
-
-                val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
-                val permissions = viewModel.permissions
-                val onPermissionsResult = {
-                    viewModel.initialLoad()
-                }
-                val permissionsLauncher =
-                    rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                        onPermissionsResult()
-                    }
-                screenStack.add(Screen.ListenSessionScreen.route)
-                logScreenStack() // Log dello stack dopo aver aperto la schermata
-                SessionScreen(
-                    permissions = permissions,
-                    permissionsGranted = permissionsGranted,
-                    uiState = viewModel.uiState,
-                    onError = { exception ->
-                        showExceptionSnackbar(snackbarHostState, scope, exception)
-                    },
-                    onPermissionsResult = {
-                        viewModel.initialLoad()
-                    },
-                    onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
-                    navController = navController,
-                    titleId = topBarTitle,
-                    viewModel = viewModel
-                )
-            }
-
-             */
-
             composable(
                 Screen.WeightScreen.route,
                 enterTransition = enterTransition,
@@ -747,50 +457,6 @@ fun PedroNavigation(
                     }
                 )
             }
-            /*
-            composable(Screen.WeightScreen.route) {
-                val viewModel: LiftSessionViewModel =
-                    viewModel(
-                        factory =
-                        GeneralActivityViewModelFactory(
-                            healthConnectManager = healthConnectManager
-                        )
-                    )
-
-                sharedViewModel = viewModel
-                sharedTitle = Screen.WeightScreen.titleId
-
-                val permissionsGranted by viewModel.permissionsGranted
-                val permissions = viewModel.permissions
-                val sessionsList by viewModel.sessionsList
-
-                val onPermissionsResult = {
-                    viewModel.initialLoad()
-                }
-                val permissionsLauncher =
-                    rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                        onPermissionsResult()
-                    }
-                screenStack.add(Screen.WeightScreen.route)
-                logScreenStack() // Log dello stack dopo aver aperto la schermata
-                SessionScreen(
-                    permissions = permissions,
-                    permissionsGranted = permissionsGranted,
-                    uiState = viewModel.uiState,
-                    onError = { exception ->
-                        showExceptionSnackbar(snackbarHostState, scope, exception)
-                    },
-                    onPermissionsResult = {
-                        viewModel.initialLoad()
-                    },
-                    onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
-                    navController = navController,
-                    titleId = topBarTitle,
-                    viewModel = viewModel
-                )
-            }
-
-             */
 
             composable(
                 Screen.YogaSessionScreen.route,
@@ -820,53 +486,6 @@ fun PedroNavigation(
                     }
                 )
             }
-            /*
-            composable(
-                Screen.YogaSessionScreen.route,
-                enterTransition = enterTransition,
-                exitTransition = exitTransition
-            ) {
-                val viewModel: YogaSessionViewModel =
-                    viewModel(
-                        factory =
-                        GeneralActivityViewModelFactory(
-                            healthConnectManager = healthConnectManager
-                        )
-                    )
-
-                sharedViewModel = viewModel
-                sharedTitle = Screen.YogaSessionScreen.titleId
-
-                val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
-                val permissions = viewModel.permissions
-                val onPermissionsResult = {
-                    viewModel.initialLoad()
-                }
-                val permissionsLauncher =
-                    rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                        onPermissionsResult()
-                    }
-                screenStack.add(Screen.YogaSessionScreen.route)
-                logScreenStack() // Log dello stack dopo aver aperto la schermata
-                SessionScreen(
-                    permissions = permissions,
-                    permissionsGranted = permissionsGranted,
-                    uiState = viewModel.uiState,
-                    onError = { exception ->
-                        showExceptionSnackbar(snackbarHostState, scope, exception)
-                    },
-                    onPermissionsResult = {
-                        viewModel.initialLoad()
-                    },
-                    onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
-                    navController = navController,
-                    titleId = topBarTitle,
-                    viewModel = viewModel
-                )
-            }
-
-             */
 
             composable(
                 Screen.CycleSessionScreen.route,
@@ -897,54 +516,6 @@ fun PedroNavigation(
                 )
             }
 
-            /*
-            composable(
-                Screen.CycleSessionScreen.route,
-                enterTransition = enterTransition,
-                exitTransition = exitTransition
-            ) {
-                val viewModel: CycleSessionViewModel =
-                    viewModel(
-                        factory =
-                        GeneralActivityViewModelFactory(
-                            healthConnectManager = healthConnectManager
-                        )
-                    )
-
-                sharedViewModel = viewModel
-                sharedTitle = Screen.CycleSessionScreen.titleId
-
-                val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
-                val permissions = viewModel.permissions
-                val onPermissionsResult = {
-                    viewModel.initialLoad()
-                }
-                val permissionsLauncher =
-                    rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                        onPermissionsResult()
-                    }
-                screenStack.add(Screen.CycleSessionScreen.route)
-                logScreenStack() // Log dello stack dopo aver aperto la schermata
-                SessionScreen(
-                    permissions = permissions,
-                    permissionsGranted = permissionsGranted,
-                    uiState = viewModel.uiState,
-                    onError = { exception ->
-                        showExceptionSnackbar(snackbarHostState, scope, exception)
-                    },
-                    onPermissionsResult = {
-                        viewModel.initialLoad()
-                    },
-                    onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
-                    navController = navController,
-                    titleId = topBarTitle,
-                    viewModel = viewModel
-                )
-            }
-
-             */
-
             composable(
                 Screen.TrainSessionScreen.route,
                 enterTransition = enterTransition,
@@ -974,53 +545,6 @@ fun PedroNavigation(
                 )
             }
 
-            /*
-            composable(
-                Screen.TrainSessionScreen.route,
-                enterTransition = enterTransition,
-                exitTransition = exitTransition
-            ) {
-                val viewModel: TrainSessionViewModel =
-                    viewModel(
-                        factory =
-                        GeneralActivityViewModelFactory(
-                            healthConnectManager = healthConnectManager
-                        )
-                    )
-
-                sharedViewModel = viewModel
-                sharedTitle = Screen.TrainSessionScreen.titleId
-
-                val permissionsGranted by viewModel.permissionsGranted
-                val sessionsList by viewModel.sessionsList
-                val permissions = viewModel.permissions
-                val onPermissionsResult = {
-                    viewModel.initialLoad()
-                }
-                val permissionsLauncher =
-                    rememberLauncherForActivityResult(viewModel.permissionsLauncher) {
-                        onPermissionsResult()
-                    }
-                screenStack.add(Screen.TrainSessionScreen.route)
-                logScreenStack() // Log dello stack dopo aver aperto la schermata
-                SessionScreen(
-                    permissions = permissions,
-                    permissionsGranted = permissionsGranted,
-                    uiState = viewModel.uiState,
-                    onError = { exception ->
-                        showExceptionSnackbar(snackbarHostState, scope, exception)
-                    },
-                    onPermissionsResult = {
-                        viewModel.initialLoad()
-                    },
-                    onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
-                    navController = navController,
-                    titleId = topBarTitle,
-                    viewModel = viewModel
-                )
-            }
-
-             */
             composable(Screen.MyScreenRecords.route) { MyScreenRecords(navController) }
 
             composable(
