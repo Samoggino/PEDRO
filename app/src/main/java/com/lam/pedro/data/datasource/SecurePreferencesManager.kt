@@ -93,16 +93,16 @@ object SecurePreferencesManager {
     }
 
     /**
-     * Cancella tutti i dati memorizzati nelle SharedPreferences crittografate.
-     * Utile per eseguire il logout dell'utente.
-     *
+     * Cancella tutti i dati relativi al login dalle SharedPreferences crittografate.
      */
-    fun clearSecurePrefs() {
+    fun logoutSecurePrefs() {
         checkInitialized()
 
-        // FIXME: non deve cancellare tutto, ma solo i campi di login
+        // Specifica le chiavi relative al login da rimuovere
+        val loginKeys = listOf(ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, UUID)
+
         with(encryptedPrefs!!.edit()) {
-            clear()
+            loginKeys.forEach { remove(it) } // Rimuovi solo le chiavi specificate
             apply()
         }
     }

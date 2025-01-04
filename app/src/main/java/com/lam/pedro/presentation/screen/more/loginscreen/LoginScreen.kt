@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen.loginscreen
+package com.lam.pedro.presentation.screen.more.loginscreen
 
 
 import android.util.Log
@@ -41,14 +41,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lam.pedro.R
 import com.lam.pedro.presentation.component.LinkedApp
-import com.lam.pedro.presentation.screen.more.loginscreen.SupabaseAuthViewModel
-import com.lam.pedro.presentation.screen.more.loginscreen.SupabaseAuthViewModelFactory
+import com.lam.pedro.presentation.navigation.Screen
 
 @Composable
 fun LoginScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: SupabaseAuthViewModel = viewModel(factory = SupabaseAuthViewModelFactory())
 ) {
-    val viewModel: SupabaseAuthViewModel = viewModel(factory = SupabaseAuthViewModelFactory())
     var isPasswordVisible by remember { mutableStateOf(false) }
 
     // al lancio fai una stampa
@@ -124,7 +123,7 @@ fun LoginScreen(
             Text("Password dimenticata?")
         }
 
-        TextButton(onClick = { viewModel.signUp(navController) }) {
+        TextButton(onClick = { navController.navigate(Screen.RegisterScreen.route) }) {
             Text("Non hai un account? Registrati")
         }
 
