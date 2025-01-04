@@ -2,6 +2,7 @@ package com.lam.pedro.presentation.screen.more.loginscreen
 
 import android.util.Log
 import com.lam.pedro.data.datasource.SupabaseClient.supabase
+import com.lam.pedro.data.datasource.SupabaseClient.userSession
 import com.lam.pedro.presentation.screen.loginscreen.User
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
@@ -9,11 +10,11 @@ import io.github.jan.supabase.postgrest.query.Columns
 object LoginRegisterHelper {
     fun checkCredentials(email: String, password: String): Boolean {
         if (email.isEmpty() || !email.contains("@") || !email.contains(".")) {
-            Log.e("Supabase-Auth", "ERRORE: signInAuth: Email non valida")
+            Log.e("Supabase", "ERRORE: checkCredentials: Email non valida")
             return false
         }
         if (password.isEmpty() || password.length < 8) {
-            Log.e("Supabase-Auth", "ERRORE: signInAuth: Password non valida")
+            Log.e("Supabase", "ERRORE: checkCredentials: Password non valida")
             return false
         }
         return true
@@ -45,6 +46,19 @@ object LoginRegisterHelper {
         } catch (e: Exception) {
             Log.e("Supabase", "Errore nel controllo dell'utente: ${e.message}")
             false
+        }
+    }
+
+    suspend fun checkUserLoggedIn(fromLogin: Boolean): LoadingState {
+        val session = userSession()
+        return if (session != null) {
+            if (fromLogin) {
+                LoadingState.Success("Login avvenuto con successo", true)
+            } else {
+                LoadingState.Success("Utente già loggato", true)
+            }
+        } else {
+            LoadingState.Error("Utente non loggato", true)
         }
     }
 }

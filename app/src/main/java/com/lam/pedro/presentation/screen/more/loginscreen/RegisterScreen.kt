@@ -1,158 +1,177 @@
 package com.lam.pedro.presentation.screen.more.loginscreen
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lam.pedro.R
-import com.lam.pedro.presentation.component.LinkedApp
 import com.lam.pedro.presentation.navigation.Screen
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
     navController: NavController,
-    viewModel: ViewModelRegister = viewModel(factory = ViewModelRegisterFactory())
+    viewModel: RegisterViewModel = RegisterViewModel
 ) {
 
-    val email by viewModel.email.collectAsState()
-    val password by viewModel.password.collectAsState()
-    val confirmPassword by viewModel.confirmPassword.collectAsState()
-    val isPasswordVisible by viewModel.isPasswordVisible.collectAsState()
-    val isConfirmPasswordVisible by viewModel.isConfirmPasswordVisible.collectAsState()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Join us",
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
+                    }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.White.copy(alpha = 0f)
+                )
+            )
+        },
     ) {
-        Text(
-            text = "Registrati",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        LinkedApp(R.drawable.supabase_logo_icon)
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        // Campo Email
-        EmailField(
-            value = email,
-            onValueChange = { viewModel.updateEmail(it) }
-        )
-
-        // Campo Password
-        PasswordTextField(
-            value = password,
-            onValueChange = { viewModel.updatePassword(it) },
-            label = "Password",
-            isPasswordVisible = isPasswordVisible,
-            onVisibilityChange = { viewModel.togglePasswordVisibility() }
-        )
-
-        // Campo Conferma Password
-        PasswordTextField(
-            value = confirmPassword,
-            onValueChange = { viewModel.updateConfirmPassword(it) },
-            label = "Conferma Password",
-            isPasswordVisible = isConfirmPasswordVisible,
-            onVisibilityChange = { viewModel.toggleConfirmPasswordVisibility() }
-        )
-
-
-        // Pulsante di registrazione
-        Button(
-            onClick = { viewModel.signUp(navController, email, password, confirmPassword) },
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 32.dp)
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Registrati")
-        }
 
-        TextButton(onClick = { navController.navigate(Screen.LoginScreen.route) }) {
-            Text("Hai già un account? Accedi")
-        }
+            val formData by viewModel.formData.collectAsState()
+            val isPasswordVisible by viewModel.isPasswordVisible.collectAsState()
 
+            val showDialog by viewModel.showDialog.collectAsState()
+            val signUpState by viewModel.state.collectAsState()
+
+            val email = formData.email
+            val password = formData.password
+            val confirmPassword = formData.confirmPassword
+
+            LoginRegisterDescriptor("\uD83C\uDF35Join the Gringos!\uD83C\uDF2E")
+
+            // Campo Email
+            EmailField(
+                value = email,
+                onValueChange = { viewModel.updateFormData(formData.copy(email = it)) }
+            )
+
+            // Campo Password
+            PasswordTextField(
+                value = password,
+                onValueChange = { viewModel.updateFormData(formData.copy(password = it)) },
+                label = "Password",
+                isPasswordVisible = isPasswordVisible,
+                onVisibilityChange = { viewModel.togglePasswordVisibility() }
+            )
+
+            // Campo Conferma Password
+            PasswordTextField(
+                value = confirmPassword,
+                onValueChange = { viewModel.updateFormData(formData.copy(confirmPassword = it)) },
+                label = "Conferma Password",
+                isPasswordVisible = isPasswordVisible,
+                onVisibilityChange = { viewModel.togglePasswordVisibility() }
+            )
+
+
+            // Pulsante di registrazione
+            Button(
+                onClick = { viewModel.signUp() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 32.dp)
+            ) {
+                Text("Join")
+            }
+
+            TextButton(onClick = { navController.navigate(Screen.LoginScreen.route) }) {
+                Text("Already have an account?")
+            }
+
+            WelcomeDialog(
+                showDialog = showDialog,
+                dialogState = signUpState, // Pass signUpState to the dialog
+                onDismiss = { viewModel.hideDialog() },
+                onNavigate = { navController.navigate(Screen.CommunityScreen.route) } // Navigate to MyScreenRecords
+            )
+
+        }
     }
 }
 
-
 @Composable
-fun EmailField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String = "Email", // Default label is "Email"
-    modifier: Modifier = Modifier
+fun WelcomeDialog(
+    showDialog: Boolean,
+    dialogState: LoadingState,
+    onDismiss: () -> Unit,
+    onNavigate: () -> Unit // Aggiungi il callback di navigazione
 ) {
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        trailingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(26.dp))
-    )
-}
-
-@Composable
-fun PasswordTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    isPasswordVisible: Boolean,
-    onVisibilityChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-        trailingIcon = {
-            IconButton(onClick = { onVisibilityChange(!isPasswordVisible) }) {
-                Icon(
-                    imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                    contentDescription = if (isPasswordVisible) "Nascondi password" else "Mostra password"
-                )
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                onDismiss()
+                if (dialogState is LoadingState.Success) {
+                    onNavigate() // Naviga solo in caso di successo
+                }
+            },
+            title = {
+                when (dialogState) {
+                    is LoadingState.Success -> Text("Benvenuto!")
+                    is LoadingState.Error -> Text("Errore")
+                    else -> null
+                }
+            },
+            text = {
+                when (dialogState) {
+                    is LoadingState.Success -> Text("\uD83C\uDF35${dialogState.message}\uD83C\uDF2E")
+                    is LoadingState.Error -> Text(dialogState.message)
+                    else -> null
+                }
+            },
+            confirmButton = {
+                Button(onClick = {
+                    onDismiss()
+                    if (dialogState is LoadingState.Success) {
+                        onNavigate() // Naviga solo in caso di successo
+                    }
+                }) {
+                    Text("OK")
+                }
             }
-        },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp)
-            .clip(RoundedCornerShape(26.dp))
-    )
+        )
+    }
 }

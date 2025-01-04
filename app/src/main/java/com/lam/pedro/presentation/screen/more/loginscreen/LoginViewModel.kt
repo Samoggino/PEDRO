@@ -1,17 +1,12 @@
 package com.lam.pedro.presentation.screen.more.loginscreen
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.lam.pedro.data.datasource.SecurePreferencesManager.logoutSecurePrefs
 import com.lam.pedro.data.datasource.SecurePreferencesManager.saveTokens
 import com.lam.pedro.data.datasource.SupabaseClient.supabase
-import com.lam.pedro.data.datasource.SupabaseClient.userSession
 import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper.checkCredentials
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper.userExists
@@ -19,17 +14,45 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserSession
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class SupabaseAuthViewModel : ViewModel() {
+object LoginViewModel : ViewModel() {
 
-    var email by mutableStateOf("")
-    var password by mutableStateOf("")
+    data class LoginFormData(
+        val email: String = "",
+        val password: String = "",
+    )
 
-    var errorMessage by mutableStateOf("")
-    var showErrorDialog by mutableStateOf(false)
-    var isLoading by mutableStateOf(false)
+    private val _loginFormData = MutableStateFlow(LoginFormData())
+    val loginFormData: StateFlow<LoginFormData> = _loginFormData.asStateFlow()
 
+    fun updateLoginFormData(newFormData: LoginFormData) {
+        _loginFormData.value = newFormData
+    }
+
+    private val _isLoginPasswordVisible = MutableStateFlow(false)
+    val isLoginPasswordVisible: StateFlow<Boolean> = _isLoginPasswordVisible.asStateFlow()
+
+    fun toggleLoginPasswordVisibility() {
+        _isLoginPasswordVisible.value = !_isLoginPasswordVisible.value
+    }
+
+    private val _showLoginDialog = MutableStateFlow(false)
+    val showLoginDialog: StateFlow<Boolean> = _showLoginDialog.asStateFlow()
+
+    fun hideDialog() {
+        _showLoginDialog.value = false
+    }
+
+    private val _loginState = MutableStateFlow<LoadingState>(LoadingState.Idle)
+    val state: StateFlow<LoadingState> = _loginState.asStateFlow()
+
+    private val _showDialog = MutableStateFlow(false)
+    val showDialog: StateFlow<Boolean> = _showDialog.asStateFlow()
 
     /**
      * Funzione per il login.
@@ -39,23 +62,31 @@ class SupabaseAuthViewModel : ViewModel() {
      *
      * @param navController Il controller di navigazione.
      */
-    fun login(navController: NavController) {
-        if (!checkCredentials(email, password)) {
-            errorMessage = "Credenziali non valide"
-            showErrorDialog = true
-            return
-        }
+    fun login() {
 
-        viewModelScope.launch {
-            isLoading = true
-            val session = logInAuth(email, password)
-            if (session != null) {
-                navController.navigate(Screen.MyScreenRecords.route)
-            } else {
-                errorMessage = "Email o password errati."
-                showErrorDialog = true
+        _loginState.value = LoadingState.Loading
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            val email = loginFormData.value.email
+            val password = loginFormData.value.password
+
+            if (!checkCredentials(email, password)) {
+                _loginState.value = LoadingState.Error("Credenziali non valide", true)
+                _showDialog.value = true
+
+                return@launch
             }
-            isLoading = false
+
+            val session = logInAuth()
+            if (session != null) {
+                _loginState.value = LoadingState.Success("Login avvenuto con successo", true)
+                _showDialog.value = true
+            } else {
+                _loginState.value = LoadingState.Error("Errore durante il login", true)
+                _showDialog.value = true
+            }
+            _loginState.value = LoadingState.Idle
         }
     }
 
@@ -69,7 +100,9 @@ class SupabaseAuthViewModel : ViewModel() {
      * @param password La password dell'utente.
      * @return La sessione utente se il login ha successo, altrimenti null.
      */
-    private suspend fun logInAuth(email: String, password: String): UserSession? {
+    private suspend fun logInAuth(): UserSession? {
+        val email = loginFormData.value.email
+        val password = loginFormData.value.password
         if (!checkCredentials(email, password)) return null
         if (!userExists(email)) return null
 
@@ -108,7 +141,9 @@ class SupabaseAuthViewModel : ViewModel() {
      * @param navController Il controller di navigazione.
      */
     fun logout(navController: NavController) {
-        viewModelScope.launch {
+
+        _loginState.value = LoadingState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val supabase = supabase()
 
@@ -119,7 +154,9 @@ class SupabaseAuthViewModel : ViewModel() {
 
                 Log.d("Supabase", "Logout avvenuto con successo")
 
-                navController.navigate(Screen.LoginScreen.route)
+                _loginState.value = LoadingState.Success("Logout avvenuto con successo", true)
+                _showDialog.value = true
+
             } catch (e: Exception) {
                 Log.e("Supabase", "Errore durante il logout: ${e.message}")
             }
@@ -127,34 +164,5 @@ class SupabaseAuthViewModel : ViewModel() {
     }
 
 
-    fun checkUserLoggedIn(fromLogin: Boolean) {
-        viewModelScope.launch {
-            val session = userSession()
-            if (session != null) {
-//                navController.navigate(Screen.ExerciseSessionData.route)
-            } else {
-                if (!fromLogin) {
-                    errorMessage = "Effettua il login per accedere"
-                    showErrorDialog = true
-                } else {
-//                    navController.navigate(Screen.LoginScreen.route)
-                }
-            }
-        }
-    }
-}
 
-/**
- * Factory per la creazione di un [SupabaseAuthViewModel].
- *
- * @return Un'istanza di [SupabaseAuthViewModel].
- */
-class SupabaseAuthViewModelFactory : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(SupabaseAuthViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return SupabaseAuthViewModel() as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
 }

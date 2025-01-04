@@ -1,152 +1,154 @@
 package com.lam.pedro.presentation.screen.more.loginscreen
 
-
-import android.util.Log
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lam.pedro.R
-import com.lam.pedro.presentation.component.LinkedApp
 import com.lam.pedro.presentation.navigation.Screen
+import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper.checkUserLoggedIn
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     navController: NavController,
-    viewModel: SupabaseAuthViewModel = viewModel(factory = SupabaseAuthViewModelFactory())
+    viewModel: LoginViewModel = LoginViewModel
 ) {
-    var isPasswordVisible by remember { mutableStateOf(false) }
 
-    // al lancio fai una stampa
     LaunchedEffect(true) {
-        Log.i("Supabase", "LaunchedEffect in LoginScreen")
-
-        // controlla al mount che l'utente sia loggato o abbia un token
-        viewModel.checkUserLoggedIn(true)
-
+        // check if user is already logged in
+        checkUserLoggedIn(true)
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Accedi",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        LinkedApp(R.drawable.supabase_logo_icon)
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        // Campo Email
-        TextField(
-            value = viewModel.email,
-            onValueChange = { viewModel.email = it },
-            label = { Text("Email") },
-            trailingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(26.dp))
-        )
-
-
-        TextField(
-            value = viewModel.password,
-            onValueChange = { viewModel.password = it },
-            label = { Text("Password") },
-            visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
-                    Icon(
-                        imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                        contentDescription = if (isPasswordVisible) "Nascondi password" else "Mostra password"
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Login",
+                        style = MaterialTheme.typography.headlineSmall
                     )
-                }
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp)
-                .clip(RoundedCornerShape(26.dp))
-        )
-
-        // Pulsante di accesso
-        Button(
-            onClick = { viewModel.login(navController) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 32.dp)
-        ) {
-            Text("Accedi")
-        }
-
-        TextButton(onClick = { /* Handle Forgot Password */ }) {
-            Text("Password dimenticata?")
-        }
-
-        TextButton(onClick = { navController.navigate(Screen.RegisterScreen.route) }) {
-            Text("Non hai un account? Registrati")
-        }
-
-        if (viewModel.isLoading) {
-            CircularProgressIndicator()
-        }
-
-        if (viewModel.showErrorDialog) {
-            AlertDialog(
-                onDismissRequest = { viewModel.showErrorDialog = false },
-                title = { Text("Errore di accesso") },
-                text = { Text(viewModel.errorMessage) },
-                confirmButton = {
-                    Button(onClick = { viewModel.showErrorDialog = false }) {
-                        Text("OK")
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Rounded.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
                     }
-                }
-            )
-        }
-        // aggiungi il logout
-        TextButton(onClick = { viewModel.logout(navController) }) {
-            Text("Logout")
-        }
 
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.White.copy(alpha = 0f)
+                )
+            )
+        },
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            val formData by viewModel.loginFormData.collectAsState()
+            val isPasswordVisible by viewModel.isLoginPasswordVisible.collectAsState()
+            val showDialog by viewModel.showLoginDialog.collectAsState()
+
+            val email = formData.email
+            val password = formData.password
+            val state by viewModel.state.collectAsState()
+
+
+            LoginRegisterDescriptor("\uD83C\uDF35Rejoin us Gringos!\uD83C\uDF2E")
+
+            EmailField(
+                value = email,
+                onValueChange = { viewModel.updateLoginFormData(formData.copy(email = it)) },
+                label = "Email",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(26.dp)),
+            )
+
+            PasswordTextField(
+                value = password,
+                onValueChange = { viewModel.updateLoginFormData(formData.copy(password = it)) },
+                isPasswordVisible = isPasswordVisible,
+                label = "Password",
+                onVisibilityChange = { viewModel.toggleLoginPasswordVisibility() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(26.dp)),
+            )
+
+            // Login button
+            TextButton(
+                onClick = { viewModel.login() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 32.dp)
+            ) {
+                Text("Login")
+            }
+
+            /**
+             *  TODO: capire come fare il "password dimenticata"
+             */
+            TextButton(onClick = {
+                // do something to recover password
+            }) {
+                Text("Forgot password?")
+            }
+
+            TextButton(onClick = { navController.navigate(Screen.RegisterScreen.route) }) {
+                Text("You are not registered yet? Join us!")
+            }
+
+            if (state is LoadingState.Loading) {
+                CircularProgressIndicator()
+            }
+
+            WelcomeDialog(
+                showDialog = showDialog,
+                dialogState = state,
+                onDismiss = { viewModel.hideDialog() },
+                onNavigate = { navController.navigate(Screen.HomeScreen.route) }
+            )
+
+            // aggiungi il logout
+            TextButton(onClick = { viewModel.logout(navController) }) {
+                Text("Logout")
+            }
+
+        }
     }
 }
