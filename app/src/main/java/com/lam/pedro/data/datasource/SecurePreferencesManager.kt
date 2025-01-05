@@ -2,12 +2,8 @@ package com.lam.pedro.data.datasource
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.lam.pedro.data.datasource.SupabaseClient.supabase
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.user.UserSession
 
 object SecurePreferencesManager {
     private const val PREFS_NAME = "secure_prefs"
@@ -64,40 +60,10 @@ object SecurePreferencesManager {
     }
 
     /**
-     * Ottiene il token di accesso dalle SharedPreferences crittografate.
-     *
-     * @return Il token di accesso o null se non è presente.
-     */
-    private fun getAccessToken(): String? {
-        checkInitialized()
-        return encryptedPrefs!!.getString(ACCESS_TOKEN_KEY, null)
-    }
-
-    /**
-     * Ottiene il token di aggiornamento dalle SharedPreferences crittografate.
-     *
-     * @return Il token di aggiornamento o null se non è presente.
-     */
-    private fun getRefreshToken(): String? {
-        checkInitialized()
-        return encryptedPrefs!!.getString(REFRESH_TOKEN_KEY, null)
-    }
-
-    /**
-     * Verifica se l'utente è autenticato controllando se esiste un access token salvato.
-     *
-     * @return true se l'access token esiste, altrimenti false.
-     */
-    fun isUserAuthenticated(): Boolean {
-        return !getAccessToken().isNullOrEmpty()
-    }
-
-    /**
      * Cancella tutti i dati relativi al login dalle SharedPreferences crittografate.
      */
     fun logoutSecurePrefs() {
         checkInitialized()
-
         // Specifica le chiavi relative al login da rimuovere
         val loginKeys = listOf(ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, UUID)
 
@@ -108,38 +74,12 @@ object SecurePreferencesManager {
     }
 
     /**
-     * Fa refresh della session con il refresh token
-     *
-     * @return La nuova sessione utente se il refresh ha successo, altrimenti null.
-     * @see UserSession
+     * Restituisce lo UUID dell'utente su Supabase.
+     * Se non è presente, restituisce null.
      */
-    suspend fun refreshSession(): UserSession? {
-        // Funzione per recuperare il refresh token salvato
-        val refreshToken = getRefreshToken()
-        return if (refreshToken != null) {
-            try {
-
-                val session = supabase().auth.refreshSession(refreshToken)
-
-                // Salva i nuovi token
-                saveTokens(session.accessToken, session.refreshToken, session.user?.id)
-                session.accessToken // Ritorna il nuovo access token
-
-            } catch (e: Exception) {
-                Log.e("Supabase", "Errore nel refresh del token: ${e.message}")
-            }
-            null
-        } else {
-            Log.e("Supabase", "Nessun refresh token trovato")
-            null
-        }
-    }
-
-
     fun getUUID(): String? {
         checkInitialized()
         return encryptedPrefs!!.getString(UUID, null)
     }
-
 
 }

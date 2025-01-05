@@ -3,11 +3,8 @@ package com.lam.pedro.presentation.screen.more.loginscreen
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
-import com.lam.pedro.data.datasource.SecurePreferencesManager.logoutSecurePrefs
 import com.lam.pedro.data.datasource.SecurePreferencesManager.saveTokens
 import com.lam.pedro.data.datasource.SupabaseClient.supabase
-import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper.checkCredentials
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper.userExists
 import io.github.jan.supabase.auth.auth
@@ -60,7 +57,6 @@ object LoginViewModel : ViewModel() {
      * Questa funzione verifica le credenziali dell'utente e, in caso di successo,
      * naviga verso la schermata di lettura dei dati di Health Connect.
      *
-     * @param navController Il controller di navigazione.
      */
     fun login() {
 
@@ -96,8 +92,6 @@ object LoginViewModel : ViewModel() {
      *
      * Questa funzione tenta di autenticare l'utente utilizzando le credenziali fornite.
      *
-     * @param email L'email dell'utente.
-     * @param password La password dell'utente.
      * @return La sessione utente se il login ha successo, altrimenti null.
      */
     private suspend fun logInAuth(): UserSession? {
@@ -131,38 +125,4 @@ object LoginViewModel : ViewModel() {
             null
         }
     }
-
-
-    /**
-     * Funzione per il logout dell'utente.
-     *
-     * Questa funzione pulisce la sessione e reindirizza l'utente alla schermata di login.
-     *
-     * @param navController Il controller di navigazione.
-     */
-    fun logout(navController: NavController) {
-
-        _loginState.value = LoadingState.Loading
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val supabase = supabase()
-
-                // pulisci la sessione
-                supabase.auth.sessionManager.deleteSession()
-                supabase.auth.signOut()
-                logoutSecurePrefs()
-
-                Log.d("Supabase", "Logout avvenuto con successo")
-
-                _loginState.value = LoadingState.Success("Logout avvenuto con successo", true)
-                _showDialog.value = true
-
-            } catch (e: Exception) {
-                Log.e("Supabase", "Errore durante il logout: ${e.message}")
-            }
-        }
-    }
-
-
-
 }

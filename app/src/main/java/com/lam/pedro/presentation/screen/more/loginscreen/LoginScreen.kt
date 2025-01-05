@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,7 +20,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -32,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.lam.pedro.R
 import com.lam.pedro.presentation.navigation.Screen
-import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper.checkUserLoggedIn
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,11 +39,6 @@ fun LoginScreen(
     navController: NavController,
     viewModel: LoginViewModel = LoginViewModel
 ) {
-
-    LaunchedEffect(true) {
-        // check if user is already logged in
-        checkUserLoggedIn(true)
-    }
 
     Scaffold(
         topBar = {
@@ -59,7 +52,7 @@ fun LoginScreen(
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            imageVector = Icons.Rounded.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = stringResource(R.string.back)
                         )
                     }
@@ -143,11 +136,6 @@ fun LoginScreen(
                 onDismiss = { viewModel.hideDialog() },
                 onNavigate = { navController.navigate(Screen.HomeScreen.route) }
             )
-
-            // aggiungi il logout
-            TextButton(onClick = { viewModel.logout(navController) }) {
-                Text("Logout")
-            }
 
         }
     }

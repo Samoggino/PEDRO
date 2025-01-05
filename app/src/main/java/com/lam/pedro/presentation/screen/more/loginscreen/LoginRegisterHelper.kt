@@ -1,11 +1,14 @@
 package com.lam.pedro.presentation.screen.more.loginscreen
 
 import android.util.Log
+import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
+import com.lam.pedro.data.datasource.SecurePreferencesManager.logoutSecurePrefs
 import com.lam.pedro.data.datasource.SupabaseClient.supabase
-import com.lam.pedro.data.datasource.SupabaseClient.userSession
 import com.lam.pedro.presentation.screen.loginscreen.User
+import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import kotlinx.coroutines.withTimeoutOrNull
 
 object LoginRegisterHelper {
     fun checkCredentials(email: String, password: String): Boolean {
@@ -49,16 +52,36 @@ object LoginRegisterHelper {
         }
     }
 
-    suspend fun checkUserLoggedIn(fromLogin: Boolean): LoadingState {
-        val session = userSession()
-        return if (session != null) {
-            if (fromLogin) {
-                LoadingState.Success("Login avvenuto con successo", true)
-            } else {
-                LoadingState.Success("Utente già loggato", true)
-            }
-        } else {
-            LoadingState.Error("Utente non loggato", true)
+    /**
+     * Controlla se l'utente è loggato.
+     *
+     * @return Lo stato del login.
+     */
+    suspend fun checkUserLoggedIn(): LoginState {
+        return withTimeoutOrNull(5000L) { // Timeout di 5 secondi
+            getUUID()?.let {
+                LoginState.LoggedIn("Utente loggato")
+            } ?: LoginState.NotLoggedIn("Utente non loggato")
+        } ?: LoginState.Error("Timeout durante la verifica del login")
+    }
+
+    /**
+     * Funzione per il logout dell'utente.
+     */
+    suspend fun logout() {
+
+        try {
+            val supabase = supabase()
+
+            // pulisci la sessione
+            supabase.auth.sessionManager.deleteSession()
+            supabase.auth.signOut()
+            logoutSecurePrefs()
+
+            Log.d("Supabase", "Logout avvenuto con successo")
+
+        } catch (e: Exception) {
+            Log.e("Supabase", "Errore durante il logout: ${e.message}")
         }
     }
 }
