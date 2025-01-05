@@ -3,7 +3,6 @@ package com.lam.pedro.presentation.screen.more.loginscreen
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -18,6 +17,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -25,22 +25,22 @@ import androidx.compose.ui.unit.dp
 import com.lam.pedro.R
 import com.lam.pedro.presentation.component.LinkedApp
 
-
 @Composable
-fun EmailField(
+fun PersonalInfoField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String = "Email", // Default label is "Email"
+    icon: ImageVector = Icons.Filled.Email,
     modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .clip(RoundedCornerShape(26.dp)),
 ) {
     TextField(
         value = value,
         onValueChange = onValueChange,
         label = { Text(label) },
-        trailingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+        trailingIcon = { Icon(icon, contentDescription = null) },
         modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(26.dp))
     )
 }
 
@@ -48,10 +48,12 @@ fun EmailField(
 fun PasswordTextField(
     value: String,
     onValueChange: (String) -> Unit,
-    label: String,
+    label: String = "Password", // Default label is "Password"
     isPasswordVisible: Boolean,
     onVisibilityChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
+        .fillMaxWidth()
+        .clip(RoundedCornerShape(26.dp))
 ) {
     TextField(
         value = value,
@@ -68,9 +70,6 @@ fun PasswordTextField(
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         modifier = modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp)
-            .clip(RoundedCornerShape(26.dp))
     )
 }
 

@@ -7,7 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,7 +52,7 @@ fun RegisterScreen(
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            imageVector = Icons.Rounded.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = stringResource(R.string.back)
                         )
                     }
@@ -78,34 +79,51 @@ fun RegisterScreen(
             val signUpState by viewModel.state.collectAsState()
 
             val email = formData.email
+            val username = formData.username
             val password = formData.password
             val confirmPassword = formData.confirmPassword
 
             LoginRegisterDescriptor("\uD83C\uDF35Join the Gringos!\uD83C\uDF2E")
 
-            // Campo Email
-            EmailField(
-                value = email,
-                onValueChange = { viewModel.updateFormData(formData.copy(email = it)) }
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
 
-            // Campo Password
-            PasswordTextField(
-                value = password,
-                onValueChange = { viewModel.updateFormData(formData.copy(password = it)) },
-                label = "Password",
-                isPasswordVisible = isPasswordVisible,
-                onVisibilityChange = { viewModel.togglePasswordVisibility() }
-            )
+                // Campo Email
+                PersonalInfoField(
+                    value = email,
+                    onValueChange = { viewModel.updateFormData(formData.copy(email = it)) },
+                )
 
-            // Campo Conferma Password
-            PasswordTextField(
-                value = confirmPassword,
-                onValueChange = { viewModel.updateFormData(formData.copy(confirmPassword = it)) },
-                label = "Conferma Password",
-                isPasswordVisible = isPasswordVisible,
-                onVisibilityChange = { viewModel.togglePasswordVisibility() }
-            )
+                // Campo Username
+                PersonalInfoField(
+                    value = username,
+                    label = "Username",
+                    onValueChange = { viewModel.updateFormData(formData.copy(username = it)) },
+                    icon = Icons.Default.AccountBox,
+                )
+
+                // Campo Password
+                PasswordTextField(
+                    value = password,
+                    onValueChange = { viewModel.updateFormData(formData.copy(password = it)) },
+                    label = "Password",
+                    isPasswordVisible = isPasswordVisible,
+                    onVisibilityChange = { viewModel.togglePasswordVisibility() }
+                )
+
+                // Campo Conferma Password
+                PasswordTextField(
+                    value = confirmPassword,
+                    onValueChange = { viewModel.updateFormData(formData.copy(confirmPassword = it)) },
+                    label = "Conferma Password",
+                    isPasswordVisible = isPasswordVisible,
+                    onVisibilityChange = { viewModel.togglePasswordVisibility() }
+                )
+            }
 
 
             // Pulsante di registrazione
@@ -152,14 +170,14 @@ fun WelcomeDialog(
                 when (dialogState) {
                     is LoadingState.Success -> Text("Benvenuto!")
                     is LoadingState.Error -> Text("Errore")
-                    else -> null
+                    else -> {}
                 }
             },
             text = {
                 when (dialogState) {
                     is LoadingState.Success -> Text("\uD83C\uDF35${dialogState.message}\uD83C\uDF2E")
                     is LoadingState.Error -> Text(dialogState.message)
-                    else -> null
+                    else -> {}
                 }
             },
             confirmButton = {

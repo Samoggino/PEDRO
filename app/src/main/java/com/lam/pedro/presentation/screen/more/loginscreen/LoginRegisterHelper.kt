@@ -4,7 +4,6 @@ import android.util.Log
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.SecurePreferencesManager.logoutSecurePrefs
 import com.lam.pedro.data.datasource.SupabaseClient.supabase
-import com.lam.pedro.presentation.screen.loginscreen.User
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
@@ -34,7 +33,7 @@ object LoginRegisterHelper {
         return try {
             val userList = supabase()
                 .from("users")
-                .select(columns = Columns.list("id", "email")) {
+                .select(columns = Columns.list("id", "email", "username")) {
                     filter {
                         eq("email", email)
                     }

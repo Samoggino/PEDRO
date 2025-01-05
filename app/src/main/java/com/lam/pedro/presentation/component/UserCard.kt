@@ -1,14 +1,11 @@
 package com.lam.pedro.presentation.component
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,98 +32,69 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.lam.pedro.presentation.screen.loginscreen.User
-
-// Costanti
-private val IconSize = 70.dp
-private val RoundedCornerSize = 12.dp
-private val RoundedIconSize = 24.dp
-private val FollowButtonSize = IconSize * 0.45f
-private val PaddingRow = 16.dp
-private val NameHeight = 24.dp
-private const val AnimationDuration = 2500
-
-@Preview
-@Composable
-fun UserCardPreview() {
-    UserCard(
-        user = User(
-            id = "1",
-            email = "simosamoggia@gmail.com",
-            avatarUrl = "https://tfgeogkbrvekrzsgpllc.supabase.co/storage/v1/object/public/avatars/0539f7b7-ec21-4bd1-a8fe-bc8deb5e5260?t=2024-11-21T16%3A48%3A08.264Z"
-        ),
-        isFollowing = true,
-        onClick = {}
-    )
-}
+import com.lam.pedro.presentation.screen.community.AnimationDuration
+import com.lam.pedro.presentation.screen.community.FollowButtonSize
+import com.lam.pedro.presentation.screen.community.IconSize
+import com.lam.pedro.presentation.screen.community.NameHeight
+import com.lam.pedro.presentation.screen.more.loginscreen.User
+import com.lam.pedro.util.placeholder
 
 @Composable
-fun FollowButton(isFollowing: Boolean, onClick: () -> Unit) {
-    val iconColor by animateColorAsState(
-        targetValue = if (isFollowing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-        animationSpec = tween(durationMillis = AnimationDuration), label = ""
-    )
-    Icon(
-        imageVector = if (isFollowing) Icons.Default.Check else Icons.Default.Add,
-        contentDescription = if (isFollowing) "Followed" else "Follow",
-        tint = iconColor,
-        modifier = Modifier
-            .size(FollowButtonSize)
-            .clickable { onClick() }
-    )
-}
-
-@Composable
-fun UserCard(user: User, isFollowing: Boolean, onClick: () -> Unit) {
+fun UserCard(user: User, isFollowing: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val roundedCornerSize = 16.dp
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(RoundedCornerSize),
+        modifier = modifier
+            .clickable { onClick() }
+            .then(
+                if (isFollowing) Modifier.border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.primary,
+                    shape = RoundedCornerShape(roundedCornerSize)
+                ) else Modifier
+            ),
+        shape = RoundedCornerShape(roundedCornerSize),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(PaddingRow),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            user.avatarUrl?.let { Avatar(it) }
-            UserBody(user, isFollowing)
+            // Avatar
+            Avatar(user.avatarUrl)
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // User Info (email)
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = user.username,
+                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            // Follow Button
             FollowButton(isFollowing, onClick)
         }
     }
 }
 
-@Composable
-private fun UserBody(user: User, isFollowing: Boolean) {
-    Column(verticalArrangement = Arrangement.Center) {
-        Text(
-            text = user.email,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            text = if (isFollowing) "Following" else "Not Following",
-            style = MaterialTheme.typography.bodyMedium,
-            color = if (isFollowing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-        )
-    }
-}
 
 @Composable
-private fun Avatar(avatarUrl: String) {
-    if (avatarUrl.isNotBlank()) {
+private fun Avatar(avatarUrl: String?) {
+    if (!avatarUrl.isNullOrBlank()) {
         Image(
             painter = rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
@@ -137,7 +105,12 @@ private fun Avatar(avatarUrl: String) {
             contentDescription = "User Avatar",
             modifier = Modifier
                 .size(IconSize)
-                .clip(RoundedCornerShape(RoundedIconSize))
+                .clip(RoundedCornerShape(50))
+                .border(
+                    1.dp,
+                    MaterialTheme.colorScheme.primary,
+                    RoundedCornerShape(50)
+                )
         )
     } else {
         Icon(
@@ -145,56 +118,59 @@ private fun Avatar(avatarUrl: String) {
             contentDescription = "Default Avatar",
             modifier = Modifier
                 .size(IconSize)
-                .clip(RoundedCornerShape(RoundedIconSize)),
+                .clip(RoundedCornerShape(50)),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
 
 @Composable
-fun shimmerAnimation(): Brush {
-    val transition = rememberInfiniteTransition(label = "")
-    val shimmerTranslate by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1200f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = AnimationDuration,
-                easing = EaseInOut
-            ),
-            repeatMode = RepeatMode.Restart
-        ), label = ""
+fun FollowButton(isFollowing: Boolean, onClick: () -> Unit) {
+    val iconColor by animateColorAsState(
+        targetValue = if (isFollowing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+        animationSpec = tween(durationMillis = AnimationDuration), label = ""
     )
-    return Brush.linearGradient(
-        colors = listOf(
-            Color.DarkGray.copy(alpha = 0.4f),
-            Color.Black.copy(alpha = 0.2f),
-            Color.DarkGray.copy(alpha = 0.4f)
-        ),
-        start = Offset.Zero,
-        end = Offset(shimmerTranslate, shimmerTranslate)
+
+    val scale by animateFloatAsState(
+        targetValue = if (isFollowing) 1.2f else 1.0f,
+        animationSpec = tween(durationMillis = 200), label = ""
+    )
+
+    Icon(
+        imageVector = if (isFollowing) Icons.Default.Check else Icons.Default.Add,
+        contentDescription = if (isFollowing) "Followed" else "Follow",
+        tint = iconColor,
+        modifier = Modifier
+            .size(FollowButtonSize)
+            .scale(scale)
+            .clickable { onClick() }
+            .padding(4.dp)
+            .animateContentSize()
     )
 }
 
 @Composable
-fun UserPlaceholder(alpha: Float) {
+fun UserPlaceholder(alpha: Float, modifier: Modifier = Modifier) {
+
+    val isLoading = true
+
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(RoundedCornerSize),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(PaddingRow),
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Box(
                 modifier = Modifier
                     .size(IconSize)
-                    .clip(RoundedCornerShape(RoundedCornerSize))
-                    .background(shimmerAnimation())
+                    .clip(RoundedCornerShape(50))
+                    .placeholder(isLoading, MaterialTheme.colorScheme.onSurfaceVariant)
                     .graphicsLayer(alpha = alpha)
             )
             Spacer(modifier = Modifier.width(16.dp))
@@ -203,7 +179,7 @@ fun UserPlaceholder(alpha: Float) {
                     modifier = Modifier
                         .height(NameHeight)
                         .fillMaxWidth()
-                        .background(shimmerAnimation())
+                        .placeholder(isLoading, MaterialTheme.colorScheme.onSurfaceVariant)
                         .graphicsLayer(alpha = alpha)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -211,7 +187,7 @@ fun UserPlaceholder(alpha: Float) {
                     modifier = Modifier
                         .height(16.dp)
                         .fillMaxWidth()
-                        .background(shimmerAnimation())
+                        .placeholder(isLoading, MaterialTheme.colorScheme.onSurfaceVariant)
                         .graphicsLayer(alpha = alpha)
                 )
             }
@@ -219,12 +195,14 @@ fun UserPlaceholder(alpha: Float) {
             Box(
                 modifier = Modifier
                     .size(FollowButtonSize)
-                    .clip(RoundedCornerShape(RoundedCornerSize))
-                    .background(shimmerAnimation())
+                    .clip(RoundedCornerShape(50))
+                    .placeholder(isLoading, MaterialTheme.colorScheme.onSurfaceVariant)
                     .graphicsLayer(alpha = alpha)
             )
+
         }
+        Spacer(modifier = Modifier.width(16.dp))
     }
+
+
 }
-
-

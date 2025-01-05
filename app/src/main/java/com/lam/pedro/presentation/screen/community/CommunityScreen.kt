@@ -12,15 +12,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -32,21 +38,31 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import com.lam.pedro.R
 import com.lam.pedro.presentation.component.UserCard
 import com.lam.pedro.presentation.component.UserPlaceholder
-import com.lam.pedro.presentation.screen.loginscreen.User
+import com.lam.pedro.presentation.screen.more.loginscreen.User
 import kotlinx.coroutines.launch
+
+val IconSize = 70.dp
+val FollowButtonSize = IconSize * 0.45f
+val NameHeight = 24.dp
+const val AnimationDuration = 2500
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CommunityScreen() {
-    var isRefreshing by remember { mutableStateOf(false) }
-    val viewModel: ViewModelFollowScreen = viewModel(factory = ViewModelFollowScreenFactory())
-    val userFollowMap by viewModel.userFollowMap.collectAsState() // Osserva il Flow
-
+fun CommunityScreen(
+    navController: NavController,
+    viewModel: CommunityScreenViewModel = CommunityScreenViewModel,
+) {
+    val userFollowMap by viewModel.userFollowMap.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+
+    var isRefreshing by remember { mutableStateOf(false) }
+    var followingOnly by remember { mutableStateOf(false) }  // Usa lo stesso stato per cuore e filtro
 
     // Carica i dati iniziali al primo caricamento
     LaunchedEffect(true) {
@@ -57,12 +73,52 @@ fun CommunityScreen() {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Follow Screen") },
-                colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
+                modifier = Modifier.fillMaxWidth(),
+                title = {
+                    Text(
+                        text = "Community",
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            followingOnly =
+                                !followingOnly  // Cambia lo stato del cuore e del filtro
+                        },
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        // Animazione per il cuore (riempito o vuoto)
+                        val heartScale by animateFloatAsState(
+                            targetValue = if (followingOnly) 1.2f else 1f, // Aumenta la dimensione del cuore quando è pieno
+                            animationSpec = tween(durationMillis = 300),
+                            label = "" // Tempo di animazione
+                        )
+
+                        Icon(
+                            imageVector = if (followingOnly) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                            contentDescription = "Follow filter",
+                            tint = Color.Red.copy(alpha = heartScale) // Tint rosso e con alpha che cambia in base all'animazione
+                        )
+                    }
+                }
             )
         }
     ) { padding ->
-        Box(modifier = Modifier.padding(padding)) {
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
             // Schermata con PullToRefresh
             PullToRefreshBox(
                 isRefreshing = isRefreshing,
@@ -75,19 +131,20 @@ fun CommunityScreen() {
                 },
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFF1B94F3))
+                    .background(MaterialTheme.colorScheme.surface)
             ) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+
                     Row {
                         UserFollowList(
                             userFollowMap = userFollowMap,
+                            followingOnly = followingOnly, // Passa lo stato del filtro
                             onFollowToggle = { user, isFollowing ->
                                 coroutineScope.launch {
                                     viewModel.toggleFollowUser(user, isFollowing)
-                                    // Modifica solo lo stato senza ricaricare tutto
                                     userFollowMap?.let {
                                         val updatedMap = it.toMutableMap()
                                         updatedMap[user] = !isFollowing
@@ -97,6 +154,7 @@ fun CommunityScreen() {
                             }
                         )
                     }
+
                     Row(
                         modifier = Modifier.fillMaxSize(),
                         horizontalArrangement = Arrangement.Center
@@ -107,37 +165,50 @@ fun CommunityScreen() {
             }
         }
     }
+
 }
 
 @Composable
 fun UserFollowList(
     userFollowMap: Map<User, Boolean>?,
+    followingOnly: Boolean, // Stato del filtro
     onFollowToggle: (User, Boolean) -> Unit
 ) {
     val isLoading = userFollowMap == null
     val alpha by animateFloatAsState(
         targetValue = if (isLoading) 1f else 0f, // Se i dati sono in caricamento, mantieni la shimmer
         animationSpec = tween(
-            durationMillis = 3000,
+            durationMillis = 1500,
             easing = EaseInOut
-        ), label = "FloatAnimation" // Animazione più lenta per il fade-out
+        ), label = "FloatAnimation"
     )
 
-    LazyColumn(
-        modifier = Modifier
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
+    LazyColumn(modifier = Modifier.padding(4.dp)) {
+        val userModifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+
         if (isLoading) {
             // Mostra skeleton loader durante il caricamento
-            items(5) { UserPlaceholder(alpha = alpha) }
+            items(5) {
+                UserPlaceholder(alpha = alpha, modifier = userModifier)
+            }
         } else {
-            userFollowMap?.forEach { (user, isFollowing) ->
+
+
+            val filteredUsers = if (followingOnly) {
+                userFollowMap?.filter { it.value }?.toMap()
+            } else {
+                userFollowMap
+            }
+
+            filteredUsers?.forEach { (user, isFollowing) ->
                 item {
                     UserCard(
                         user = user,
                         isFollowing = isFollowing,
-                        onClick = { onFollowToggle(user, isFollowing) }
+                        onClick = { onFollowToggle(user, isFollowing) },
+                        modifier = userModifier
                     )
                 }
             }
@@ -145,8 +216,9 @@ fun UserFollowList(
     }
 }
 
+
 @Composable
-fun FileUploadButton(viewModel: ViewModelFollowScreen) {
+fun FileUploadButton(viewModel: CommunityScreenViewModel) {
 
     // Launcher per aprire il file picker
     val pickFileLauncher = rememberLauncherForActivityResult(

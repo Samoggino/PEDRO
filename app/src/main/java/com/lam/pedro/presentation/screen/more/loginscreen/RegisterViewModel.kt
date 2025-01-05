@@ -3,6 +3,7 @@ package com.lam.pedro.presentation.screen.more.loginscreen
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.SecurePreferencesManager.saveTokens
 import com.lam.pedro.data.datasource.SupabaseClient.supabase
 import com.lam.pedro.data.datasource.SupabaseClient.userSession
@@ -12,6 +13,7 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserSession
+import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,6 +25,7 @@ object RegisterViewModel : ViewModel() {
     data class RegisterFormData(
         val email: String = "",
         val password: String = "",
+        val username: String = "",
         val confirmPassword: String = "",
     )
 
@@ -63,7 +66,6 @@ object RegisterViewModel : ViewModel() {
     /**
      * Funzione per la registrazione.
      *
-     * @param navController Il controller di navigazione.
      */
     fun signUp() {
 
@@ -96,7 +98,6 @@ object RegisterViewModel : ViewModel() {
                 is SignUpResult.Success -> {
                     _state.value = LoadingState.Success("Welcome to the Gringos community!", true)
                     _showDialog.value = true // Show the dialog
-//                    navController.navigate(Screen.MyScreenRecords.route)
                 }
 
                 is SignUpResult.UserAlreadyExists -> {
@@ -133,13 +134,15 @@ object RegisterViewModel : ViewModel() {
                 id = session?.user?.id
             )
 
+            setUsername(email)
+
             Log.d("Supabase", "Registrazione avvenuta: ${session?.accessToken}")
             SignUpResult.Success(session)
 
         } catch (e: AuthRestException) {
             Log.e("Supabase", "Registration error: ${e.message}")
             when (e.statusCode) { // Example: Check status code for specific errors
-                400 -> SignUpResult.Error("Invalid email or password") // Example: Don't show dialog for invalid input
+                400 -> SignUpResult.Error("Invalid email or password")
                 409 -> SignUpResult.UserAlreadyExists
                 else -> SignUpResult.Error("Registration failed: ${e.message}")
             }
@@ -147,5 +150,21 @@ object RegisterViewModel : ViewModel() {
             Log.e("Supabase", "Generic registration error: ${e.message}")
             SignUpResult.Error("An unexpected error occurred")
         }
+    }
+
+    /***
+     * FIXME: Non funziona il settaggio dell'username sul database, potrebbe essere un problema
+     * di tempistiche ad usare getUUID() per ottenere l'id dell'utente.
+     */
+    private suspend fun setUsername(email: String) {
+        val uuid = getUUID()
+
+        supabase().from("users").upsert(
+            User(
+                id = uuid!!,
+                email = email,
+                username = formData.value.username
+            )
+        )
     }
 }

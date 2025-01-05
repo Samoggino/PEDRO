@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -24,7 +23,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -83,25 +81,27 @@ fun LoginScreen(
 
             LoginRegisterDescriptor("\uD83C\uDF35Rejoin us Gringos!\uD83C\uDF2E")
 
-            EmailField(
-                value = email,
-                onValueChange = { viewModel.updateLoginFormData(formData.copy(email = it)) },
-                label = "Email",
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(26.dp)),
-            )
+                    .padding(top = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
 
-            PasswordTextField(
-                value = password,
-                onValueChange = { viewModel.updateLoginFormData(formData.copy(password = it)) },
-                isPasswordVisible = isPasswordVisible,
-                label = "Password",
-                onVisibilityChange = { viewModel.toggleLoginPasswordVisibility() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(26.dp)),
-            )
+                PersonalInfoField(
+                    value = email,
+                    onValueChange = { viewModel.updateLoginFormData(formData.copy(email = it)) },
+                    label = "Email"
+                )
+
+                PasswordTextField(
+                    value = password,
+                    onValueChange = { viewModel.updateLoginFormData(formData.copy(password = it)) },
+                    isPasswordVisible = isPasswordVisible,
+                    label = "Password",
+                    onVisibilityChange = { viewModel.toggleLoginPasswordVisibility() },
+                )
+            }
 
             // Login button
             TextButton(

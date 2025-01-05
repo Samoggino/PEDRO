@@ -3,13 +3,12 @@ package com.lam.pedro.presentation.screen.community
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.datasource.SecurePreferencesManager
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.SupabaseClient.supabase
-import com.lam.pedro.presentation.screen.loginscreen.User
-import com.lam.pedro.presentation.screen.loginscreen.parseUsers
+import com.lam.pedro.presentation.screen.more.loginscreen.User
+import com.lam.pedro.presentation.screen.more.loginscreen.parseUsers
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.storage.storage
 import io.ktor.http.ContentType
@@ -21,7 +20,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
-class ViewModelFollowScreen : ViewModel() {
+object CommunityScreenViewModel : ViewModel() {
 
     private val _userFollowMap = MutableStateFlow<Map<User, Boolean>?>(null)
     val userFollowMap: StateFlow<Map<User, Boolean>?> = _userFollowMap
@@ -101,16 +100,5 @@ class ViewModelFollowScreen : ViewModel() {
                 Log.e("Supabase", "Errore durante il caricamento: ${e.message}", e)
             }
         }
-    }
-}
-
-// Factory per la creazione del ViewModel
-@Suppress("UNCHECKED_CAST")
-class ViewModelFollowScreenFactory : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ViewModelFollowScreen::class.java)) {
-            return ViewModelFollowScreen() as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

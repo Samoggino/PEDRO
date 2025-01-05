@@ -57,8 +57,8 @@ import com.lam.pedro.presentation.screen.more.AboutScreen
 import com.lam.pedro.presentation.screen.more.PrivacyPolicyScreen
 import com.lam.pedro.presentation.screen.more.SettingsScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginScreen
-import com.lam.pedro.presentation.screen.profile.ProfileScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.RegisterScreen
+import com.lam.pedro.presentation.screen.profile.ProfileScreen
 import com.lam.pedro.presentation.serialization.MyScreenRecords
 import com.lam.pedro.presentation.serialization.ViewModelRecordFactory
 import com.lam.pedro.util.showExceptionSnackbar
@@ -120,7 +120,6 @@ fun PedroNavigation(
     var sharedViewModel: ActivitySessionViewModel? by remember { mutableStateOf(null) }
     val sharedColor: Color? by remember { mutableStateOf(null) }
     var sharedTitle: Int? by remember { mutableStateOf(null) }
-    // var sharedActivityType: Int? by remember { mutableStateOf(null) }
 
     // Funzione per loggare le schermate attive
     fun logScreenStack() {
@@ -160,7 +159,7 @@ fun PedroNavigation(
             ) {
                 screenStack.add(Screen.CommunityScreen.route)
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                CommunityScreen()
+                CommunityScreen(navController = navController)
             }
             composable(
                 Screen.MoreScreen.route,

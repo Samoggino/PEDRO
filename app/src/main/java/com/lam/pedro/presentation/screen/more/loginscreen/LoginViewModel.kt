@@ -111,7 +111,7 @@ object LoginViewModel : ViewModel() {
 
             // Salva il token di accesso e il refresh token
             if (session != null) {
-                saveTokens(session.accessToken, session.refreshToken, session.user?.id)
+                session.user?.id?.let { saveTokens(session.accessToken, session.refreshToken, it) }
                 Log.d("Supabase", "Login success: ${session.accessToken}")
             }
 
