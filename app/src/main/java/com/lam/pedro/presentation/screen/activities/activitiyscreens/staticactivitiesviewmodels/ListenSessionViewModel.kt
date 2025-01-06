@@ -61,7 +61,7 @@ class ListenSessionViewModel(private val healthConnectManager: HealthConnectMana
         trainIntensity: String,
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
-        distance: MutableState<Double>,
+        distance: Double,
         exerciseRoute: List<ExerciseRoute.Location>
     ) {
         this.actualSession = SessionCreator.createListenSession(

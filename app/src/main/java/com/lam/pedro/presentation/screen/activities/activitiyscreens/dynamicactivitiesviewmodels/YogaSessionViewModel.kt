@@ -73,7 +73,7 @@ class YogaSessionViewModel(private val healthConnectManager: HealthConnectManage
         trainIntensity: String,
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
-        distance: MutableState<Double>,
+        distance: Double,
         exerciseRoute: List<ExerciseRoute.Location>,
     ) {
         val averageSpeed = calculateAverageSpeed(speedSamples)
@@ -82,7 +82,7 @@ class YogaSessionViewModel(private val healthConnectManager: HealthConnectManage
             profileViewModel.height.toDouble(),
             profileViewModel.age.toInt(),
             profileViewModel.sex,
-            distance.value,
+            distance,
             steps.toInt(),
             duration,
             averageSpeed

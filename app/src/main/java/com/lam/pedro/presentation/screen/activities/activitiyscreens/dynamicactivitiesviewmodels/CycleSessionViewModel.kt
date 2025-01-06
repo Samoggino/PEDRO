@@ -90,7 +90,7 @@ class CycleSessionViewModel(private val healthConnectManager: HealthConnectManag
         trainIntensity: String,
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
-        distance: MutableState<Double>,
+        distance: Double,
         exerciseRoute: List<ExerciseRoute.Location>,
     ) {
         val averageSpeed = calculateAverageSpeed(speedSamples)
@@ -99,7 +99,7 @@ class CycleSessionViewModel(private val healthConnectManager: HealthConnectManag
             profileViewModel.height.toDouble(),
             profileViewModel.age.toInt(),
             profileViewModel.sex,
-            distance.value,
+            distance,
             duration,
             averageSpeed
         )
@@ -111,7 +111,7 @@ class CycleSessionViewModel(private val healthConnectManager: HealthConnectManag
             speedSamples = speedSamples, // Non disponibile in ExerciseSessionRecord
             totalEnergy = Energy.calories(totalCalories), // Fallback
             activeEnergy = Energy.calories(activeCalories), // Fallback
-            distance = Length.meters(distance.value), // Fallback
+            distance = Length.meters(distance), // Fallback
             exerciseRoute = ExerciseRoute(exerciseRoute) //Fallback
         )
     }

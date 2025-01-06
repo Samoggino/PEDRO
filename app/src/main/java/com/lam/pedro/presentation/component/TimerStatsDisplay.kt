@@ -36,7 +36,7 @@ fun StatsDisplay(
 fun StatsDisplay(
     steps: Float? = null, // Parametro opzionale
     averageSpeed: Double,
-    distance: MutableState<Double>,
+    distance: Double,
     color: Color
 ) {
     Column {

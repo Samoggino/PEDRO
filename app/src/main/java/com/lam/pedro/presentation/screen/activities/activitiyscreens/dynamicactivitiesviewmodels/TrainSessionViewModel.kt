@@ -76,7 +76,7 @@ class TrainSessionViewModel(private val healthConnectManager: HealthConnectManag
         trainIntensity: String,
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
-        distance: MutableState<Double>,
+        distance: Double,
         exerciseRoute: List<ExerciseRoute.Location>,
     ) {
         val (totalCalories, activeCalories) = calculateTrainCalories(

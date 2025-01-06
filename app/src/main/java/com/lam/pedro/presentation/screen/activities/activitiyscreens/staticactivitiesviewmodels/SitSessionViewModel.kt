@@ -55,7 +55,7 @@ class SitSessionViewModel(private val healthConnectManager: HealthConnectManager
         trainIntensity: String,
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
-        distance: MutableState<Double>,
+        distance: Double,
         exerciseRoute: List<ExerciseRoute.Location>,
     ) {
         this.actualSession = SessionCreator.createSitSession(

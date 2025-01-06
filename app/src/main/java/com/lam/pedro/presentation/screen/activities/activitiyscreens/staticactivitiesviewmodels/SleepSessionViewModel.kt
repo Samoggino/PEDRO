@@ -54,7 +54,7 @@ class SleepSessionViewModel(private val healthConnectManager: HealthConnectManag
         trainIntensity: String,
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
-        distance: MutableState<Double>,
+        distance: Double,
         exerciseRoute: List<ExerciseRoute.Location>,
     ) {
         this.actualSession = SessionCreator.createSleepSession(

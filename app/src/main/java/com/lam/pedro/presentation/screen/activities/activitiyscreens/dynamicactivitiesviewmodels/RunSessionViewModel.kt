@@ -105,8 +105,8 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
         trainIntensity: String,
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
-        distance: MutableState<Double>,
-        exerciseRoute: List<ExerciseRoute.Location>,
+        distance: Double,
+        exerciseRoute: List<ExerciseRoute.Location>
     ) {
         val averageSpeed = calculateAverageSpeed(speedSamples)
         val (totalCalories, activeCalories) = calculateCalories(
@@ -114,7 +114,7 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
             profileViewModel.height.toDouble(),
             profileViewModel.age.toInt(),
             profileViewModel.sex,
-            distance.value,
+            distance,
             steps.toInt(),
             duration,
             averageSpeed
@@ -128,7 +128,7 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
             stepsCount = steps.toLong(),
             totalEnergy = Energy.calories(totalCalories),
             activeEnergy = Energy.calories(activeCalories),
-            distance = Length.meters(distance.value),
+            distance = Length.meters(distance),
             exerciseRoute = ExerciseRoute(exerciseRoute)
         )
     }
@@ -153,6 +153,7 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
         }
 
     }
+
 
     override var value: ActivitySessionViewModel?
         get() = TODO("Not yet implemented")

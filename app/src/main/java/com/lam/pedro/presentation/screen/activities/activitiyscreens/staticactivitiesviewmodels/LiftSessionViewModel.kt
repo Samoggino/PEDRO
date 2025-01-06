@@ -87,7 +87,7 @@ class LiftSessionViewModel(private val healthConnectManager: HealthConnectManage
         trainIntensity: String,
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
-        distance: MutableState<Double>,
+        distance: Double,
         exerciseRoute: List<ExerciseRoute.Location>
     ) {
         TODO("Not yet implemented")

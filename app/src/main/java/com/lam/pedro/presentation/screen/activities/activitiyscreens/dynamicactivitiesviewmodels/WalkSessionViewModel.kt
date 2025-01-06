@@ -102,7 +102,7 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
         trainIntensity: String,
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
-        distance: MutableState<Double>,
+        distance: Double,
         exerciseRoute: List<ExerciseRoute.Location>,
     ) {
         val (totalCalories, activeCalories) = calculateYogaCalories(
@@ -122,7 +122,7 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
             stepsCount = steps.toLong(),
             totalEnergy = Energy.calories(totalCalories),
             activeEnergy = Energy.calories(activeCalories),
-            distance = Length.meters(distance.value),
+            distance = Length.meters(distance),
             exerciseRoute = ExerciseRoute(exerciseRoute)
         )
     }

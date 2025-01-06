@@ -68,7 +68,7 @@ fun SessionHistoryRow(
                 colorFilter = ColorFilter.tint(color)
             )
             Spacer(modifier = Modifier.width(10.dp))
-            Text(text = session.basicActivity.title.toString(), modifier = Modifier.weight(1f))
+            Text(text = session.basicActivity.title, modifier = Modifier.weight(1f))
             Icon(
                 Icons.Filled.TouchApp,
                 contentDescription = null,

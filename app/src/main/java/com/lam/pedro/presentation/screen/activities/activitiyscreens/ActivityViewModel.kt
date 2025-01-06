@@ -1,6 +1,5 @@
 package com.lam.pedro.presentation.screen.activities.activitiyscreens
 
-//import com.lam.pedro.data.ExerciseSession
 import android.os.RemoteException
 import android.util.Log
 import androidx.compose.runtime.MutableState
@@ -40,7 +39,6 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.util.UUID
-
 
 abstract class ActivitySessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ViewModel() {
@@ -147,7 +145,7 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
         trainIntensity: String,
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
-        distance: MutableState<Double>,
+        distance: Double,
         exerciseRoute: List<ExerciseRoute.Location>,
     )
 

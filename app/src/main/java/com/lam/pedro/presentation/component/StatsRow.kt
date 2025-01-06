@@ -110,7 +110,7 @@ fun StatsRowWithoutSteps(speed: Double, distance: MutableState<Double>, color: C
 fun StatsRow(
     steps: Float? = null, // Parametro opzionale
     speed: Double,
-    distance: MutableState<Double>,
+    distance: Double,
     color: Color
 ) {
     Row(
@@ -140,7 +140,7 @@ fun StatsRow(
         StatsColumn(
             icon = R.drawable.distance_icon,
             unit = "(m)",
-            value = String.format("%.2f", distance.value), // Arrotonda a 2 decimali
+            value = String.format("%.2f", distance), // Arrotonda a 2 decimali
             color = color
         )
     }
