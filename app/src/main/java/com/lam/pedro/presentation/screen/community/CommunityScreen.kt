@@ -42,9 +42,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.lam.pedro.R
-import com.lam.pedro.presentation.component.UserCard
+import com.lam.pedro.presentation.component.UserCommunityCard
 import com.lam.pedro.presentation.component.UserPlaceholder
 import com.lam.pedro.presentation.screen.more.loginscreen.User
+import com.lam.pedro.util.vibrateOnClick
+import com.lam.pedro.util.vibrateOnLongPress
 import kotlinx.coroutines.launch
 
 val IconSize = 70.dp
@@ -66,7 +68,7 @@ fun CommunityScreen(
 
     // Carica i dati iniziali al primo caricamento
     LaunchedEffect(true) {
-        Log.i("Supabase-Following", "FollowScreen")
+        Log.i("Community", "CommunityScreen")
         viewModel.getFollowedUsers()
     }
 
@@ -91,8 +93,8 @@ fun CommunityScreen(
                 actions = {
                     IconButton(
                         onClick = {
-                            followingOnly =
-                                !followingOnly  // Cambia lo stato del cuore e del filtro
+                            followingOnly = !followingOnly  // Cambia lo stato del filtro
+                            vibrateOnClick()
                         },
                         modifier = Modifier.padding(16.dp)
                     ) {
@@ -204,11 +206,17 @@ fun UserFollowList(
 
             filteredUsers?.forEach { (user, isFollowing) ->
                 item {
-                    UserCard(
+                    UserCommunityCard(
                         user = user,
                         isFollowing = isFollowing,
-                        onClick = { onFollowToggle(user, isFollowing) },
-                        modifier = userModifier
+                        onClick = {
+                            vibrateOnClick()
+                            onFollowToggle(user, isFollowing)
+                        },
+                        onLongPress = {
+                            vibrateOnLongPress()
+                        },
+                        modifier = userModifier,
                     )
                 }
             }
@@ -225,7 +233,7 @@ fun FileUploadButton(viewModel: CommunityScreenViewModel) {
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         uri?.let { selectedFileUri ->
-            Log.i("Supabase", "FileUploadButton")
+            Log.i("Community", "FileUploadButton")
             viewModel.uploadFileToSupabase(selectedFileUri)
         }
     }

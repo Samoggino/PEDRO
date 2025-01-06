@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -47,11 +49,29 @@ import com.lam.pedro.presentation.screen.more.loginscreen.User
 import com.lam.pedro.util.placeholder
 
 @Composable
-fun UserCard(user: User, isFollowing: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun UserCommunityCard(
+    user: User,
+    isFollowing: Boolean,
+    onClick: () -> Unit,
+    onLongPress: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
     val roundedCornerSize = 16.dp
+
     Card(
         modifier = modifier
-            .clickable { onClick() }
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {
+                        // Esegui l'azione per il long press
+                        onLongPress()
+                    },
+                    onTap = {
+                        // Esegui l'azione per il click
+                        onClick()
+                    }
+                )
+            }
             .then(
                 if (isFollowing) Modifier.border(
                     width = 1.dp,

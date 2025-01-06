@@ -82,4 +82,12 @@ object SecurePreferencesManager {
         return encryptedPrefs!!.getString(UUID, null)
     }
 
+    /**
+     * Restituisce il context dell'applicazione.
+     */
+    fun getMyContext(): Context {
+        checkInitialized()
+        return appContext!!
+    }
+
 }

@@ -15,6 +15,10 @@
  */
 package com.lam.pedro.util
 
+import android.content.Context
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.util.Log
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -24,10 +28,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.unit.dp
-import com.lam.pedro.data.dateTimeWithOffsetOrDefault
+import androidx.core.content.ContextCompat
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.shimmer
 import com.google.accompanist.placeholder.placeholder
+import com.lam.pedro.data.datasource.SecurePreferencesManager.getMyContext
+import com.lam.pedro.data.dateTimeWithOffsetOrDefault
 import com.lam.pedro.presentation.theme.PedroDarkGray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -82,4 +88,26 @@ fun Modifier.placeholder(
         shape = shape,
         highlight = highlight
     )
+}
+
+fun vibrateOnClick(context: Context = getMyContext()) {
+    val vibrator = ContextCompat.getSystemService(context, Vibrator::class.java)
+    vibrator?.let {
+        if (it.hasVibrator()) {
+            val effect = VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK)
+            it.vibrate(effect)
+            Log.d("Vibrating", "Vibrating phone with click effect")
+        }
+    }
+}
+
+fun vibrateOnLongPress(context: Context = getMyContext()) {
+    val vibrator = ContextCompat.getSystemService(context, Vibrator::class.java)
+    vibrator?.let {
+        if (it.hasVibrator()) {
+            val effect = VibrationEffect.createOneShot(100L,VibrationEffect.EFFECT_HEAVY_CLICK)
+            it.vibrate(effect)
+            Log.d("Vibrating", "Vibrating phone with heavy click effect")
+        }
+    }
 }
