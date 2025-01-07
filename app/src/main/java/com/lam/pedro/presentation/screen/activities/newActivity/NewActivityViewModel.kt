@@ -13,6 +13,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.lifecycle.ViewModel
+import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository
+import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.distance
+import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.exerciseRoute
+import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.speedSamples
+import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.steps
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.newActivity.strategyForNewScreen.GpsFunctionality
@@ -27,13 +32,19 @@ import com.lam.pedro.util.updateDistance
 import org.maplibre.android.geometry.LatLng
 import java.time.ZonedDateTime
 
-class NewActivityViewModel(context: Context) : ViewModel() {
+class NewActivityViewModel(context: Context, private val repository: ActivityTrackingRepository) : ViewModel() {
 
     private val stepCounter = StepCounter(context)
     //var steps by remember { mutableFloatStateOf(0f) }
-    var steps = mutableFloatStateOf(0f)
-    var averageSpeed = mutableDoubleStateOf(0.0)
-    val distance = mutableDoubleStateOf(0.0)
+    //var steps = mutableFloatStateOf(0f)
+    //var averageSpeed = mutableDoubleStateOf(0.0)
+    //val distance = mutableDoubleStateOf(0.0)
+
+    val steps = repository.steps
+
+    val averageSpeed = repository.averageSpeed
+
+    val distance = repository.distance
 
     var hydrationVolume = mutableDoubleStateOf(0.0)
     var yogaStyle = mutableStateOf("Yin (gentle)")
@@ -47,8 +58,8 @@ class NewActivityViewModel(context: Context) : ViewModel() {
     val speedTracker = SpeedTracker(context)
     val locationTracker = LocationTracker(context)
 
-    val speedSamples = mutableStateListOf<SpeedRecord.Sample>()
-    val exerciseRoute = mutableStateListOf<ExerciseRoute.Location>()
+    //val speedSamples = mutableStateListOf<SpeedRecord.Sample>()
+    //val exerciseRoute = mutableStateListOf<ExerciseRoute.Location>()
 
     val positions = mutableStateListOf<LatLng>()
 
@@ -71,44 +82,6 @@ class NewActivityViewModel(context: Context) : ViewModel() {
         activityTitle.value = newTitle
     }
 
-    suspend fun startSpeedTracking() {
-        speedTracker.trackSpeed().collect { sample ->
-            speedCounter.intValue++
-            totalSpeed.value += sample.speed.inMetersPerSecond
-            averageSpeed.doubleValue =
-                totalSpeed.doubleValue / speedCounter.intValue
-            speedSamples.add(sample)
-            Log.d(TAG, "----------------------New Speed Sample: $sample")
-        }
-    }
-
-    suspend fun startLocationTracking() {
-        locationTracker.trackLocation().collect { location ->
-            exerciseRoute.add(location)
-            Log.d(TAG, "--------------------------------New location: $location")
-            val newLatLng = LatLng(location.latitude, location.longitude)
-            updateDistance(distance, positions, newLatLng)
-            positions.add(newLatLng)
-            Log.d(
-                TAG,
-                "--------------------------------New distance: ${distance.doubleValue}"
-            )
-        }
-    }
-
-    suspend fun startStepCounter() {
-        try {
-            stepCounter.isAvailable()
-            stepCounter.stepsCounter { newSteps ->
-                steps.floatValue = newSteps // Aggiorna lo stato della UI
-            }
-            //steps = stepCount.toFloat() // Aggiorna lo stato
-            Log.d("STEP_COUNTER", "Steps: $steps")
-        } catch (e: Exception) {
-            Log.e("STEP_COUNTER", "Error retrieving steps: ${e.message}")
-        }
-    }
-
     suspend fun saveActivity(
         elapsedTime: Int,
         timerResults: MutableList<String>,
@@ -124,8 +97,8 @@ class NewActivityViewModel(context: Context) : ViewModel() {
             duration = duration,
             startTime = startTime,
             endTime = endTime,
-            activityTitle = activityTitle.toString(),
-            notes = notes.toString(),
+            activityTitle = activityTitle.value,
+            notes = notes.value,
             speedSamples = speedSamples,
             steps = steps.floatValue,
             hydrationVolume = hydrationVolume.doubleValue,

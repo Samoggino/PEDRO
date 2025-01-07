@@ -44,6 +44,9 @@
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
 
+    <!-- Notification -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <!-- Step counter detector -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
@@ -91,11 +94,10 @@
         <service
             android:name=".util.ActivityTrackingService"
             android:enabled="true"
-            android:exported="false"
             android:foregroundServiceType="location|health" />
+            <!-- android:exported="false" -->
 
     </application>
-
 
 
     <queries>

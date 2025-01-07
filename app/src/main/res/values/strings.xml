@@ -184,5 +184,7 @@
     <string name="follow_screen">pagina per i followers</string>
     <string name="charts_screen">charts screen</string>
     <string name="community_screen">Community</string>
+    <string name="notification_permission_description">Pedro needs to send notification to show you when it\'s recording your activity</string>
+    <string name="notification_permission_title">Notification permission</string>
 
 </resources>

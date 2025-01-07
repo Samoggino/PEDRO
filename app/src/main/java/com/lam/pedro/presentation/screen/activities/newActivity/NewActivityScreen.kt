@@ -269,7 +269,6 @@ fun NewActivityScreen(
             if (timerRunning && !isPaused) {
                 LaunchedEffect(Unit) {
                     val serviceIntent = Intent(context, ActivityTrackingService::class.java)
-                    context.startService(serviceIntent)
 
                     startTime = ZonedDateTime.now()
 
@@ -281,15 +280,16 @@ fun NewActivityScreen(
                     }
 
                     sessionScope.launch {
-                        newActivityViewModel.startStepCounter()
+                        //newActivityViewModel.startStepCounter()
+                        context.startService(serviceIntent)
                     }
 
                     sessionScope.launch {
-                        newActivityViewModel.startSpeedTracking()
+                        //newActivityViewModel.startSpeedTracking()
                     }
 
                     sessionScope.launch {
-                        newActivityViewModel.startLocationTracking()
+                        //newActivityViewModel.startLocationTracking()
                     }
                 }
             }

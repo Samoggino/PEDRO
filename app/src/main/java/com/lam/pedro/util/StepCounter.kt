@@ -22,7 +22,7 @@ import androidx.core.content.ContextCompat.getSystemService
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
-private const val TAG = "STEP_COUNT_LISTENER"
+const val TAG = "STEP_COUNT_LISTENER"
 
 class StepCounter(context: Context) {
 
