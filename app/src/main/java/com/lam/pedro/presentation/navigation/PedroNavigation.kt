@@ -34,7 +34,6 @@ import com.example.healthconnectsample.presentation.screen.HealthConnectScreen
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.presentation.charts.ScreenCharts
-import com.lam.pedro.presentation.charts.viewModelChartsFactory
 import com.lam.pedro.presentation.screen.ActivitiesScreen
 import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.MoreScreen
@@ -60,7 +59,6 @@ import com.lam.pedro.presentation.screen.more.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.RegisterScreen
 import com.lam.pedro.presentation.screen.profile.ProfileScreen
 import com.lam.pedro.presentation.serialization.MyScreenRecords
-import com.lam.pedro.presentation.serialization.ViewModelRecordFactory
 import com.lam.pedro.util.showExceptionSnackbar
 import kotlinx.coroutines.launch
 
@@ -733,17 +731,6 @@ fun PedroNavigation(
                     )
                 ScreenCharts(
                     activityEnum = activityEnumProp,
-                    viewModelCharts =
-                    viewModel(
-                        factory =
-                        viewModelChartsFactory(
-                            viewModelRecords =
-                            viewModel(
-                                factory =
-                                ViewModelRecordFactory()
-                            )
-                        )
-                    ),
                     navController = navController
                 )
             }

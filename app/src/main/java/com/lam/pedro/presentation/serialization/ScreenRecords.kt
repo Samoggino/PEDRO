@@ -29,7 +29,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.presentation.navigation.Screen
@@ -38,7 +37,7 @@ import com.lam.pedro.presentation.navigation.Screen
 @Composable
 fun MyScreenRecords(
     navController: NavController,
-    viewModel: ViewModelRecords = viewModel(factory = ViewModelRecordFactory())
+    viewModel: ViewModelRecords = ViewModelRecords
 ) {
     val scrollState = rememberScrollState()
 

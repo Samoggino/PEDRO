@@ -44,9 +44,10 @@ import kotlinx.coroutines.delay
 @Composable
 fun ScreenCharts(
     activityEnum: ActivityEnum,
-    viewModelCharts: ViewModelCharts,
     navController: NavController
 ) {
+    val viewModelCharts = ViewModelCharts
+
     val chartState by viewModelCharts.chartState.observeAsState(ChartState.Loading)
 
     LaunchedEffect(activityEnum) {

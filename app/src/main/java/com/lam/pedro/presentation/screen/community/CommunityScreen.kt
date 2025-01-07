@@ -7,14 +7,17 @@ import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
@@ -45,9 +48,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.lam.pedro.R
+import com.lam.pedro.data.activity.ActivityEnum
+import com.lam.pedro.data.activity.GenericActivity
+import com.lam.pedro.presentation.component.ShowSessionDetails
 import com.lam.pedro.presentation.component.UserCommunityCard
 import com.lam.pedro.presentation.component.UserPlaceholder
 import com.lam.pedro.presentation.navigation.Screen
+import com.lam.pedro.presentation.screen.community.CommunityScreenViewModel.activityMap
+import com.lam.pedro.presentation.screen.community.CommunityScreenViewModel.fetchActivityMap
 import com.lam.pedro.presentation.screen.more.loginscreen.User
 import com.lam.pedro.util.vibrateOnClick
 import com.lam.pedro.util.vibrateOnLongPress
@@ -67,6 +75,7 @@ fun CommunityScreen(
     val userFollowMap by viewModel.userFollowMap.collectAsState()
     val coroutineScope = rememberCoroutineScope()
     val userIsLogged = viewModel.userIsLoggedIn.collectAsState()
+
 
     var isRefreshing by remember { mutableStateOf(false) }
     var followingOnly by remember { mutableStateOf(false) }  // Usa lo stesso stato per cuore e filtro
@@ -189,40 +198,9 @@ fun CommunityScreen(
                         }
                     }
                 } else {
-                    // Se l'utente non è loggato, mostra un messaggio
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center
-                    ) {
 
-                        Row {
-
-                            Text(
-                                text = "You need to be logged in to access the community",
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .fillMaxWidth(),
-                                textAlign = TextAlign.Center,
-                                fontSize = 20.sp
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Button(
-                                onClick = {
-                                    navController.navigate(Screen.LoginScreen.route)
-                                },
-                                modifier = Modifier.padding(16.dp)
-                            ) {
-                                Text("Login")
-                            }
-                        }
-
-                    }
+                    // Mostra un messaggio se l'utente non è loggato
+                    PlaceholderCommunity(navController)
                 }
 
 
@@ -233,6 +211,43 @@ fun CommunityScreen(
 }
 
 @Composable
+private fun PlaceholderCommunity(navController: NavController) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        Row {
+
+            Text(
+                text = "You need to be logged in to access the community",
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                fontSize = 20.sp
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Button(
+                onClick = {
+                    navController.navigate(Screen.LoginScreen.route)
+                },
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text("Login")
+            }
+        }
+
+    }
+}
+
+@Composable
 fun UserFollowList(
     userFollowMap: Map<User, Boolean>?,
     followingOnly: Boolean, // Stato del filtro
@@ -240,7 +255,7 @@ fun UserFollowList(
     isRefreshing: Boolean,
     mounted: Boolean
 ) {
-    val alpha by animateFloatAsState(
+    val animation by animateFloatAsState(
         targetValue = if (isRefreshing) 1f else 0f, // Se i dati sono in caricamento, mantieni la shimmer
         animationSpec = tween(
             durationMillis = 1500,
@@ -256,7 +271,7 @@ fun UserFollowList(
         if (isRefreshing && !mounted) {
             // Mostra skeleton loader durante il caricamento
             items(5) {
-                UserPlaceholder(alpha = alpha, modifier = userModifier)
+                UserPlaceholder(animation = animation, modifier = userModifier)
             }
         } else {
 
@@ -277,6 +292,8 @@ fun UserFollowList(
                         },
                         onLongPress = {
                             vibrateOnLongPress()
+                            // Mostra un popup con la cronologia delle attività dell'utente
+                            ActivityHistoryPopup(user.id)
                         },
                         modifier = userModifier,
                     )
@@ -285,7 +302,6 @@ fun UserFollowList(
         }
     }
 }
-
 
 @Composable
 fun FileUploadButton(viewModel: CommunityScreenViewModel) {
@@ -309,4 +325,95 @@ fun FileUploadButton(viewModel: CommunityScreenViewModel) {
     ) {
         Text("Carica avatar")
     }
+}
+
+@Composable
+fun ActivityHistoryPopup(
+    userUUID: String
+) {
+
+    val activityMap by activityMap.collectAsState(emptyMap())
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedActivityType: ActivityEnum? by remember { mutableStateOf(null) }
+
+    LaunchedEffect(userUUID) {
+        fetchActivityMap(userUUID)
+    }
+
+    Column {
+        Text(text = "Activity History", modifier = Modifier.padding(16.dp))
+
+        LazyColumn(
+            modifier = Modifier
+                .padding(8.dp)
+                .heightIn(max = 300.dp)
+        ) {
+            try {
+                items(activityMap.keys.toList()) { activityType ->
+                    Text(
+                        text = activityType.name,
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clickable {
+                                selectedActivityType = activityType
+                                showDialog = true
+                            }
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("Community", "Error showing dialog", e)
+            }
+        }
+
+        if (showDialog && selectedActivityType != null) {
+            val recentActivities = activityMap[selectedActivityType]?.takeLast(5) ?: emptyList()
+            ActivityDetailsDialog(
+                activities = recentActivities,
+                onDismiss = { showDialog = false },
+                activityType = selectedActivityType!!
+
+            )
+        }
+    }
+}
+
+@Composable
+fun ActivityDetailsDialog(
+    activities: List<GenericActivity>,
+    activityType: ActivityEnum,
+    onDismiss: () -> Unit,
+) {
+
+//    AlertDialog(
+//        onDismissRequest = onDismiss,
+//        title = { Text(text = "Recent ${activityType.name} Activities") },
+//        text = {
+//            LazyColumn(
+//                modifier = Modifier.padding(8.dp).heightIn(max = 300.dp)
+//            ) {
+//                try {
+//                    items(activities) { activity ->
+//                        Text(text = "Date: ${activity.basicActivity.startTime}, Duration: ${activity.basicActivity.durationInMinutes()}")
+//                    }
+//                } catch (e: Exception) {
+//                    Log.e("Community", "Error showing dialog", e)
+//                }
+//            }
+//        },
+//        confirmButton = {
+//            Button(onClick = onDismiss) {
+//                Text("Close")
+//            }
+//        }
+//    )
+
+    Column(
+        modifier = Modifier.heightIn(max = 300.dp)
+    ) {
+        activities.forEach { activity ->
+            ShowSessionDetails(activity)
+        }
+    }
+
+
 }

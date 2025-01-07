@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
@@ -31,9 +30,9 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.serializer
 
-class ViewModelRecords : ViewModel() {
+object ViewModelRecords : ViewModel() {
 
-    val tag = "Supabase"
+    const val tag = "Supabase"
 
     // LiveData per monitorare lo stato dell'import
     private val _importResult = MutableLiveData<ResultState>(ResultState.Idle)
@@ -53,7 +52,11 @@ class ViewModelRecords : ViewModel() {
      * @return Lista di attività di tipo [GenericActivity]
      */
     @OptIn(InternalSerializationApi::class)
-    suspend fun getActivitySession(activityEnum: ActivityEnum): List<GenericActivity> {
+    suspend fun getActivitySession(
+        activityEnum: ActivityEnum,
+        uuid: String? = getUUID()!!
+    ): List<GenericActivity> {
+
         Log.d(tag, "Recupero delle attività di tipo $activityEnum")
         val config = activityConfigs[activityEnum] as? SessionCreator.ActivityConfig<*>
 
@@ -65,7 +68,7 @@ class ViewModelRecords : ViewModel() {
                         (safeRpcCall(
                             rpcFunctionName = "get_${activityEnum.name.lowercase()}_session",
                             buildJsonObject {
-                                put("user_uuid", Json.encodeToJsonElement(getUUID()))
+                                put("user_uuid", Json.encodeToJsonElement(uuid))
                             }
                         ) as? PostgrestResult)?.data!!
                     )
@@ -79,6 +82,20 @@ class ViewModelRecords : ViewModel() {
             return emptyList()
         }
     }
+
+
+    private val _activityMap = MutableLiveData<Map<ActivityEnum, List<GenericActivity>>>()
+
+
+    suspend fun getActivityMap(userUUID: String): Map<ActivityEnum, List<GenericActivity>> {
+        val map = mutableMapOf<ActivityEnum, List<GenericActivity>>()
+        ActivityEnum.entries.forEach { activityEnum ->
+            map[activityEnum] = getActivitySession(activityEnum, userUUID)
+        }
+        _activityMap.postValue(map)
+        return map
+    }
+
 
     /**
      * Inserisce una sessione di attività nel database.
@@ -202,17 +219,6 @@ class ViewModelRecords : ViewModel() {
         }
     }
 
-}
-
-@Suppress("UNCHECKED_CAST")
-class ViewModelRecordFactory :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ViewModelRecords::class.java)) {
-            return ViewModelRecords() as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
 }
 
 

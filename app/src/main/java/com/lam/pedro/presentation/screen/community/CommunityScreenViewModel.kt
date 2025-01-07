@@ -4,11 +4,14 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lam.pedro.data.activity.ActivityEnum
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.datasource.SecurePreferencesManager
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.SupabaseClient.supabase
 import com.lam.pedro.presentation.screen.more.loginscreen.User
 import com.lam.pedro.presentation.screen.more.loginscreen.parseUsers
+import com.lam.pedro.presentation.serialization.ViewModelRecords
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.storage.storage
 import io.ktor.http.ContentType
@@ -110,6 +113,16 @@ object CommunityScreenViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.e("Supabase", "Errore durante il caricamento: ${e.message}", e)
             }
+        }
+    }
+
+    val activityMap = MutableStateFlow<Map<ActivityEnum, List<GenericActivity>>>(emptyMap())
+
+    fun fetchActivityMap(userUUID: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            activityMap.value = ViewModelRecords.getActivityMap(userUUID = userUUID)
+
         }
     }
 }

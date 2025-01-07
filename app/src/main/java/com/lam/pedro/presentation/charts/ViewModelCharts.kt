@@ -5,7 +5,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
@@ -15,9 +14,9 @@ import ir.ehsannarmani.compose_charts.models.Bars
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ViewModelCharts(
-    private val viewModelRecords: ViewModelRecords
-) : ViewModel() {
+object ViewModelCharts : ViewModel() {
+
+    private val viewModelRecords = ViewModelRecords
 
     // In ViewModelCharts
     private val _chartState = MutableLiveData<ChartState>(ChartState.Loading)
@@ -156,13 +155,13 @@ fun getAvailableMetricsForActivity(activityEnum: ActivityEnum) =
         else -> LabelMetrics.entries.filter { it == LabelMetrics.DURATION }
     }
 
-@Suppress("UNCHECKED_CAST")
-fun viewModelChartsFactory(viewModelRecords: ViewModelRecords) =
-    object : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(ViewModelCharts::class.java)) {
-                return ViewModelCharts(viewModelRecords) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
-    }
+//@Suppress("UNCHECKED_CAST")
+//fun viewModelChartsFactory(viewModelRecords: ViewModelRecords) =
+//    object : ViewModelProvider.Factory {
+//        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+//            if (modelClass.isAssignableFrom(ViewModelCharts::class.java)) {
+//                return ViewModelCharts(viewModelRecords) as T
+//            }
+//            throw IllegalArgumentException("Unknown ViewModel class")
+//        }
+//    }

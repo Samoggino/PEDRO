@@ -30,6 +30,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,18 +56,24 @@ fun UserCommunityCard(
     user: User,
     isFollowing: Boolean,
     onClick: () -> Unit,
-    onLongPress: () -> Unit = {},
+    onLongPress: @Composable () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val roundedCornerSize = 16.dp
+    var showLongPressContent by remember { mutableStateOf(false) } // Stato per mostrare il contenuto
 
+
+    if (showLongPressContent) {
+        onLongPress()
+    }
+    
     Card(
         modifier = modifier
             .pointerInput(Unit) {
                 detectTapGestures(
                     onLongPress = {
                         // Esegui l'azione per il long press
-                        onLongPress()
+                        showLongPressContent = true
                     },
                     onTap = {
                         // Esegui l'azione per il click
@@ -170,7 +179,7 @@ fun FollowButton(isFollowing: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-fun UserPlaceholder(alpha: Float, modifier: Modifier = Modifier) {
+fun UserPlaceholder(animation: Float, modifier: Modifier = Modifier) {
 
     val isLoading = true
 
@@ -191,7 +200,7 @@ fun UserPlaceholder(alpha: Float, modifier: Modifier = Modifier) {
                     .size(IconSize)
                     .clip(RoundedCornerShape(50))
                     .placeholder(isLoading, MaterialTheme.colorScheme.onSurfaceVariant)
-                    .graphicsLayer(alpha = alpha)
+                    .graphicsLayer(alpha = animation)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column {
@@ -200,7 +209,7 @@ fun UserPlaceholder(alpha: Float, modifier: Modifier = Modifier) {
                         .height(NameHeight)
                         .fillMaxWidth()
                         .placeholder(isLoading, MaterialTheme.colorScheme.onSurfaceVariant)
-                        .graphicsLayer(alpha = alpha)
+                        .graphicsLayer(alpha = animation)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Box(
@@ -208,7 +217,7 @@ fun UserPlaceholder(alpha: Float, modifier: Modifier = Modifier) {
                         .height(16.dp)
                         .fillMaxWidth()
                         .placeholder(isLoading, MaterialTheme.colorScheme.onSurfaceVariant)
-                        .graphicsLayer(alpha = alpha)
+                        .graphicsLayer(alpha = animation)
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
@@ -217,7 +226,7 @@ fun UserPlaceholder(alpha: Float, modifier: Modifier = Modifier) {
                     .size(FollowButtonSize)
                     .clip(RoundedCornerShape(50))
                     .placeholder(isLoading, MaterialTheme.colorScheme.onSurfaceVariant)
-                    .graphicsLayer(alpha = alpha)
+                    .graphicsLayer(alpha = animation)
             )
 
         }
