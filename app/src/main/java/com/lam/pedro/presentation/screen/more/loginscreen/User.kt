@@ -25,7 +25,7 @@ fun parseUsers(jsonString: String): Map<User, Boolean> {
         User(
             id = raw.userId,
             email = raw.userEmail,
-            username = raw.username,
+            username = raw.username.ifEmpty { raw.userEmail.substringBefore("@") },
             avatarUrl = raw.avatarUrl ?: "" // Usa stringa vuota se null
         ) to raw.isFollowed
     }

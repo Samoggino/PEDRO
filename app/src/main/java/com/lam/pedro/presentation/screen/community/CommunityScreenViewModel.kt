@@ -22,6 +22,17 @@ import kotlinx.serialization.json.put
 
 object CommunityScreenViewModel : ViewModel() {
 
+    private val _userIsLoggedIn: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val userIsLoggedIn: StateFlow<Boolean> = _userIsLoggedIn
+
+    init {
+        _userIsLoggedIn.value = getUUID() != null
+    }
+
+    fun updateUserIsLoggedIn() {
+        _userIsLoggedIn.value = getUUID() != null
+    }
+
     private val _userFollowMap = MutableStateFlow<Map<User, Boolean>?>(null)
     val userFollowMap: StateFlow<Map<User, Boolean>?> = _userFollowMap
 

@@ -121,11 +121,16 @@ object RegisterViewModel : ViewModel() {
         val email = formData.value.email
         val password = formData.value.password
 
-        return try {
+        try {
             supabase().auth.signUpWith(Email) {
                 this.email = email
                 this.password = password
             }
+        } catch (e: Exception) {
+            Log.e("Supabase", "Errore durante la registrazione: ${e.message}", e)
+        }
+
+        return try {
 
             val session = userSession()
             saveTokens(
@@ -134,7 +139,7 @@ object RegisterViewModel : ViewModel() {
                 id = session?.user?.id
             )
 
-            setUsername(email)
+            setUsername()
 
             Log.d("Supabase", "Registrazione avvenuta: ${session?.accessToken}")
             SignUpResult.Success(session)
@@ -152,19 +157,25 @@ object RegisterViewModel : ViewModel() {
         }
     }
 
-    /***
-     * FIXME: Non funziona il settaggio dell'username sul database, potrebbe essere un problema
-     * di tempistiche ad usare getUUID() per ottenere l'id dell'utente.
-     */
-    private suspend fun setUsername(email: String) {
-        val uuid = getUUID()
+    private fun setUsername() {
 
-        supabase().from("users").upsert(
-            User(
-                id = uuid!!,
-                email = email,
-                username = formData.value.username
-            )
-        )
+        viewModelScope.launch(Dispatchers.IO) {
+            val uuid = getUUID()
+            val email = formData.value.email
+            val username = formData.value.username.ifEmpty { email.substringBefore("@") }
+
+            try {
+                supabase().from("users")
+                    .update(
+                        { set("username", username) }
+                    ) { filter { eq("id", uuid!!) } }
+
+                Log.d("Supabase", "Username set: $username")
+
+            } catch (e: Exception) {
+                Log.e("Supabase", "Errore durante il settaggio dell'username: ${e.message}", e)
+            }
+        }
+
     }
 }

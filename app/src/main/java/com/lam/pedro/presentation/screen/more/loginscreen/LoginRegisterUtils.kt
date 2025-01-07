@@ -24,6 +24,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.lam.pedro.R
 import com.lam.pedro.presentation.component.LinkedApp
+import com.lam.pedro.util.vibrateOnClick
 
 @Composable
 fun PersonalInfoField(
@@ -61,7 +62,10 @@ fun PasswordTextField(
         label = { Text(label) },
         visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
         trailingIcon = {
-            IconButton(onClick = { onVisibilityChange(!isPasswordVisible) }) {
+            IconButton(onClick = {
+                onVisibilityChange(!isPasswordVisible)
+                vibrateOnClick()
+            }) {
                 Icon(
                     imageVector = if (isPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                     contentDescription = if (isPasswordVisible) "Nascondi password" else "Mostra password"

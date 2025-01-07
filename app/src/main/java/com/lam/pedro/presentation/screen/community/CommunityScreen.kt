@@ -39,11 +39,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.lam.pedro.R
 import com.lam.pedro.presentation.component.UserCommunityCard
 import com.lam.pedro.presentation.component.UserPlaceholder
+import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.presentation.screen.more.loginscreen.User
 import com.lam.pedro.util.vibrateOnClick
 import com.lam.pedro.util.vibrateOnLongPress
@@ -62,15 +66,26 @@ fun CommunityScreen(
 ) {
     val userFollowMap by viewModel.userFollowMap.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    val userIsLogged = viewModel.userIsLoggedIn.collectAsState()
 
     var isRefreshing by remember { mutableStateOf(false) }
     var followingOnly by remember { mutableStateOf(false) }  // Usa lo stesso stato per cuore e filtro
-
+    var mounted by remember { mutableStateOf(false) }
     // Carica i dati iniziali al primo caricamento
-    LaunchedEffect(true) {
-        Log.i("Community", "CommunityScreen")
-        viewModel.getFollowedUsers()
+
+    LaunchedEffect(Unit) {
+        if (!mounted) {
+            isRefreshing = true
+            Log.i("Community", "CommunityScreen")
+            if (userIsLogged.value) {
+                viewModel.getFollowedUsers()
+            }
+            viewModel.updateUserIsLoggedIn()
+            isRefreshing = false
+            mounted = true // Imposta mounted solo alla prima esecuzione
+        }
     }
+
 
     Scaffold(
         topBar = {
@@ -91,25 +106,30 @@ fun CommunityScreen(
                     }
                 },
                 actions = {
-                    IconButton(
-                        onClick = {
-                            followingOnly = !followingOnly  // Cambia lo stato del filtro
-                            vibrateOnClick()
-                        },
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        // Animazione per il cuore (riempito o vuoto)
-                        val heartScale by animateFloatAsState(
-                            targetValue = if (followingOnly) 1.2f else 1f, // Aumenta la dimensione del cuore quando è pieno
-                            animationSpec = tween(durationMillis = 300),
-                            label = "" // Tempo di animazione
-                        )
 
-                        Icon(
-                            imageVector = if (followingOnly) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                            contentDescription = "Follow filter",
-                            tint = Color.Red.copy(alpha = heartScale) // Tint rosso e con alpha che cambia in base all'animazione
-                        )
+
+                    if (userIsLogged.value) {
+                        IconButton(
+                            onClick = {
+                                followingOnly = !followingOnly  // Cambia lo stato del filtro
+                                vibrateOnClick()
+                            },
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            // Animazione per il cuore (riempito o vuoto)
+                            val heartScale by animateFloatAsState(
+                                targetValue = if (followingOnly) 1.2f else 1f, // Aumenta la dimensione del cuore quando è pieno
+                                animationSpec = tween(durationMillis = 300),
+                                label = "" // Tempo di animazione
+                            )
+
+                            Icon(
+                                imageVector = if (followingOnly) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                contentDescription = "Follow filter",
+                                tint = Color.Red.copy(alpha = heartScale) // Tint rosso e con alpha che cambia in base all'animazione
+                            )
+                        }
+
                     }
                 }
             )
@@ -133,37 +153,79 @@ fun CommunityScreen(
                 },
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(MaterialTheme.colorScheme.surface),
             ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
 
-                    Row {
-                        UserFollowList(
-                            userFollowMap = userFollowMap,
-                            followingOnly = followingOnly, // Passa lo stato del filtro
-                            onFollowToggle = { user, isFollowing ->
-                                coroutineScope.launch {
-                                    viewModel.toggleFollowUser(user, isFollowing)
-                                    userFollowMap?.let {
-                                        val updatedMap = it.toMutableMap()
-                                        updatedMap[user] = !isFollowing
-                                        viewModel.updateFollowState(updatedMap)
-                                    }
-                                }
-                            }
-                        )
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalArrangement = Arrangement.Center
+                if (userIsLogged.value) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        FileUploadButton(viewModel)
+
+                        Row {
+                            UserFollowList(
+                                userFollowMap = userFollowMap,
+                                followingOnly = followingOnly, // Passa lo stato del filtro
+                                onFollowToggle = { user, isFollowing ->
+                                    coroutineScope.launch {
+                                        viewModel.toggleFollowUser(user, isFollowing)
+                                        userFollowMap?.let {
+                                            val updatedMap = it.toMutableMap()
+                                            updatedMap[user] = !isFollowing
+                                            viewModel.updateFollowState(updatedMap)
+                                        }
+                                    }
+                                },
+                                isRefreshing = isRefreshing,
+                                mounted = mounted
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            FileUploadButton(viewModel)
+                        }
+                    }
+                } else {
+                    // Se l'utente non è loggato, mostra un messaggio
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center
+                    ) {
+
+                        Row {
+
+                            Text(
+                                text = "You need to be logged in to access the community",
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                fontSize = 20.sp
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Button(
+                                onClick = {
+                                    navController.navigate(Screen.LoginScreen.route)
+                                },
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Text("Login")
+                            }
+                        }
+
                     }
                 }
+
+
             }
         }
     }
@@ -174,11 +236,12 @@ fun CommunityScreen(
 fun UserFollowList(
     userFollowMap: Map<User, Boolean>?,
     followingOnly: Boolean, // Stato del filtro
-    onFollowToggle: (User, Boolean) -> Unit
+    onFollowToggle: (User, Boolean) -> Unit,
+    isRefreshing: Boolean,
+    mounted: Boolean
 ) {
-    val isLoading = userFollowMap == null
     val alpha by animateFloatAsState(
-        targetValue = if (isLoading) 1f else 0f, // Se i dati sono in caricamento, mantieni la shimmer
+        targetValue = if (isRefreshing) 1f else 0f, // Se i dati sono in caricamento, mantieni la shimmer
         animationSpec = tween(
             durationMillis = 1500,
             easing = EaseInOut
@@ -190,13 +253,12 @@ fun UserFollowList(
             .fillMaxWidth()
             .padding(8.dp)
 
-        if (isLoading) {
+        if (isRefreshing && !mounted) {
             // Mostra skeleton loader durante il caricamento
             items(5) {
                 UserPlaceholder(alpha = alpha, modifier = userModifier)
             }
         } else {
-
 
             val filteredUsers = if (followingOnly) {
                 userFollowMap?.filter { it.value }?.toMap()

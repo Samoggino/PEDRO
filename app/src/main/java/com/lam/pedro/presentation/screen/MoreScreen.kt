@@ -37,12 +37,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.lam.pedro.R
 import com.lam.pedro.data.HealthConnectManager
-import com.lam.pedro.data.fetchFromHealthConnectForDB
 import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper.checkUserLoggedIn
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginState
-import com.lam.pedro.presentation.serialization.ViewModelRecords
 import kotlinx.coroutines.launch
 
 @Composable
@@ -110,11 +108,14 @@ fun MoreScreen(
             iconId = R.drawable.modify_icon,
             label = "UPDATE DB",
             onClick = {
-                coroutineScope.launch {
-                    val allActivities = fetchFromHealthConnectForDB(healthConnectManager)
-                    val viewModelRecords = ViewModelRecords()
-                    viewModelRecords.insertActivitySession(allActivities)
-                }
+                /**
+                 * FIXME: eccezione per exerciseRoute = null
+                 * coroutineScope.launch {
+                 *     val allActivities = fetchFromHealthConnectForDB(healthConnectManager)
+                 *     val viewModelRecords = ViewModelRecords()
+                 *     viewModelRecords.insertActivitySession(allActivities)
+                 * }
+                 */
             },
             height = itemHeight
         )
