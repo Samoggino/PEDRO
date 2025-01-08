@@ -1,6 +1,7 @@
 package com.lam.pedro.presentation.screen.activities.newActivity.strategyForNewScreen
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -17,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -56,10 +58,16 @@ class StepCounterFunctionality(private val context: Context) : ScreenFunctionali
         ) { isGranted ->
             hasActivityRecognitionPermission = isGranted
             if (isGranted) {
-                Log.d(TAG, "-----------------Activity Recognition Permission granted-----------------")
+                Log.d(
+                    TAG,
+                    "-----------------Activity Recognition Permission granted-----------------"
+                )
             } else {
                 //TODO: Handle permission denied, inform the user
-                Log.d(TAG, "-----------------Activity Recognition Permission denied-----------------")
+                Log.d(
+                    TAG,
+                    "-----------------Activity Recognition Permission denied-----------------"
+                )
                 hasBeenAskedForActivityRecognitionPermission = true
                 showActivityRecognitionPermissionDialog = true
             }
@@ -120,8 +128,24 @@ class StepCounterFunctionality(private val context: Context) : ScreenFunctionali
             color = MaterialTheme.colorScheme.primary,
             title = R.string.activity_recognition_permission_title,
             icon = R.drawable.steps_icon,
-            text = R.string.activity_recognition_permission_description,
-            buttonText = R.string.go_to_settings
+            text = if (!ActivityCompat.shouldShowRequestPermissionRationale(
+                    context as Activity,
+                    Manifest.permission.ACTIVITY_RECOGNITION
+                )
+            ) {
+                R.string.activity_recognition_permission_permanently_denied_description
+            } else {
+                R.string.activity_recognition_permission_description
+            },
+            buttonText = if (!ActivityCompat.shouldShowRequestPermissionRationale(
+                    context as Activity,
+                    Manifest.permission.ACTIVITY_RECOGNITION
+                )
+            ) {
+                R.string.go_to_settings
+            } else {
+                R.string.request_permission
+            }
         )
     }
 }

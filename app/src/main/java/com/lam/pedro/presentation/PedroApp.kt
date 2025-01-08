@@ -20,6 +20,7 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -61,6 +62,7 @@ import com.lam.pedro.util.NotificationsFunctionality
 
 const val TAG = "Health Connect sample"
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PedroApp(healthConnectManager: HealthConnectManager) {
@@ -124,7 +126,8 @@ fun PedroApp(healthConnectManager: HealthConnectManager) {
             else -> R.string.app_name
         }
 
-        val notificationsFunctionality = NotificationsFunctionality(LocalContext.current)
+        val context = LocalContext.current /*as Activity*/
+        val notificationsFunctionality = NotificationsFunctionality(context)
         notificationsFunctionality.Execute()
 
         Scaffold(
