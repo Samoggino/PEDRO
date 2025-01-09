@@ -1,11 +1,11 @@
 package com.lam.pedro.presentation.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,25 +15,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import com.lam.pedro.R
 import com.lam.pedro.presentation.navigation.Screen
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
-    val context = LocalContext.current
+fun HomeScreen(navController: NavController) {
+
+    Log.i("Reload", "HomeScreen loaded out")
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -42,7 +41,7 @@ fun HomeScreen(navController: NavHostController) {
     ) {
         item {
             Spacer(modifier = Modifier.height(30.dp))
-            Row() {
+            Row {
                 Text(
                     text = "Welcome back!",
                     style = MaterialTheme.typography.headlineMedium,
@@ -53,15 +52,10 @@ fun HomeScreen(navController: NavHostController) {
                     .size(70.dp)
                     .clip(RoundedCornerShape(26.dp))
                     .background(MaterialTheme.colorScheme.primary)
-                    .clickable { navController.navigate(Screen.ProfileScreen.route) {
-                        navController.graph.startDestinationRoute?.let { route ->
-                            popUpTo(route) {
-                                saveState = true
-                            }
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    } }) {
+                    .clickable {
+                        navController.navigate(Screen.ProfileScreen.route)
+                    }
+                ) {
                     Image(
                         painter = painterResource(id = R.drawable.profile_icon),
                         contentDescription = null,

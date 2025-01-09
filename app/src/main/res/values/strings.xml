@@ -185,5 +185,6 @@
     <string name="charts_screen">charts screen</string>
     <string name="community_screen">Community</string>
     <string name="register_screen">Register screen</string>
+    <string name="community_user_details">user details</string>
 
 </resources>

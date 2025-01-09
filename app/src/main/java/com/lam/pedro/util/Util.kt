@@ -36,6 +36,7 @@ import com.lam.pedro.data.datasource.SecurePreferencesManager.getMyContext
 import com.lam.pedro.data.dateTimeWithOffsetOrDefault
 import com.lam.pedro.presentation.theme.PedroDarkGray
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneOffset
@@ -50,7 +51,7 @@ fun showExceptionSnackbar(
     scope: CoroutineScope,
     throwable: Throwable?
 ) {
-    scope.launch {
+    scope.launch(Dispatchers.IO) {
         snackbarHostState.showSnackbar(
             message = throwable?.localizedMessage ?: "Unknown exception",
             duration = SnackbarDuration.Short

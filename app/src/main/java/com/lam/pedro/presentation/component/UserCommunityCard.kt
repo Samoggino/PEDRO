@@ -45,11 +45,12 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.lam.pedro.presentation.screen.community.AnimationDuration
-import com.lam.pedro.presentation.screen.community.FollowButtonSize
-import com.lam.pedro.presentation.screen.community.IconSize
-import com.lam.pedro.presentation.screen.community.NameHeight
 import com.lam.pedro.presentation.screen.more.loginscreen.User
 import com.lam.pedro.util.placeholder
+
+val ICON_SIZE = 70.dp
+val FOLLOW_BUTTON_SIZE = ICON_SIZE * 0.45f
+val NameHeight = 24.dp
 
 @Composable
 fun UserCommunityCard(
@@ -59,6 +60,7 @@ fun UserCommunityCard(
     onLongPress: @Composable () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+
     val roundedCornerSize = 16.dp
     var showLongPressContent by remember { mutableStateOf(false) } // Stato per mostrare il contenuto
 
@@ -66,7 +68,7 @@ fun UserCommunityCard(
     if (showLongPressContent) {
         onLongPress()
     }
-    
+
     Card(
         modifier = modifier
             .pointerInput(Unit) {
@@ -133,7 +135,7 @@ private fun Avatar(avatarUrl: String?) {
             ),
             contentDescription = "User Avatar",
             modifier = Modifier
-                .size(IconSize)
+                .size(ICON_SIZE)
                 .clip(RoundedCornerShape(50))
                 .border(
                     1.dp,
@@ -146,7 +148,7 @@ private fun Avatar(avatarUrl: String?) {
             imageVector = Icons.Default.AccountCircle,
             contentDescription = "Default Avatar",
             modifier = Modifier
-                .size(IconSize)
+                .size(ICON_SIZE)
                 .clip(RoundedCornerShape(50)),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -170,7 +172,7 @@ fun FollowButton(isFollowing: Boolean, onClick: () -> Unit) {
         contentDescription = if (isFollowing) "Followed" else "Follow",
         tint = iconColor,
         modifier = Modifier
-            .size(FollowButtonSize)
+            .size(FOLLOW_BUTTON_SIZE)
             .scale(scale)
             .clickable { onClick() }
             .padding(4.dp)
@@ -180,7 +182,6 @@ fun FollowButton(isFollowing: Boolean, onClick: () -> Unit) {
 
 @Composable
 fun UserPlaceholder(animation: Float, modifier: Modifier = Modifier) {
-
     val isLoading = true
 
     Card(
@@ -197,7 +198,7 @@ fun UserPlaceholder(animation: Float, modifier: Modifier = Modifier) {
         ) {
             Box(
                 modifier = Modifier
-                    .size(IconSize)
+                    .size(ICON_SIZE)
                     .clip(RoundedCornerShape(50))
                     .placeholder(isLoading, MaterialTheme.colorScheme.onSurfaceVariant)
                     .graphicsLayer(alpha = animation)
@@ -223,15 +224,14 @@ fun UserPlaceholder(animation: Float, modifier: Modifier = Modifier) {
             Spacer(modifier = Modifier.width(16.dp))
             Box(
                 modifier = Modifier
-                    .size(FollowButtonSize)
+                    .size(FOLLOW_BUTTON_SIZE)
                     .clip(RoundedCornerShape(50))
                     .placeholder(isLoading, MaterialTheme.colorScheme.onSurfaceVariant)
                     .graphicsLayer(alpha = animation)
             )
-
         }
         Spacer(modifier = Modifier.width(16.dp))
     }
-
-
 }
+
+

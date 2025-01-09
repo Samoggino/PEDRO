@@ -29,6 +29,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.presentation.navigation.Screen
@@ -37,7 +38,7 @@ import com.lam.pedro.presentation.navigation.Screen
 @Composable
 fun MyScreenRecords(
     navController: NavController,
-    viewModel: ViewModelRecords = ViewModelRecords
+    viewModel: MyRecordsViewModel = viewModel(factory = MyScreenRecordsFactory())
 ) {
     val scrollState = rememberScrollState()
 
@@ -147,7 +148,7 @@ fun ActivityRow(
 }
 
 @Composable
-private fun ExportButton(viewModel: ViewModelRecords) {
+private fun ExportButton(viewModel: MyRecordsViewModel) {
     val saveResult by viewModel.saveResult.observeAsState(ResultState.Idle)
     val message by viewModel.messageEvent.observeAsState()
 
@@ -168,7 +169,7 @@ private fun ExportButton(viewModel: ViewModelRecords) {
 }
 
 @Composable
-private fun ImportButton(viewModel: ViewModelRecords) {
+private fun ImportButton(viewModel: MyRecordsViewModel) {
     val importResult by viewModel.importResult.observeAsState(ResultState.Idle) // Osserva lo stato dell'import
     val message by viewModel.messageEvent.observeAsState() // Messaggi da mostrare tramite Toast
 

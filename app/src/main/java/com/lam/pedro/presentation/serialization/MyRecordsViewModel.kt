@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
@@ -30,9 +31,9 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.serializer
 
-object ViewModelRecords : ViewModel() {
+class MyRecordsViewModel : ViewModel() {
 
-    const val tag = "Supabase"
+    val tag = "Supabase"
 
     // LiveData per monitorare lo stato dell'import
     private val _importResult = MutableLiveData<ResultState>(ResultState.Idle)
@@ -192,7 +193,7 @@ object ViewModelRecords : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val inputStream =
-                    SecurePreferencesManager.appContext!!.contentResolver.openInputStream(uri)
+                    SecurePreferencesManager.getMyContext().contentResolver.openInputStream(uri)
                         ?: throw Exception("Impossibile leggere il file, URI non valido.")
 
                 val jsonObject =
@@ -221,4 +222,13 @@ object ViewModelRecords : ViewModel() {
 
 }
 
+class MyScreenRecordsFactory : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MyRecordsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MyRecordsViewModel() as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
 

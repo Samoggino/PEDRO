@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 object SecurePreferencesManager {
     private const val PREFS_NAME = "secure_prefs"
@@ -11,9 +14,8 @@ object SecurePreferencesManager {
     private const val REFRESH_TOKEN_KEY = "REFRESH_TOKEN"
     private const val UUID = "UUID"
 
-
     private var encryptedPrefs: SharedPreferences? = null
-    var appContext: Context? = null
+    private var appContext: Context? = null
 
     /**
      * Inizializza il SecurePreferencesManager con l'application context.
@@ -21,8 +23,15 @@ object SecurePreferencesManager {
      * @param context Il contesto dell'applicazione.
      */
     fun initialize(context: Context) {
-        if (encryptedPrefs == null) {
+        if (appContext != null) {
+            return
+        }
+
+
+        // Esegui l'inizializzazione delle SharedPreferences in una coroutine
+        CoroutineScope(Dispatchers.IO).launch {
             appContext = context.applicationContext
+
             val masterKey = MasterKey.Builder(appContext!!)
                 .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                 .build()
@@ -37,8 +46,11 @@ object SecurePreferencesManager {
         }
     }
 
+    /**
+     * Verifica che SecurePreferencesManager sia stato inizializzato.
+     */
     private fun checkInitialized() {
-        if (encryptedPrefs == null) {
+        if (appContext == null || encryptedPrefs == null) {
             throw IllegalStateException("SecurePreferencesManager is not initialized. Call initialize(context) first.")
         }
     }
@@ -48,14 +60,18 @@ object SecurePreferencesManager {
      *
      * @param accessToken Il token di accesso da salvare.
      * @param refreshToken Il token di aggiornamento da salvare.
+     * @param id Il UUID da associare, se disponibile.
      */
     fun saveTokens(accessToken: String, refreshToken: String, id: String?) {
         checkInitialized()
-        with(encryptedPrefs!!.edit()) {
-            putString(ACCESS_TOKEN_KEY, accessToken)
-            putString(REFRESH_TOKEN_KEY, refreshToken)
-            id?.let { putString(UUID, it) }
-            apply()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            with(encryptedPrefs!!.edit()) {
+                putString(ACCESS_TOKEN_KEY, accessToken)
+                putString(REFRESH_TOKEN_KEY, refreshToken)
+                id?.let { putString(UUID, it) }
+                apply()
+            }
         }
     }
 
@@ -64,12 +80,14 @@ object SecurePreferencesManager {
      */
     fun logoutSecurePrefs() {
         checkInitialized()
-        // Specifica le chiavi relative al login da rimuovere
-        val loginKeys = listOf(ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, UUID)
 
-        with(encryptedPrefs!!.edit()) {
-            loginKeys.forEach { remove(it) } // Rimuovi solo le chiavi specificate
-            apply()
+        CoroutineScope(Dispatchers.IO).launch {
+            val loginKeys = listOf(ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, UUID)
+
+            with(encryptedPrefs!!.edit()) {
+                loginKeys.forEach { remove(it) } // Rimuovi solo le chiavi specificate
+                apply()
+            }
         }
     }
 
@@ -79,15 +97,17 @@ object SecurePreferencesManager {
      */
     fun getUUID(): String? {
         checkInitialized()
+
         return encryptedPrefs!!.getString(UUID, null)
     }
 
     /**
      * Restituisce il context dell'applicazione.
+     * Se il manager non è stato inizializzato, lancerà un'eccezione.
      */
     fun getMyContext(): Context {
         checkInitialized()
+
         return appContext!!
     }
-
 }

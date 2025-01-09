@@ -23,7 +23,7 @@ import com.lam.pedro.util.calculateCyclingCalories
 import java.time.ZonedDateTime
 
 
-class CycleSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+class CycleSessionViewModel(val healthConnectManager: HealthConnectManager) :
     ActivitySessionViewModel(healthConnectManager), MutableState<ActivitySessionViewModel?> {
 
     //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps

@@ -2,6 +2,7 @@ package com.lam.pedro.presentation.screen.more.loginscreen
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.datasource.SecurePreferencesManager.saveTokens
 import com.lam.pedro.data.datasource.SupabaseClient.supabase
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-object LoginViewModel : ViewModel() {
+class LoginViewModel : ViewModel() {
 
     data class LoginFormData(
         val email: String = "",
@@ -124,5 +125,15 @@ object LoginViewModel : ViewModel() {
             Log.e("Supabase", "Errore generico di login: ${e.message}")
             null
         }
+    }
+}
+
+class LoginViewModelFactory : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return LoginViewModel() as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

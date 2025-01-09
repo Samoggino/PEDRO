@@ -18,7 +18,7 @@ import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.SessionState
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.presentation.TAG
+import com.lam.pedro.data.datasource.SecurePreferencesManager.getMyContext
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.CycleSessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.RunSessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.TrainSessionViewModel
@@ -169,7 +169,11 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
 
                 // Avvia la sessione di esercizio e registra i dati necessari
                 healthConnectManager.insertExerciseSession(
-                    startOfSession.toInstant(), endOfSession.toInstant(), activityEnum.activityType, title, notes
+                    startOfSession.toInstant(),
+                    endOfSession.toInstant(),
+                    activityEnum.activityType,
+                    title,
+                    notes
                 )
                 fetchSessions()  // aggiorna la lista delle sessioni
             }
@@ -226,9 +230,8 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
 
 }
 
-class GeneralActivityViewModelFactory(
-    private val healthConnectManager: HealthConnectManager
-) : ViewModelProvider.Factory {
+class GeneralActivityViewModelFactory : ViewModelProvider.Factory {
+    private val healthConnectManager: HealthConnectManager = HealthConnectManager(getMyContext())
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -236,8 +239,8 @@ class GeneralActivityViewModelFactory(
             // Dynamic activities
             modelClass.isAssignableFrom(CycleSessionViewModel::class.java) -> {
                 (CycleSessionViewModel(
-        healthConnectManager
-    )) as T
+                    healthConnectManager
+                )) as T
             }
 
             modelClass.isAssignableFrom(RunSessionViewModel::class.java) -> {

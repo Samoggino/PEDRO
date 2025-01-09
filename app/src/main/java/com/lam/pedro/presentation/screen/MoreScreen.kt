@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.lam.pedro.R
-import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper.checkUserLoggedIn
@@ -45,11 +44,13 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MoreScreen(
-    navController: NavHostController,
-    healthConnectManager: HealthConnectManager
+    navController: NavHostController
 ) {
     val coroutineScope = rememberCoroutineScope()
     val loginState = remember { mutableStateOf<LoginState>(LoginState.Idle) }
+
+//    val context = LocalContext.current
+//    remember { HealthConnectManager(context) }
 
     // Controllo login al montaggio del composable
     LaunchedEffect(Unit) {

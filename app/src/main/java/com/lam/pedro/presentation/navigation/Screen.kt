@@ -67,6 +67,6 @@ enum class Screen(
     MyScreenRecords(route = "my_screen_records", titleId = R.string.my_screen_records),
     FollowScreen(route = "follow_screen", titleId = R.string.follow_screen),
     ChartsScreen(route = "charts_screen", titleId = R.string.charts_screen),
-    RegisterScreen(route = "register_screen", titleId = R.string.register_screen)
-
+    RegisterScreen(route = "register_screen", titleId = R.string.register_screen),
+    CommunityUserDetails(route = "community_user_details", titleId = R.string.community_user_details)
 }

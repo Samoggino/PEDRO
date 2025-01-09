@@ -3,15 +3,13 @@ package com.lam.pedro.presentation.screen.community
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.lam.pedro.data.activity.ActivityEnum
-import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.datasource.SecurePreferencesManager
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.SupabaseClient.supabase
 import com.lam.pedro.presentation.screen.more.loginscreen.User
 import com.lam.pedro.presentation.screen.more.loginscreen.parseUsers
-import com.lam.pedro.presentation.serialization.ViewModelRecords
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.storage.storage
 import io.ktor.http.ContentType
@@ -23,7 +21,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
-object CommunityScreenViewModel : ViewModel() {
+class CommunityScreenViewModel : ViewModel() {
 
     private val _userIsLoggedIn: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val userIsLoggedIn: StateFlow<Boolean> = _userIsLoggedIn
@@ -91,7 +89,7 @@ object CommunityScreenViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val inputStream =
-                    SecurePreferencesManager.appContext!!.contentResolver.openInputStream(fileUri)
+                    SecurePreferencesManager.getMyContext().contentResolver.openInputStream(fileUri)
                         ?: throw Exception("Impossibile leggere il file, URI non valido.")
 
                 val fileBytes = inputStream.readBytes()
@@ -115,14 +113,16 @@ object CommunityScreenViewModel : ViewModel() {
             }
         }
     }
+}
 
-    val activityMap = MutableStateFlow<Map<ActivityEnum, List<GenericActivity>>>(emptyMap())
 
-    fun fetchActivityMap(userUUID: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-
-            activityMap.value = ViewModelRecords.getActivityMap(userUUID = userUUID)
-
+class CommunityScreenViewModelFactory : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(CommunityScreenViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return CommunityScreenViewModel() as T
         }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+

@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.util.placeholder
@@ -44,9 +45,11 @@ import kotlinx.coroutines.delay
 @Composable
 fun ScreenCharts(
     activityEnum: ActivityEnum,
-    navController: NavController
+    navController: NavController,
+    viewModelCharts: ViewModelCharts = viewModel(
+        factory = ChartsViewModelFactory() // Usa la factory
+    )
 ) {
-    val viewModelCharts = ViewModelCharts
 
     val chartState by viewModelCharts.chartState.observeAsState(ChartState.Loading)
 

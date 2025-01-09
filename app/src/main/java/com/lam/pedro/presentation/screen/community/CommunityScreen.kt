@@ -1,25 +1,20 @@
 package com.lam.pedro.presentation.screen.community
 
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
@@ -39,106 +34,81 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.lam.pedro.R
-import com.lam.pedro.data.activity.ActivityEnum
-import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.presentation.component.ShowSessionDetails
 import com.lam.pedro.presentation.component.UserCommunityCard
 import com.lam.pedro.presentation.component.UserPlaceholder
 import com.lam.pedro.presentation.navigation.Screen
-import com.lam.pedro.presentation.screen.community.CommunityScreenViewModel.activityMap
-import com.lam.pedro.presentation.screen.community.CommunityScreenViewModel.fetchActivityMap
 import com.lam.pedro.presentation.screen.more.loginscreen.User
 import com.lam.pedro.util.vibrateOnClick
 import com.lam.pedro.util.vibrateOnLongPress
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-val IconSize = 70.dp
-val FollowButtonSize = IconSize * 0.45f
-val NameHeight = 24.dp
+
 const val AnimationDuration = 2500
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityScreen(
     navController: NavController,
-    viewModel: CommunityScreenViewModel = CommunityScreenViewModel,
+    viewModel: CommunityScreenViewModel = viewModel(factory = CommunityScreenViewModelFactory())
 ) {
-    val userFollowMap by viewModel.userFollowMap.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val userIsLogged = viewModel.userIsLoggedIn.collectAsState()
+
+    // Usa remember per gli stati
+    val isRefreshingState = remember { mutableStateOf(false) }
+    val isInitialLoadState = remember { mutableStateOf(false) }
+    val followingOnlyState = remember { mutableStateOf(false) }
+
+    val userFollowMap by viewModel.userFollowMap.collectAsState(initial = emptyMap()) // Fornisci un valore iniziale
+    val userIsLogged by viewModel.userIsLoggedIn.collectAsState(initial = false)
 
 
-    var isRefreshing by remember { mutableStateOf(false) }
-    var followingOnly by remember { mutableStateOf(false) }  // Usa lo stesso stato per cuore e filtro
-    var mounted by remember { mutableStateOf(false) }
-    // Carica i dati iniziali al primo caricamento
-
-    LaunchedEffect(Unit) {
-        if (!mounted) {
-            isRefreshing = true
-            Log.i("Community", "CommunityScreen")
-            if (userIsLogged.value) {
+    Log.i("Community", "CommunityScreen")
+    LaunchedEffect(isInitialLoadState.value) {
+        if (!isInitialLoadState.value) {
+            isRefreshingState.value = true
+            if (userIsLogged) {
                 viewModel.getFollowedUsers()
             }
             viewModel.updateUserIsLoggedIn()
-            isRefreshing = false
-            mounted = true // Imposta mounted solo alla prima esecuzione
+            isRefreshingState.value = false
+            isInitialLoadState.value = true
         }
     }
-
 
     Scaffold(
         topBar = {
             TopAppBar(
-                modifier = Modifier.fillMaxWidth(),
-                title = {
-                    Text(
-                        text = "Community",
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                },
+                title = { Text("Community") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
-
-
-                    if (userIsLogged.value) {
+                    if (userIsLogged) {
                         IconButton(
                             onClick = {
-                                followingOnly = !followingOnly  // Cambia lo stato del filtro
+                                followingOnlyState.value = !followingOnlyState.value
                                 vibrateOnClick()
-                            },
-                            modifier = Modifier.padding(16.dp)
+                            }
                         ) {
-                            // Animazione per il cuore (riempito o vuoto)
-                            val heartScale by animateFloatAsState(
-                                targetValue = if (followingOnly) 1.2f else 1f, // Aumenta la dimensione del cuore quando è pieno
-                                animationSpec = tween(durationMillis = 300),
-                                label = "" // Tempo di animazione
-                            )
-
                             Icon(
-                                imageVector = if (followingOnly) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                                contentDescription = "Follow filter",
-                                tint = Color.Red.copy(alpha = heartScale) // Tint rosso e con alpha che cambia in base all'animazione
+                                imageVector = if (followingOnlyState.value) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                                contentDescription = null,
+                                tint = Color.Red
                             )
                         }
-
                     }
                 }
             )
@@ -152,12 +122,12 @@ fun CommunityScreen(
         ) {
             // Schermata con PullToRefresh
             PullToRefreshBox(
-                isRefreshing = isRefreshing,
+                isRefreshing = isRefreshingState.value,
                 onRefresh = {
-                    isRefreshing = true
-                    coroutineScope.launch {
+                    isRefreshingState.value = true
+                    coroutineScope.launch(Dispatchers.IO) {
                         viewModel.getFollowedUsers()
-                        isRefreshing = false
+                        isRefreshingState.value = false
                     }
                 },
                 modifier = Modifier
@@ -165,7 +135,7 @@ fun CommunityScreen(
                     .background(MaterialTheme.colorScheme.surface),
             ) {
 
-                if (userIsLogged.value) {
+                if (userIsLogged) {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -174,7 +144,7 @@ fun CommunityScreen(
                         Row {
                             UserFollowList(
                                 userFollowMap = userFollowMap,
-                                followingOnly = followingOnly, // Passa lo stato del filtro
+                                followingOnly = followingOnlyState.value, // Passa lo stato del filtro
                                 onFollowToggle = { user, isFollowing ->
                                     coroutineScope.launch {
                                         viewModel.toggleFollowUser(user, isFollowing)
@@ -185,17 +155,18 @@ fun CommunityScreen(
                                         }
                                     }
                                 },
-                                isRefreshing = isRefreshing,
-                                mounted = mounted
+                                isRefreshing = isRefreshingState.value,
+                                isInitialLoad = isInitialLoadState.value,
+                                navController = navController
                             )
                         }
 
-                        Row(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            FileUploadButton(viewModel)
-                        }
+//                        Row(
+//                            modifier = Modifier.fillMaxSize(),
+//                            horizontalArrangement = Arrangement.Center
+//                        ) {
+//                            FileUploadButton(viewModel)
+//                        }
                     }
                 } else {
 
@@ -207,18 +178,84 @@ fun CommunityScreen(
             }
         }
     }
+}
 
+@Composable
+fun UserFollowList(
+    userFollowMap: Map<User, Boolean>?,
+    followingOnly: Boolean,
+    onFollowToggle: (User, Boolean) -> Unit,
+    isRefreshing: Boolean,
+    isInitialLoad: Boolean,
+    navController: NavController
+) {
+    var isNavigating by remember { mutableStateOf(false) } // Aggiungi questa variabile
+    val animation by animateFloatAsState(
+        targetValue = if (isRefreshing) 1f else 0f, // Se i dati sono in caricamento, mantieni la shimmer
+        animationSpec = tween(
+            durationMillis = 1500,
+            easing = EaseInOut
+        ), label = "FloatAnimation"
+    )
+
+    LazyColumn(modifier = Modifier.padding(4.dp)) {
+        val userModifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+
+        if (isRefreshing && !isInitialLoad) {
+            items(5) {
+                UserPlaceholder(modifier = userModifier, animation = animation)
+            }
+        } else {
+
+            val filteredUsers = if (followingOnly) {
+                userFollowMap?.filter { it.value }?.toMap()
+            } else {
+                userFollowMap
+            }
+
+            filteredUsers?.forEach { (user, isFollowing) ->
+                item {
+                    UserCommunityCard(
+                        user = user,
+                        isFollowing = isFollowing,
+                        onClick = {
+                            vibrateOnClick()
+                            onFollowToggle(user, isFollowing)
+                        },
+                        onLongPress = {
+                            // Impedisci la navigazione ripetuta
+                            if (!isNavigating) {
+                                isNavigating = true
+                                vibrateOnLongPress()
+                                navController.navigate(Screen.CommunityUserDetails.route + "/${user.id}")
+                                // Reset isNavigating dopo la navigazione
+                                // Questo può essere fatto tramite un callback in LaunchedEffect se necessario
+                                LaunchedEffect(Unit) {
+                                    delay(300)
+                                    // Una volta che la navigazione è completata, ripristina isNavigating
+                                    isNavigating = false
+                                }
+                            }
+                        },
+                        modifier = userModifier,
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable
 private fun PlaceholderCommunity(navController: NavController) {
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
         Row {
-
             Text(
                 text = "You need to be logged in to access the community",
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
@@ -245,175 +282,4 @@ private fun PlaceholderCommunity(navController: NavController) {
         }
 
     }
-}
-
-@Composable
-fun UserFollowList(
-    userFollowMap: Map<User, Boolean>?,
-    followingOnly: Boolean, // Stato del filtro
-    onFollowToggle: (User, Boolean) -> Unit,
-    isRefreshing: Boolean,
-    mounted: Boolean
-) {
-    val animation by animateFloatAsState(
-        targetValue = if (isRefreshing) 1f else 0f, // Se i dati sono in caricamento, mantieni la shimmer
-        animationSpec = tween(
-            durationMillis = 1500,
-            easing = EaseInOut
-        ), label = "FloatAnimation"
-    )
-
-    LazyColumn(modifier = Modifier.padding(4.dp)) {
-        val userModifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-
-        if (isRefreshing && !mounted) {
-            // Mostra skeleton loader durante il caricamento
-            items(5) {
-                UserPlaceholder(animation = animation, modifier = userModifier)
-            }
-        } else {
-
-            val filteredUsers = if (followingOnly) {
-                userFollowMap?.filter { it.value }?.toMap()
-            } else {
-                userFollowMap
-            }
-
-            filteredUsers?.forEach { (user, isFollowing) ->
-                item {
-                    UserCommunityCard(
-                        user = user,
-                        isFollowing = isFollowing,
-                        onClick = {
-                            vibrateOnClick()
-                            onFollowToggle(user, isFollowing)
-                        },
-                        onLongPress = {
-                            vibrateOnLongPress()
-                            // Mostra un popup con la cronologia delle attività dell'utente
-                            ActivityHistoryPopup(user.id)
-                        },
-                        modifier = userModifier,
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun FileUploadButton(viewModel: CommunityScreenViewModel) {
-
-    // Launcher per aprire il file picker
-    val pickFileLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        uri?.let { selectedFileUri ->
-            Log.i("Community", "FileUploadButton")
-            viewModel.uploadFileToSupabase(selectedFileUri)
-        }
-    }
-
-    // Bottone per attivare il file picker
-    Button(
-        onClick = {
-            pickFileLauncher.launch("image/*") // Specifica il tipo di file da selezionare
-        },
-        modifier = Modifier.padding(16.dp)
-    ) {
-        Text("Carica avatar")
-    }
-}
-
-@Composable
-fun ActivityHistoryPopup(
-    userUUID: String
-) {
-
-    val activityMap by activityMap.collectAsState(emptyMap())
-    var showDialog by remember { mutableStateOf(false) }
-    var selectedActivityType: ActivityEnum? by remember { mutableStateOf(null) }
-
-    LaunchedEffect(userUUID) {
-        fetchActivityMap(userUUID)
-    }
-
-    Column {
-        Text(text = "Activity History", modifier = Modifier.padding(16.dp))
-
-        LazyColumn(
-            modifier = Modifier
-                .padding(8.dp)
-                .heightIn(max = 300.dp)
-        ) {
-            try {
-                items(activityMap.keys.toList()) { activityType ->
-                    Text(
-                        text = activityType.name,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .clickable {
-                                selectedActivityType = activityType
-                                showDialog = true
-                            }
-                    )
-                }
-            } catch (e: Exception) {
-                Log.e("Community", "Error showing dialog", e)
-            }
-        }
-
-        if (showDialog && selectedActivityType != null) {
-            val recentActivities = activityMap[selectedActivityType]?.takeLast(5) ?: emptyList()
-            ActivityDetailsDialog(
-                activities = recentActivities,
-                onDismiss = { showDialog = false },
-                activityType = selectedActivityType!!
-
-            )
-        }
-    }
-}
-
-@Composable
-fun ActivityDetailsDialog(
-    activities: List<GenericActivity>,
-    activityType: ActivityEnum,
-    onDismiss: () -> Unit,
-) {
-
-//    AlertDialog(
-//        onDismissRequest = onDismiss,
-//        title = { Text(text = "Recent ${activityType.name} Activities") },
-//        text = {
-//            LazyColumn(
-//                modifier = Modifier.padding(8.dp).heightIn(max = 300.dp)
-//            ) {
-//                try {
-//                    items(activities) { activity ->
-//                        Text(text = "Date: ${activity.basicActivity.startTime}, Duration: ${activity.basicActivity.durationInMinutes()}")
-//                    }
-//                } catch (e: Exception) {
-//                    Log.e("Community", "Error showing dialog", e)
-//                }
-//            }
-//        },
-//        confirmButton = {
-//            Button(onClick = onDismiss) {
-//                Text("Close")
-//            }
-//        }
-//    )
-
-    Column(
-        modifier = Modifier.heightIn(max = 300.dp)
-    ) {
-        activities.forEach { activity ->
-            ShowSessionDetails(activity)
-        }
-    }
-
-
 }

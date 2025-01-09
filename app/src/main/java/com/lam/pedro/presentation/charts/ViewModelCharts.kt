@@ -5,18 +5,20 @@ import androidx.compose.ui.graphics.Brush
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.toMonthNumber
-import com.lam.pedro.presentation.serialization.ViewModelRecords
+import com.lam.pedro.presentation.serialization.MyScreenRecordsFactory
+import com.lam.pedro.presentation.serialization.MyRecordsViewModel
 import ir.ehsannarmani.compose_charts.models.Bars
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-object ViewModelCharts : ViewModel() {
+class ViewModelCharts : ViewModel() {
 
-    private val viewModelRecords = ViewModelRecords
+    private val myRecordsViewModel = MyScreenRecordsFactory().create(MyRecordsViewModel::class.java)
 
     // In ViewModelCharts
     private val _chartState = MutableLiveData<ChartState>(ChartState.Loading)
@@ -35,7 +37,7 @@ object ViewModelCharts : ViewModel() {
         _chartState.value = ChartState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                activities = viewModelRecords.getActivitySession(activityEnum)
+                activities = myRecordsViewModel.getActivitySession(activityEnum)
                 if (activities.isEmpty()) {
                     _chartState.postValue(ChartState.Error(ChartError.NoData))
                 } else {
@@ -155,13 +157,12 @@ fun getAvailableMetricsForActivity(activityEnum: ActivityEnum) =
         else -> LabelMetrics.entries.filter { it == LabelMetrics.DURATION }
     }
 
-//@Suppress("UNCHECKED_CAST")
-//fun viewModelChartsFactory(viewModelRecords: ViewModelRecords) =
-//    object : ViewModelProvider.Factory {
-//        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-//            if (modelClass.isAssignableFrom(ViewModelCharts::class.java)) {
-//                return ViewModelCharts(viewModelRecords) as T
-//            }
-//            throw IllegalArgumentException("Unknown ViewModel class")
-//        }
-//    }
+class ChartsViewModelFactory : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(ViewModelCharts::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return ViewModelCharts() as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
