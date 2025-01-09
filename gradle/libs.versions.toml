@@ -36,9 +36,11 @@ playServicesLocation = "21.3.0"
 core = "1.46.0"
 playServicesMaps = "19.0.0"
 securityCryptoKtx = "1.0.0"
+workRuntimeKtx = "2.10.0"
 
 [libraries]
 accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanistPlaceholderMaterial" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 mapLibre = { module = "org.maplibre.gl:android-sdk", version.ref = "androidSdk" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

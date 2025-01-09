@@ -1,4 +1,4 @@
-package com.lam.pedro.util
+package com.lam.pedro.util.notification
 
 import android.Manifest
 import android.app.Activity
@@ -21,7 +21,6 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
@@ -30,6 +29,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.lam.pedro.R
 import com.lam.pedro.presentation.component.DeniedPermissionDialog
 import com.lam.pedro.presentation.screen.activities.newActivity.strategyForNewScreen.ScreenFunctionality
+import com.lam.pedro.util.TAG
 
 class NotificationsFunctionality(private val context: Context) : ScreenFunctionality {
 
@@ -42,7 +42,6 @@ class NotificationsFunctionality(private val context: Context) : ScreenFunctiona
     override fun Execute() {
         var showNotificationPermissionDialog by remember { mutableStateOf(false) }
         val lifecycleOwner = LocalLifecycleOwner.current
-
 
         // Launcher per richiedere il permesso di POST_NOTIFICATIONS
         val requestNotificationPermissionLauncher = rememberLauncherForActivityResult(
