@@ -28,11 +28,7 @@ fun UploadAvatarButton(viewModel: CommunityScreenViewModel = viewModel(factory =
 
     // Bottone per attivare il file picker
     Button(
-        onClick = {
-            pickFileLauncher.launch("image/*") // Specifica il tipo di file da selezionare
-        },
+        onClick = { pickFileLauncher.launch("image/*") },
         modifier = Modifier.padding(16.dp)
-    ) {
-        Text("Carica avatar")
-    }
+    ) { Text("Carica avatar") }
 }

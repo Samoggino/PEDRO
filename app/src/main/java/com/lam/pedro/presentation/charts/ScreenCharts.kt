@@ -46,9 +46,7 @@ import kotlinx.coroutines.delay
 fun ScreenCharts(
     activityEnum: ActivityEnum,
     navController: NavController,
-    viewModelCharts: ViewModelCharts = viewModel(
-        factory = ChartsViewModelFactory() // Usa la factory
-    )
+    viewModelCharts: ViewModelCharts = viewModel(factory = ChartsViewModelFactory())
 ) {
 
     val chartState by viewModelCharts.chartState.observeAsState(ChartState.Loading)

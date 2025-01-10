@@ -666,7 +666,7 @@ fun PedroNavigation(
             ) { backStackEntry ->
                 val userId = backStackEntry.arguments?.getString("userId")
                 if (userId != null) {
-                    CommunityUserDetails(userUUID = userId, navController = navController)
+                    CommunityUserDetails(selectedUser = userId, navController = navController)
                 }
             }
         }

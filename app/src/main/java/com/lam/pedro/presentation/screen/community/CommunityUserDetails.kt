@@ -2,22 +2,33 @@ package com.lam.pedro.presentation.screen.community
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -25,32 +36,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.presentation.component.ShowSessionDetails
-import com.lam.pedro.presentation.serialization.MyRecordsViewModel
-import com.lam.pedro.presentation.serialization.MyScreenRecordsFactory
-import com.lam.pedro.util.placeholder
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CommunityUserDetails(
-    userUUID: String,
-    navController: NavController,
+    selectedUser: String,
+    navController: NavController
 ) {
 
-    val rememberedUserUUID = remember(userUUID) { userUUID }
+    val userUUID = remember(selectedUser) { selectedUser }
 
     // Fetch data una sola volta per il nuovo userUUID
     LaunchedEffect(key1 = userUUID) {
@@ -69,9 +74,10 @@ fun CommunityUserDetails(
             )
         }
     ) { paddingValues ->
+
         // Pass paddingValues se usi Material3 correttamente
         CommunityUserDetailsContent(
-            userUUID = rememberedUserUUID,
+            userUUID = userUUID,
             paddingValues = paddingValues
         )
     }
@@ -85,20 +91,20 @@ fun CommunityUserDetailsContent(
 
 ) {
     val activityMap by viewModel.activityMap.collectAsState(emptyMap())
-    ActivityHistoryPopup(activityMap, userUUID)
+    ActivityHistoryPopup(activityMap, userUUID, paddingValues)
 }
 
 
 @Composable
 fun ActivityHistoryPopup(
     activityMap: Map<ActivityEnum, List<GenericActivity>>,
-    userUUID: String
+    userUUID: String,
+    paddingValues: PaddingValues
 ) {
     val viewModel: CommunityUserDetailsViewModel =
         viewModel(factory = CommunityUserDetailsViewModelFactory())
     var showDialog by remember { mutableStateOf(false) }
     var selectedActivityType: ActivityEnum? by remember { mutableStateOf(null) }
-    val isLoading by viewModel.isFetchingMap.collectAsState()
 
     // Evita fetch multipli
     LaunchedEffect(key1 = userUUID) {
@@ -106,106 +112,107 @@ fun ActivityHistoryPopup(
         viewModel.fetchActivityMap(userUUID)
     }
 
-    Column {
-        Text(text = "Activity History", modifier = Modifier.padding(16.dp))
-
-        LazyColumn(
+    Column(
+        modifier = Modifier
+            .padding(paddingValues)
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        Text(
+            text = "Activity History",
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
-                .padding(8.dp)
-                .height(300.dp)
-                .placeholder(isLoading = isLoading, showShimmerAnimation = true)
+                .padding(16.dp)
+                .align(Alignment.CenterHorizontally)
+        )
+
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+//                .fillMaxSize()
+            ,
+            contentPadding = PaddingValues(vertical = 8.dp)
         ) {
-            items(activityMap.keys.toList()) { activityType ->
-                Text(
-                    text = activityType.name,
+            items(activityMap.keys.filter { activityType ->
+                // Mostra solo attività con record disponibili
+                !activityMap[activityType].isNullOrEmpty()
+            }.toList()) { activityType ->
+                Card(
                     modifier = Modifier
                         .padding(8.dp)
+                        .fillMaxWidth()
                         .clickable {
                             selectedActivityType = activityType
                             showDialog = true
-                        }
-                )
+                        },
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = activityType.image),
+                            contentDescription = activityType.name,
+                            tint = activityType.color,
+                            modifier = Modifier.size(40.dp)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = activityType.name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
             }
         }
 
+        // Mostra il bottom sheet se richiesto
         if (showDialog && selectedActivityType != null) {
             val recentActivities = activityMap[selectedActivityType]?.takeLast(5) ?: emptyList()
-            ActivityDetailsDialog(
+            ActivityDetailsBottomSheet(
                 activities = recentActivities,
-                onDismiss = { showDialog = false },
-                activityType = selectedActivityType!!
+                onDismiss = { showDialog = false }
             )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ActivityDetailsDialog(
+fun ActivityDetailsBottomSheet(
     activities: List<GenericActivity>,
-    activityType: ActivityEnum,
-    onDismiss: () -> Unit,
+    onDismiss: () -> Unit
 ) {
-
-//    AlertDialog(
-//        onDismissRequest = onDismiss,
-//        title = { Text(text = "Recent ${activityType.name} Activities") },
-//        text = {
-//            LazyColumn(
-//                modifier = Modifier.padding(8.dp).heightIn(max = 300.dp)
-//            ) {
-//                try {
-//                    items(activities) { activity ->
-//                        Text(text = "Date: ${activity.basicActivity.startTime}, Duration: ${activity.basicActivity.durationInMinutes()}")
-//                    }
-//                } catch (e: Exception) {
-//                    Log.e("Community", "Error showing dialog", e)
-//                }
-//            }
-//        },
-//        confirmButton = {
-//            Button(onClick = onDismiss) {
-//                Text("Close")
-//            }
-//        }
-//    )
-
-    LaunchedEffect(Unit) {
-        Log.i("Community", "ActivityDetailsDialog")
-    }
-
-    Column(
-        modifier = Modifier.heightIn(max = 300.dp)
+    ModalBottomSheet(
+        onDismissRequest = { onDismiss() },
+        sheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true
+        ),
+        modifier = Modifier.fillMaxWidth()
     ) {
-        activities.forEach { activity ->
-            ShowSessionDetails(activity)
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            Text(
+                text = "Recent Activities",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            activities.forEach { activity ->
+                ShowSessionDetails(activity)
+            }
         }
-    }
-
-
-}
-
-class CommunityUserDetailsViewModel : ViewModel() {
-    val activityMap = MutableStateFlow<Map<ActivityEnum, List<GenericActivity>>>(emptyMap())
-    val isFetchingMap = MutableStateFlow(false)
-
-    val viewModel = MyScreenRecordsFactory().create(MyRecordsViewModel::class.java)
-
-    fun fetchActivityMap(userUUID: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            isFetchingMap.value = true
-
-            activityMap.value = viewModel.getActivityMap(userUUID = userUUID)
-            isFetchingMap.value = false
-        }
-    }
-}
-
-class CommunityUserDetailsViewModelFactory : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(CommunityUserDetailsViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return CommunityUserDetailsViewModel() as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
