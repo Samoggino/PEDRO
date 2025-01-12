@@ -1,7 +1,6 @@
 package com.lam.pedro.presentation.navigation
 
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -21,7 +20,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
@@ -40,7 +38,6 @@ import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.MoreScreen
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.GeneralActivityViewModelFactory
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.SessionScreen
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.CycleSessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.RunSessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.TrainSessionViewModel
@@ -56,11 +53,11 @@ import com.lam.pedro.presentation.screen.community.CommunityScreen
 import com.lam.pedro.presentation.screen.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.more.AboutScreen
 import com.lam.pedro.presentation.screen.more.PrivacyPolicyScreen
-import com.lam.pedro.presentation.screen.more.SettingsScreen
+import com.lam.pedro.presentation.screen.more.settingsscreen.SettingsScreen
+import com.lam.pedro.presentation.screen.more.settingsscreen.UserActivityRecognitionScreen
 import com.lam.pedro.presentation.screen.profile.ProfileScreen
 import com.lam.pedro.presentation.serialization.MyScreenRecords
 import com.lam.pedro.presentation.serialization.ViewModelRecordFactory
-import com.lam.pedro.util.showExceptionSnackbar
 import kotlinx.coroutines.launch
 
 /** Provides the navigation in the app. */
@@ -569,6 +566,17 @@ fun PedroNavigation(
                         )
                     ),
                     navController = navController
+                )
+            }
+
+            composable(
+                Screen.UserActivityRecognitionScreen.route,
+                enterTransition = slideInH,
+                exitTransition = slideOutH
+            ) {
+                UserActivityRecognitionScreen(
+                    navController,
+                    Screen.UserActivityRecognitionScreen.titleId
                 )
             }
         }

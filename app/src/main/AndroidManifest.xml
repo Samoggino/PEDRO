@@ -53,6 +53,8 @@
     <uses-feature android:name="android.hardware.sensor.stepdetector" android:required="true" />
     <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true" />
 
+    <!-- Activity detection -->
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
 
     <application
         android:name="com.lam.pedro.presentation.BaseApplication"

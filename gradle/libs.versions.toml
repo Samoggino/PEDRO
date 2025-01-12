@@ -1,5 +1,6 @@
 [versions]
 accompanistDrawablepainter = "0.36.0"
+accompanistPermissions = "0.37.0"
 agp = "8.7.3"
 androidSdk = "11.6.1"
 concurrentFuturesKtx = "1.2.0"
@@ -12,6 +13,7 @@ coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
+kotlinxCoroutinesPlayServices = "1.10.1"
 ktorClientCore = "3.0.0"
 ktorClientOkhttp = "3.0.0"
 lifecycleRuntimeKtx = "2.8.6"
@@ -39,8 +41,10 @@ securityCryptoKtx = "1.0.0"
 workRuntimeKtx = "2.10.0"
 
 [libraries]
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanistPlaceholderMaterial" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutinesPlayServices" }
 mapLibre = { module = "org.maplibre.gl:android-sdk", version.ref = "androidSdk" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

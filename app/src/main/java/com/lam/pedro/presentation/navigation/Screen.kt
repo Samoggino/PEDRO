@@ -147,6 +147,16 @@ enum class Screen(
         route = "my_screen_records",
         titleId = R.string.my_screen_records
     ),
-    FollowScreen(route = "follow_screen", titleId = R.string.follow_screen, hasMenuItem = false),
-    ChartsScreen(route = "charts_screen", titleId = R.string.charts_screen, hasMenuItem = false),
+    FollowScreen(
+        route = "follow_screen",
+        titleId = R.string.follow_screen,
+        hasMenuItem = false),
+    ChartsScreen(
+        route = "charts_screen",
+        titleId = R.string.charts_screen,
+        hasMenuItem = false),
+    UserActivityRecognitionScreen(
+        route = "user_activity_recognition_screen",
+        titleId = R.string.user_activity_recognition_screen
+    ),
 }

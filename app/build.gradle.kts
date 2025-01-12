@@ -215,7 +215,11 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.play.services.location)
 
+    implementation(libs.kotlinx.coroutines.play.services)
+
+    implementation(libs.accompanist.permissions)
 
     // Supabase
     //noinspection UseTomlInstead

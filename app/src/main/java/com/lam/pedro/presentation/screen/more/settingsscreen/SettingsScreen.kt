@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen.more
+package com.lam.pedro.presentation.screen.more.settingsscreen
 
 import android.content.Context
 import androidx.compose.foundation.clickable
@@ -9,19 +9,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -47,9 +46,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.lam.pedro.R
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.CustomSnackbarHost
+import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.util.notification.areNotificationsActive
 import com.lam.pedro.util.notification.cancelPeriodicNotifications
 import com.lam.pedro.util.notification.schedulePeriodicNotifications
@@ -164,6 +163,38 @@ fun SettingsScreen(
                 }
             }
 
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(85.dp)
+                    .padding(horizontal = 10.dp)
+                    .clickable(onClick = {
+                        navController.navigate(Screen.UserActivityRecognitionScreen.route) {
+                            // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
+                            navController.graph.startDestinationRoute?.let { route ->
+                                popUpTo(route) {
+                                    saveState = true
+                                }
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        } // Cambia lo stato del click
+                    }),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Activity recognition",
+                    style = MaterialTheme.typography.bodyLarge, // Increased text size
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    Icons.Filled.ArrowForwardIos,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.size(25.dp)
+                )
+            }
+
             // Open dialog to set notification interval
             if (showDialog) {
                 AlertDialog(
@@ -174,29 +205,32 @@ fun SettingsScreen(
                             value = notificationInterval.toString(),
                             onValueChange = { newValue ->
                                 if (newValue.isNotEmpty() && newValue.all { it.isDigit() }) {
-                                    var newInterval = newValue.toLong()
-                                    if (newInterval < 15) {
-                                        newInterval = 15
-                                        coroutineScope.launch {
-                                            snackbarHostState.showSnackbar("Notification interval cannot be less than 15 minutes")
-                                        }
-                                    }
-                                    notificationInterval = newInterval
-                                    saveSettings() // Save automatically every time the user changes the value
-                                    if (isToggled) {
-                                        schedulePeriodicNotifications(context, notificationInterval)
-                                    }
-                                    coroutineScope.launch {
-                                        snackbarHostState.showSnackbar("New notification interval: $notificationInterval minutes")
-                                    }
+                                    notificationInterval = newValue.toLong() // Set the value directly without enforcing the limit yet
                                 }
                             },
                             label = { Text("Notification interval (minutes)") },
-                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                            modifier = Modifier.clip(RoundedCornerShape(26.dp))
                         )
                     },
                     confirmButton = {
-                        TextButton(onClick = { showDialog = false }) {
+                        TextButton(onClick = {
+                            // Check the value before confirming
+                            if (notificationInterval < 15) {
+                                notificationInterval = 15
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar("Notification interval cannot be less than 15 minutes, setting it to 15")
+                                }
+                            }
+                            showDialog = false
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar("New notification interval: $notificationInterval minutes")
+                            }
+                            saveSettings() // Save the settings after confirmation
+                            if (isToggled) {
+                                schedulePeriodicNotifications(context, notificationInterval)
+                            }
+                        }) {
                             Text("OK")
                         }
                     },
@@ -207,6 +241,7 @@ fun SettingsScreen(
                     }
                 )
             }
+
 
         }
     }
