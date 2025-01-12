@@ -14,6 +14,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,8 +28,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.lam.pedro.R
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getMyContext
@@ -51,7 +54,7 @@ import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactiv
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.SleepSessionViewModel
 import com.lam.pedro.presentation.screen.activities.newActivity.NewActivityScreen
 import com.lam.pedro.presentation.screen.community.CommunityScreen
-import com.lam.pedro.presentation.screen.community.CommunityUserDetails
+import com.lam.pedro.presentation.screen.community.CommunityUserDetailsScreen
 import com.lam.pedro.presentation.screen.more.AboutScreen
 import com.lam.pedro.presentation.screen.more.HealthConnectScreen
 import com.lam.pedro.presentation.screen.more.PrivacyPolicyScreen
@@ -68,13 +71,40 @@ import kotlinx.coroutines.launch
 /** Provides the navigation in the app. */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun PedroNavigation(
-    navController: NavHostController,
-    snackbarHostState: SnackbarHostState,
-    topBarTitle: Int,
-) {
+fun PedroNavigation(navController: NavHostController, snackbarHostState: SnackbarHostState) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    val titleId by remember(currentRoute) {
+        derivedStateOf {
+            when (currentRoute) {
+                Screen.HomeScreen.route -> Screen.HomeScreen.titleId
+                Screen.ActivitiesScreen.route -> Screen.ActivitiesScreen.titleId
+                Screen.CommunityScreen.route -> Screen.CommunityScreen.titleId
+                Screen.MoreScreen.route -> Screen.MoreScreen.titleId
 
-    Log.d("PedroNavigation", "PedroNavigation")
+                Screen.SleepSessions.route -> Screen.SleepSessions.titleId
+                Screen.DriveSessionScreen.route -> Screen.DriveSessionScreen.titleId
+                Screen.SitSessionScreen.route -> Screen.SitSessionScreen.titleId
+                Screen.WeightScreen.route -> Screen.WeightScreen.titleId
+                Screen.ListenSessionScreen.route -> Screen.ListenSessionScreen.titleId
+
+                Screen.RunSessionScreen.route -> Screen.RunSessionScreen.titleId
+                Screen.WalkSessionScreen.route -> Screen.WalkSessionScreen.titleId
+                Screen.YogaSessionScreen.route -> Screen.YogaSessionScreen.titleId
+                Screen.CycleSessionScreen.route -> Screen.CycleSessionScreen.titleId
+                Screen.TrainSessionScreen.route -> Screen.TrainSessionScreen.titleId
+
+                Screen.HealthConnectScreen.route -> Screen.HealthConnectScreen.titleId
+                Screen.SettingScreen.route -> Screen.SettingScreen.titleId
+                Screen.PrivacyPolicy.route -> Screen.PrivacyPolicy.titleId
+                Screen.AboutScreen.route -> Screen.AboutScreen.titleId
+
+                else -> R.string.app_name
+            }
+        }
+    }
+
+    Log.d("Navigation", "PedroNavigation")
 
     val fadeInTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? =
         {
@@ -116,13 +146,13 @@ fun PedroNavigation(
 
     val scope = rememberCoroutineScope()
 
-    // Stack per tenere traccia delle schermate aperte
+//     Stack per tenere traccia delle schermate aperte
 
     var sharedViewModel: ActivitySessionViewModel? by remember { mutableStateOf(null) }
-    val sharedColor: Color? by remember { mutableStateOf(null) }
-    var sharedTitle: Int? by remember { mutableStateOf(null) }
+    val sharedColor: Color = Color.Red
+    var sharedTitle: Int? = 0
 
-    // Funzione per loggare le schermate attive
+    //     Funzione per loggare le schermate attive
     fun logScreenStack() {
         Log.d("Reload", "Ho cambiato pagina")
     }
@@ -140,11 +170,22 @@ fun PedroNavigation(
             val availability by healthConnectManager.availability
 
             composable(
+                Screen.CommunityScreen.route,
+                enterTransition = fadeInTransition,
+                exitTransition = fadeOutTransition
+            ) {
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
+                Log.d("Navigation", "CommunityScreen navigation")
+                CommunityScreen(navController = navController)
+            }
+
+            composable(
                 Screen.HomeScreen.route,
                 enterTransition = fadeInTransition,
                 exitTransition = fadeOutTransition
             ) {
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
+                Log.d("Navigation", "HomeScreen navigation")
                 HomeScreen(navController)
             }
             composable(
@@ -155,14 +196,7 @@ fun PedroNavigation(
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 ActivitiesScreen(navController)
             }
-            composable(
-                Screen.CommunityScreen.route,
-                enterTransition = fadeInTransition,
-                exitTransition = fadeOutTransition
-            ) {
-                logScreenStack() // Log dello stack dopo aver aperto la schermata
-                CommunityScreen(navController = navController)
-            }
+
             composable(
                 Screen.MoreScreen.route,
                 enterTransition = fadeInTransition,
@@ -177,7 +211,7 @@ fun PedroNavigation(
                 exitTransition = fadeOutTransition
             ) {
                 logScreenStack()
-                ProfileScreen(navController, topBarTitle)
+                ProfileScreen(navController, titleId)
             }
             composable(
                 Screen.AboutScreen.route,
@@ -185,7 +219,7 @@ fun PedroNavigation(
                 exitTransition = slideOutH,
             ) {
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                AboutScreen(navController = navController, titleId = topBarTitle)
+                AboutScreen(navController = navController, titleId = titleId)
             }
             composable(
                 Screen.LoginScreen.route,
@@ -218,7 +252,7 @@ fun PedroNavigation(
                 )
             ) {
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                PrivacyPolicyScreen(navController = navController, titleId = topBarTitle)
+                PrivacyPolicyScreen(navController = navController, titleId = titleId)
             }
             composable(
                 Screen.HealthConnectScreen.route,
@@ -226,7 +260,7 @@ fun PedroNavigation(
                 exitTransition = slideOutH
             ) {
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                HealthConnectLauncher(availability, navController, topBarTitle, scope)
+                HealthConnectLauncher(availability, navController, titleId, scope)
             }
             composable(
                 Screen.SettingScreen.route,
@@ -234,7 +268,7 @@ fun PedroNavigation(
                 exitTransition = slideOutH
             ) {
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                SettingsScreen(navController = navController, titleId = topBarTitle)
+                SettingsScreen(navController = navController, titleId = titleId)
             }
 
 
@@ -245,7 +279,7 @@ fun PedroNavigation(
             ) {
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 sharedViewModel?.let { it1 ->
-                    sharedColor?.let { it2 ->
+                    sharedColor.let { it2 ->
                         sharedTitle?.let { it3 ->
                             NewActivityScreen(
                                 navController = navController,
@@ -294,7 +328,7 @@ fun PedroNavigation(
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
-                    titleId = topBarTitle,
+                    titleId = titleId,
                     viewModel = viewModel
                 )
             }
@@ -333,7 +367,7 @@ fun PedroNavigation(
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
-                    titleId = topBarTitle,
+                    titleId = titleId,
                     viewModel = viewModel
                 )
             }
@@ -372,7 +406,7 @@ fun PedroNavigation(
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
-                    titleId = topBarTitle,
+                    titleId = titleId,
                     viewModel = viewModel
                 )
             }
@@ -411,7 +445,7 @@ fun PedroNavigation(
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
-                    titleId = topBarTitle,
+                    titleId = titleId,
                     viewModel = viewModel
                 )
             }
@@ -450,7 +484,7 @@ fun PedroNavigation(
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
-                    titleId = topBarTitle,
+                    titleId = titleId,
                     viewModel = viewModel
                 )
             }
@@ -489,7 +523,7 @@ fun PedroNavigation(
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
-                    titleId = topBarTitle,
+                    titleId = titleId,
                     viewModel = viewModel
                 )
             }
@@ -525,7 +559,7 @@ fun PedroNavigation(
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
-                    titleId = topBarTitle,
+                    titleId = titleId,
                     viewModel = viewModel
                 )
             }
@@ -564,7 +598,7 @@ fun PedroNavigation(
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
-                    titleId = topBarTitle,
+                    titleId = titleId,
                     viewModel = viewModel
                 )
             }
@@ -603,7 +637,7 @@ fun PedroNavigation(
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
-                    titleId = topBarTitle,
+                    titleId = titleId,
                     viewModel = viewModel
                 )
             }
@@ -642,7 +676,7 @@ fun PedroNavigation(
                     },
                     onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
                     navController = navController,
-                    titleId = topBarTitle,
+                    titleId = titleId,
                     viewModel = viewModel
                 )
             }
@@ -666,7 +700,7 @@ fun PedroNavigation(
             ) { backStackEntry ->
                 val userId = backStackEntry.arguments?.getString("userId")
                 if (userId != null) {
-                    CommunityUserDetails(selectedUser = userId, navController = navController)
+                    CommunityUserDetailsScreen(selectedUser = userId, navController = navController)
                 }
             }
         }
@@ -677,7 +711,7 @@ fun PedroNavigation(
 private fun HealthConnectLauncher(
     availability: Int,
     navController: NavHostController,
-    topBarTitle: Int,
+    titleId: Int,
     scope: CoroutineScope
 ) {
 
@@ -688,7 +722,7 @@ private fun HealthConnectLauncher(
         healthConnectAvailability = availability,
         onResumeAvailabilityCheck = { healthConnectManager.checkAvailability() },
         navController = navController,
-        titleId = topBarTitle,
+        titleId = titleId,
         revokeAllPermissions = {
             scope.launch(Dispatchers.IO) { healthConnectManager.revokeAllPermissions() }
         }

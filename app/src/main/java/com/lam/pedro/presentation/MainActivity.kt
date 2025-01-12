@@ -1,12 +1,14 @@
 package com.lam.pedro.presentation
 
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
@@ -45,6 +47,7 @@ class MainActivity : ComponentActivity() {
             // Se i singleton sono inizializzati, carica la tua app, altrimenti mostra un placeholder
             if (isInitialized.value) {
                 PedroTheme {
+                    Log.i("Launcher", "Launcher")
                     PedroApp()
                 }
             } else {
@@ -69,6 +72,6 @@ fun LoadingScreen() {
         contentAlignment = Alignment.Center,
         modifier = Modifier.fillMaxSize()
     ) {
-        CircularProgressIndicator()
+        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
     }
 }

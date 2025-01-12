@@ -148,7 +148,7 @@ fun MoreScreen(
 @Composable
 private fun AccountItem(navController: NavHostController, loginState: LoginState) {
     when (loginState) {
-        is LoginState.Loading -> CircularProgressIndicator()
+        is LoginState.Loading -> CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
 
         is LoginState.LoggedIn -> {
             MenuItem(

@@ -15,6 +15,7 @@
  */
 package com.lam.pedro.presentation.navigation
 
+import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreHoriz
@@ -27,24 +28,20 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.lam.pedro.R
-import kotlinx.coroutines.CoroutineScope
 
 /**
  * The side navigation drawer used to explore each Health Connect feature.
  */
 @Composable
-fun BottomBar(
-    scope: CoroutineScope,
-    navController: NavController
-) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+fun BottomBar(navController: NavController, currentRoute: String?) {
+
+//    val navBackStackEntry = navController.currentBackStackEntryAsState().value
+//    val currentRoute = navBackStackEntry?.destination?.route
 
     NavigationBar(
         containerColor = Color.White.copy(alpha = 0.05f),
@@ -55,7 +52,6 @@ fun BottomBar(
             val selected = item.route == currentRoute
             NavigationBarItem(
                 icon = {
-
                     when (item.titleId) {
                         R.string.home_screen -> Icon(
                             Icons.Filled.Home,
@@ -83,50 +79,22 @@ fun BottomBar(
                     Text(
                         text = stringResource(item.titleId),
                         fontWeight = if (selected) {
-                            androidx.compose.ui.text.font.FontWeight.Bold
+                            FontWeight.Bold
                         } else {
-                            androidx.compose.ui.text.font.FontWeight.Normal
+                            FontWeight.Normal
                         }
                     )
                 },
                 selected = item.route == currentRoute,
                 onClick = {
-                    navController.navigate(item.route) {
-                        // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
-                        navController.graph.startDestinationRoute?.let { route ->
-                            popUpTo(route) {
-                                saveState = true
-                            }
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
+                    Log.d("BottomBar", "Navigating to ${item.route}")
+                    navController.navigate(item.route)
                 },
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = MaterialTheme.colorScheme.primary
                 )// Chiama la funzione di navigazione per Home
             )
         }
-
-        /*
-                    BottomBarItem(
-                        item = item,
-                        selected = item.route == currentRoute,
-                        onItemClick = {
-                            navController.navigate(item.route) {
-                                // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
-                                navController.graph.startDestinationRoute?.let { route ->
-                                    popUpTo(route) {
-                                        saveState = true
-                                    }
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    )
-
-         */
     }
 
 }

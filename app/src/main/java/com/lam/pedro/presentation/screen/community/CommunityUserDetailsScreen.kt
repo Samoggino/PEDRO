@@ -2,9 +2,12 @@ package com.lam.pedro.presentation.screen.community
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -16,10 +19,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,6 +43,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -50,17 +56,16 @@ import com.lam.pedro.presentation.component.ShowSessionDetails
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun CommunityUserDetails(
+fun CommunityUserDetailsScreen(
     selectedUser: String,
     navController: NavController
 ) {
 
-    val userUUID = remember(selectedUser) { selectedUser }
-
-    // Fetch data una sola volta per il nuovo userUUID
-    LaunchedEffect(key1 = userUUID) {
-        Log.i("Community", "Fetching details for $userUUID")
+    LaunchedEffect(key1 = selectedUser) {
+        Log.i("Community", "Fetching details for $selectedUser")
     }
+
+
 
     Scaffold(
         topBar = {
@@ -77,7 +82,7 @@ fun CommunityUserDetails(
 
         // Pass paddingValues se usi Material3 correttamente
         CommunityUserDetailsContent(
-            userUUID = userUUID,
+            userUUID = selectedUser,
             paddingValues = paddingValues
         )
     }
@@ -103,6 +108,7 @@ fun ActivityHistoryPopup(
 ) {
     val viewModel: CommunityUserDetailsViewModel =
         viewModel(factory = CommunityUserDetailsViewModelFactory())
+    val isLoading by viewModel.isLoading.collectAsState() // Osserva lo stato di caricamento
     var showDialog by remember { mutableStateOf(false) }
     var selectedActivityType: ActivityEnum? by remember { mutableStateOf(null) }
 
@@ -112,76 +118,102 @@ fun ActivityHistoryPopup(
         viewModel.fetchActivityMap(userUUID)
     }
 
-    Column(
-        modifier = Modifier
-            .padding(paddingValues)
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        Text(
-            text = "Activity History",
-            style = MaterialTheme.typography.titleLarge,
+    if (isLoading) {
+        Box(
             modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.CenterHorizontally)
-        )
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-//                .fillMaxSize()
-            ,
-            contentPadding = PaddingValues(vertical = 8.dp)
+                .fillMaxSize()
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
         ) {
-            items(activityMap.keys.filter { activityType ->
-                // Mostra solo attività con record disponibili
-                !activityMap[activityType].isNullOrEmpty()
-            }.toList()) { activityType ->
-                Card(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth()
-                        .clickable {
-                            selectedActivityType = activityType
-                            showDialog = true
-                        },
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(id = activityType.image),
-                            contentDescription = activityType.name,
-                            tint = activityType.color,
-                            modifier = Modifier.size(40.dp)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = activityType.name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            textAlign = TextAlign.Center
-                        )
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        }
+    } else {
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+        ) {
+            Text(
+                text = "Activity History",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .weight(1f),
+                contentPadding = PaddingValues(vertical = 8.dp)
+            ) {
+                items(activityMap.keys.filter { activityType ->
+                    // Mostra solo attività con record disponibili
+                    !activityMap[activityType].isNullOrEmpty()
+                }.toList()) { activityType ->
+                    ActivityCard(activityType = activityType) {
+                        selectedActivityType = activityType
+                        showDialog = true
                     }
                 }
             }
-        }
 
-        // Mostra il bottom sheet se richiesto
-        if (showDialog && selectedActivityType != null) {
-            val recentActivities = activityMap[selectedActivityType]?.takeLast(5) ?: emptyList()
-            ActivityDetailsBottomSheet(
-                activities = recentActivities,
-                onDismiss = { showDialog = false }
+            // Mostra il bottom sheet se richiesto
+            if (showDialog && selectedActivityType != null) {
+                val recentActivities = activityMap[selectedActivityType]?.takeLast(5) ?: emptyList()
+                ActivityDetailsBottomSheet(
+                    activities = recentActivities,
+                    onDismiss = { showDialog = false }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ActivityCard(
+    activityType: ActivityEnum,
+    onCardClick: () -> Unit
+) {
+
+    Card(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(26.dp)) // Clip per rispettare il bordo arrotondato
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = LocalIndication.current // Usa l'indicazione ripple predefinita
+            ) {
+                onCardClick()
+            },
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ),
+        shape = RoundedCornerShape(26.dp) // Arrotonda gli angoli della Card
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                painter = painterResource(id = activityType.image),
+                contentDescription = activityType.name,
+                tint = activityType.color,
+                modifier = Modifier.size(40.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = activityType.name,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center
             )
         }
     }
@@ -213,6 +245,7 @@ fun ActivityDetailsBottomSheet(
             activities.forEach { activity ->
                 ShowSessionDetails(activity)
             }
+            Spacer(modifier = Modifier.height(16.dp)) // Add some space at the bottom
         }
     }
 }

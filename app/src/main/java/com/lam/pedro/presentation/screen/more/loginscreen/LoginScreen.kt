@@ -129,7 +129,7 @@ fun LoginScreen(
             }
 
             if (state is LoadingState.Loading) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
 
             WelcomeDialog(

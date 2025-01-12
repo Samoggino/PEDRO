@@ -1,5 +1,6 @@
 package com.lam.pedro.presentation.screen.community
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -14,14 +15,23 @@ import kotlinx.coroutines.launch
 
 class CommunityUserDetailsViewModel : ViewModel() {
     val activityMap = MutableStateFlow<Map<ActivityEnum, List<GenericActivity>>>(emptyMap())
-    val viewModel = MyScreenRecordsFactory().create(MyRecordsViewModel::class.java)
+    val isLoading = MutableStateFlow(false) // Stato di caricamento
+    private val viewModel = MyScreenRecordsFactory().create(MyRecordsViewModel::class.java)
 
     fun fetchActivityMap(userUUID: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            activityMap.value = viewModel.getActivityMap(userUUID = userUUID)
+            try {
+                isLoading.value = true // Avvia il caricamento
+                activityMap.value = viewModel.getActivityMap(userUUID = userUUID)
+            } catch (e: Exception) {
+                Log.e("Community", "Errore nel fetch dei dati: ${e.message}")
+            } finally {
+                isLoading.value = false // Concludi il caricamento
+            }
         }
     }
 }
+
 
 class CommunityUserDetailsViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

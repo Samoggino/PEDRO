@@ -20,6 +20,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -164,7 +165,7 @@ private fun ExportButton(viewModel: MyRecordsViewModel) {
     }
 
     if (saveResult == ResultState.Loading) {
-        CircularProgressIndicator()
+        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
     }
 }
 
@@ -201,6 +202,6 @@ private fun ImportButton(viewModel: MyRecordsViewModel) {
 
     // Mostra il loader se lo stato è Loading
     if (importResult == ResultState.Loading) {
-        CircularProgressIndicator()
+        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
     }
 }
