@@ -1,4 +1,4 @@
-package com.lam.pedro.util
+package com.lam.pedro.util.services
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -10,7 +10,6 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.lam.pedro.R
-import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository
 import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.positions
 import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.speedCounter
 import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.totalSpeed
@@ -19,6 +18,10 @@ import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.
 import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.exerciseRoute
 import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.distance
 import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.steps
+import com.lam.pedro.util.LocationTracker
+import com.lam.pedro.util.SpeedTracker
+import com.lam.pedro.util.StepCounter
+import com.lam.pedro.util.updateDistance
 import kotlinx.coroutines.*
 import org.maplibre.android.geometry.LatLng
 
