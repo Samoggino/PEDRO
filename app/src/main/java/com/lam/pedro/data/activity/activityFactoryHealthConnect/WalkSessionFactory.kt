@@ -1,6 +1,7 @@
 package com.lam.pedro.data.activity.activityFactoryHealthConnect
 
 import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import com.lam.pedro.data.activity.GenericActivity
 
@@ -36,8 +37,9 @@ class WalkSessionFactory : ActivitySessionFactoryFromHealthConnect() {
             distance = distance,
             totalEnergy = totalCaloriesBurned,
             activeEnergy = activeCaloriesBurned,
-            exerciseRoute = exerciseRoute
-                ?: throw IllegalArgumentException("Exercise route is null")
+            exerciseRoute = exerciseRoute ?: ExerciseRoute(
+                route = emptyList()
+            )
         )
     }
 }

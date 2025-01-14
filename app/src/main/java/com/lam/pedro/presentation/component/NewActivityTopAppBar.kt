@@ -12,13 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewActivityTopAppBar(
     titleId: Int,
-    navController: NavController,
+    onNavBack: () -> Unit,
     modifier: Modifier = Modifier,
     additionalTitle: String = " - New activity"
 ) {
@@ -39,7 +38,7 @@ fun NewActivityTopAppBar(
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxHeight()
             ) {
-                BackButton(navController)
+                BackButton(onNavBack)
             }
         },
         modifier = modifier

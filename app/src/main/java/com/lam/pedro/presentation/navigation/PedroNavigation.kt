@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -144,8 +145,20 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
                 enterTransition = { NavigationTransitions.fadeIn(700) },
                 exitTransition = { NavigationTransitions.fadeOut(700) }
             ) {
+                Log.d("BackStack", "Stack: ${navController.currentBackStackEntry}")
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                MoreScreen(onNavigate = { route -> navController.navigate(route) })
+                MoreScreen(onNavigate = { route -> navController.navigate(route){
+                    popUpTo(
+                        navController.graph.findStartDestination().id
+                    ) {
+                        saveState = true
+                    }
+                    // Avoid multiple copies of the same destination when
+                    // reselecting the same item
+                    launchSingleTop = true
+                    // Restore state when reselecting a previously selected item
+                    restoreState = true
+                } })
             }
             composable(
                 route = Screen.ProfileScreen.route,
@@ -204,7 +217,7 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
             ) {
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 PrivacyPolicyScreen(
-                    navController = navController,
+                    onNavBack = { onNavBack() },
                     titleId = getTitleIdForRoute(currentRoute)
                 )
             }
@@ -228,7 +241,7 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
             ) {
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 SettingsScreen(
-                    navController = navController,
+                    onNavBack = { onNavBack() },
                     titleId = getTitleIdForRoute(currentRoute)
                 )
             }
@@ -244,7 +257,7 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
                     sharedColor.let { it2 ->
                         sharedTitle?.let { it3 ->
                             NewActivityScreen(
-                                navController = navController,
+                                onNavBack = { onNavBack() },
                                 titleId = it3,
                                 color = it2,
                                 viewModel = it1

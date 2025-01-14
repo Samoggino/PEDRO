@@ -13,11 +13,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 class ChatViewModel(selectedUser: User) : ViewModel() {
 
@@ -91,7 +92,8 @@ class ChatViewModel(selectedUser: User) : ViewModel() {
         // Aggiungi il nuovo messaggio alla conversazione
         val updatedConversation = conversation + Message(
             message = message,
-            timestamp = Clock.System.now().toString(),
+            timestamp = ZonedDateTime.now(ZoneId.of("Europe/Rome"))
+                .toString(), // Aggiungi il fuso orario locale
             sender = sender
         )
 

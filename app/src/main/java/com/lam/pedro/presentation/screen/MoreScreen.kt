@@ -56,11 +56,8 @@ fun MoreScreen(
         val result = checkUserLoggedIn() // Chiama la funzione sospesa
         loginState.value = result
     }
-
-    val isLoggedIn = loginState.value is LoginState.LoggedIn
-
     // se l'utente è loggato c'è un bottone in più, quindi ogni elemento deve essere più piccolo
-    val itemHeight = if (isLoggedIn) 75 else 85
+    val itemHeight = if (loginState.value is LoginState.LoggedIn) 75 else 85
 
 
     Column(
@@ -103,21 +100,32 @@ fun MoreScreen(
             height = itemHeight
         )
 
-        MenuItem(
-            iconId = R.drawable.modify_icon,
-            label = "UPDATE DB",
-            onClick = {
-                /**
-                 * FIXME: eccezione per exerciseRoute = null
-                 * coroutineScope.launch {
-                 *     val allActivities = fetchFromHealthConnectForDB(healthConnectManager)
-                 *     val viewModelRecords = ViewModelRecords()
-                 *     viewModelRecords.insertActivitySession(allActivities)
-                 * }
-                 */
-            },
-            height = itemHeight
-        )
+        /**
+         * FIXME: eccezione per exerciseRoute = null
+         * coroutineScope.launch {
+         *     val allActivities = fetchFromHealthConnectForDB(healthConnectManager)
+         *     val viewModelRecords = ViewModelRecords()
+         *     viewModelRecords.insertActivitySession(allActivities)
+         * }
+         */
+        if (loginState.value is LoginState.LoggedIn) {
+            MenuItem(
+                iconId = R.drawable.modify_icon,
+                label = "UPDATE DB",
+                onClick = {
+                    /**
+                     * FIXME: eccezione per exerciseRoute = null
+                     * coroutineScope.launch {
+                     *     val allActivities = fetchFromHealthConnectForDB(healthConnectManager)
+                     *     val viewModelRecords = ViewModelRecords()
+                     *     viewModelRecords.insertActivitySession(allActivities)
+                     * }
+                     */
+                },
+                height = itemHeight
+            )
+        }
+
 
         // Bottone Logout (mostrato solo se l'utente è loggato)
         if (loginState.value is LoginState.LoggedIn) {

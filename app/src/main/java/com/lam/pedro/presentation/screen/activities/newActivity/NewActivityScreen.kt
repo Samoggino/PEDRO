@@ -1,13 +1,6 @@
 package com.lam.pedro.presentation.screen.activities.newActivity
 
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.provider.Settings
 import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,7 +14,6 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
@@ -40,19 +32,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import com.lam.pedro.R
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.component.CustomSnackbarHost
-import com.lam.pedro.presentation.component.DeniedPermissionDialog
 import com.lam.pedro.presentation.component.NewActivityControlButtons
 import com.lam.pedro.presentation.component.NewActivitySaveAlertDialog
 import com.lam.pedro.presentation.component.NewActivityTopAppBar
@@ -84,14 +70,17 @@ import java.time.ZonedDateTime
 
 @Composable
 fun NewActivityScreen(
-    navController: NavController,
+    onNavBack: () -> Unit,
     titleId: Int,
     color: Color,
     viewModel: ActivitySessionViewModel,
     profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModelFactory(LocalContext.current))
 ) {
 
-    Log.d("TIPO DEL NEW ACTIVITY SCREEN", "---- TIPO DEL NEW ACTIVITY SCREEN: ${viewModel.activityEnum.activityType}")
+    Log.d(
+        "TIPO DEL NEW ACTIVITY SCREEN",
+        "---- TIPO DEL NEW ACTIVITY SCREEN: ${viewModel.activityEnum.activityType}"
+    )
     // variables
     val activityType = viewModel.activityEnum.activityType
     val context = LocalContext.current
@@ -107,7 +96,7 @@ fun NewActivityScreen(
     var speedCounter by remember { mutableIntStateOf(0) }
     var totalSpeed by remember { mutableDoubleStateOf(0.0) }
 
-    /*
+    /**
     var showLocationPermissionDialog by remember { mutableStateOf(false) }
     var showActivityRecognitionPermissionDialog by remember { mutableStateOf(false) }
     var requestLocationPermissionCounter by remember { mutableIntStateOf(0) }
@@ -119,159 +108,159 @@ fun NewActivityScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-/*
+    /**
     var hasLocationPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
-        )
+    mutableStateOf(
+    ContextCompat.checkSelfPermission(
+    context,
+    Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
+    )
     }
 
     // Stato per il permesso di ACTIVITY_RECOGNITION
     var hasActivityRecognitionPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACTIVITY_RECOGNITION
-            ) == PackageManager.PERMISSION_GRANTED
-        )
+    mutableStateOf(
+    ContextCompat.checkSelfPermission(
+    context,
+    Manifest.permission.ACTIVITY_RECOGNITION
+    ) == PackageManager.PERMISSION_GRANTED
+    )
     }
 
     // Launcher per richiedere il permesso di ACTIVITY_RECOGNITION
     val requestActivityRecognitionPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
+    contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        hasActivityRecognitionPermission = isGranted
-        if (isGranted) {
-            Log.d(TAG, "-----------------Activity Recognition Permission granted-----------------")
-        } else {
-            //TODO: Handle permission denied, inform the user
-            Log.d(TAG, "-----------------Activity Recognition Permission denied-----------------")
-            hasBeenAskedForActivityRecognitionPermission = true
-            showActivityRecognitionPermissionDialog = true
-        }
+    hasActivityRecognitionPermission = isGranted
+    if (isGranted) {
+    Log.d(TAG, "-----------------Activity Recognition Permission granted-----------------")
+    } else {
+    //TODO: Handle permission denied, inform the user
+    Log.d(TAG, "-----------------Activity Recognition Permission denied-----------------")
+    hasBeenAskedForActivityRecognitionPermission = true
+    showActivityRecognitionPermissionDialog = true
+    }
     }
 
     val requestLocationPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
+    contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
-        hasLocationPermission = isGranted
-        if (isGranted) {
-            Log.d(TAG, "-----------------GPS Permission granted-----------------")
-            requestActivityRecognitionPermissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
-        } else {
-            //TODO: Handle permission denied, the app won't work
-            Log.d(TAG, "-----------------GPS Permission denied-----------------")
-            hasBeenAskedForLocationPermission = true
-            requestLocationPermissionCounter++
-            showLocationPermissionDialog = true
-        }
+    hasLocationPermission = isGranted
+    if (isGranted) {
+    Log.d(TAG, "-----------------GPS Permission granted-----------------")
+    requestActivityRecognitionPermissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
+    } else {
+    //TODO: Handle permission denied, the app won't work
+    Log.d(TAG, "-----------------GPS Permission denied-----------------")
+    hasBeenAskedForLocationPermission = true
+    requestLocationPermissionCounter++
+    showLocationPermissionDialog = true
+    }
     }
 
     DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_RESUME -> {
-                    // Controlla se i permessi sono concessi quando lo screen torna attivo
-                    if (ContextCompat.checkSelfPermission(
-                            context,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        ) == PackageManager.PERMISSION_GRANTED
-                    ) {
-                        //if (!isFirstTimeRequest) {
-                        hasLocationPermission = true
-                        showLocationPermissionDialog = false
-                        requestActivityRecognitionPermissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
-                        //}
-                    } else {
-                        if (hasBeenAskedForLocationPermission)
-                            showLocationPermissionDialog = true
-                    }
-                }
+    val observer = LifecycleEventObserver { _, event ->
+    when (event) {
+    Lifecycle.Event.ON_RESUME -> {
+    // Controlla se i permessi sono concessi quando lo screen torna attivo
+    if (ContextCompat.checkSelfPermission(
+    context,
+    Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
+    ) {
+    //if (!isFirstTimeRequest) {
+    hasLocationPermission = true
+    showLocationPermissionDialog = false
+    requestActivityRecognitionPermissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
+    //}
+    } else {
+    if (hasBeenAskedForLocationPermission)
+    showLocationPermissionDialog = true
+    }
+    }
 
-                else -> Unit
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
+    else -> Unit
+    }
+    }
+    lifecycleOwner.lifecycle.addObserver(observer)
 
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+    onDispose {
+    lifecycleOwner.lifecycle.removeObserver(observer)
+    }
     }
 
     DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_RESUME -> {
-                    // Controlla se il permesso di ACTIVITY_RECOGNITION è stato concesso
-                    if (ContextCompat.checkSelfPermission(
-                            context,
-                            Manifest.permission.ACTIVITY_RECOGNITION
-                        ) == PackageManager.PERMISSION_GRANTED
-                    ) {
-                        hasActivityRecognitionPermission = true
-                        showActivityRecognitionPermissionDialog = false
-                    } else {
-                        // Mostra il dialog se il permesso non è stato concesso
-                        if (hasBeenAskedForActivityRecognitionPermission)
-                            showActivityRecognitionPermissionDialog = true
-                    }
-                }
+    val observer = LifecycleEventObserver { _, event ->
+    when (event) {
+    Lifecycle.Event.ON_RESUME -> {
+    // Controlla se il permesso di ACTIVITY_RECOGNITION è stato concesso
+    if (ContextCompat.checkSelfPermission(
+    context,
+    Manifest.permission.ACTIVITY_RECOGNITION
+    ) == PackageManager.PERMISSION_GRANTED
+    ) {
+    hasActivityRecognitionPermission = true
+    showActivityRecognitionPermissionDialog = false
+    } else {
+    // Mostra il dialog se il permesso non è stato concesso
+    if (hasBeenAskedForActivityRecognitionPermission)
+    showActivityRecognitionPermissionDialog = true
+    }
+    }
 
-                else -> Unit
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
+    else -> Unit
+    }
+    }
+    lifecycleOwner.lifecycle.addObserver(observer)
 
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+    onDispose {
+    lifecycleOwner.lifecycle.removeObserver(observer)
+    }
     }
 
     DeniedPermissionDialog(
-        showDialog = showLocationPermissionDialog,
-        onDismiss = {
-            if (hasLocationPermission) {
-                showLocationPermissionDialog = false
-            }
-        },
-        onGoToSettings = {
-            if (requestLocationPermissionCounter < 2) {
-                requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-            } else {
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                val uri = Uri.fromParts("package", context.packageName, null)
-                intent.data = uri
-                context.startActivity(intent)
-            }
-        },
-        color = MaterialTheme.colorScheme.primary,
-        title = R.string.location_permission_title,
-        icon = R.drawable.location_icon,
-        text = R.string.location_permission_description,
-        buttonText = if (requestLocationPermissionCounter < 2) R.string.request_permission else R.string.go_to_settings
+    showDialog = showLocationPermissionDialog,
+    onDismiss = {
+    if (hasLocationPermission) {
+    showLocationPermissionDialog = false
+    }
+    },
+    onGoToSettings = {
+    if (requestLocationPermissionCounter < 2) {
+    requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+    } else {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+    val uri = Uri.fromParts("package", context.packageName, null)
+    intent.data = uri
+    context.startActivity(intent)
+    }
+    },
+    color = MaterialTheme.colorScheme.primary,
+    title = R.string.location_permission_title,
+    icon = R.drawable.location_icon,
+    text = R.string.location_permission_description,
+    buttonText = if (requestLocationPermissionCounter < 2) R.string.request_permission else R.string.go_to_settings
     )
 
     DeniedPermissionDialog(
-        showDialog = showActivityRecognitionPermissionDialog,
-        onDismiss = {
-            if (hasActivityRecognitionPermission) {
-                showActivityRecognitionPermissionDialog = false
-            }
-        },
-        onGoToSettings = {
-            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-            val uri = Uri.fromParts("package", context.packageName, null)
-            intent.data = uri
-            context.startActivity(intent)
-        },
-        color = MaterialTheme.colorScheme.primary,
-        title = R.string.activity_recognition_permission_title,
-        icon = R.drawable.steps_icon,
-        text = R.string.activity_recognition_permission_description,
-        buttonText = R.string.go_to_settings
+    showDialog = showActivityRecognitionPermissionDialog,
+    onDismiss = {
+    if (hasActivityRecognitionPermission) {
+    showActivityRecognitionPermissionDialog = false
+    }
+    },
+    onGoToSettings = {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+    val uri = Uri.fromParts("package", context.packageName, null)
+    intent.data = uri
+    context.startActivity(intent)
+    },
+    color = MaterialTheme.colorScheme.primary,
+    title = R.string.activity_recognition_permission_title,
+    icon = R.drawable.steps_icon,
+    text = R.string.activity_recognition_permission_description,
+    buttonText = R.string.go_to_settings
     )
      */
 
@@ -291,7 +280,7 @@ fun NewActivityScreen(
         topBar = {
             NewActivityTopAppBar(
                 titleId = titleId,
-                navController = navController
+                onNavBack = { onNavBack() },
             )
         },
         snackbarHost = { CustomSnackbarHost(snackbarHostState) }
@@ -361,6 +350,7 @@ fun NewActivityScreen(
                                 color = color
                             )
                         }
+
                         ExerciseSessionRecord.EXERCISE_TYPE_BIKING, ExerciseSessionRecord.EXERCISE_TYPE_SURFING -> {
                             StatsDisplay(
                                 averageSpeed = averageSpeed,
@@ -368,6 +358,7 @@ fun NewActivityScreen(
                                 color = color
                             )
                         }
+
                         ExerciseSessionRecord.EXERCISE_TYPE_YOGA -> {
                             YogaStyleSelector(
                                 yogaStyle = yogaStyle,
@@ -375,6 +366,7 @@ fun NewActivityScreen(
                                 color = color
                             )
                         }
+
                         ExerciseSessionRecord.EXERCISE_TYPE_EXERCISE_CLASS -> {
                             TrainIntensitySelector(
                                 trainIntensity = trainIntensity,
@@ -382,6 +374,7 @@ fun NewActivityScreen(
                                 color = color
                             )
                         }
+
                         ExerciseSessionRecord.EXERCISE_TYPE_WHEELCHAIR -> {
                             WaterGlass(hydrationVolume = hydrationVolume) { addedVolume ->
                                 hydrationVolume += addedVolume
@@ -469,7 +462,7 @@ fun NewActivityScreen(
                                     //coroutineScope.launch {
                                     sessionJob.cancelAndJoin()  // Cancella il sessionJob in background
                                     //}
-                                    navController.popBackStack()
+                                    onNavBack()
 
                                 } else {
                                     visible = !visible

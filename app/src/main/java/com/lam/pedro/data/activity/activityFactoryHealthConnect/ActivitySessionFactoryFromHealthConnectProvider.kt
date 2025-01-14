@@ -20,8 +20,13 @@ object ActivitySessionFactoryFromHealthConnectProvider {
     suspend fun createSession(
         exerciseType: Int,
         healthConnectClient: HealthConnectClient,
-        exerciseRecord: ExerciseSessionRecord
+        exerciseRecord: ExerciseSessionRecord?
     ): GenericActivity {
-        return factories[exerciseType]?.createSession(healthConnectClient, exerciseRecord)?: throw IllegalArgumentException("Unknown exercise type: $exerciseType")
+        return exerciseRecord?.let {
+            factories[exerciseType]?.createSession(healthConnectClient,
+                it
+            )
+        }
+            ?: throw IllegalArgumentException("Unknown exercise type: $exerciseType")
     }
 }
