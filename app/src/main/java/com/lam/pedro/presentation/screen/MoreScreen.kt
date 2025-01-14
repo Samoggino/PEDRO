@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.lam.pedro.R
 import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper
@@ -45,7 +44,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MoreScreen(
-    navController: NavHostController
+    onNavigate: (String) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val loginState = remember { mutableStateOf<LoginState>(LoginState.Idle) }
@@ -72,20 +71,20 @@ fun MoreScreen(
     ) {
 
         // Mostra l'elemento account
-        AccountItem(navController, loginState.value)
+        AccountItem(onNavigate, loginState.value)
 
         // Bottoni principali
         MenuItem(
             iconId = R.drawable.health_connect_icon,
             label = "Health Connect",
-            onClick = { navController.navigate(Screen.HealthConnectScreen.route) },
+            onClick = { onNavigate(Screen.HealthConnectScreen.route) },
             height = itemHeight
         )
 
         MenuItem(
             iconId = R.drawable.settings_icon,
             label = "Settings",
-            onClick = { navController.navigate(Screen.SettingScreen.route) },
+            onClick = { onNavigate(Screen.SettingScreen.route) },
             height = itemHeight
 
         )
@@ -93,14 +92,14 @@ fun MoreScreen(
         MenuItem(
             iconId = R.drawable.privacy_policy_icon,
             label = "Privacy Policy",
-            onClick = { navController.navigate(Screen.PrivacyPolicy.route) },
+            onClick = { onNavigate(Screen.PrivacyPolicy.route) },
             height = itemHeight
         )
 
         MenuItem(
             iconId = R.drawable.about_icon,
             label = "About",
-            onClick = { navController.navigate(Screen.AboutScreen.route) },
+            onClick = { onNavigate(Screen.AboutScreen.route) },
             height = itemHeight
         )
 
@@ -145,7 +144,7 @@ fun MoreScreen(
 }
 
 @Composable
-private fun AccountItem(navController: NavHostController, loginState: LoginState) {
+private fun AccountItem(onNavigate: (String) -> Unit, loginState: LoginState) {
     when (loginState) {
         is LoginState.Loading -> CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
 
@@ -169,7 +168,7 @@ private fun AccountItem(navController: NavHostController, loginState: LoginState
             MenuItem(
                 iconId = R.drawable.user_icon,
                 label = "You're not a Gringo, yet",
-                onClick = { navController.navigate(Screen.LoginScreen.route) },
+                onClick = { onNavigate(Screen.LoginScreen.route) },
                 topHeight = 85
             )
         }

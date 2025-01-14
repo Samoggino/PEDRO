@@ -8,11 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,14 +22,14 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.lam.pedro.R
+import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.theme.PedroYellow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(
-    navController: NavHostController,
+    onNavBack: () -> Unit,
     titleId: Int
 ) {
 
@@ -41,21 +37,12 @@ fun AboutScreen(
         topBar = {
             TopAppBar(
                 title = {
-
                     Text(
                         text = stringResource(titleId),
                         style = MaterialTheme.typography.headlineSmall
                     )
                 },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
-                    }
-
-                },
+                navigationIcon = { BackButton { onNavBack() } },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White.copy(alpha = 0f)
                 )
@@ -99,10 +86,6 @@ fun AboutScreen(
                 text = stringResource(id = R.string.about_app_developers),
                 style = MaterialTheme.typography.titleSmall
             )
-
-
         }
-
     }
-
 }

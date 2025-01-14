@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen.community
+package com.lam.pedro.presentation.screen.community.user
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -50,12 +50,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
+import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseRepositoryImpl
 import com.lam.pedro.presentation.component.ShowSessionDetails
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun CommunityUserDetailsScreen(
+fun UserCommunityDetails(
     selectedUser: String,
     onNavBack: () -> Unit,
 ) {
@@ -63,8 +64,6 @@ fun CommunityUserDetailsScreen(
     LaunchedEffect(key1 = selectedUser) {
         Log.i("Community", "Fetching details for $selectedUser")
     }
-
-
 
     Scaffold(
         topBar = {
@@ -91,9 +90,10 @@ fun CommunityUserDetailsScreen(
 fun CommunityUserDetailsContent(
     userUUID: String,
     paddingValues: PaddingValues,
-    viewModel: CommunityUserDetailsViewModel = viewModel(
-        factory = CommunityUserDetailsViewModelFactory(
-            userUUID
+    viewModel: UserCommunityDetailsViewModel = viewModel(
+        factory = UserCommunityDetailsViewModelFactory(
+            userUUID,
+            ActivitySupabaseRepositoryImpl() // Passaggio del repository al ViewModel
         )
     )
 
@@ -107,9 +107,10 @@ fun ActivityHistoryPopup(
     activityMap: Map<ActivityEnum, List<GenericActivity>>,
     userUUID: String,
     paddingValues: PaddingValues,
-    viewModel: CommunityUserDetailsViewModel = viewModel(
-        factory = CommunityUserDetailsViewModelFactory(
-            userUUID
+    viewModel: UserCommunityDetailsViewModel = viewModel(
+        factory = UserCommunityDetailsViewModelFactory(
+            userUUID,
+            ActivitySupabaseRepositoryImpl() // Passaggio del repository al ViewModel
         )
     )
 ) {

@@ -28,7 +28,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.lam.pedro.R
 import com.lam.pedro.presentation.navigation.Screen
 
@@ -36,7 +35,8 @@ import com.lam.pedro.presentation.navigation.Screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    navController: NavController,
+    onNavBack: () -> Unit,
+    onNavigate: (route: String) -> Unit,
     viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory())
 ) {
 
@@ -50,7 +50,7 @@ fun LoginScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { onNavBack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = stringResource(R.string.back)
@@ -124,7 +124,7 @@ fun LoginScreen(
                 Text("Forgot password?")
             }
 
-            TextButton(onClick = { navController.navigate(Screen.RegisterScreen.route) }) {
+            TextButton(onClick = { onNavigate(Screen.RegisterScreen.route) }) {
                 Text("You are not registered yet? Join us!")
             }
 
@@ -136,7 +136,7 @@ fun LoginScreen(
                 showDialog = showDialog,
                 dialogState = state,
                 onDismiss = { viewModel.hideDialog() },
-                onNavigate = { navController.navigate(Screen.HomeScreen.route) }
+                onNavigate = { onNavigate(Screen.HomeScreen.route) }
             )
 
         }

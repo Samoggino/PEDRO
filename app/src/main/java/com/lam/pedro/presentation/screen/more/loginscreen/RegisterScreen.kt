@@ -7,13 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,18 +23,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.lam.pedro.R
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.navigation.Screen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
-    navController: NavController,
-    viewModel: RegisterViewModel = RegisterViewModel
+    onNavBack: () -> Unit,
+    onNavigate: (String) -> Unit,
+    viewModel: RegisterViewModel = viewModel(factory = RegisterViewModelFactory())
 ) {
 
     Scaffold(
@@ -49,15 +46,7 @@ fun RegisterScreen(
                         style = MaterialTheme.typography.headlineSmall
                     )
                 },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
-                    }
-
-                },
+                navigationIcon = { BackButton(onNavBack = onNavBack) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White.copy(alpha = 0f)
                 )
@@ -136,7 +125,7 @@ fun RegisterScreen(
                 Text("Join")
             }
 
-            TextButton(onClick = { navController.navigate(Screen.LoginScreen.route) }) {
+            TextButton(onClick = { onNavigate(Screen.LoginScreen.route) }) {
                 Text("Already have an account?")
             }
 
@@ -144,7 +133,7 @@ fun RegisterScreen(
                 showDialog = showDialog,
                 dialogState = signUpState, // Pass signUpState to the dialog
                 onDismiss = { viewModel.hideDialog() },
-                onNavigate = { navController.navigate(Screen.CommunityScreen.route) } // Navigate to MyScreenRecords
+                onNavigate = { onNavigate(Screen.HomeScreen.route) }
             )
 
         }

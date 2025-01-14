@@ -36,8 +36,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.lam.pedro.data.activity.ActivityEnum
+import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
+import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseRepositoryImpl
 import com.lam.pedro.util.placeholder
 import kotlinx.coroutines.delay
 
@@ -45,8 +46,13 @@ import kotlinx.coroutines.delay
 @Composable
 fun ScreenCharts(
     activityEnum: ActivityEnum,
-    navController: NavController,
-    viewModelCharts: ViewModelCharts = viewModel(factory = ChartsViewModelFactory())
+    onNavBack: () -> Unit,
+    viewModelCharts: ViewModelCharts = viewModel(
+        factory = ChartsViewModelFactory(
+            uuid = getUUID()!!,
+            activityRepository = ActivitySupabaseRepositoryImpl()
+        )
+    )
 ) {
 
     val chartState by viewModelCharts.chartState.observeAsState(ChartState.Loading)
@@ -61,7 +67,7 @@ fun ScreenCharts(
             TopAppBar(
                 title = { Text(text = activityEnum.name) },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { onNavBack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"

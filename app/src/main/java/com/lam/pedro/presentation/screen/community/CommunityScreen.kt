@@ -18,14 +18,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -33,11 +30,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.lam.pedro.presentation.component.CommunityTopBar
 import com.lam.pedro.presentation.component.UserCommunityCard
 import com.lam.pedro.presentation.component.UserPlaceholder
 import com.lam.pedro.presentation.screen.more.loginscreen.User
 import com.lam.pedro.util.vibrateOnClick
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -47,26 +45,21 @@ const val AnimationDuration = 2500
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityScreen(
-    onNavigateToChat: (String) -> Unit,  // Funzione per la navigazione alla chat
-    onNavigateToUserDetails: (String) -> Unit,  // Funzione per la navigazione ai dettagli utente
+    onNavigateToChat: (String) -> Unit,
+    onNavigateToUserDetails: (String) -> Unit,
     onNavBack: () -> Unit,
     onLoginClick: () -> Unit,
     viewModel: CommunityScreenViewModel = viewModel(factory = CommunityScreenViewModelFactory())
 ) {
-    val coroutineScope = rememberCoroutineScope()
+    Log.i("Community", "CommunityScreen reloaded")
 
     // Usa remember per gli stati
-    val isRefreshingState = remember { mutableStateOf(false) }
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val userIsLogged by viewModel.userIsLoggedIn.collectAsState()
+
     val followingOnlyState = remember { mutableStateOf(false) }
 
-    val isInitialLoadState by viewModel.isInitialLoad.collectAsState(initial = true)
-    val userFollowMap by viewModel.userFollowMap.collectAsState(initial = emptyMap())
-    val userIsLogged by viewModel.userIsLoggedIn.collectAsState(initial = false)
 
-    Log.i("Community", "CommunityScreen")
-    LaunchedEffect(userIsLogged) {
-        viewModel.loadInitialData()
-    }
 
     Scaffold(
         topBar = {
@@ -84,17 +77,16 @@ fun CommunityScreen(
                 .padding(padding)
         ) {
             PullToRefreshBox(
-                isRefreshing = isRefreshingState.value,
+                isRefreshing = isRefreshing,
                 onRefresh = {
-                    coroutineScope.launch(Dispatchers.IO) {
-                        viewModel.getFollowedUsers()
-                        isRefreshingState.value = false
-                    }
+                    viewModel.refreshData()
                 },
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.surface),
             ) {
+                val isInitialLoad by viewModel.isInitialLoad.collectAsState()
+                val userFollowMap by viewModel.userFollowMap.collectAsState()
 
                 if (userIsLogged) {
                     Column(
@@ -105,19 +97,12 @@ fun CommunityScreen(
                             userFollowMap = userFollowMap,
                             followingOnly = followingOnlyState.value,
                             onFollowToggle = { user, isFollowing ->
-                                coroutineScope.launch {
-                                    viewModel.toggleFollowUser(user, isFollowing)
-                                    userFollowMap.let {
-                                        val updatedMap = it.toMutableMap()
-                                        updatedMap[user] = !isFollowing
-                                        viewModel.updateFollowState(updatedMap)
-                                    }
-                                }
+                                viewModel.toggleFollowUser(user, isFollowing)
                             },
-                            isRefreshing = isRefreshingState.value,
-                            isInitialLoad = isInitialLoadState,
-                            onNavigateToChat = onNavigateToChat,  // Passa la funzione di navigazione
-                            onNavigateToUserDetails = onNavigateToUserDetails  // Passa la funzione di navigazione
+                            isRefreshing = isRefreshing,
+                            isInitialLoad = isInitialLoad,
+                            onNavigateToChat = onNavigateToChat,
+                            onNavigateToUserDetails = onNavigateToUserDetails
                         )
                     }
                 } else {
@@ -140,28 +125,23 @@ fun UserFollowList(
     onNavigateToUserDetails: (String) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
-    var isNavigating by remember { mutableStateOf(false) }
+    val debounceJob = remember { mutableStateOf<Job?>(null) }
 
     fun debounceClick(action: () -> Unit) {
-        if (!isNavigating) {
-            isNavigating = true
-            coroutineScope.launch {
-                Log.i("Community", "Navigating")
-                action()
-                delay(600) // debounce
-                isNavigating = false
-            }
+        debounceJob.value?.cancel()
+        debounceJob.value = coroutineScope.launch {
+            delay(600)
+            action()
         }
     }
 
-    val filteredUsers by remember(userFollowMap, followingOnly) {
-        derivedStateOf {
-            userFollowMap?.filter { it.value || !followingOnly }
-        }
+    val filteredUsers = userFollowMap?.let { map ->
+        map.filter { it.value || !followingOnly }
     }
 
     LazyColumn(modifier = Modifier.padding(4.dp)) {
-        if (userFollowMap.isNullOrEmpty() && isInitialLoad) {
+        if (isInitialLoad) {
+            // Mostra 5 placeholders mentre i dati sono in fase di caricamento
             items(5) {
                 UserPlaceholder(
                     modifier = Modifier
@@ -170,9 +150,23 @@ fun UserFollowList(
                     animation = animateFloatAsState(if (isRefreshing) 1f else 0f, label = "").value
                 )
             }
+        } else if (userFollowMap.isNullOrEmpty()) {
+            // Mostra un messaggio se non ci sono utenti
+            item {
+                Text(
+                    text = "No users found",
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    fontSize = 20.sp
+                )
+            }
         } else {
+            // Visualizza la lista di utenti
             filteredUsers?.forEach { (user, isFollowing) ->
-                item {
+                item(key = user.id) {
                     UserCommunityCard(
                         user = user,
                         isFollowing = isFollowing,

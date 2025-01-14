@@ -1,15 +1,5 @@
 package com.lam.pedro.presentation.screen
 
-import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.provider.Settings
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -28,37 +18,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.navigation.NavHostController
-import com.lam.pedro.R
 import com.lam.pedro.data.activity.ActivityEnum
-import com.lam.pedro.presentation.TAG
-import com.lam.pedro.presentation.component.DeniedPermissionDialog
 import com.lam.pedro.presentation.navigation.Screen
 
 @Composable
 fun ActivitiesScreen(
-    navController: NavHostController
+    onActivityItemClick: (ActivityItem) -> Unit,
 ) {
     val staticActivities = listOf(
         ActivityItem("Sleeping", painterResource(id = ActivityEnum.SLEEP.image), 90.dp, Screen.SleepSessions.route, ActivityEnum.SLEEP.color),
@@ -89,7 +63,7 @@ fun ActivitiesScreen(
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(10.dp))
-            ActivitiesGrid(navController, staticActivities)
+            ActivitiesGrid(onActivityItemClick, staticActivities)
             Spacer(modifier = Modifier.height(30.dp))
             Text(
                 text = "Dynamic Activities",
@@ -97,7 +71,7 @@ fun ActivitiesScreen(
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(10.dp))
-            ActivitiesGrid(navController, dynamicActivities)
+            ActivitiesGrid(onActivityItemClick, dynamicActivities)
             Spacer(modifier = Modifier.height(30.dp))
         }
     }
@@ -106,7 +80,7 @@ fun ActivitiesScreen(
 
 @Composable
 fun ActivitiesGrid(
-    navController: NavHostController,
+    onActivityItemClick: (ActivityItem) -> Unit,
     activities: List<ActivityItem>,
     columns: Int = 2,
 ) {
@@ -123,18 +97,7 @@ fun ActivitiesGrid(
                     activity.route?.let {
                         ActivityCard(
                             activity = activity,
-                            onClick = {
-                                navController.navigate(activity.route) {
-                                    navController.graph.startDestinationRoute?.let { route ->
-                                        popUpTo(route) {
-                                            saveState = true
-                                        }
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-
-                            },
+                            onClick = { onActivityItemClick(activity) },
                             modifier = Modifier.weight(1f) // Assegna il peso a ciascun elemento in una riga
                         )
                     }

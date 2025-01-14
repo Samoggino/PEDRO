@@ -31,15 +31,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.lam.pedro.data.activity.ActivityEnum
-import com.lam.pedro.presentation.navigation.Screen
+import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseRepositoryImpl
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyScreenRecords(
-    navController: NavController,
-    viewModel: MyRecordsViewModel = viewModel(factory = MyScreenRecordsFactory())
+    onNavBack: () -> Unit,
+    onActivityClick: (ActivityEnum) -> Unit,
+    onCommunityClick: () -> Unit,
+    viewModel: MyRecordsViewModel = viewModel(
+        factory = MyScreenRecordsFactory(
+            activityRepository = ActivitySupabaseRepositoryImpl()
+        )
+    )
 ) {
     val scrollState = rememberScrollState()
 
@@ -48,7 +53,7 @@ fun MyScreenRecords(
             TopAppBar(
                 title = { Text("Test Activity Methods") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigate(Screen.LoginScreen.route) }) {
+                    IconButton(onClick = { onNavBack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back to login"
@@ -70,16 +75,9 @@ fun MyScreenRecords(
             ActivityEnum.entries.forEach { activityType ->
                 ActivityRow(
                     activityEnum = activityType,
-                    onInsertClick = {
-                        viewModel.insertActivitySession(
-                            activityEnum = activityType
-                        )
-                    },
-                    onGetClick = {
-                        navController.navigate(Screen.ChartsScreen.route + "/${activityType.name}")
-                    }
+                    onInsertClick = { viewModel.insertActivitySession(activityType) },
+                    onGetClick = { onActivityClick(activityType) }
                 )
-
             }
 
             Row(
@@ -91,7 +89,7 @@ fun MyScreenRecords(
             }
 
             // Navigation buttons
-            NavButtons(navController)
+            NavButtons(onCommunityClick)
         }
     }
 }
@@ -104,14 +102,14 @@ sealed class ResultState {
 }
 
 @Composable
-fun NavButtons(navController: NavController) {
+fun NavButtons(onCommunityClick: () -> Unit) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
 
         Button(
-            onClick = { navController.navigate(Screen.CommunityScreen.route) },
+            onClick = onCommunityClick,
             content = { Text("Vai alla community dei gringos") },
             modifier = Modifier.fillMaxWidth()
         )

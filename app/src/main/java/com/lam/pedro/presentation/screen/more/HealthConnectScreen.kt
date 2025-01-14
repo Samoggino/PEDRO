@@ -52,7 +52,6 @@ import androidx.health.connect.client.HealthConnectClient.Companion.SDK_UNAVAILA
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.NavHostController
 import com.lam.pedro.R
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.InstalledMessage
@@ -72,9 +71,8 @@ fun HealthConnectScreen(
     onResumeAvailabilityCheck: () -> Unit,
     lifecycleOwner: LifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current,
     revokeAllPermissions: () -> Unit,
-    navController: NavHostController,
+    onNavBack: () -> Unit,
     titleId: Int
-
 ) {
     val currentOnAvailabilityCheck by rememberUpdatedState(onResumeAvailabilityCheck)
     val context = LocalContext.current
@@ -106,9 +104,7 @@ fun HealthConnectScreen(
                         style = MaterialTheme.typography.headlineSmall
                     )
                 },
-                navigationIcon = {
-                    BackButton(navController)
-                },
+                navigationIcon = { BackButton(onNavBack) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White.copy(alpha = 0f)
                 )

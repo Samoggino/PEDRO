@@ -10,17 +10,17 @@ import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.toMonthNumber
-import com.lam.pedro.presentation.serialization.MyScreenRecordsFactory
-import com.lam.pedro.presentation.serialization.MyRecordsViewModel
+import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
+import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseRepositoryImpl
 import ir.ehsannarmani.compose_charts.models.Bars
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class ViewModelCharts : ViewModel() {
+class ViewModelCharts(
+    private val uuid: String = getUUID()!!,
+    private val activityRepository: ActivitySupabaseRepositoryImpl // Aggiungi il repository come dipendenza
+) : ViewModel() {
 
-    private val myRecordsViewModel = MyScreenRecordsFactory().create(MyRecordsViewModel::class.java)
-
-    // In ViewModelCharts
     private val _chartState = MutableLiveData<ChartState>(ChartState.Loading)
     val chartState: LiveData<ChartState> = _chartState
 
@@ -37,7 +37,10 @@ class ViewModelCharts : ViewModel() {
         _chartState.value = ChartState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                activities = myRecordsViewModel.getActivitySession(activityEnum)
+                activities = activityRepository.getActivitySession(
+                    activityEnum,
+                    uuid
+                ) // Usa il repository
                 if (activities.isEmpty()) {
                     _chartState.postValue(ChartState.Error(ChartError.NoData))
                 } else {
@@ -55,6 +58,7 @@ class ViewModelCharts : ViewModel() {
             }
         }
     }
+
 
     /**
      * Cambia la metrica selezionata e aggiorna il grafico
@@ -83,12 +87,6 @@ class ViewModelCharts : ViewModel() {
         return when (selectedMetric) {
             LabelMetrics.DISTANCE -> (activity as? GenericActivity.DistanceMetrics)?.distance?.inMeters
                 ?: 0.0
-
-            /*
-            LabelMetrics.ELEVATION -> (activity as? GenericActivity.DistanceMetrics)?.elevationGained?.inMeters
-                ?: 0.0
-
-             */
 
             LabelMetrics.TOTAL_CALORIES -> (activity as? GenericActivity.EnergyMetrics)?.totalEnergy?.inKilocalories
                 ?: 0.0
@@ -157,11 +155,17 @@ fun getAvailableMetricsForActivity(activityEnum: ActivityEnum) =
         else -> LabelMetrics.entries.filter { it == LabelMetrics.DURATION }
     }
 
-class ChartsViewModelFactory : ViewModelProvider.Factory {
+class ChartsViewModelFactory(
+    private val uuid: String,
+    private val activityRepository: ActivitySupabaseRepositoryImpl
+) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ViewModelCharts::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return ViewModelCharts() as T
+            return ViewModelCharts(
+                uuid,
+                activityRepository
+            ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

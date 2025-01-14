@@ -33,7 +33,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.lam.pedro.R
 import com.lam.pedro.data.CarouselItem
 import com.lam.pedro.presentation.component.ActivityScreenHeader
@@ -51,7 +50,7 @@ fun SessionScreen(
     onError: (Throwable?) -> Unit = {},
     onPermissionsResult: () -> Unit = {},
     onPermissionsLaunch: (Set<String>) -> Unit = {},
-    navController: NavController,
+    onNavigate: (String) -> Unit,
     titleId: Int,
     viewModel: ActivitySessionViewModel
 ) {
@@ -73,17 +72,7 @@ fun SessionScreen(
         floatingActionButton = {
             if (permissionsGranted) {
                 ExtendedFloatingActionButton(
-                    onClick = {
-                        navController.navigate(Screen.NewActivityScreen.route) {
-                            navController.graph.startDestinationRoute?.let { route ->
-                                popUpTo(route) {
-                                    saveState = true
-                                }
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    },
+                    onClick = { onNavigate(Screen.NewActivityScreen.route) },
                     icon = { Icon(Icons.Filled.Add, contentDescription = "Add Activity") },
                     text = { Text("Start Session") },
                     shape = RoundedCornerShape(26.dp),
@@ -103,7 +92,13 @@ fun SessionScreen(
                 Alignment.Start
             }
         ) {
-            item { ActivityScreenHeader(titleId, viewModel.activityEnum.color, viewModel.activityEnum.image) }
+            item {
+                ActivityScreenHeader(
+                    titleId,
+                    viewModel.activityEnum.color,
+                    viewModel.activityEnum.image
+                )
+            }
 
             if (!permissionsGranted) {
                 item { Spacer(modifier = Modifier.height(30.dp)) }
@@ -188,7 +183,12 @@ fun SessionScreen(
                                 }
                             } else {
                                 items(sessionList) { session ->
-                                    SessionHistoryRow(viewModel.activityEnum.color, viewModel.activityEnum.image, session, viewModel)
+                                    SessionHistoryRow(
+                                        viewModel.activityEnum.color,
+                                        viewModel.activityEnum.image,
+                                        session,
+                                        viewModel
+                                    )
                                     HorizontalDivider(
                                         thickness = 1.dp,
                                         color = Color(0xFF606060)

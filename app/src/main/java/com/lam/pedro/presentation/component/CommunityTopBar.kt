@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen.community
+package com.lam.pedro.presentation.component
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack

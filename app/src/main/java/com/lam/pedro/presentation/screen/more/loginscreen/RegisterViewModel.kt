@@ -2,6 +2,7 @@ package com.lam.pedro.presentation.screen.more.loginscreen
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.SecurePreferencesManager.saveTokens
@@ -177,5 +178,15 @@ object RegisterViewModel : ViewModel() {
             }
         }
 
+    }
+}
+
+class RegisterViewModelFactory : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(RegisterViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return RegisterViewModel as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
