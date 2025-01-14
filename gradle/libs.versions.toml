@@ -1,10 +1,6 @@
 [versions]
-accompanistDrawablepainter = "0.36.0"
-agp = "8.7.3"
+agp = "8.8.0"
 androidSdk = "11.6.1"
-concurrentFuturesKtx = "1.2.0"
-connectClient = "1.1.0-alpha09"
-desugar_jdk_libs = "2.1.2"
 accompanistPlaceholderMaterial = "0.19.0"
 coilCompose = "2.4.0"
 kotlin = "2.0.0"
@@ -28,14 +24,10 @@ runtimeLivedata = "1.7.5"
 # charts
 composeCharts = "0.1.0"
 storage = "1.5.0"
-uiCompose = "1.7.0-alpha07"
-composeAnimation = "1.7.0-alpha07"
-foundationCompose = "1.7.0-alpha07"
 benchmarkCommon = "1.3.3"
 playServicesLocation = "21.3.0"
 core = "1.46.0"
 playServicesMaps = "19.0.0"
-securityCryptoKtx = "1.0.0"
 
 [libraries]
 accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanistPlaceholderMaterial" }
@@ -76,7 +68,6 @@ androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtim
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 core = { group = "com.google.ar", name = "core", version.ref = "core" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
-androidx-security-crypto-ktx = { group = "androidx.security", name = "security-crypto-ktx", version.ref = "securityCryptoKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

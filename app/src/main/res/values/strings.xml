@@ -186,5 +186,6 @@
     <string name="community_screen">Community</string>
     <string name="register_screen">Register screen</string>
     <string name="community_user_details">user details</string>
+    <string name="chat_screen">chat screen</string>
 
 </resources>

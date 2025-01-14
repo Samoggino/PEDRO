@@ -13,12 +13,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 
-class CommunityUserDetailsViewModel : ViewModel() {
+class CommunityUserDetailsViewModel(
+    private val userUUID: String
+) : ViewModel() {
     val activityMap = MutableStateFlow<Map<ActivityEnum, List<GenericActivity>>>(emptyMap())
     val isLoading = MutableStateFlow(false) // Stato di caricamento
     private val viewModel = MyScreenRecordsFactory().create(MyRecordsViewModel::class.java)
 
-    fun fetchActivityMap(userUUID: String) {
+    init {
+        fetchActivityMap()
+    }
+
+
+    private fun fetchActivityMap() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 isLoading.value = true // Avvia il caricamento
@@ -33,11 +40,11 @@ class CommunityUserDetailsViewModel : ViewModel() {
 }
 
 
-class CommunityUserDetailsViewModelFactory : ViewModelProvider.Factory {
+class CommunityUserDetailsViewModelFactory(private val userUUID: String) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CommunityUserDetailsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return CommunityUserDetailsViewModel() as T
+            return CommunityUserDetailsViewModel(userUUID) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

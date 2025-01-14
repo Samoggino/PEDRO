@@ -33,10 +33,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.lam.pedro.presentation.component.UserCommunityCard
 import com.lam.pedro.presentation.component.UserPlaceholder
-import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.presentation.screen.more.loginscreen.User
 import com.lam.pedro.util.vibrateOnClick
 import kotlinx.coroutines.Dispatchers
@@ -49,7 +47,10 @@ const val AnimationDuration = 2500
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityScreen(
-    navController: NavController,
+    onNavigateToChat: (String) -> Unit,  // Funzione per la navigazione alla chat
+    onNavigateToUserDetails: (String) -> Unit,  // Funzione per la navigazione ai dettagli utente
+    onNavBack: () -> Unit,
+    onLoginClick: () -> Unit,
     viewModel: CommunityScreenViewModel = viewModel(factory = CommunityScreenViewModelFactory())
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -67,13 +68,12 @@ fun CommunityScreen(
         viewModel.loadInitialData()
     }
 
-
     Scaffold(
         topBar = {
             CommunityTopBar(
                 userIsLogged = userIsLogged,
                 followingOnlyState = followingOnlyState,
-                navController = navController
+                onNavBack = onNavBack
             )
         },
     ) { padding ->
@@ -115,13 +115,14 @@ fun CommunityScreen(
                                 }
                             },
                             isRefreshing = isRefreshingState.value,
-                            isInitialLoad = isInitialLoadState, // Passiamo il valore aggiornato
-                            navController = navController
+                            isInitialLoad = isInitialLoadState,
+                            onNavigateToChat = onNavigateToChat,  // Passa la funzione di navigazione
+                            onNavigateToUserDetails = onNavigateToUserDetails  // Passa la funzione di navigazione
                         )
                     }
                 } else {
                     // Mostra un messaggio se l'utente non è loggato
-                    NotInTheCommunity(navController)
+                    NotInTheCommunity(onLoginClick)
                 }
             }
         }
@@ -135,9 +136,10 @@ fun UserFollowList(
     onFollowToggle: (User, Boolean) -> Unit,
     isRefreshing: Boolean,
     isInitialLoad: Boolean,
-    navController: NavController
+    onNavigateToChat: (String) -> Unit,
+    onNavigateToUserDetails: (String) -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope() // Aggiunto
+    val coroutineScope = rememberCoroutineScope()
     var isNavigating by remember { mutableStateOf(false) }
 
     fun debounceClick(action: () -> Unit) {
@@ -154,7 +156,7 @@ fun UserFollowList(
 
     val filteredUsers by remember(userFollowMap, followingOnly) {
         derivedStateOf {
-            userFollowMap?.filter { it.value || !followingOnly } // Mostra tutti se il filtro è disattivato
+            userFollowMap?.filter { it.value || !followingOnly }
         }
     }
 
@@ -174,13 +176,18 @@ fun UserFollowList(
                     UserCommunityCard(
                         user = user,
                         isFollowing = isFollowing,
-                        onClick = {
+                        onFollowClick = {
                             vibrateOnClick()
                             onFollowToggle(user, isFollowing)
                         },
+                        onChatClick = {
+                            debounceClick {
+                                onNavigateToChat(user.toEncodedString())  // Usa la funzione passata
+                            }
+                        },
                         onLongPress = {
                             debounceClick {
-                                navController.navigate(Screen.CommunityUserDetails.route + "/${user.id}")
+                                onNavigateToUserDetails(user.id)  // Usa la funzione passata
                             }
                         },
                         modifier = Modifier
@@ -195,7 +202,9 @@ fun UserFollowList(
 
 
 @Composable
-private fun NotInTheCommunity(navController: NavController) {
+private fun NotInTheCommunity(
+    onLoginClick: () -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -219,7 +228,7 @@ private fun NotInTheCommunity(navController: NavController) {
             horizontalArrangement = Arrangement.Center
         ) {
             Button(
-                onClick = { navController.navigate(Screen.LoginScreen.route) },
+                onClick = onLoginClick,
                 modifier = Modifier.padding(16.dp),
                 content = { Text("Login") }
             )

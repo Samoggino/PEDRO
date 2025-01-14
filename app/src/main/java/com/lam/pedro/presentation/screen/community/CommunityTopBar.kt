@@ -12,7 +12,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavController
 import com.lam.pedro.util.vibrateOnClick
 
 
@@ -21,12 +20,12 @@ import com.lam.pedro.util.vibrateOnClick
 fun CommunityTopBar(
     userIsLogged: Boolean,
     followingOnlyState: MutableState<Boolean>,
-    navController: NavController
+    onNavBack: () -> Unit,
 ) {
     TopAppBar(
         title = { Text("Community") },
         navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
+            IconButton(onClick = { onNavBack() }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
             }
         },

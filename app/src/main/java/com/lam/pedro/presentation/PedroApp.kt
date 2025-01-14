@@ -99,8 +99,11 @@ fun PedroApp() {
             // Mostra la BottomBar solo se `showBottomBar` è true
             if (showBottomNotTop.value) {
                 BottomBar(
-                    navController = navController,
-                    currentRoute = currentRoute
+                    currentRoute = currentRoute,
+                    onNavigateToHome = { navController.navigate(Screen.HomeScreen.route) },
+                    onNavigateToActivities = { navController.navigate(Screen.ActivitiesScreen.route) },
+                    onNavigateToCommunity = { navController.navigate(Screen.CommunityScreen.route) },
+                    onNavigateToMore = { navController.navigate(Screen.MoreScreen.route) }
                 )
             }
         }

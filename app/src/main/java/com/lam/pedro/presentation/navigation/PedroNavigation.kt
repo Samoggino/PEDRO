@@ -55,12 +55,14 @@ import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactiv
 import com.lam.pedro.presentation.screen.activities.newActivity.NewActivityScreen
 import com.lam.pedro.presentation.screen.community.CommunityScreen
 import com.lam.pedro.presentation.screen.community.CommunityUserDetailsScreen
+import com.lam.pedro.presentation.screen.community.chat.ChatScreen
 import com.lam.pedro.presentation.screen.more.AboutScreen
 import com.lam.pedro.presentation.screen.more.HealthConnectScreen
 import com.lam.pedro.presentation.screen.more.PrivacyPolicyScreen
 import com.lam.pedro.presentation.screen.more.SettingsScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.RegisterScreen
+import com.lam.pedro.presentation.screen.more.loginscreen.User
 import com.lam.pedro.presentation.screen.profile.ProfileScreen
 import com.lam.pedro.presentation.serialization.MyScreenRecords
 import com.lam.pedro.util.showExceptionSnackbar
@@ -102,6 +104,10 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
                 else -> R.string.app_name
             }
         }
+    }
+
+    fun onNavBack() {
+        navController.popBackStack()
     }
 
     Log.d("Navigation", "PedroNavigation")
@@ -176,20 +182,30 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
             ) {
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 Log.d("Navigation", "CommunityScreen navigation")
-                CommunityScreen(navController = navController)
+                CommunityScreen(
+                    onNavigateToChat = { userId ->
+                        navController.navigate(Screen.ChatScreen.route + "/$userId")
+                    },
+                    onNavigateToUserDetails = { userId ->
+                        navController.navigate(Screen.CommunityUserDetails.route + "/$userId")
+                    },
+                    onNavBack = { onNavBack() },
+                    onLoginClick = { navController.navigate(Screen.LoginScreen.route) }
+                )
+
             }
 
             composable(
-                Screen.HomeScreen.route,
+                route = Screen.HomeScreen.route,
                 enterTransition = fadeInTransition,
                 exitTransition = fadeOutTransition
             ) {
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 Log.d("Navigation", "HomeScreen navigation")
-                HomeScreen(navController)
+                HomeScreen(onProfileClick = { navController.navigate(Screen.ProfileScreen.route) })
             }
             composable(
-                Screen.ActivitiesScreen.route,
+                route = Screen.ActivitiesScreen.route,
                 enterTransition = fadeInTransition,
                 exitTransition = fadeOutTransition
             ) {
@@ -198,7 +214,7 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
             }
 
             composable(
-                Screen.MoreScreen.route,
+                route = Screen.MoreScreen.route,
                 enterTransition = fadeInTransition,
                 exitTransition = fadeOutTransition
             ) {
@@ -206,7 +222,7 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
                 MoreScreen(navController)
             }
             composable(
-                Screen.ProfileScreen.route,
+                route = Screen.ProfileScreen.route,
                 enterTransition = fadeInTransition,
                 exitTransition = fadeOutTransition
             ) {
@@ -214,7 +230,7 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
                 ProfileScreen(navController, titleId)
             }
             composable(
-                Screen.AboutScreen.route,
+                route = Screen.AboutScreen.route,
                 enterTransition = slideInH,
                 exitTransition = slideOutH,
             ) {
@@ -222,7 +238,7 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
                 AboutScreen(navController = navController, titleId = titleId)
             }
             composable(
-                Screen.LoginScreen.route,
+                route = Screen.LoginScreen.route,
                 enterTransition = slideInH,
                 exitTransition = slideOutH
             ) {
@@ -231,7 +247,7 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
             }
 
             composable(
-                Screen.RegisterScreen.route,
+                route = Screen.RegisterScreen.route,
                 enterTransition = slideInH,
                 exitTransition = slideOutH
             ) {
@@ -255,7 +271,7 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
                 PrivacyPolicyScreen(navController = navController, titleId = titleId)
             }
             composable(
-                Screen.HealthConnectScreen.route,
+                route = Screen.HealthConnectScreen.route,
                 enterTransition = slideInH,
                 exitTransition = slideOutH
             ) {
@@ -263,7 +279,7 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
                 HealthConnectLauncher(availability, navController, titleId, scope)
             }
             composable(
-                Screen.SettingScreen.route,
+                route = Screen.SettingScreen.route,
                 enterTransition = slideInH,
                 exitTransition = slideOutH
             ) {
@@ -273,7 +289,7 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
 
 
             composable(
-                Screen.NewActivityScreen.route,
+                route = Screen.NewActivityScreen.route,
                 enterTransition = enterTransition,
                 exitTransition = exitTransition
             ) {
@@ -700,9 +716,31 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
             ) { backStackEntry ->
                 val userId = backStackEntry.arguments?.getString("userId")
                 if (userId != null) {
-                    CommunityUserDetailsScreen(selectedUser = userId, navController = navController)
+                    CommunityUserDetailsScreen(
+                        selectedUser = userId,
+                        onNavBack = { onNavBack() })
                 }
             }
+
+            composable(
+                route = Screen.ChatScreen.route + "/{currentUser}",
+                enterTransition = fadeInTransition,
+                exitTransition = fadeOutTransition
+            ) { backStackEntry ->
+                val userJsonEncoded = backStackEntry.arguments?.getString("currentUser")
+                val user = if (userJsonEncoded != null) {
+                    User.fromEncodedString(userJsonEncoded)
+                } else {
+                    null
+                }
+                logScreenStack()
+                Log.d("Navigation", "ChatScreen navigation")
+
+                if (user != null) {
+                    ChatScreen(selectedUser = user) { onNavBack() }
+                }
+            }
+
         }
     }
 }

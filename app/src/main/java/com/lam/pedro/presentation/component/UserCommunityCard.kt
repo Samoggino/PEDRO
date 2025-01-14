@@ -23,9 +23,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,10 +39,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -56,8 +60,9 @@ val NameHeight = 24.dp
 fun UserCommunityCard(
     user: User,
     isFollowing: Boolean,
-    onClick: () -> Unit,
+    onFollowClick: () -> Unit,
     onLongPress: @Composable () -> Unit = {},
+    onChatClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -79,7 +84,7 @@ fun UserCommunityCard(
                     },
                     onTap = {
                         // Esegui l'azione per il click
-                        onClick()
+                        onFollowClick()
                     }
                 )
             }
@@ -117,14 +122,17 @@ fun UserCommunityCard(
             }
 
             // Follow Button
-            FollowButton(isFollowing, onClick)
+            MessageButton(user) {
+                onChatClick()
+            }
+            FollowButton(isFollowing, onFollowClick)
         }
     }
 }
 
 
 @Composable
-private fun Avatar(avatarUrl: String?) {
+fun Avatar(avatarUrl: String?, size: Dp = ICON_SIZE, tint : Color = MaterialTheme.colorScheme.onSurfaceVariant) {
     if (!avatarUrl.isNullOrBlank()) {
         Image(
             painter = rememberAsyncImagePainter(
@@ -135,7 +143,7 @@ private fun Avatar(avatarUrl: String?) {
             ),
             contentDescription = "User Avatar",
             modifier = Modifier
-                .size(ICON_SIZE)
+                .size(size)
                 .clip(RoundedCornerShape(50))
                 .border(
                     1.dp,
@@ -148,9 +156,9 @@ private fun Avatar(avatarUrl: String?) {
             imageVector = Icons.Default.AccountCircle,
             contentDescription = "Default Avatar",
             modifier = Modifier
-                .size(ICON_SIZE)
+                .size(size)
                 .clip(RoundedCornerShape(50)),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            tint = tint
         )
     }
 }
@@ -178,6 +186,23 @@ fun FollowButton(isFollowing: Boolean, onClick: () -> Unit) {
             .padding(4.dp)
             .animateContentSize()
     )
+}
+
+@Composable
+fun MessageButton(user: User, onClick: (User) -> Unit) {
+    IconButton(
+        onClick = { onClick(user) }, // Azione quando si clicca sul pulsante
+        modifier = Modifier
+            .size(FOLLOW_BUTTON_SIZE)
+            .padding(4.dp)
+            .animateContentSize()
+    ) {
+        Icon(
+            imageVector = Icons.Default.Mail, // Icona di messaggio
+            contentDescription = "Message ${user.username}",
+            tint = MaterialTheme.colorScheme.primary
+        )
+    }
 }
 
 @Composable

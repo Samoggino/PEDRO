@@ -24,12 +24,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.lam.pedro.R
-import com.lam.pedro.presentation.navigation.Screen
 
 @Composable
-fun HomeScreen(navController: NavController) {
+fun HomeScreen(onProfileClick: () -> Unit) {
 
     Log.i("Reload", "HomeScreen loaded out")
 
@@ -53,7 +51,7 @@ fun HomeScreen(navController: NavController) {
                     .clip(RoundedCornerShape(26.dp))
                     .background(MaterialTheme.colorScheme.primary)
                     .clickable {
-                        navController.navigate(Screen.ProfileScreen.route)
+                        onProfileClick()
                     }
                 ) {
                     Image(

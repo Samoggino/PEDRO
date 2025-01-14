@@ -48,7 +48,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.presentation.component.ShowSessionDetails
@@ -58,7 +57,7 @@ import com.lam.pedro.presentation.component.ShowSessionDetails
 @Composable
 fun CommunityUserDetailsScreen(
     selectedUser: String,
-    navController: NavController
+    onNavBack: () -> Unit,
 ) {
 
     LaunchedEffect(key1 = selectedUser) {
@@ -72,7 +71,7 @@ fun CommunityUserDetailsScreen(
             TopAppBar(
                 title = { Text(text = "User Details") },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { onNavBack() }) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
                     }
                 }
@@ -83,7 +82,7 @@ fun CommunityUserDetailsScreen(
         // Pass paddingValues se usi Material3 correttamente
         CommunityUserDetailsContent(
             userUUID = selectedUser,
-            paddingValues = paddingValues
+            paddingValues = paddingValues,
         )
     }
 }
@@ -92,22 +91,28 @@ fun CommunityUserDetailsScreen(
 fun CommunityUserDetailsContent(
     userUUID: String,
     paddingValues: PaddingValues,
-    viewModel: CommunityUserDetailsViewModel = viewModel(factory = CommunityUserDetailsViewModelFactory())
+    viewModel: CommunityUserDetailsViewModel = viewModel(
+        factory = CommunityUserDetailsViewModelFactory(
+            userUUID
+        )
+    )
 
 ) {
     val activityMap by viewModel.activityMap.collectAsState(emptyMap())
-    ActivityHistoryPopup(activityMap, userUUID, paddingValues)
+    ActivityHistoryPopup(activityMap, userUUID, paddingValues, viewModel)
 }
-
 
 @Composable
 fun ActivityHistoryPopup(
     activityMap: Map<ActivityEnum, List<GenericActivity>>,
     userUUID: String,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    viewModel: CommunityUserDetailsViewModel = viewModel(
+        factory = CommunityUserDetailsViewModelFactory(
+            userUUID
+        )
+    )
 ) {
-    val viewModel: CommunityUserDetailsViewModel =
-        viewModel(factory = CommunityUserDetailsViewModelFactory())
     val isLoading by viewModel.isLoading.collectAsState() // Osserva lo stato di caricamento
     var showDialog by remember { mutableStateOf(false) }
     var selectedActivityType: ActivityEnum? by remember { mutableStateOf(null) }
@@ -115,7 +120,6 @@ fun ActivityHistoryPopup(
     // Evita fetch multipli
     LaunchedEffect(key1 = userUUID) {
         Log.i("Community", "Fetching activity map for $userUUID")
-        viewModel.fetchActivityMap(userUUID)
     }
 
     if (isLoading) {
@@ -128,6 +132,20 @@ fun ActivityHistoryPopup(
             CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
     } else {
+
+        if (activityMap.isEmpty()) {
+            Log.i("Community", "No activity found for $userUUID")
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("No activity found", style = MaterialTheme.typography.bodyMedium)
+            }
+            return
+        }
+
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -135,7 +153,7 @@ fun ActivityHistoryPopup(
                 .background(MaterialTheme.colorScheme.background)
         ) {
             Text(
-                text = "Activity History",
+                text = "Select an activity",
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier
                     .padding(16.dp)

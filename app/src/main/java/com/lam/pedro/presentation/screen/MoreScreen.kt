@@ -1,5 +1,6 @@
 package com.lam.pedro.presentation.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,9 +50,7 @@ fun MoreScreen(
     val coroutineScope = rememberCoroutineScope()
     val loginState = remember { mutableStateOf<LoginState>(LoginState.Idle) }
 
-//    val context = LocalContext.current
-//    remember { HealthConnectManager(context) }
-
+    Log.i("MoreScreen", "MoreScreen reloaded")
     // Controllo login al montaggio del composable
     LaunchedEffect(Unit) {
         loginState.value = LoginState.Loading

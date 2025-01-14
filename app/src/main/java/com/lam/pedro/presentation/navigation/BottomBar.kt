@@ -1,18 +1,3 @@
-/*
- * Copyright 2022 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.lam.pedro.presentation.navigation
 
 import android.util.Log
@@ -31,18 +16,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.navigation.NavController
 import com.lam.pedro.R
 
 /**
  * The side navigation drawer used to explore each Health Connect feature.
  */
 @Composable
-fun BottomBar(navController: NavController, currentRoute: String?) {
-
-//    val navBackStackEntry = navController.currentBackStackEntryAsState().value
-//    val currentRoute = navBackStackEntry?.destination?.route
-
+fun BottomBar(
+    onNavigateToHome: () -> Unit,
+    onNavigateToActivities: () -> Unit,
+    onNavigateToCommunity: () -> Unit,
+    onNavigateToMore: () -> Unit,
+    currentRoute: String?
+) {
     NavigationBar(
         containerColor = Color.White.copy(alpha = 0.05f),
         contentColor = MaterialTheme.colorScheme.primary
@@ -88,13 +74,17 @@ fun BottomBar(navController: NavController, currentRoute: String?) {
                 selected = item.route == currentRoute,
                 onClick = {
                     Log.d("BottomBar", "Navigating to ${item.route}")
-                    navController.navigate(item.route)
+                    when (item.route) {
+                        Screen.HomeScreen.route -> onNavigateToHome()
+                        Screen.ActivitiesScreen.route -> onNavigateToActivities()
+                        Screen.CommunityScreen.route -> onNavigateToCommunity()
+                        Screen.MoreScreen.route -> onNavigateToMore()
+                    }
                 },
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = MaterialTheme.colorScheme.primary
-                )// Chiama la funzione di navigazione per Home
+                )
             )
         }
     }
-
 }
