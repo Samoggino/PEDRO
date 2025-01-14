@@ -26,12 +26,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.lam.pedro.data.datasource.community.chat.ChatRepositoryImpl
 import com.lam.pedro.presentation.screen.more.loginscreen.User
 
 @Composable
 fun ChatScreen(
     selectedUser: User,
-    chatViewModel: ChatViewModel = viewModel(factory = ChatViewModelFactory(selectedUser)),
+    chatViewModel: ChatViewModel = viewModel(factory = ChatViewModelFactory(selectedUser, ChatRepositoryImpl())),
     onNavBack: () -> Unit
 ) {
     val conversation by chatViewModel.messages.collectAsState()

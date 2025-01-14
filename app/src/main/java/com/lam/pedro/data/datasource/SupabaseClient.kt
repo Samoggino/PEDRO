@@ -10,6 +10,7 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -27,6 +28,7 @@ object SupabaseClient {
                     install(Auth)
                     install(Postgrest)
                     install(Storage)
+                    install(Realtime)
                 } catch (e: Exception) {
                     System.err.println("Errore durante la connessione a Supabase: ${e.message}")
                     e.printStackTrace()
