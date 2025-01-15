@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
-import com.lam.pedro.data.datasource.community.CommunityRepository
-import com.lam.pedro.data.datasource.community.CommunityRepositoryImpl
+import com.lam.pedro.data.datasource.communityRepository.CommunityRepository
+import com.lam.pedro.data.datasource.communityRepository.CommunityRepositoryImpl
 import com.lam.pedro.presentation.screen.more.loginscreen.User
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

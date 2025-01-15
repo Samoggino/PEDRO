@@ -27,7 +27,7 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.serializer
 
 @OptIn(InternalSerializationApi::class)
-class ActivitySupabaseRepositoryImpl : IActivityRepository {
+class ActivitySupabaseSupabaseRepositoryImpl : IActivitySupabaseRepository {
 
     override suspend fun getActivitySession(
         activityEnum: ActivityEnum,
@@ -145,4 +145,3 @@ class ActivitySupabaseRepositoryImpl : IActivityRepository {
         }
     }
 }
-

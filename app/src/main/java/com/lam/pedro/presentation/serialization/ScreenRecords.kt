@@ -32,7 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lam.pedro.data.activity.ActivityEnum
-import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseRepositoryImpl
+import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseSupabaseRepositoryImpl
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +42,7 @@ fun MyScreenRecords(
     onCommunityClick: () -> Unit,
     viewModel: MyRecordsViewModel = viewModel(
         factory = MyScreenRecordsFactory(
-            activityRepository = ActivitySupabaseRepositoryImpl()
+            activityRepository = ActivitySupabaseSupabaseRepositoryImpl()
         )
     )
 ) {

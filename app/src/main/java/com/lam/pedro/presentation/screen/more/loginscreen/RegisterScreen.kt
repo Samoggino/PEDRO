@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.lam.pedro.data.datasource.authRepository.AuthRepositoryImpl
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.navigation.Screen
 
@@ -34,7 +35,11 @@ import com.lam.pedro.presentation.navigation.Screen
 fun RegisterScreen(
     onNavBack: () -> Unit,
     onNavigate: (String) -> Unit,
-    viewModel: RegisterViewModel = viewModel(factory = RegisterViewModelFactory())
+    viewModel: RegisterViewModel = viewModel(
+        factory = RegisterViewModelFactory(
+            authRepository = AuthRepositoryImpl()
+        )
+    )
 ) {
 
     Scaffold(

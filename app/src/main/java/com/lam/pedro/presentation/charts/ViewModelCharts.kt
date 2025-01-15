@@ -11,14 +11,14 @@ import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.toMonthNumber
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
-import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseRepositoryImpl
+import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseSupabaseRepositoryImpl
 import ir.ehsannarmani.compose_charts.models.Bars
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ViewModelCharts(
     private val uuid: String = getUUID()!!,
-    private val activityRepository: ActivitySupabaseRepositoryImpl // Aggiungi il repository come dipendenza
+    private val activityRepository: ActivitySupabaseSupabaseRepositoryImpl // Aggiungi il repository come dipendenza
 ) : ViewModel() {
 
     private val _chartState = MutableLiveData<ChartState>(ChartState.Loading)
@@ -157,7 +157,7 @@ fun getAvailableMetricsForActivity(activityEnum: ActivityEnum) =
 
 class ChartsViewModelFactory(
     private val uuid: String,
-    private val activityRepository: ActivitySupabaseRepositoryImpl
+    private val activityRepository: ActivitySupabaseSupabaseRepositoryImpl
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ViewModelCharts::class.java)) {

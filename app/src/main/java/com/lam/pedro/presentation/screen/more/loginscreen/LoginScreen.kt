@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lam.pedro.R
+import com.lam.pedro.data.datasource.authRepository.AuthRepositoryImpl
 import com.lam.pedro.presentation.navigation.Screen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -37,7 +38,11 @@ import com.lam.pedro.presentation.navigation.Screen
 fun LoginScreen(
     onNavBack: () -> Unit,
     onNavigate: (route: String) -> Unit,
-    viewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory())
+    viewModel: LoginViewModel = viewModel(
+        factory = LoginViewModelFactory(
+            authRepository = AuthRepositoryImpl()
+        )
+    )
 ) {
 
     Scaffold(
@@ -113,15 +118,6 @@ fun LoginScreen(
                     .padding(top = 32.dp)
             ) {
                 Text("Login")
-            }
-
-            /**
-             *  TODO: capire come fare il "password dimenticata"
-             */
-            TextButton(onClick = {
-                // do something to recover password
-            }) {
-                Text("Forgot password?")
             }
 
             TextButton(onClick = { onNavigate(Screen.RegisterScreen.route) }) {

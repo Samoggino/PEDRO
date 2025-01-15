@@ -1,4 +1,4 @@
-package com.lam.pedro.data.datasource.community
+package com.lam.pedro.data.datasource.communityRepository
 
 import android.util.Log
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID

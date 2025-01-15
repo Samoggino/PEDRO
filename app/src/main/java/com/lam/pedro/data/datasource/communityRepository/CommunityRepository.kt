@@ -1,4 +1,4 @@
-package com.lam.pedro.data.datasource.community
+package com.lam.pedro.data.datasource.communityRepository
 
 import com.lam.pedro.presentation.screen.more.loginscreen.User
 

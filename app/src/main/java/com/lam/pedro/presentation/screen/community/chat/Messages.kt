@@ -1,33 +1,34 @@
 package com.lam.pedro.presentation.screen.community.chat
 
-import com.lam.pedro.presentation.screen.more.loginscreen.User
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 @Serializable
 data class Message(
+    val uuidMessage: String = UUID.randomUUID().toString(), // Genera un UUID casuale
     val message: String,
     val timestamp: String,
-    val sender: User
+    val sender: String
 ) {
     val formattedTimestamp: String
         get() {
             return try {
-                val dateTime = LocalDateTime.parse(timestamp.substring(0, 19)) // Ignora i millisecondi e il suffisso 'Z'
+                val dateTime = LocalDateTime.parse(timestamp.substring(0, 19))
                 val currentDate = LocalDateTime.now(ZoneId.systemDefault())
 
+                // Se è oggi, restituisci solo l'ora e i minuti
+                // Altrimenti, restituisci la data
                 if (dateTime.toLocalDate() == currentDate.toLocalDate()) {
-                    // Se è oggi, restituisci solo l'ora e i minuti
                     dateTime.format(DateTimeFormatter.ofPattern("HH:mm"))
                 } else {
-                    // Altrimenti, restituisci la data
                     dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 }
             } catch (e: Exception) {
-                // Gestione fallback in caso di errore nel parsing
+                // in caso di errore nel parsing
                 timestamp
             }
         }

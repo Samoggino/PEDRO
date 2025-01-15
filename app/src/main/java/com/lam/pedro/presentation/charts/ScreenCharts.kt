@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
-import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseRepositoryImpl
+import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseSupabaseRepositoryImpl
 import com.lam.pedro.util.placeholder
 import kotlinx.coroutines.delay
 
@@ -50,7 +50,7 @@ fun ScreenCharts(
     viewModelCharts: ViewModelCharts = viewModel(
         factory = ChartsViewModelFactory(
             uuid = getUUID()!!,
-            activityRepository = ActivitySupabaseRepositoryImpl()
+            activityRepository = ActivitySupabaseSupabaseRepositoryImpl()
         )
     )
 ) {

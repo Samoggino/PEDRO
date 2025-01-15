@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseRepositoryImpl
+import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseSupabaseRepositoryImpl
 import com.lam.pedro.presentation.component.ShowSessionDetails
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,7 +93,7 @@ fun CommunityUserDetailsContent(
     viewModel: UserCommunityDetailsViewModel = viewModel(
         factory = UserCommunityDetailsViewModelFactory(
             userUUID,
-            ActivitySupabaseRepositoryImpl() // Passaggio del repository al ViewModel
+            ActivitySupabaseSupabaseRepositoryImpl() // Passaggio del repository al ViewModel
         )
     )
 
@@ -110,7 +110,7 @@ fun ActivityHistoryPopup(
     viewModel: UserCommunityDetailsViewModel = viewModel(
         factory = UserCommunityDetailsViewModelFactory(
             userUUID,
-            ActivitySupabaseRepositoryImpl() // Passaggio del repository al ViewModel
+            ActivitySupabaseSupabaseRepositoryImpl() // Passaggio del repository al ViewModel
         )
     )
 ) {

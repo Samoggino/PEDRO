@@ -6,14 +6,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.data.datasource.activitySupabase.IActivityRepository
+import com.lam.pedro.data.datasource.activitySupabase.IActivitySupabaseRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class UserCommunityDetailsViewModel(
     private val userUUID: String,
-    private val activityRepository: IActivityRepository // Repository iniettato
+    private val activityRepository: IActivitySupabaseRepository // Repository iniettato
 ) : ViewModel() {
 
     val activityMap = MutableStateFlow<Map<ActivityEnum, List<GenericActivity>>>(emptyMap())
@@ -51,7 +51,7 @@ class UserCommunityDetailsViewModel(
 
 class UserCommunityDetailsViewModelFactory(
     private val userUUID: String,
-    private val activityRepository: IActivityRepository // Repository da iniettare
+    private val activityRepository: IActivitySupabaseRepository // Repository da iniettare
 ) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

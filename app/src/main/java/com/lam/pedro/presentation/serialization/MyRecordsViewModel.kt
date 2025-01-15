@@ -10,11 +10,11 @@ import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
-import com.lam.pedro.data.datasource.activitySupabase.IActivityRepository
+import com.lam.pedro.data.datasource.activitySupabase.IActivitySupabaseRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class MyRecordsViewModel(private val activityRepository: IActivityRepository) : ViewModel() {
+class MyRecordsViewModel(private val activityRepository: IActivitySupabaseRepository) : ViewModel() {
 
     val tag = "Supabase"
 
@@ -106,7 +106,7 @@ class MyRecordsViewModel(private val activityRepository: IActivityRepository) : 
     }
 }
 
-class MyScreenRecordsFactory(private val activityRepository: IActivityRepository) :
+class MyScreenRecordsFactory(private val activityRepository: IActivitySupabaseRepository) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MyRecordsViewModel::class.java)) {

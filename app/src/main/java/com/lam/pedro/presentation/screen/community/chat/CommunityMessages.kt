@@ -17,16 +17,32 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
+import com.lam.pedro.data.datasource.chatRepository.ChatRepositoryImpl
+import com.lam.pedro.presentation.screen.more.loginscreen.User
 
 
 @Composable
-fun MessagesList(messages: List<Message>, modifier: Modifier = Modifier) {
+fun MessagesList(
+    modifier: Modifier = Modifier,
+    selectedUser: User,
+    viewModel: ChatViewModel = viewModel(
+        factory = ChatViewModelFactory(
+            chatRepository = ChatRepositoryImpl(),
+            user = selectedUser
+        )
+    )
+) {
     val listState = rememberLazyListState()
+
+    val messages by viewModel.messages.collectAsState()
 
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
@@ -40,7 +56,10 @@ fun MessagesList(messages: List<Message>, modifier: Modifier = Modifier) {
         contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp),
         state = listState
     ) {
-        items(messages) { message ->
+        items(
+            items = messages,
+            key = { message -> message.uuidMessage }
+        ) { message ->
             MessageBubble(message = message)
         }
     }
@@ -49,11 +68,11 @@ fun MessagesList(messages: List<Message>, modifier: Modifier = Modifier) {
 
 @Composable
 fun MessageBubble(message: Message) {
-    val isCurrentUser = message.sender.id == getUUID()!!
+    val isCurrentUser = message.sender == getUUID()!!
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = if (!isCurrentUser) Arrangement.End else Arrangement.Start
+        horizontalArrangement = if (isCurrentUser) Arrangement.End else Arrangement.Start
     ) {
         Card(
             modifier = Modifier.padding(8.dp),

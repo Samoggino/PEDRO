@@ -1,4 +1,4 @@
-package com.lam.pedro.data.datasource.community.chat
+package com.lam.pedro.data.datasource.chatRepository
 
 import android.util.Log
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
@@ -8,7 +8,6 @@ import com.lam.pedro.presentation.screen.community.chat.Message
 import com.lam.pedro.presentation.screen.more.loginscreen.User
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,11 +22,21 @@ import java.time.ZonedDateTime
 class ChatRepositoryImpl : IChatRepository {
 
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
-    override val messages: StateFlow<List<Message>> = _messages
+    override val messages: StateFlow<List<Message>> get() = _messages
 
     private val chatId = MutableStateFlow("")
 
-    override suspend fun loadMessages(selectedUser: User, yourCoroutineScope: CoroutineScope) {
+
+    override suspend fun loadMessages(selectedUser: User) {
+        // Simula una chiamata al server
+        val newMessages = fetchMessagesFromServer(selectedUser)
+        _messages.value = newMessages
+    }
+
+    private suspend fun fetchMessagesFromServer(
+        selectedUser: User
+    ): List<Message> {
+
         val currentUser = getUUID()
 
         val json = buildJsonObject {
@@ -45,23 +54,25 @@ class ChatRepositoryImpl : IChatRepository {
                 ).decodeSingle<Chat>()
             }
 
-            if (chat.conversation.isNotEmpty()) {
-                _messages.value = chat.conversation
-            }
-
             chatId.value = chat.uuidCHAT
+            return chat.conversation
 
 
         } catch (e: Exception) {
             Log.e("ChatRepository", "Error loading messages: ${e.message}")
         }
+        return emptyList()
     }
 
-    override suspend fun sendMessage(conversation: List<Message>, message: String, sender: User) {
-        val updatedConversation = conversation + Message(
-            message = message,
+    override suspend fun sendMessage(
+        conversation: List<Message>,
+        newMessageText: String,
+        selectedUser: User
+    ) {
+        val updatedConversation = fetchMessagesFromServer(selectedUser) + Message(
+            message = newMessageText,
             timestamp = ZonedDateTime.now(ZoneId.of("Europe/Rome")).toString(),
-            sender = sender
+            sender = getUUID()!!
         )
 
         try {
