@@ -37,6 +37,8 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.UUID
 
@@ -57,6 +59,15 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
     var sessionsList: MutableState<List<GenericActivity>> = mutableStateOf(listOf())
         private set
 
+    fun filterSessionsByDay(sessionsList: List<GenericActivity>, day: LocalDate): List<GenericActivity> {
+        // Supponiamo che sessionList.value sia una lista di sessioni
+        return sessionsList.filter { session ->
+            // Converti session.startTime (Instant) in LocalDate usando il fuso orario di default
+            val sessionDate = session.basicActivity.startTime.atZone(ZoneId.systemDefault()).toLocalDate()
+            // Confronta con il giorno dato in input
+            sessionDate == day
+        }
+    }
 
     var uiState: UiState by mutableStateOf(UiState.Uninitialized)
         private set
@@ -181,6 +192,10 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
             healthConnectManager.fetchAndBuildActivitySession(start, now, activityEnum.activityType)
 
         Log.d("SESSION LIST", "${sessionsList.value}")
+    }
+
+    suspend fun filterSessionsByDay() {
+
     }
 
 

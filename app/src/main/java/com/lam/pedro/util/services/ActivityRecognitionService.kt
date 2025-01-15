@@ -48,11 +48,12 @@ class ActivityRecognitionService : Service() {
         // Inizializza il Handler per aggiornare la notifica ogni 10 secondi
         handler = Handler(Looper.getMainLooper())
         updateRunnable = Runnable {
+            // Log per indicare che sta avvenendo un aggiornamento programmato
+            Log.d("ActivityRecognitionService", "Nessun intent ricevuto. Aggiornamento notifica...")
             // Aggiorna la notifica utilizzando il testo corrente
             updateNotification(currentNotificationText)
             handler.postDelayed(updateRunnable, 10000) // Riprogramma l'aggiornamento dopo 10 secondi
         }
-
 
         // Avvia il ciclo di aggiornamenti ogni 10 secondi
         handler.postDelayed(updateRunnable, 10000) // Prima esecuzione dopo 10 secondi
@@ -61,13 +62,27 @@ class ActivityRecognitionService : Service() {
         val intentFilter = IntentFilter("USER-ACTIVITY-DETECTION-INTENT-ACTION")
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                if (intent == null) return
+                // Log per indicare che è stato ricevuto un intent
+                Log.d("ActivityRecognitionService", "Intent ricevuto!")
 
-                val result = ActivityTransitionResult.extractResult(intent) ?: return
+                if (intent == null) {
+                    Log.w("ActivityRecognitionService", "Intent ricevuto nullo.")
+                    return
+                }
+
+                val result = ActivityTransitionResult.extractResult(intent)
+                if (result == null) {
+                    Log.w("ActivityRecognitionService", "ActivityTransitionResult nullo.")
+                    return
+                }
+
                 val transitionText = result.transitionEvents.joinToString("\n") { event ->
                     "${UserActivityTransitionManager.getActivityType(event.activityType)} - " +
                             UserActivityTransitionManager.getTransitionType(event.transitionType)
                 }
+
+                // Log delle attività rilevate
+                Log.d("ActivityRecognitionService", "Transizioni rilevate:\n$transitionText")
 
                 // Aggiorna la notifica con l'attività corrente
                 updateNotification(transitionText)
@@ -75,6 +90,7 @@ class ActivityRecognitionService : Service() {
         }
         registerReceiver(receiver, intentFilter, Context.RECEIVER_NOT_EXPORTED)
     }
+
 
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -148,7 +164,7 @@ class ActivityRecognitionService : Service() {
         unregisterReceiver(receiver)
 
         // Interrompi il servizio in foreground e rimuovi la notifica
-        stopForeground(Service.STOP_FOREGROUND_REMOVE) // Imposta la notifica come non visibile
+        stopForeground(STOP_FOREGROUND_REMOVE) // Imposta la notifica come non visibile
         stopSelf() // Ferma il servizio
     }
 

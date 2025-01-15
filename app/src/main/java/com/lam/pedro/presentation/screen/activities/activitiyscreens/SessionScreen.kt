@@ -1,9 +1,12 @@
 package com.lam.pedro.presentation.screen.activities.activitiyscreens
 
+import android.app.DatePickerDialog
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +17,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -25,11 +32,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,10 +47,17 @@ import androidx.navigation.NavController
 import com.lam.pedro.R
 import com.lam.pedro.data.CarouselItem
 import com.lam.pedro.presentation.component.ActivityScreenHeader
+import com.lam.pedro.presentation.component.DatePickerModal
 import com.lam.pedro.presentation.component.DisplayGraph
 import com.lam.pedro.presentation.component.PermissionRequired
 import com.lam.pedro.presentation.component.SessionHistoryRow
 import com.lam.pedro.presentation.navigation.Screen
+import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 import java.util.UUID
 
 @Composable
@@ -57,7 +74,11 @@ fun SessionScreen(
 ) {
     Log.d("TIPO DELLO SCREEN", "---- TIPO DELLO SCREEN: ${viewModel.activityEnum.activityType}")
     val errorId = rememberSaveable { mutableStateOf(UUID.randomUUID()) }
-    val sessionList by viewModel.sessionsList
+    var sessionList by viewModel.sessionsList
+    val coroutineScope = rememberCoroutineScope()
+
+    var isDatePickerVisible by remember { mutableStateOf(false) } // Stato per il DatePickerModal
+    var selectedDate by remember { mutableStateOf<LocalDate?>(null) } // Stato per la data selezionata
 
     LaunchedEffect(uiState) {
         if (uiState is ActivitySessionViewModel.UiState.Uninitialized) {
@@ -154,45 +175,142 @@ fun SessionScreen(
                         Spacer(modifier = Modifier.height(30.dp))
                         //-------------------------------------------------
 
-                        Text(
-                            text = stringResource(R.string.activity_history),
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 16.dp)
-                        )
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.activity_history),
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    fontWeight = FontWeight.Bold
+                                )
 
-                        LazyColumn(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(26.dp))
-                                .height(350.dp)
-                                .background(MaterialTheme.colorScheme.primaryContainer)
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp),
-                        ) {
-                            Log.d("TEST SESSION LIST", sessionList.toString())
-                            if (sessionList.isEmpty()) {
-                                item {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize(), // Riempi tutto lo spazio disponibile
-                                        contentAlignment = Alignment.Center, // Centra sia orizzontalmente che verticalmente
+                                Box {
+
+
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(10.dp), // Spazio tra i bottoni
+                                        verticalAlignment = Alignment.CenterVertically // Allineamento verticale
                                     ) {
-                                        Text(
-                                            text = stringResource(R.string.empty_history),
-                                            style = MaterialTheme.typography.bodyLarge, // Aggiungi lo stile desiderato
-                                            color = MaterialTheme.colorScheme.onSecondaryContainer, // Imposta un colore opzionale
-                                            modifier = Modifier.padding(16.dp)
+                                        // Bottone per filtrare
+                                        Button(
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = viewModel.activityEnum.color, // Colore di sfondo del bottone
+                                                contentColor = Color.White // Colore del contenuto (icona o testo)
+                                            ),
+                                            onClick = {
+                                                isDatePickerVisible = true
+                                            } // Mostra il DatePickerModal
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.CalendarToday, // Usa un'icona predefinita di calendario
+                                                contentDescription = stringResource(R.string.select_date)
+                                            )
+                                        }
+
+                                        // Bottone per resettare
+                                        Button(
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = viewModel.activityEnum.color, // Colore di sfondo del bottone
+                                                contentColor = Color.White // Colore del contenuto (icona o testo)
+                                            ),
+                                            onClick = {
+                                                coroutineScope.launch {
+                                                    viewModel.fetchSessions() // Avvia la coroutine per eseguire l'operazione
+                                                    selectedDate = null // Resetta la data selezionata
+                                                }
+                                            }
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Refresh, // Icona di refresh
+                                                contentDescription = stringResource(R.string.reset_sessions)
+                                            )
+                                        }
+                                    }
+
+                                    // Mostra il DatePickerModal se visibile
+                                    if (isDatePickerVisible) {
+                                        DatePickerModal(
+                                            onDateSelected = { timestamp ->
+                                                if (timestamp != null) {
+                                                    val localDate = Instant.ofEpochMilli(timestamp)
+                                                        .atZone(ZoneId.systemDefault())
+                                                        .toLocalDate()
+                                                    selectedDate = localDate
+                                                    coroutineScope.launch {
+                                                        viewModel.fetchSessions() // Avvia la coroutine per eseguire l'operazione
+                                                        sessionList = viewModel.filterSessionsByDay(sessionList, localDate)
+                                                    }
+                                                }
+                                                isDatePickerVisible = false
+                                            },
+                                            onDismiss = {
+                                                isDatePickerVisible = false
+                                            },
+                                            accentColor = viewModel.activityEnum.color
                                         )
                                     }
                                 }
-                            } else {
-                                items(sessionList) { session ->
-                                    SessionHistoryRow(viewModel.activityEnum.color, viewModel.activityEnum.image, session, viewModel)
-                                    HorizontalDivider(
-                                        thickness = 1.dp,
-                                        color = Color(0xFF606060)
-                                    )
+
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            LazyColumn(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(26.dp))
+                                    .height(350.dp)
+                                    .background(MaterialTheme.colorScheme.primaryContainer)
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp),
+                            ) {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp), // Padding verticale per separare dal bordo
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        // Se selectedDate è null, mostra "All", altrimenti mostra la data formattata
+                                        val displayText = selectedDate?.format(
+                                            DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH) // Imposta la lingua in inglese
+                                        ) ?: "All" // Testo di default quando la data non è selezionata
+
+                                        Text(
+                                            text = displayText,
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = Color.White
+                                        )
+                                    }
+
+                                }
+                                Log.d("TEST SESSION LIST", sessionList.toString())
+                                if (sessionList.isEmpty()) {
+                                    item {
+                                        Box(
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentAlignment = Alignment.Center,
+                                        ) {
+                                            Text(
+                                                text = stringResource(R.string.empty_history),
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                                modifier = Modifier.padding(16.dp)
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    items(sessionList) { session ->
+                                        SessionHistoryRow(viewModel.activityEnum.color, viewModel.activityEnum.image, session, viewModel)
+                                        HorizontalDivider(
+                                            thickness = 1.dp,
+                                            color = Color(0xFF606060)
+                                        )
+                                    }
                                 }
                             }
                         }
