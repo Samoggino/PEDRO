@@ -1,6 +1,5 @@
 package com.lam.pedro.presentation.screen.activities.activitiyscreens
 
-//import com.lam.pedro.data.ExerciseSession
 import android.os.RemoteException
 import android.util.Log
 import androidx.compose.runtime.MutableState
@@ -19,16 +18,17 @@ import com.lam.pedro.data.SessionState
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getMyContext
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.CycleSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.RunSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.TrainSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.WalkSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.YogaSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.DriveSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.LiftSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.ListenSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.SitSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities.SleepSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.CycleSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.RunSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.TrainSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.WalkSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.YogaSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.DriveSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.LiftSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.ListenSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.SitSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.SleepSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.unknownactivityviewmodel.UnknownSessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -39,9 +39,10 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.UUID
-
 
 abstract class ActivitySessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ViewModel() {
@@ -60,6 +61,19 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
     var sessionsList: MutableState<List<GenericActivity>> = mutableStateOf(listOf())
         private set
 
+    fun filterSessionsByDay(
+        sessionsList: List<GenericActivity>,
+        day: LocalDate
+    ): List<GenericActivity> {
+        // Supponiamo che sessionList.value sia una lista di sessioni
+        return sessionsList.filter { session ->
+            // Converti session.startTime (Instant) in LocalDate usando il fuso orario di default
+            val sessionDate =
+                session.basicActivity.startTime.atZone(ZoneId.systemDefault()).toLocalDate()
+            // Confronta con il giorno dato in input
+            sessionDate == day
+        }
+    }
 
     var uiState: UiState by mutableStateOf(UiState.Uninitialized)
         private set
@@ -148,7 +162,7 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
         trainIntensity: String,
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
-        distance: MutableState<Double>,
+        distance: Double,
         exerciseRoute: List<ExerciseRoute.Location>,
     )
 
@@ -188,6 +202,10 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
             healthConnectManager.fetchAndBuildActivitySession(start, now, activityEnum.activityType)
 
         Log.d("SESSION LIST", "${sessionsList.value}")
+    }
+
+    suspend fun filterSessionsByDay() {
+
     }
 
 
@@ -230,8 +248,9 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
 
 }
 
-class GeneralActivityViewModelFactory : ViewModelProvider.Factory {
+class GeneralActivityViewModelFactory(
     private val healthConnectManager: HealthConnectManager = HealthConnectManager(getMyContext())
+) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -298,8 +317,13 @@ class GeneralActivityViewModelFactory : ViewModelProvider.Factory {
                 )) as T
             }
 
+            modelClass.isAssignableFrom(UnknownSessionViewModel::class.java) -> {
+                (UnknownSessionViewModel(
+                    healthConnectManager
+                )) as T
+            }
+
             else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 }
-

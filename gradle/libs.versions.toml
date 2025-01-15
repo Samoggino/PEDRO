@@ -17,6 +17,9 @@ lottieCompose = "6.1.0"
 materialIconsCore = "1.7.4"
 constraintlayoutCompose = "1.0.1"
 
+kotlinxCoroutinesPlayServices = "1.10.1"
+accompanistPermissions = "0.37.0"
+
 navigationCompose = "2.8.3"
 securityCrypto = "1.1.0-alpha06"
 supabase-storage = "3.0.1"
@@ -30,7 +33,10 @@ core = "1.46.0"
 playServicesMaps = "19.0.0"
 
 [libraries]
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanistPlaceholderMaterial" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutinesPlayServices" }
+
 mapLibre = { module = "org.maplibre.gl:android-sdk", version.ref = "androidSdk" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }

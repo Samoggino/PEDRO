@@ -1,16 +1,17 @@
 package com.lam.pedro.presentation.component
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.sp
+
 /*
 @Composable
 fun StatsDisplay(
@@ -36,7 +37,7 @@ fun StatsDisplay(
 fun StatsDisplay(
     steps: Float? = null, // Parametro opzionale
     averageSpeed: Double,
-    distance: MutableState<Double>,
+    distance: Double,
     color: Color
 ) {
     Column {
@@ -67,6 +68,7 @@ fun StatsDisplayWithoutSteps(
 }
  */
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun TimerDisplay(elapsedTime: Int) {
     val minutes = (elapsedTime / 60000) % 60

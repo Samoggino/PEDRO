@@ -67,7 +67,6 @@ enum class ActivityEnum(
         energyMetrics = true,
         activityType = ExerciseSessionRecord.EXERCISE_TYPE_WEIGHTLIFTING
     ),
-
     SIT(
         color = SitColor,
         image = R.drawable.armchair_icon,
@@ -82,5 +81,10 @@ enum class ActivityEnum(
         color = ListenColor,
         image = R.drawable.headphones_icon,
         activityType = ExerciseSessionRecord.EXERCISE_TYPE_GUIDED_BREATHING
+    ),
+    UNKNOWN(
+        color = Color.Black,
+        image = R.drawable.unknown_icon,
+        activityType = ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT
     )
 }

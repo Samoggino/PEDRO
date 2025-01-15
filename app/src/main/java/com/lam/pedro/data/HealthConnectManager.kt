@@ -37,6 +37,7 @@ import com.lam.pedro.R
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.SleepSessionData
 import com.lam.pedro.data.activity.activityFactoryHealthConnect.ActivitySessionFactoryFromHealthConnectProvider
+import com.lam.pedro.data.datasource.SecurePreferencesManager.getMyContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.io.IOException
@@ -52,7 +53,7 @@ import kotlin.reflect.KClass
 const val MIN_SUPPORTED_SDK = Build.VERSION_CODES.O_MR1
 
 /** Demonstrates reading and writing from Health Connect. */
-class HealthConnectManager(private val context: Context) {
+class HealthConnectManager(private val context: Context = getMyContext()) {
     private val healthConnectClient by lazy { HealthConnectClient.getOrCreate(context) }
 
     val healthConnectCompatibleApps by lazy {
@@ -733,7 +734,11 @@ class HealthConnectManager(private val context: Context) {
         // For each ExerciseSessionRecord, fetch the related Health Connect record and build the ActivitySession-s
         return records.map { record ->
             buildActivitySession(healthConnectClient, record, activityType)
-            ActivitySessionFactoryFromHealthConnectProvider.createSession(activityType, healthConnectClient, record)
+            ActivitySessionFactoryFromHealthConnectProvider.createSession(
+                activityType,
+                healthConnectClient,
+                record
+            )
         }
     }
 
@@ -742,56 +747,56 @@ class HealthConnectManager(private val context: Context) {
      */
     /**
     suspend fun readAssociatedSessionData(
-        uid: String
+    uid: String
     ): ActivitySession {
-        val exerciseSession = healthConnectClient.readRecord(ExerciseSessionRecord::class, uid)
-        // Use the start time and end time from the session, for reading raw and aggregate data.
-        val timeRangeFilter = TimeRangeFilter.between(
-            startTime = exerciseSession.record.startTime,
-            endTime = exerciseSession.record.endTime
-        )
-        val aggregateDataTypes = setOf(
-            ExerciseSessionRecord.EXERCISE_DURATION_TOTAL,
-            DistanceRecord.DISTANCE_TOTAL,
-            SpeedRecord.SPEED_AVG,
-            StepsRecord.COUNT_TOTAL,
-            TotalCaloriesBurnedRecord.ENERGY_TOTAL,
-            ActiveCaloriesBurnedRecord.ACTIVE_CALORIES_TOTAL
-        )
-        // Limit the data read to just the application that wrote the session. This may or may not
-        // be desirable depending on the use case: In some cases, it may be useful to combine with
-        // data written by other apps.
-        val dataOriginFilter = setOf(exerciseSession.record.metadata.dataOrigin)
-        val aggregateRequest = AggregateRequest(
-            metrics = aggregateDataTypes,
-            timeRangeFilter = timeRangeFilter,
-            dataOriginFilter = dataOriginFilter
-        )
-        val aggregateData = healthConnectClient.aggregate(aggregateRequest)
+    val exerciseSession = healthConnectClient.readRecord(ExerciseSessionRecord::class, uid)
+    // Use the start time and end time from the session, for reading raw and aggregate data.
+    val timeRangeFilter = TimeRangeFilter.between(
+    startTime = exerciseSession.record.startTime,
+    endTime = exerciseSession.record.endTime
+    )
+    val aggregateDataTypes = setOf(
+    ExerciseSessionRecord.EXERCISE_DURATION_TOTAL,
+    DistanceRecord.DISTANCE_TOTAL,
+    SpeedRecord.SPEED_AVG,
+    StepsRecord.COUNT_TOTAL,
+    TotalCaloriesBurnedRecord.ENERGY_TOTAL,
+    ActiveCaloriesBurnedRecord.ACTIVE_CALORIES_TOTAL
+    )
+    // Limit the data read to just the application that wrote the session. This may or may not
+    // be desirable depending on the use case: In some cases, it may be useful to combine with
+    // data written by other apps.
+    val dataOriginFilter = setOf(exerciseSession.record.metadata.dataOrigin)
+    val aggregateRequest = AggregateRequest(
+    metrics = aggregateDataTypes,
+    timeRangeFilter = timeRangeFilter,
+    dataOriginFilter = dataOriginFilter
+    )
+    val aggregateData = healthConnectClient.aggregate(aggregateRequest)
 
-        return RunSession(
-            /*
-            uid = uid,
-            totalActiveTime = aggregateData[ExerciseSessionRecord.EXERCISE_DURATION_TOTAL],
-            totalSteps = aggregateData[StepsRecord.COUNT_TOTAL],
-            totalDistance = aggregateData[DistanceRecord.DISTANCE_TOTAL],
-            totalEnergyBurned = aggregateData[TotalCaloriesBurnedRecord.ENERGY_TOTAL],
-            minHeartRate = aggregateData[HeartRateRecord.BPM_MIN],
-            maxHeartRate = aggregateData[HeartRateRecord.BPM_MAX],
-            avgHeartRate = aggregateData[HeartRateRecord.BPM_AVG],
+    return RunSession(
+    /*
+    uid = uid,
+    totalActiveTime = aggregateData[ExerciseSessionRecord.EXERCISE_DURATION_TOTAL],
+    totalSteps = aggregateData[StepsRecord.COUNT_TOTAL],
+    totalDistance = aggregateData[DistanceRecord.DISTANCE_TOTAL],
+    totalEnergyBurned = aggregateData[TotalCaloriesBurnedRecord.ENERGY_TOTAL],
+    minHeartRate = aggregateData[HeartRateRecord.BPM_MIN],
+    maxHeartRate = aggregateData[HeartRateRecord.BPM_MAX],
+    avgHeartRate = aggregateData[HeartRateRecord.BPM_AVG],
 
-             */
-            title = title ?: "My Run #${exerciseRecord.hashCode()}",
-            notes = notes?: "",
-            startTime = startTime,
-            endTime = endTime,
-            speedSamples = speedRecord.samples,
-            stepsCount = stepsRecord.count,
-            totalEnergy = totalCaloriesBurnedRecord.energy,
-            activeEnergy = activeCaloriesBurnedRecord?.energy ?: Energy.calories(0.0),
-            distance = distanceRecord.distance,
-            exerciseRoute = exerciseRoute
-        )
+    */
+    title = title ?: "My Run #${exerciseRecord.hashCode()}",
+    notes = notes?: "",
+    startTime = startTime,
+    endTime = endTime,
+    speedSamples = speedRecord.samples,
+    stepsCount = stepsRecord.count,
+    totalEnergy = totalCaloriesBurnedRecord.energy,
+    activeEnergy = activeCaloriesBurnedRecord?.energy ?: Energy.calories(0.0),
+    distance = distanceRecord.distance,
+    exerciseRoute = exerciseRoute
+    )
     }
 
      */

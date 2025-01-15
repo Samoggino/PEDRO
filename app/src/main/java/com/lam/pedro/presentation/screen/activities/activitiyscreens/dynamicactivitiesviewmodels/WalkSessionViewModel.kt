@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities
+package com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels
 
 import androidx.compose.runtime.MutableState
 import androidx.health.connect.client.permission.HealthPermission
@@ -25,8 +25,6 @@ import java.time.ZonedDateTime
 
 class WalkSessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ActivitySessionViewModel(healthConnectManager), MutableState<ActivitySessionViewModel?> {
-
-    //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
     //override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_WALKING
     override lateinit var actualSession: WalkSession
@@ -102,7 +100,7 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
         trainIntensity: String,
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
-        distance: MutableState<Double>,
+        distance: Double,
         exerciseRoute: List<ExerciseRoute.Location>,
     ) {
         val (totalCalories, activeCalories) = calculateYogaCalories(
@@ -122,7 +120,7 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
             stepsCount = steps.toLong(),
             totalEnergy = Energy.calories(totalCalories),
             activeEnergy = Energy.calories(activeCalories),
-            distance = Length.meters(distance.value),
+            distance = Length.meters(distance),
             exerciseRoute = ExerciseRoute(exerciseRoute)
         )
     }
@@ -160,82 +158,3 @@ class WalkSessionViewModel(private val healthConnectManager: HealthConnectManage
     }
 
 }
-
-/*
-class WalkSessionViewModel(private val healthConnectManager: HealthConnectManager) :
-    ActivitySessionViewModel(healthConnectManager) {
-    /*Define here the required permissions for the Health Connect usage*/
-    override val permissions = setOf(
-
-        /*
-        * ExerciseSessionRecord
-        * */
-        HealthPermission.getReadPermission(ExerciseSessionRecord::class),
-        HealthPermission.getWritePermission(ExerciseSessionRecord::class),
-
-        /*
-        * ActiveCaloriesBurnedRecord
-        * */
-        HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class),
-        HealthPermission.getWritePermission(ActiveCaloriesBurnedRecord::class),
-
-        /*
-        * DistanceRecord
-        * */
-        HealthPermission.getReadPermission(DistanceRecord::class),
-        HealthPermission.getWritePermission(DistanceRecord::class),
-
-        /*
-        * ElevationGainedRecord
-        * */
-        HealthPermission.getReadPermission(ElevationGainedRecord::class),
-        HealthPermission.getWritePermission(ElevationGainedRecord::class),
-
-        /*
-        * ExerciseRoute - it isn't a record, it uses GPS so it requires manifest permissions
-        * */
-
-        /*
-        * SpeedRecord
-        * */
-        HealthPermission.getReadPermission(SpeedRecord::class),
-        HealthPermission.getWritePermission(SpeedRecord::class),
-
-        /*
-        * StepsCadenceRecord
-        * */
-        HealthPermission.getReadPermission(StepsCadenceRecord::class),
-        HealthPermission.getWritePermission(StepsCadenceRecord::class),
-
-        /*
-        * StepsRecord
-        * */
-        HealthPermission.getReadPermission(StepsRecord::class),
-        HealthPermission.getWritePermission(StepsRecord::class),
-
-        /*
-        * TotalCaloriesBurnedRecord
-        * */
-        HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
-        HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
-
-        )
-    }
-
- */
-/*
-class WalkSessionViewModelFactory(
-    private val healthConnectManager: HealthConnectManager
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(WalkSessionViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return WalkSessionViewModel(
-                healthConnectManager = healthConnectManager
-            ) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
-
- */

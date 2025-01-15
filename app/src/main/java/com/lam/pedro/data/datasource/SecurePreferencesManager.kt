@@ -13,6 +13,8 @@ object SecurePreferencesManager {
     private const val ACCESS_TOKEN_KEY = "ACCESS_TOKEN"
     private const val REFRESH_TOKEN_KEY = "REFRESH_TOKEN"
     private const val UUID = "UUID"
+    private const val USERNAME = "USERNAME"
+    private const val AVATAR_URL = "AVATAR_URL"
 
     private var encryptedPrefs: SharedPreferences? = null
     private var appContext: Context? = null
@@ -75,6 +77,18 @@ object SecurePreferencesManager {
         }
     }
 
+    fun saveProfileInfo(username: String, avatarUrl: String?) {
+        checkInitialized()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            with(encryptedPrefs!!.edit()) {
+                putString(USERNAME, username)
+                avatarUrl?.let { putString(AVATAR_URL, it) }
+                apply()
+            }
+        }
+    }
+
     /**
      * Cancella tutti i dati relativi al login dalle SharedPreferences crittografate.
      */
@@ -100,6 +114,19 @@ object SecurePreferencesManager {
 
         return encryptedPrefs!!.getString(UUID, null)
     }
+
+    fun getUsername(): String? {
+        checkInitialized()
+
+        return encryptedPrefs!!.getString(USERNAME, null)
+    }
+
+    fun getAvatarUrl(): String? {
+        checkInitialized()
+
+        return encryptedPrefs!!.getString(AVATAR_URL, null)
+    }
+
 
     /**
      * Restituisce il context dell'applicazione.

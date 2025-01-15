@@ -1,47 +1,50 @@
-package com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities
+package com.lam.pedro.presentation.screen.activities.activitiyscreens.unknownactivityviewmodel
 
 import androidx.compose.runtime.MutableState
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSessionRecord
-import androidx.health.connect.client.records.HydrationRecord
 import androidx.health.connect.client.records.SpeedRecord
-import androidx.health.connect.client.units.Volume
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.data.activity.GenericActivity.SitSession
+import com.lam.pedro.data.activity.GenericActivity.UnknownSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.serialization.SessionCreator
 import java.time.ZonedDateTime
 
-class SitSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+class UnknownSessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ActivitySessionViewModel(healthConnectManager), MutableState<ActivitySessionViewModel?> {
 
-    //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
+    override lateinit var actualSession: UnknownSession
 
-    //override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_WHEELCHAIR
-    override lateinit var actualSession: SitSession
+    override val activityEnum = ActivityEnum.UNKNOWN
 
-    override val activityEnum = ActivityEnum.SIT
-
-    /*Define here the required permissions for the Health Connect usage*/
+    /** Define here the required permissions for the Health Connect usage*/
     override val permissions = setOf(
 
-        /*
-        * ExerciseSessionRecord
-        * */
+        /**
+         * ExerciseSessionRecord
+         * */
         HealthPermission.getReadPermission(ExerciseSessionRecord::class),
         HealthPermission.getWritePermission(ExerciseSessionRecord::class),
 
-        /*
-        * HydrationRecord
-        * */
-        HealthPermission.getReadPermission(HydrationRecord::class),
-        HealthPermission.getWritePermission(HydrationRecord::class),
-
         )
+
+    override suspend fun saveSession(activitySession: GenericActivity) {
+        if (activitySession is UnknownSession) {
+            healthConnectManager.insertListenSession(
+                activityEnum.activityType,
+                activitySession.basicActivity.startTime,
+                activitySession.basicActivity.endTime,
+                activitySession.basicActivity.title,
+                activitySession.basicActivity.notes
+            )
+        } else {
+            throw IllegalArgumentException("Invalid session type for ListenSessionViewModel")
+        }
+    }
 
     override fun createSession(
         duration: Long,
@@ -55,31 +58,15 @@ class SitSessionViewModel(private val healthConnectManager: HealthConnectManager
         trainIntensity: String,
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
-        distance: MutableState<Double>,
-        exerciseRoute: List<ExerciseRoute.Location>,
+        distance: Double,
+        exerciseRoute: List<ExerciseRoute.Location>
     ) {
-        this.actualSession = SessionCreator.createSitSession(
+        this.actualSession = SessionCreator.createUnknownSession(
             startTime = startTime.toInstant(),
             endTime = endTime.toInstant(),
             title = activityTitle,
-            notes = notes,
-            volume = Volume.liters(hydrationVolume)
+            notes = notes
         )
-    }
-
-    override suspend fun saveSession(activitySession: GenericActivity) {
-        if (activitySession is SitSession) {
-            healthConnectManager.insertSitSession(
-                activityEnum.activityType,
-                activitySession.basicActivity.startTime,
-                activitySession.basicActivity.endTime,
-                activitySession.basicActivity.title,
-                activitySession.basicActivity.notes,
-                activitySession.volume
-            )
-        } else {
-            throw IllegalArgumentException("Invalid session type for SitSessionViewModel")
-        }
     }
 
     override var value: ActivitySessionViewModel?

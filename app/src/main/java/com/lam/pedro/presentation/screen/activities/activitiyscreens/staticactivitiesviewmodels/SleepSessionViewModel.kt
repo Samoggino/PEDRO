@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities
+package com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels
 
 import androidx.compose.runtime.MutableState
 import androidx.health.connect.client.permission.HealthPermission
@@ -20,7 +20,7 @@ class SleepSessionViewModel(private val healthConnectManager: HealthConnectManag
 
     //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
-        //override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT
+    //override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT
     override lateinit var actualSession: SleepSession
 
     override val activityEnum = ActivityEnum.SLEEP
@@ -40,7 +40,7 @@ class SleepSessionViewModel(private val healthConnectManager: HealthConnectManag
         HealthPermission.getReadPermission(SleepSessionRecord::class),
         HealthPermission.getWritePermission(SleepSessionRecord::class)
 
-        )
+    )
 
     override fun createSession(
         duration: Long,
@@ -54,7 +54,7 @@ class SleepSessionViewModel(private val healthConnectManager: HealthConnectManag
         trainIntensity: String,
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
-        distance: MutableState<Double>,
+        distance: Double,
         exerciseRoute: List<ExerciseRoute.Location>,
     ) {
         this.actualSession = SessionCreator.createSleepSession(

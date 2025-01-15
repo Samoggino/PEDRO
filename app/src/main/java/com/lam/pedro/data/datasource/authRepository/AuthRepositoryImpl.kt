@@ -1,16 +1,22 @@
 package com.lam.pedro.data.datasource.authRepository
 
 import android.util.Log
+import com.lam.pedro.data.datasource.SecurePreferencesManager.saveProfileInfo
 import com.lam.pedro.data.datasource.SecurePreferencesManager.saveTokens
 import com.lam.pedro.data.datasource.SupabaseClient.supabase
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper.checkCredentials
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper.userExists
+import com.lam.pedro.presentation.screen.more.loginscreen.User
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserSession
+import io.github.jan.supabase.postgrest.from
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class AuthRepositoryImpl: IAuthRepository {
+class AuthRepositoryImpl : IAuthRepository {
 
     override suspend fun login(email: String, password: String): UserSession? {
         if (!checkCredentials(email, password)) return null
@@ -30,6 +36,8 @@ class AuthRepositoryImpl: IAuthRepository {
                 session.user?.id?.let { saveTokens(session.accessToken, session.refreshToken, it) }
                 Log.d("Supabase", "Login success: ${session.accessToken}")
             }
+
+            updateUserInfo(session?.user?.id)
 
             session
 
@@ -51,6 +59,8 @@ class AuthRepositoryImpl: IAuthRepository {
                 refreshToken = session?.refreshToken ?: "",
                 id = session?.user?.id
             )
+            updateUserInfo(session?.user?.id)
+
             return SignUpResult.Success(session)
         } catch (e: AuthRestException) {
             return when (e.statusCode) {
@@ -62,7 +72,29 @@ class AuthRepositoryImpl: IAuthRepository {
             return SignUpResult.Error("An unexpected error occurred")
         }
     }
+
+    private fun updateUserInfo(userId: String?) {
+
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+                // salva in sharedPreferences username e avatar
+                val user = supabase().from("users").select {
+                    filter {
+                        eq("id", userId!!)
+                    }
+                }.decodeSingle<User>()
+
+                saveProfileInfo(username = user.username, avatarUrl = user.avatarUrl)
+            }
+        } catch (e: Exception) {
+            Log.e(
+                "UpdateUserInfo",
+                "Errore durante l'aggiornamento delle informazioni utente: ${e.message}"
+            )
+        }
+    }
 }
+
 /**
  * Sigillo di risposta per il risultato della registrazione.
  */
@@ -78,6 +110,7 @@ data class RegisterFormData(
     val username: String = "",
     val confirmPassword: String = ""
 )
+
 data class LoginFormData(
     val email: String = "",
     val password: String = ""

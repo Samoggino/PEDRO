@@ -13,19 +13,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.data.activity.GenericActivity.*
+import com.lam.pedro.data.activity.GenericActivity.CyclingSession
+import com.lam.pedro.data.activity.GenericActivity.DriveSession
+import com.lam.pedro.data.activity.GenericActivity.LiftSession
+import com.lam.pedro.data.activity.GenericActivity.ListenSession
+import com.lam.pedro.data.activity.GenericActivity.RunSession
+import com.lam.pedro.data.activity.GenericActivity.SitSession
+import com.lam.pedro.data.activity.GenericActivity.SleepSession
+import com.lam.pedro.data.activity.GenericActivity.TrainSession
+import com.lam.pedro.data.activity.GenericActivity.UnknownSession
+import com.lam.pedro.data.activity.GenericActivity.WalkSession
+import com.lam.pedro.data.activity.GenericActivity.YogaSession
 import com.lam.pedro.util.calculateAverageSpeed
 import org.maplibre.android.geometry.LatLng
 import java.time.Duration
 import java.time.ZoneId
 
 @Composable
-fun ShowSessionDetails(session: GenericActivity) {
-
-    val color = session.activityEnum.color
+fun ShowSessionDetails(
+    session: GenericActivity,
+    color: Color = session.activityEnum.color
+) {
     LazyColumn(
         modifier = Modifier
             .padding(16.dp)
@@ -89,7 +101,7 @@ fun ShowSessionDetails(session: GenericActivity) {
             is RunSession -> {
                 item {
                     val positions =
-                        session.exerciseRoute?.route?.map { LatLng(it.latitude, it.longitude) }
+                        session.exerciseRoute.route.map { LatLng(it.latitude, it.longitude) }
 
                     Text(text = "Average speed: ${calculateAverageSpeed(session.speedSamples)}")
                     Text(text = "Steps: ${session.stepsCount}")
@@ -97,16 +109,14 @@ fun ShowSessionDetails(session: GenericActivity) {
                     Text(text = "Energia attiva: ${session.activeEnergy}")
                     Text(text = "Distance: ${session.distance}")
                     //Text(text = "Elevazione guadagnata: ${session.elevationGained}")
-                    if (positions != null) {
-                        MapComponent(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(300.dp)
-                                .clip(RoundedCornerShape(26.dp)),
-                            positions = positions,
-                            color = color
-                        )
-                    }
+                    MapComponent(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp)
+                            .clip(RoundedCornerShape(26.dp)),
+                        positions = positions,
+                        color = color
+                    )
                 }
             }
 
@@ -168,6 +178,12 @@ fun ShowSessionDetails(session: GenericActivity) {
 
             is SleepSession -> {
                 //nothing else to display
+            }
+
+            is UnknownSession -> {
+                item {
+                    Text(text = "Questa è una sessione sconosciuta.")
+                }
             }
         }
     }

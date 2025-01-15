@@ -19,6 +19,7 @@ import com.lam.pedro.data.activity.GenericActivity.RunSession
 import com.lam.pedro.data.activity.GenericActivity.SitSession
 import com.lam.pedro.data.activity.GenericActivity.SleepSession
 import com.lam.pedro.data.activity.GenericActivity.TrainSession
+import com.lam.pedro.data.activity.GenericActivity.UnknownSession
 import com.lam.pedro.data.activity.GenericActivity.WalkSession
 import com.lam.pedro.data.activity.GenericActivity.YogaSession
 import kotlinx.datetime.Month
@@ -194,6 +195,15 @@ object SessionCreator {
         activeEnergy = activeEnergy,
         exerciseSegment = exerciseSegment,
         exerciseLap = exerciseLap
+    )
+
+    fun createUnknownSession(
+        title: String,
+        notes: String,
+        startTime: Instant,
+        endTime: Instant
+    ) = UnknownSession(
+        basicActivity = createBasicActivity(title, notes, startTime, endTime),
     )
 
     fun createBasicActivity(
@@ -501,6 +511,15 @@ object SessionCreator {
     fun createSleepSession(
         basicActivity: BasicActivity
     ) = createSleepSession(
+        title = basicActivity.title,
+        notes = basicActivity.notes,
+        startTime = basicActivity.startTime,
+        endTime = basicActivity.endTime
+    )
+
+    fun createUnknownSession(
+        basicActivity: BasicActivity
+    ) = createUnknownSession(
         title = basicActivity.title,
         notes = basicActivity.notes,
         startTime = basicActivity.startTime,

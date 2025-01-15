@@ -1,4 +1,4 @@
-package com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivities
+package com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels
 
 import android.util.Log
 import androidx.compose.runtime.MutableState
@@ -69,7 +69,7 @@ class DriveSessionViewModel(private val healthConnectManager: HealthConnectManag
         trainIntensity: String,
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
-        distance: MutableState<Double>,
+        distance: Double,
         exerciseRoute: List<ExerciseRoute.Location>,
     ) {
         this.actualSession = SessionCreator.createDriveSession(
@@ -78,7 +78,7 @@ class DriveSessionViewModel(private val healthConnectManager: HealthConnectManag
             title = activityTitle,
             notes = notes,
             speedSamples = speedSamples,
-            distance = Length.meters(distance.value),
+            distance = Length.meters(distance),
             exerciseRoute = ExerciseRoute(exerciseRoute)
         )
         Log.d("ACTUAL SESSION", "$actualSession")

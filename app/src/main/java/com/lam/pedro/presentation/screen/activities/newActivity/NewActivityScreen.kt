@@ -1,5 +1,6 @@
 package com.lam.pedro.presentation.screen.activities.newActivity
 
+import android.content.Intent
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
@@ -11,13 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -26,18 +24,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSessionRecord
-import androidx.health.connect.client.records.SpeedRecord
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.component.CustomSnackbarHost
 import com.lam.pedro.presentation.component.NewActivityControlButtons
 import com.lam.pedro.presentation.component.NewActivitySaveAlertDialog
@@ -48,23 +41,15 @@ import com.lam.pedro.presentation.component.TrainIntensitySelector
 import com.lam.pedro.presentation.component.WaterGlass
 import com.lam.pedro.presentation.component.YogaStyleSelector
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
-import com.lam.pedro.presentation.screen.activities.newActivity.strategyForNewScreen.GpsFunctionality
-import com.lam.pedro.presentation.screen.activities.newActivity.strategyForNewScreen.ScreenContext
-import com.lam.pedro.presentation.screen.activities.newActivity.strategyForNewScreen.StepCounterFunctionality
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModelFactory
-import com.lam.pedro.util.LocationTracker
-import com.lam.pedro.util.SpeedTracker
-import com.lam.pedro.util.StepCounter
-import com.lam.pedro.util.stopActivity
-import com.lam.pedro.util.updateDistance
+import com.lam.pedro.util.services.ActivityTrackingService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.maplibre.android.geometry.LatLng
 import java.time.Duration
 import java.time.ZonedDateTime
 
@@ -72,9 +57,11 @@ import java.time.ZonedDateTime
 fun NewActivityScreen(
     onNavBack: () -> Unit,
     titleId: Int,
-    color: Color,
     viewModel: ActivitySessionViewModel,
-    profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModelFactory(LocalContext.current))
+    profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModelFactory(LocalContext.current)),
+    newActivityViewModel: NewActivityViewModel = viewModel(
+        factory = NewActivityViewModelFactory(LocalContext.current)
+    )
 ) {
 
     Log.d(
@@ -82,191 +69,15 @@ fun NewActivityScreen(
         "---- TIPO DEL NEW ACTIVITY SCREEN: ${viewModel.activityEnum.activityType}"
     )
     // variables
+    val color = viewModel.activityEnum.color
     val activityType = viewModel.activityEnum.activityType
     val context = LocalContext.current
+
     val coroutineScope = rememberCoroutineScope()
     val sessionJob = remember { Job() }
     val sessionScope = remember { CoroutineScope(sessionJob + Dispatchers.Default) }
-    val stepCounter = remember { StepCounter(context) }
-    var steps by remember { mutableFloatStateOf(0f) }
-    var hydrationVolume by remember { mutableDoubleStateOf(0.0) }
-    var yogaStyle by remember { mutableStateOf("Yin (gentle)") }
-    var trainIntensity by remember { mutableStateOf("moderate") }
-    var averageSpeed by remember { mutableDoubleStateOf(0.0) }
-    var speedCounter by remember { mutableIntStateOf(0) }
-    var totalSpeed by remember { mutableDoubleStateOf(0.0) }
 
-    /**
-    var showLocationPermissionDialog by remember { mutableStateOf(false) }
-    var showActivityRecognitionPermissionDialog by remember { mutableStateOf(false) }
-    var requestLocationPermissionCounter by remember { mutableIntStateOf(0) }
-    var hasBeenAskedForLocationPermission by remember { mutableStateOf(false) }
-    var hasBeenAskedForActivityRecognitionPermission by remember { mutableStateOf(false) }
-     */
-
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    /**
-    var hasLocationPermission by remember {
-    mutableStateOf(
-    ContextCompat.checkSelfPermission(
-    context,
-    Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
-    )
-    }
-
-    // Stato per il permesso di ACTIVITY_RECOGNITION
-    var hasActivityRecognitionPermission by remember {
-    mutableStateOf(
-    ContextCompat.checkSelfPermission(
-    context,
-    Manifest.permission.ACTIVITY_RECOGNITION
-    ) == PackageManager.PERMISSION_GRANTED
-    )
-    }
-
-    // Launcher per richiedere il permesso di ACTIVITY_RECOGNITION
-    val requestActivityRecognitionPermissionLauncher = rememberLauncherForActivityResult(
-    contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-    hasActivityRecognitionPermission = isGranted
-    if (isGranted) {
-    Log.d(TAG, "-----------------Activity Recognition Permission granted-----------------")
-    } else {
-    //TODO: Handle permission denied, inform the user
-    Log.d(TAG, "-----------------Activity Recognition Permission denied-----------------")
-    hasBeenAskedForActivityRecognitionPermission = true
-    showActivityRecognitionPermissionDialog = true
-    }
-    }
-
-    val requestLocationPermissionLauncher = rememberLauncherForActivityResult(
-    contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-    hasLocationPermission = isGranted
-    if (isGranted) {
-    Log.d(TAG, "-----------------GPS Permission granted-----------------")
-    requestActivityRecognitionPermissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
-    } else {
-    //TODO: Handle permission denied, the app won't work
-    Log.d(TAG, "-----------------GPS Permission denied-----------------")
-    hasBeenAskedForLocationPermission = true
-    requestLocationPermissionCounter++
-    showLocationPermissionDialog = true
-    }
-    }
-
-    DisposableEffect(lifecycleOwner) {
-    val observer = LifecycleEventObserver { _, event ->
-    when (event) {
-    Lifecycle.Event.ON_RESUME -> {
-    // Controlla se i permessi sono concessi quando lo screen torna attivo
-    if (ContextCompat.checkSelfPermission(
-    context,
-    Manifest.permission.ACCESS_FINE_LOCATION
-    ) == PackageManager.PERMISSION_GRANTED
-    ) {
-    //if (!isFirstTimeRequest) {
-    hasLocationPermission = true
-    showLocationPermissionDialog = false
-    requestActivityRecognitionPermissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
-    //}
-    } else {
-    if (hasBeenAskedForLocationPermission)
-    showLocationPermissionDialog = true
-    }
-    }
-
-    else -> Unit
-    }
-    }
-    lifecycleOwner.lifecycle.addObserver(observer)
-
-    onDispose {
-    lifecycleOwner.lifecycle.removeObserver(observer)
-    }
-    }
-
-    DisposableEffect(lifecycleOwner) {
-    val observer = LifecycleEventObserver { _, event ->
-    when (event) {
-    Lifecycle.Event.ON_RESUME -> {
-    // Controlla se il permesso di ACTIVITY_RECOGNITION è stato concesso
-    if (ContextCompat.checkSelfPermission(
-    context,
-    Manifest.permission.ACTIVITY_RECOGNITION
-    ) == PackageManager.PERMISSION_GRANTED
-    ) {
-    hasActivityRecognitionPermission = true
-    showActivityRecognitionPermissionDialog = false
-    } else {
-    // Mostra il dialog se il permesso non è stato concesso
-    if (hasBeenAskedForActivityRecognitionPermission)
-    showActivityRecognitionPermissionDialog = true
-    }
-    }
-
-    else -> Unit
-    }
-    }
-    lifecycleOwner.lifecycle.addObserver(observer)
-
-    onDispose {
-    lifecycleOwner.lifecycle.removeObserver(observer)
-    }
-    }
-
-    DeniedPermissionDialog(
-    showDialog = showLocationPermissionDialog,
-    onDismiss = {
-    if (hasLocationPermission) {
-    showLocationPermissionDialog = false
-    }
-    },
-    onGoToSettings = {
-    if (requestLocationPermissionCounter < 2) {
-    requestLocationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-    } else {
-    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-    val uri = Uri.fromParts("package", context.packageName, null)
-    intent.data = uri
-    context.startActivity(intent)
-    }
-    },
-    color = MaterialTheme.colorScheme.primary,
-    title = R.string.location_permission_title,
-    icon = R.drawable.location_icon,
-    text = R.string.location_permission_description,
-    buttonText = if (requestLocationPermissionCounter < 2) R.string.request_permission else R.string.go_to_settings
-    )
-
-    DeniedPermissionDialog(
-    showDialog = showActivityRecognitionPermissionDialog,
-    onDismiss = {
-    if (hasActivityRecognitionPermission) {
-    showActivityRecognitionPermissionDialog = false
-    }
-    },
-    onGoToSettings = {
-    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-    val uri = Uri.fromParts("package", context.packageName, null)
-    intent.data = uri
-    context.startActivity(intent)
-    },
-    color = MaterialTheme.colorScheme.primary,
-    title = R.string.activity_recognition_permission_title,
-    icon = R.drawable.steps_icon,
-    text = R.string.activity_recognition_permission_description,
-    buttonText = R.string.go_to_settings
-    )
-     */
-
-
-    /*------------------------------------------------------------------------------------------------------------------*/
-
+    /*
     // Crea la lista di funzionalità
     val functionalities = listOf(GpsFunctionality(context), StepCounterFunctionality(context))
 
@@ -275,15 +86,18 @@ fun NewActivityScreen(
 
     // Esegui tutte le funzionalità
     screenContext.ExecuteFunctionalities()
+     */
+
+    newActivityViewModel.ExecuteFunctionalities()
 
     Scaffold(
         topBar = {
             NewActivityTopAppBar(
                 titleId = titleId,
-                onNavBack = { onNavBack() },
+                onNavBack = onNavBack,
             )
         },
-        snackbarHost = { CustomSnackbarHost(snackbarHostState) }
+        snackbarHost = { CustomSnackbarHost(newActivityViewModel.snackbarHostState) }
     ) { paddingValues ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -301,26 +115,13 @@ fun NewActivityScreen(
             var elapsedTime by remember { mutableIntStateOf(0) }
 
             var startTime: ZonedDateTime by remember { mutableStateOf(ZonedDateTime.now()) }
-            val speedTracker = SpeedTracker(LocalContext.current)
-            val locationTracker = LocationTracker(LocalContext.current)
 
             val timerResults = remember { mutableStateListOf<String>() }
-
-            val speedSamples = remember { mutableStateListOf<SpeedRecord.Sample>() }
-            val exerciseRoute = remember { mutableStateListOf<ExerciseRoute.Location>() }
-
-            val positions = remember { mutableStateListOf<LatLng>() }
-            val distance = remember { mutableDoubleStateOf(0.0) }
-
-            var activityTitle by remember { mutableStateOf("") }
-            var notes by remember { mutableStateOf("") }
-            var isTitleEmpty by remember { mutableStateOf(false) }
-
 
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
-                text = if (activityTitle == "") "Press to start" else activityTitle,
+                text = if (newActivityViewModel.activityTitle.value == "") "Press to start" else newActivityViewModel.activityTitle.value,
                 style = MaterialTheme.typography.headlineMedium.copy(fontSize = 40.sp),
                 fontWeight = FontWeight.Bold,
             )
@@ -344,40 +145,44 @@ fun NewActivityScreen(
                     when (activityType) {
                         ExerciseSessionRecord.EXERCISE_TYPE_RUNNING, ExerciseSessionRecord.EXERCISE_TYPE_WALKING -> {
                             StatsDisplay(
-                                steps = steps,
-                                averageSpeed = averageSpeed,
-                                distance = distance,
+                                steps = newActivityViewModel.steps.floatValue,
+                                averageSpeed = newActivityViewModel.averageSpeed.doubleValue,
+                                distance = newActivityViewModel.distance.doubleValue,
                                 color = color
                             )
                         }
 
                         ExerciseSessionRecord.EXERCISE_TYPE_BIKING, ExerciseSessionRecord.EXERCISE_TYPE_SURFING -> {
                             StatsDisplay(
-                                averageSpeed = averageSpeed,
-                                distance = distance,
+                                averageSpeed = newActivityViewModel.averageSpeed.doubleValue,
+                                distance = newActivityViewModel.distance.doubleValue,
                                 color = color
                             )
                         }
 
                         ExerciseSessionRecord.EXERCISE_TYPE_YOGA -> {
                             YogaStyleSelector(
-                                yogaStyle = yogaStyle,
-                                onYogaStyleChange = { newStyle -> yogaStyle = newStyle },
+                                yogaStyle = newActivityViewModel.yogaStyle.toString(),
+                                onYogaStyleChange = { newStyle ->
+                                    newActivityViewModel.yogaStyle.value = newStyle
+                                },
                                 color = color
                             )
                         }
 
                         ExerciseSessionRecord.EXERCISE_TYPE_EXERCISE_CLASS -> {
                             TrainIntensitySelector(
-                                trainIntensity = trainIntensity,
-                                onTrainIntensityChange = { newStyle -> trainIntensity = newStyle },
+                                trainIntensity = newActivityViewModel.trainIntensity.toString(),
+                                onTrainIntensityChange = { newStyle ->
+                                    newActivityViewModel.trainIntensity.value = newStyle
+                                },
                                 color = color
                             )
                         }
 
                         ExerciseSessionRecord.EXERCISE_TYPE_WHEELCHAIR -> {
-                            WaterGlass(hydrationVolume = hydrationVolume) { addedVolume ->
-                                hydrationVolume += addedVolume
+                            WaterGlass(hydrationVolume = newActivityViewModel.hydrationVolume.doubleValue) { addedVolume ->
+                                newActivityViewModel.hydrationVolume.value += addedVolume
                             }
                         }
                     }
@@ -413,55 +218,51 @@ fun NewActivityScreen(
                     isStopAction = isStopAction,
                     visible = visible,
                     color = color,
-                    activityTitle = activityTitle,
+                    activityTitle = newActivityViewModel.activityTitle.value,
                     onTitleChange = {
-                        activityTitle = it
-                        isTitleEmpty = activityTitle.isBlank()
+                        //newActivityViewModel.activityTitle = it
+                        newActivityViewModel.updateTitle(it)
+                        //newActivityViewModel.isTitleEmpty.value = newActivityViewModel.activityTitle.value.isBlank()
                     },
-                    isTitleEmpty = isTitleEmpty,
-                    notes = notes,
-                    onNotesChange = { notes = it },
+                    isTitleEmpty = newActivityViewModel.isTitleEmpty.value,
+                    notes = newActivityViewModel.notes.value,
+                    onNotesChange = { newActivityViewModel.notes.value = it },
                     onConfirm = {
                         coroutineScope.launch {
-                            if (activityTitle.isNotBlank()) {
+                            if (newActivityViewModel.activityTitle.value.isNotBlank()) {
                                 if (isStopAction) {
+                                    context.stopService(
+                                        Intent(
+                                            context,
+                                            ActivityTrackingService::class.java
+                                        )
+                                    )
+
                                     val endTime = ZonedDateTime.now()
                                     val duration = Duration.between(startTime, endTime).toMinutes()
                                     if (duration < 1) {
                                         showConfirmDialog = false
                                         coroutineScope.launch {
-                                            snackbarHostState.showSnackbar(
+                                            newActivityViewModel.snackbarHostState.showSnackbar(
                                                 message = "Activity must be at least 1 minute",
                                                 actionLabel = "OK",
                                                 duration = SnackbarDuration.Long // Short, Long o Indefinite
                                             )
                                         }
                                     } else {
-                                        stopActivity(
-                                            timerRunning = mutableStateOf(timerRunning),
-                                            visible = mutableStateOf(visible),
-                                            isPaused = mutableStateOf(isPaused),
+                                        newActivityViewModel.saveActivity(
                                             elapsedTime = elapsedTime,
                                             timerResults = timerResults,
                                             duration = duration,
                                             startTime = startTime,
                                             endTime = endTime,
-                                            activityTitle = activityTitle,
-                                            notes = notes,
-                                            speedSamples = speedSamples,
-                                            steps = steps,
-                                            hydrationVolume = hydrationVolume,
-                                            trainIntensity = trainIntensity,
-                                            yogaStyle = yogaStyle,
                                             profileViewModel = profileViewModel,
-                                            distance = mutableDoubleStateOf(distance.doubleValue),
-                                            exerciseRoute = exerciseRoute,
-                                            viewModel = viewModel
+                                            activitySessionViewModel = viewModel
                                         )
                                     }
-                                    //coroutineScope.launch {
-                                    sessionJob.cancelAndJoin()  // Cancella il sessionJob in background
-                                    //}
+
+                                    sessionJob.cancelAndJoin()
+
                                     onNavBack()
 
                                 } else {
@@ -473,7 +274,7 @@ fun NewActivityScreen(
                                 }
                                 showConfirmDialog = false
                             } else {
-                                isTitleEmpty = true
+                                newActivityViewModel.isTitleEmpty.value = true
                             }
                         }
                     }
@@ -482,6 +283,8 @@ fun NewActivityScreen(
 
             if (timerRunning && !isPaused) {
                 LaunchedEffect(Unit) {
+                    val serviceIntent = Intent(context, ActivityTrackingService::class.java)
+
                     startTime = ZonedDateTime.now()
 
                     sessionScope.launch {
@@ -492,46 +295,21 @@ fun NewActivityScreen(
                     }
 
                     sessionScope.launch {
-                        try {
-                            stepCounter.isAvailable()
-                            stepCounter.stepsCounter { newSteps ->
-                                steps = newSteps // Aggiorna lo stato della UI
-                            }
-                            //steps = stepCount.toFloat() // Aggiorna lo stato
-                            Log.d("STEP_COUNTER", "Steps: $steps")
-                        } catch (e: Exception) {
-                            Log.e("STEP_COUNTER", "Error retrieving steps: ${e.message}")
-                        }
+                        //newActivityViewModel.startStepCounter()
+                        context.startService(serviceIntent)
                     }
 
                     sessionScope.launch {
-                        speedTracker.trackSpeed().collect { sample ->
-                            speedCounter++
-                            totalSpeed += sample.speed.inMetersPerSecond
-                            averageSpeed = totalSpeed / speedCounter
-                            speedSamples.add(sample)
-                            Log.d(TAG, "----------------------New Speed Sample: $sample")
-                        }
+                        //newActivityViewModel.startSpeedTracking()
                     }
 
                     sessionScope.launch {
-                        locationTracker.trackLocation().collect { location ->
-                            exerciseRoute.add(location)
-                            Log.d(TAG, "--------------------------------New location: $location")
-                            val newLatLng = LatLng(location.latitude, location.longitude)
-                            updateDistance(distance, positions, newLatLng)
-                            positions.add(newLatLng)
-                            Log.d(
-                                TAG,
-                                "--------------------------------New distance: ${distance.value}"
-                            )
-                        }
+                        //newActivityViewModel.startLocationTracking()
                     }
                 }
             }
 
         }
     }
-
 
 }

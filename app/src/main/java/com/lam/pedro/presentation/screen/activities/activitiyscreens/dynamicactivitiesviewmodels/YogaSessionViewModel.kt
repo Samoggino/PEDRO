@@ -1,82 +1,62 @@
-package com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities
+package com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels
 
 import androidx.compose.runtime.MutableState
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
-import androidx.health.connect.client.records.CyclingPedalingCadenceRecord
-import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.units.Energy
-import androidx.health.connect.client.units.Length
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.data.activity.GenericActivity.CyclingSession
+import com.lam.pedro.data.activity.GenericActivity.YogaSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.serialization.SessionCreator
 import com.lam.pedro.util.calculateAverageSpeed
-import com.lam.pedro.util.calculateCyclingCalories
+import com.lam.pedro.util.calculateCalories
 import java.time.ZonedDateTime
 
 
-class CycleSessionViewModel(val healthConnectManager: HealthConnectManager) :
+class YogaSessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ActivitySessionViewModel(healthConnectManager), MutableState<ActivitySessionViewModel?> {
 
-    //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
+    override lateinit var actualSession: YogaSession
 
-    //override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_BIKING
-    override lateinit var actualSession: CyclingSession
+    override val activityEnum = ActivityEnum.YOGA
 
-    override val activityEnum = ActivityEnum.CYCLING
-
-    /*Define here the required permissions for the Health Connect usage*/
+    /**Define here the required permissions for the Health Connect usage*/
     override val permissions = setOf(
 
-        /*
-       * ExerciseSessionRecord
-       * */
+        /**
+         * ExerciseSessionRecord
+         * */
         HealthPermission.getReadPermission(ExerciseSessionRecord::class),
         HealthPermission.getWritePermission(ExerciseSessionRecord::class),
 
-        /*
-        * ActiveCaloriesBurnedRecord
-        * */
+        /**
+         * ActiveCaloriesBurnedRecord
+         * */
         HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class),
         HealthPermission.getWritePermission(ActiveCaloriesBurnedRecord::class),
 
-        /*
-        * DistanceRecord
-        * */
-        HealthPermission.getReadPermission(DistanceRecord::class),
-        HealthPermission.getWritePermission(DistanceRecord::class),
+        /**
+         * ExerciseCompletionGoal.DurationGoal - permissions not needed, it doesn't use any sensors or personal data
+         * */
 
-        /*
-        * ExerciseRoute - it isn't a record, it uses GPS so it requires manifest permissions
-        * */
-
-        /*
-        * CyclingPedalingCadenceRecord
-        * */
-        HealthPermission.getReadPermission(CyclingPedalingCadenceRecord::class),
-        HealthPermission.getWritePermission(CyclingPedalingCadenceRecord::class),
-
-        /*
-        * SpeedRecord
-        * */
-        HealthPermission.getReadPermission(SpeedRecord::class),
-        HealthPermission.getWritePermission(SpeedRecord::class),
-
-        /*
-        * TotalCaloriesBurnedRecord
-        * */
+        /**
+         * TotalCaloriesBurnedRecord
+         * */
         HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class),
         HealthPermission.getWritePermission(TotalCaloriesBurnedRecord::class),
 
-        )
+        /**
+         * ExerciseLap - no permissions needed, it split exercise sessions into segments such as laps or exercise series
+         * */
+
+    )
 
     override fun createSession(
         duration: Long,
@@ -90,50 +70,48 @@ class CycleSessionViewModel(val healthConnectManager: HealthConnectManager) :
         trainIntensity: String,
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
-        distance: MutableState<Double>,
+        distance: Double,
         exerciseRoute: List<ExerciseRoute.Location>,
     ) {
         val averageSpeed = calculateAverageSpeed(speedSamples)
-        val (totalCalories, activeCalories) = calculateCyclingCalories(
+        val (totalCalories, activeCalories) = calculateCalories(
             profileViewModel.weight.toDouble(),
             profileViewModel.height.toDouble(),
             profileViewModel.age.toInt(),
             profileViewModel.sex,
-            distance.value,
+            distance,
+            steps.toInt(),
             duration,
             averageSpeed
         )
-        this.actualSession = SessionCreator.createCyclingSession(
+        this.actualSession = SessionCreator.createYogaSession(
             startTime = startTime.toInstant(),
             endTime = endTime.toInstant(),
             title = activityTitle,
             notes = notes,
-            speedSamples = speedSamples, // Non disponibile in ExerciseSessionRecord
-            totalEnergy = Energy.calories(totalCalories), // Fallback
-            activeEnergy = Energy.calories(activeCalories), // Fallback
-            distance = Length.meters(distance.value), // Fallback
-            exerciseRoute = ExerciseRoute(exerciseRoute) //Fallback
+            totalEnergy = Energy.calories(totalCalories),
+            activeEnergy = Energy.calories(activeCalories),
+            exerciseSegment = listOf(),//TODO
+            exerciseLap = listOf()//TODO
         )
     }
 
     override suspend fun saveSession(activitySession: GenericActivity) {
-        if (activitySession is CyclingSession) {
-            healthConnectManager.insertCycleSession(
+        if (activitySession is YogaSession) {
+            healthConnectManager.insertYogaSession(
                 activityEnum.activityType,
                 activitySession.basicActivity.startTime,
                 activitySession.basicActivity.endTime,
                 activitySession.basicActivity.title,
                 activitySession.basicActivity.notes,
-                activitySession.speedSamples,
                 activitySession.totalEnergy,
                 activitySession.activeEnergy,
-                activitySession.distance,
-                activitySession.exerciseRoute
+                activitySession.exerciseSegment,
+                activitySession.exerciseLap
             )
         } else {
-            throw IllegalArgumentException("Invalid session type for CycleSessionViewModel")
+            throw IllegalArgumentException("Invalid session type for YogaSessionViewModel")
         }
-
     }
 
     override var value: ActivitySessionViewModel?

@@ -21,6 +21,7 @@ import com.lam.pedro.presentation.serialization.SessionCreator.createRunSession
 import com.lam.pedro.presentation.serialization.SessionCreator.createSitSession
 import com.lam.pedro.presentation.serialization.SessionCreator.createSleepSession
 import com.lam.pedro.presentation.serialization.SessionCreator.createTrainSession
+import com.lam.pedro.presentation.serialization.SessionCreator.createUnknownSession
 import com.lam.pedro.presentation.serialization.SessionCreator.createWalkSession
 import com.lam.pedro.presentation.serialization.SessionCreator.createYogaSession
 import kotlinx.serialization.builtins.ListSerializer
@@ -167,6 +168,12 @@ object JsonDBManager {
 
         ActivityEnum.LISTEN to { basicActivity, _ ->
             createListenSession(
+                basicActivity = basicActivity
+            )
+        },
+        
+        ActivityEnum.UNKNOWN to { basicActivity, _ ->
+            createUnknownSession(
                 basicActivity = basicActivity
             )
         }

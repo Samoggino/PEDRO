@@ -33,7 +33,7 @@ import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.MoreScreen
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.GeneralActivityViewModelFactory
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivities.RunSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.RunSessionViewModel
 import com.lam.pedro.presentation.screen.activities.newActivity.NewActivityScreen
 import com.lam.pedro.presentation.screen.community.CommunityScreen
 import com.lam.pedro.presentation.screen.community.CommunityScreenViewModelFactory
@@ -259,7 +259,6 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
                             NewActivityScreen(
                                 onNavBack = { onNavBack() },
                                 titleId = it3,
-                                color = it2,
                                 viewModel = it1
                             )
                         }

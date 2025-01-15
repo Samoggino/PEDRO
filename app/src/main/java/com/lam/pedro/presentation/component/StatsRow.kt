@@ -12,12 +12,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lam.pedro.R
@@ -110,7 +108,7 @@ fun StatsRowWithoutSteps(speed: Double, distance: MutableState<Double>, color: C
 fun StatsRow(
     steps: Float? = null, // Parametro opzionale
     speed: Double,
-    distance: MutableState<Double>,
+    distance: Double,
     color: Color
 ) {
     Row(
@@ -140,7 +138,7 @@ fun StatsRow(
         StatsColumn(
             icon = R.drawable.distance_icon,
             unit = "(m)",
-            value = String.format("%.2f", distance.value), // Arrotonda a 2 decimali
+            value = String.format("%.2f", distance), // Arrotonda a 2 decimali
             color = color
         )
     }
