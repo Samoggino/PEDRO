@@ -140,7 +140,7 @@ enum class Screen(
         titleId = R.string.train_session_screen
     ),
     UnknownSessionScreen(
-        route = "swim_session_screen",
+        route = "unknown_session_screen",
         titleId = R.string.unknown_session_screen
     ),
     NewActivityScreen(

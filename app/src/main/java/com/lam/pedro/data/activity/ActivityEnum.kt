@@ -11,6 +11,7 @@ import com.lam.pedro.presentation.theme.RunColor
 import com.lam.pedro.presentation.theme.SitColor
 import com.lam.pedro.presentation.theme.SleepColor
 import com.lam.pedro.presentation.theme.TrainColor
+import com.lam.pedro.presentation.theme.UnknownColor
 import com.lam.pedro.presentation.theme.WalkColor
 import com.lam.pedro.presentation.theme.YogaColor
 import kotlinx.serialization.Serializable
@@ -84,9 +85,8 @@ enum class ActivityEnum(
         activityType = ExerciseSessionRecord.EXERCISE_TYPE_GUIDED_BREATHING
     ),
     UNKNOWN(
-        color = Color.Black,
+        color = UnknownColor,
         image = R.drawable.unknown_icon,
         activityType = ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT
-
     )
 }

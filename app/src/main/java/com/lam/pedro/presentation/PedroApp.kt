@@ -15,22 +15,17 @@
  */
 package com.lam.pedro.presentation
 
+import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -50,8 +45,8 @@ import com.lam.pedro.util.notification.NotificationsFunctionality
 
 const val TAG = "Health Connect sample"
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PedroApp(healthConnectManager: HealthConnectManager) {
     PedroTheme {
@@ -78,7 +73,8 @@ fun PedroApp(healthConnectManager: HealthConnectManager) {
             Screen.WalkSessionScreen.route,
             Screen.YogaSessionScreen.route,
             Screen.CycleSessionScreen.route,
-            Screen.TrainSessionScreen.route -> true
+            Screen.TrainSessionScreen.route,
+            Screen.UnknownSessionScreen.route -> true
 
             else -> false
         }
@@ -105,6 +101,8 @@ fun PedroApp(healthConnectManager: HealthConnectManager) {
             Screen.CycleSessionScreen.route -> Screen.CycleSessionScreen.titleId
             Screen.TrainSessionScreen.route -> Screen.TrainSessionScreen.titleId
 
+            Screen.UnknownSessionScreen.route -> Screen.UnknownSessionScreen.titleId
+
             /* More */
             Screen.HealthConnectScreen.route -> Screen.HealthConnectScreen.titleId
             Screen.SettingScreen.route -> Screen.SettingScreen.titleId
@@ -119,16 +117,6 @@ fun PedroApp(healthConnectManager: HealthConnectManager) {
         notificationsFunctionality.Execute()
 
         Scaffold(
-            floatingActionButton = {
-                if (currentRoute == Screen.ActivitiesScreen.route)
-                    ExtendedFloatingActionButton(
-                        onClick = { /*onClick()*/ },
-                        icon = { Icon(Icons.Filled.Add, "Add Activity") },
-                        text = { Text(text = "New Activity") },
-                        shape = RoundedCornerShape(26.dp),
-                        contentColor = MaterialTheme.colorScheme.primary
-                    )
-            },
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState) { data ->
                     Snackbar(
@@ -141,13 +129,12 @@ fun PedroApp(healthConnectManager: HealthConnectManager) {
                 // Mostra la BottomBar solo se `showBottomBar` è true
                 if (showBottomNotTop) {
                     BottomBar(
-                        scope = scope,
                         navController = navController
                     )
                 }
             }
-        ) { paddingValues ->
-            Box(modifier = Modifier.padding(paddingValues)) {
+        ) {
+            Box(modifier = Modifier.padding(0.dp)) {
                 PedroNavigation(
                     healthConnectManager = healthConnectManager,
                     navController = navController,

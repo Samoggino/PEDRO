@@ -41,7 +41,7 @@ fun HomeScreen(navController: NavHostController) {
         verticalArrangement = Arrangement.Top
     ) {
         item {
-            Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(40.dp))
             Row() {
                 Text(
                     text = "Welcome back!",

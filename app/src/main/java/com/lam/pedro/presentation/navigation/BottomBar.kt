@@ -1,5 +1,7 @@
 package com.lam.pedro.presentation.navigation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreHoriz
@@ -13,27 +15,29 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.lam.pedro.R
-import kotlinx.coroutines.CoroutineScope
 
-/**
- * The side navigation drawer used to explore each Health Connect feature.
- */
 @Composable
 fun BottomBar(
-    scope: CoroutineScope,
     navController: NavController
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
     NavigationBar(
-        containerColor = Color.White.copy(alpha = 0.05f),
-        contentColor = MaterialTheme.colorScheme.primary
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        contentColor = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.graphicsLayer {
+            shape = RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp)
+            clip = true
+        }
     ) {
         Screen.entries.filter { (it.hasMenuItem) }.forEach { item ->
 
@@ -88,8 +92,8 @@ fun BottomBar(
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = MaterialTheme.colorScheme.primary /*Color(0xFFE4B53F)*/,
-                    selectedIconColor = Color.White,
+                    indicatorColor = MaterialTheme.colorScheme.primary, /*Color(0xFFE4B53F)*/
+                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
                     selectedTextColor = Color.White,
                 )// Chiama la funzione di navigazione per Home
             )

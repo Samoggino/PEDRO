@@ -1,5 +1,6 @@
 package com.lam.pedro.presentation.screen.activities.activitiyscreens
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.util.Log
 import androidx.compose.foundation.background
@@ -60,6 +61,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.UUID
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SessionScreen(
     permissions: Set<String>,
@@ -113,11 +115,11 @@ fun SessionScreen(
                 )
             }
         }
-    ) { paddingValues ->
+    ) {
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 0.dp, bottom = paddingValues.calculateBottomPadding()),
+                .fillMaxSize(),
+                //.padding(top = 0.dp, bottom = paddingValues.calculateBottomPadding()),
             horizontalAlignment = if (!permissionsGranted) {
                 Alignment.CenterHorizontally
             } else {

@@ -38,44 +38,34 @@ fun SetupSessionScreen(
     onSharedViewModelChange: (ActivitySessionViewModel) -> Unit,
     onSharedTitleChange: (Int) -> Unit
 ) {
-    /*
-    composable(
-        screen.route,
-        enterTransition = enterTransition,
-        exitTransition = exitTransition
-    ) {
+    // Aggiorna il ViewModel e il titolo condiviso
+    onSharedViewModelChange(activityViewModel)
+    onSharedTitleChange(screen.titleId)
 
-     */
+    val permissionsGranted by activityViewModel.permissionsGranted
+    val permissions = activityViewModel.permissions
+    val onPermissionsResult = { activityViewModel.initialLoad() }
+    val permissionsLauncher =
+        rememberLauncherForActivityResult(activityViewModel.permissionsLauncher) {
+            onPermissionsResult()
+        }
 
+    // Aggiorna lo stack delle schermate
+    screenStack.add(screen.route)
+    Log.d("PedroNavigation", "Current screen stack: $screenStack")
 
-        // Aggiorna il ViewModel e il titolo condiviso
-        onSharedViewModelChange(activityViewModel)
-        onSharedTitleChange(screen.titleId)
-
-        val permissionsGranted by activityViewModel.permissionsGranted
-        val permissions = activityViewModel.permissions
-        val onPermissionsResult = { activityViewModel.initialLoad() }
-        val permissionsLauncher =
-            rememberLauncherForActivityResult(activityViewModel.permissionsLauncher) {
-                onPermissionsResult()
-            }
-
-        // Aggiorna lo stack delle schermate
-        screenStack.add(screen.route)
-        Log.d("PedroNavigation", "Current screen stack: $screenStack")
-
-        SessionScreen(
-            permissions = permissions,
-            permissionsGranted = permissionsGranted,
-            uiState = activityViewModel.uiState,
-            onError = { exception ->
-                showExceptionSnackbar(snackbarHostState, scope, exception)
-            },
-            onPermissionsResult = onPermissionsResult,
-            onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
-            navController = navController,
-            titleId = topBarTitle,
-            viewModel = activityViewModel
-        )
+    SessionScreen(
+        permissions = permissions,
+        permissionsGranted = permissionsGranted,
+        uiState = activityViewModel.uiState,
+        onError = { exception ->
+            showExceptionSnackbar(snackbarHostState, scope, exception)
+        },
+        onPermissionsResult = onPermissionsResult,
+        onPermissionsLaunch = { values -> permissionsLauncher.launch(values) },
+        navController = navController,
+        titleId = topBarTitle,
+        viewModel = activityViewModel
+    )
     //}
 }

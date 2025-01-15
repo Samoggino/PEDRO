@@ -13,7 +13,9 @@ private val DarkColorPalette: ColorScheme = darkColorScheme(
     secondary = PedroBlack,
     primaryContainer = PedroDarkGray,
     secondaryContainer = PedroDark,
-    onSecondaryContainer = PedroLighterGray
+    onSecondaryContainer = PedroLighterGray,
+    onPrimary = PedroLighterYellow,
+    surfaceContainer = PedroBottomBar
 )
 
 private val LightColorPalette: ColorScheme = lightColorScheme(
