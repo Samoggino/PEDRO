@@ -1,179 +1,131 @@
 package com.lam.pedro.presentation.charts
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lam.pedro.data.activity.ActivityEnum
-import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
+import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseSupabaseRepositoryImpl
-import com.lam.pedro.util.placeholder
-import kotlinx.coroutines.delay
+import ir.ehsannarmani.compose_charts.models.Bars
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun ScreenCharts(
-    activityEnum: ActivityEnum,
-    onNavBack: () -> Unit,
-    viewModelCharts: ViewModelCharts = viewModel(
-        factory = ChartsViewModelFactory(
-            uuid = getUUID()!!,
-            activityRepository = ActivitySupabaseSupabaseRepositoryImpl()
-        )
-    )
+fun ActivityChart(
+    chartData: List<Bars>,
+    modifier: Modifier = Modifier
 ) {
-
-    val chartState by viewModelCharts.chartState.observeAsState(ChartState.Loading)
-
-    LaunchedEffect(activityEnum) {
-        Log.i("Charts", "ScreenCharts for $activityEnum")
-        viewModelCharts.loadActivityData(activityEnum)
-    }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = activityEnum.name) },
-                navigationIcon = {
-                    IconButton(onClick = { onNavBack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                }
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(400.dp)
+            .padding(8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        if (chartData.isEmpty()) {
+            Text(
+                text = "No data available",
+                color = Color.Gray,
+                modifier = Modifier.align(Alignment.Center)
             )
-        }
-    ) { paddingValues ->
-        PullToRefreshBox(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            onRefresh = {
-                viewModelCharts.loadActivityData(activityEnum)
-            },
-            isRefreshing = chartState is ChartState.Loading
-        ) {
-
-
-            Column {
-                MetricSelector(
-                    onMetricChange = { metric ->
-                        viewModelCharts.changeMetric(metric)
-                    },
-                    activityEnum = activityEnum
-                )
-                ChartContent(chartState = chartState, activityEnum = activityEnum)
-            }
+        } else {
+            BarChart(
+                chartData = chartData,
+                modifier = Modifier.fillMaxSize()
+            )
         }
     }
 }
 
+
 @Composable
-fun ChartContent(
-    activityEnum: ActivityEnum,
-    chartState: ChartState,
-    modifier: Modifier =
-        Modifier
-            .fillMaxWidth()
-            .height(600.dp)
-            .placeholder(
-                isLoading = chartState is ChartState.Loading,
-                showShimmerAnimation = true,
-                backgroundColor = activityEnum.color
-            )
+fun StaticActivityChart(
+    metric: LabelMetrics,
+    activities: List<GenericActivity>,
+    modifier: Modifier = Modifier
 ) {
+
+    val viewModel: ViewModelCharts = viewModel(
+        factory = ChartsViewModelFactory(
+            activityRepository = ActivitySupabaseSupabaseRepositoryImpl()
+        )
+    )
+
+    // Trasforma le attività in dati per il grafico
+    val chartData = remember(activities, metric) {
+        viewModel.buildBarsList(activities, metric)
+    }
+
+    ActivityChart(
+        chartData = chartData,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun FetchingActivityChart(
+    activityEnum: ActivityEnum,
+    metric: LabelMetrics,
+    viewModelCharts: ViewModelCharts = viewModel(
+        factory = ChartsViewModelFactory(
+            activityRepository = ActivitySupabaseSupabaseRepositoryImpl()
+        )
+    ),
+    modifier: Modifier = Modifier
+) {
+    // Carica i dati al montaggio del Composable
+    LaunchedEffect(activityEnum, metric) {
+        Log.i("FetchingActivityChart", "Loading data for $activityEnum with metric $metric")
+        viewModelCharts.loadActivityData(activityEnum, metric)
+    }
+
+    // Osserva lo stato dei dati dal ViewModel
+    val chartState by viewModelCharts.chartState.observeAsState(ChartState.Loading)
+
     Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
+        modifier = modifier
+            .fillMaxWidth()
+            .height(400.dp)
+            .padding(8.dp)
     ) {
         when (chartState) {
             is ChartState.Loading -> {
-                // do nothing. Placeholder is already shown
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = activityEnum.color
+                )
             }
 
             is ChartState.Success -> {
-
-                val chartsData = chartState.data
-
-                if (chartsData.isEmpty()) {
-                    Text("No data available", color = Color.White)
-                } else {
-                    var showFirstChart by remember { mutableStateOf(false) }
-                    var showSecondChart by remember { mutableStateOf(false) }
-
-                    LazyColumn {
-                        item {
-                            AnimatedVisibility(
-                                visible = showFirstChart,
-                                enter = fadeIn() + scaleIn(
-                                    animationSpec = spring(
-                                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                                        stiffness = Spring.StiffnessLow
-                                    )
-                                ),
-                                exit = fadeOut() + scaleOut()
-                            ) {
-                                BarChart(chartsData)
-                            }
-                        }
-                        item {
-                            AnimatedVisibility(
-                                visible = showSecondChart,
-                                enter = fadeIn() + scaleIn(
-                                    animationSpec = spring(
-                                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                                        stiffness = Spring.StiffnessLow
-                                    )
-                                ),
-                                exit = fadeOut() + scaleOut()
-                            ) {
-                                MyRowChart(chartsData)
-                            }
-                        }
-                    }
-
-                    LaunchedEffect(Unit) {
-                        showFirstChart = true // Show the first chart immediately
-                        delay(500) // Example delay before showing the second chart
-                        showSecondChart = true
-                    }
-                }
+                val chartsData = (chartState as ChartState.Success).data
+                ActivityChart(
+                    chartData = chartsData,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
 
-            is ChartState.Error -> Text("Error: ${chartState.error}", color = Color.Red)
+            is ChartState.Error -> {
+                val error = (chartState as ChartState.Error).message
+                Text(
+                    text = "Error: $error",
+                    color = Color.Red,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
         }
     }
 }

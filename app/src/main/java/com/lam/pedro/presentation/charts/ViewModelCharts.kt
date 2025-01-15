@@ -1,7 +1,8 @@
 package com.lam.pedro.presentation.charts
 
 import android.util.Log
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ViewModelCharts(
-    private val uuid: String = getUUID()!!,
     private val activityRepository: ActivitySupabaseSupabaseRepositoryImpl // Aggiungi il repository come dipendenza
 ) : ViewModel() {
 
@@ -33,28 +33,35 @@ class ViewModelCharts(
     /**
      * Carica i dati iniziali e salva la lista di attività in cache
      */
-    fun loadActivityData(activityEnum: ActivityEnum) {
+    fun loadActivityData(
+        activityEnum: ActivityEnum,
+        metric: LabelMetrics,
+        uuid: String = getUUID()!!
+    ) {
         _chartState.value = ChartState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                activities = activityRepository.getActivitySession(
-                    activityEnum,
-                    uuid
-                ) // Usa il repository
+                activities = activityRepository.getActivitySession(activityEnum, uuid)
+
                 if (activities.isEmpty()) {
-                    _chartState.postValue(ChartState.Error(ChartError.NoData))
+                    _chartState.postValue(ChartState.Error(ChartError.NoData, "No data available"))
                 } else {
                     _chartState.postValue(
                         ChartState.Success(
                             buildBarsList(
                                 activities,
-                                selectedMetric
+                                metric // Usa la metrica passata come parametro
                             )
                         )
                     )
                 }
             } catch (e: Exception) {
-                _chartState.postValue(ChartState.Error(ChartError.DataError("Error loading data: ${e.message}")))
+                _chartState.postValue(
+                    ChartState.Error(
+                        ChartError.DataError("Error loading data: ${e.message}"),
+                        e.message ?: "Unknown error"
+                    )
+                )
             }
         }
     }
@@ -101,39 +108,44 @@ class ViewModelCharts(
     /**
      * Genera la lista delle barre mensili per le attività selezionate.
      */
-    private fun buildBarsList(
+    fun buildBarsList(
         activities: List<GenericActivity>,
         selectedMetric: LabelMetrics
     ): List<Bars> {
         val monthlyData = mutableMapOf<Int, MutableList<Double>>()
 
+        // Popola la mappa con i dati delle attività
         for (activity in activities) {
             val month = activity.basicActivity.startTime.toMonthNumber()
             val value = calculateMetricValue(
                 selectedMetric,
                 activity
-            ) // Extract calculation to a separate function
+            )
             monthlyData.getOrPut(month) { mutableListOf() }.add(value)
         }
 
-        return monthlyData.entries.sortedBy { it.key }.map { (month, values) ->
+        // Crea la lista di Bars, aggiungendo un mese con valore zero se non esistono dati per quel mese
+        val allMonths = (1..12) // Considera tutti i mesi dell'anno
+        val completeMonthlyData = allMonths.map { month ->
+            val values =
+                monthlyData.getOrElse(month) { mutableListOf(0.0) } // Aggiungi zero se non ci sono dati
             Bars(
                 label = month.toString(),
                 values = listOf(
                     Bars.Data(
                         label = selectedMetric.toString(),
                         value = values.sum(),
-                        color = Brush.verticalGradient(
-                            colors = listOf(
-                                activities[0].activityEnum.color,
-                                activities[0].activityEnum.color
-                            )
-                        )
+                        color = SolidColor(
+                            activities.getOrNull(0)?.activityEnum?.color ?: Color.Gray
+                        ) // Usa SolidColor invece di Brush.verticalGradient
                     )
                 )
             )
         }
+
+        return completeMonthlyData
     }
+
 }
 
 sealed class ChartError {
@@ -144,7 +156,7 @@ sealed class ChartError {
 sealed class ChartState {
     data object Loading : ChartState()
     data class Success(val data: List<Bars>) : ChartState()
-    data class Error(val error: ChartError) : ChartState()
+    data class Error(val error: ChartError, val message: String) : ChartState()
 }
 
 fun getAvailableMetricsForActivity(activityEnum: ActivityEnum) =
@@ -156,16 +168,12 @@ fun getAvailableMetricsForActivity(activityEnum: ActivityEnum) =
     }
 
 class ChartsViewModelFactory(
-    private val uuid: String,
     private val activityRepository: ActivitySupabaseSupabaseRepositoryImpl
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ViewModelCharts::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return ViewModelCharts(
-                uuid,
-                activityRepository
-            ) as T
+            return ViewModelCharts(activityRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

@@ -42,7 +42,7 @@ fun BarChart(
         TextStyle(
             fontSize = 12.sp,
             color = Color.White,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Light,
             textAlign = TextAlign.Center,
         )
     }

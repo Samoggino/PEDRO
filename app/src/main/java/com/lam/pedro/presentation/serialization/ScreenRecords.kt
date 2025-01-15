@@ -38,7 +38,6 @@ import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseSupabaseRe
 @Composable
 fun MyScreenRecords(
     onNavBack: () -> Unit,
-    onActivityClick: (ActivityEnum) -> Unit,
     onCommunityClick: () -> Unit,
     viewModel: MyRecordsViewModel = viewModel(
         factory = MyScreenRecordsFactory(
@@ -76,7 +75,6 @@ fun MyScreenRecords(
                 ActivityRow(
                     activityEnum = activityType,
                     onInsertClick = { viewModel.insertActivitySession(activityType) },
-                    onGetClick = { onActivityClick(activityType) }
                 )
             }
 
@@ -120,7 +118,6 @@ fun NavButtons(onCommunityClick: () -> Unit) {
 fun ActivityRow(
     activityEnum: ActivityEnum,
     onInsertClick: () -> Unit,
-    onGetClick: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -135,14 +132,6 @@ fun ActivityRow(
             Text("Insert ${activityEnum.name}")
         }
 
-        Button(
-            onClick = onGetClick,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = activityEnum.color // Cambia il colore del bottone
-            )
-        ) {
-            Text("Get ${activityEnum.name}")
-        }
     }
 }
 

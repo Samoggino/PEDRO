@@ -86,6 +86,7 @@ fun PedroApp() {
         floatingActionButton = {
             if (currentRoute == Screen.ActivitiesScreen.route) {
                 ExtendedFloatingActionButton(
+                    // TODO: da togliere, ovviamente
                     onClick = { navController.navigate(Screen.MyScreenRecords.route) },
                     icon = { Icon(Icons.Filled.Add, "Add Activity") },
                     text = { Text(text = "New Activity") },

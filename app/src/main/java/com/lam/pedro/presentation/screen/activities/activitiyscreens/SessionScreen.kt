@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.lam.pedro.R
 import com.lam.pedro.data.CarouselItem
+import com.lam.pedro.presentation.charts.getAvailableMetricsForActivity
 import com.lam.pedro.presentation.component.ActivityScreenHeader
 import com.lam.pedro.presentation.component.DisplayGraph
 import com.lam.pedro.presentation.component.PermissionRequired
@@ -134,17 +135,10 @@ fun SessionScreen(
                         }
 
                          */
-                        val items = remember {
-                            listOf(
-                                CarouselItem(0, "Chart one"),
-                                CarouselItem(1, "Chart two"),
-                                CarouselItem(2, "Chart three"),
-                                CarouselItem(3, "Chart four"),
-                                CarouselItem(4, "Chart five"),
-                            )
-                        }
 
-                        DisplayGraph(items)
+                        val availableMetrics =
+                            getAvailableMetricsForActivity(viewModel.activityEnum)
+                        DisplayGraph(items = sessionList, availableMetrics = availableMetrics)
 
                         Spacer(modifier = Modifier.height(30.dp))
                         //-------------------------------------------------

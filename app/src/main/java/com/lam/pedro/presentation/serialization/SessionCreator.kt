@@ -9,6 +9,17 @@ import androidx.health.connect.client.units.Length
 import androidx.health.connect.client.units.Velocity
 import androidx.health.connect.client.units.Volume
 import com.lam.pedro.data.activity.ActivityEnum
+import com.lam.pedro.data.activity.ActivityEnum.CYCLING
+import com.lam.pedro.data.activity.ActivityEnum.DRIVE
+import com.lam.pedro.data.activity.ActivityEnum.LIFT
+import com.lam.pedro.data.activity.ActivityEnum.LISTEN
+import com.lam.pedro.data.activity.ActivityEnum.RUN
+import com.lam.pedro.data.activity.ActivityEnum.SIT
+import com.lam.pedro.data.activity.ActivityEnum.SLEEP
+import com.lam.pedro.data.activity.ActivityEnum.TRAIN
+import com.lam.pedro.data.activity.ActivityEnum.UNKNOWN
+import com.lam.pedro.data.activity.ActivityEnum.WALK
+import com.lam.pedro.data.activity.ActivityEnum.YOGA
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.GenericActivity.BasicActivity
 import com.lam.pedro.data.activity.GenericActivity.CyclingSession
@@ -229,45 +240,49 @@ object SessionCreator {
     // Configura i tuoi tipi di attività
 
     val activityConfigs = mapOf(
-        ActivityEnum.YOGA to ActivityConfig(
+        YOGA to ActivityConfig(
             responseType = YogaSession::class,
             sessionCreator = ::createYogaSession
         ),
-        ActivityEnum.RUN to ActivityConfig(
+        RUN to ActivityConfig(
             responseType = RunSession::class,
             sessionCreator = ::createRunSession
         ),
-        ActivityEnum.LISTEN to ActivityConfig(
+        LISTEN to ActivityConfig(
             responseType = ListenSession::class,
             sessionCreator = ::createListenSession
         ),
-        ActivityEnum.LIFT to ActivityConfig(
+        LIFT to ActivityConfig(
             responseType = LiftSession::class,
             sessionCreator = ::createLiftSession
         ),
-        ActivityEnum.SIT to ActivityConfig(
+        SIT to ActivityConfig(
             responseType = SitSession::class,
             sessionCreator = ::createSitSession
         ),
-        ActivityEnum.CYCLING to ActivityConfig(
+        CYCLING to ActivityConfig(
             responseType = CyclingSession::class,
             sessionCreator = ::createCyclingSession
         ),
-        ActivityEnum.TRAIN to ActivityConfig(
+        TRAIN to ActivityConfig(
             responseType = TrainSession::class,
             sessionCreator = ::createTrainSession
         ),
-        ActivityEnum.DRIVE to ActivityConfig(
+        DRIVE to ActivityConfig(
             responseType = DriveSession::class,
             sessionCreator = ::createDriveSession
         ),
-        ActivityEnum.SLEEP to ActivityConfig(
+        SLEEP to ActivityConfig(
             responseType = SleepSession::class,
             sessionCreator = ::createSleepSession
         ),
-        ActivityEnum.WALK to ActivityConfig(
+        WALK to ActivityConfig(
             responseType = WalkSession::class,
             sessionCreator = ::createWalkSession
+        ),
+        UNKNOWN to ActivityConfig(
+            responseType = UnknownSession::class,
+            sessionCreator = ::createUnknownSession
         )
     )
 
@@ -330,6 +345,10 @@ object SessionCreator {
 
     fun createSleepSession() = createSleepSession(
         basicActivity = createBasicActivity("Sleep Title", "Sleep Notes")
+    )
+
+    fun createUnknownSession() = createUnknownSession(
+        basicActivity = createBasicActivity("Unknown Title", "Unknown Notes")
     )
 
     fun createWalkSession() = createWalkSession(

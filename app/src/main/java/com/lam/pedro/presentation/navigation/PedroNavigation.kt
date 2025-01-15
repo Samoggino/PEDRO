@@ -25,9 +25,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.lam.pedro.R
 import com.lam.pedro.data.HealthConnectManager
-import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getMyContext
-import com.lam.pedro.presentation.charts.ScreenCharts
 import com.lam.pedro.presentation.screen.ActivitiesScreen
 import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.MoreScreen
@@ -147,18 +145,20 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
             ) {
                 Log.d("BackStack", "Stack: ${navController.currentBackStackEntry}")
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                MoreScreen(onNavigate = { route -> navController.navigate(route){
-                    popUpTo(
-                        navController.graph.findStartDestination().id
-                    ) {
-                        saveState = true
+                MoreScreen(onNavigate = { route ->
+                    navController.navigate(route) {
+                        popUpTo(
+                            navController.graph.findStartDestination().id
+                        ) {
+                            saveState = true
+                        }
+                        // Avoid multiple copies of the same destination when
+                        // reselecting the same item
+                        launchSingleTop = true
+                        // Restore state when reselecting a previously selected item
+                        restoreState = true
                     }
-                    // Avoid multiple copies of the same destination when
-                    // reselecting the same item
-                    launchSingleTop = true
-                    // Restore state when reselecting a previously selected item
-                    restoreState = true
-                } })
+                })
             }
             composable(
                 route = Screen.ProfileScreen.route,
@@ -441,24 +441,10 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
             composable(Screen.MyScreenRecords.route) {
                 MyScreenRecords(
                     onNavBack = { onNavBack() },
-                    onActivityClick = { activityEnum ->
-                        navController.navigate(Screen.ChartsScreen.route + "/${activityEnum.name}")
-                    },
                     onCommunityClick = { navController.navigate(Screen.CommunityScreen.route) }
                 )
             }
 
-            composable(
-                route = Screen.ChartsScreen.route + "/{activityType}",
-                arguments = listOf(navArgument("activityType") { type = NavType.StringType })
-            ) { backStackEntry ->
-
-                ScreenCharts(
-                    activityEnum = ActivityEnum
-                        .valueOf(backStackEntry.arguments?.getString("activityType") ?: ""),
-                    onNavBack = { onNavBack() }
-                )
-            }
 
             composable(
                 route = Screen.CommunityUserDetails.route + "/{userId}",
