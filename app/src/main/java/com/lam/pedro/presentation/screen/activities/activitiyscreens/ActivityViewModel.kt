@@ -27,6 +27,7 @@ import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactiv
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.ListenSessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.SitSessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.SleepSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.unknownactivityviewmodel.UnknownSessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -303,6 +304,12 @@ class GeneralActivityViewModelFactory(
 
             modelClass.isAssignableFrom(SleepSessionViewModel::class.java) -> {
                 (SleepSessionViewModel(
+                    healthConnectManager
+                )) as T
+            }
+
+            modelClass.isAssignableFrom(UnknownSessionViewModel::class.java) -> {
+                (UnknownSessionViewModel(
                     healthConnectManager
                 )) as T
             }

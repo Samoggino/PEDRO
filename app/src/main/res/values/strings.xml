@@ -192,5 +192,6 @@
     <string name="user_activity_recognition_screen">Settings > Activity recognition</string>
     <string name="select_date">select date</string>
     <string name="reset_sessions">reset session</string>
+    <string name="unknown_session_screen">Unknown</string>
 
 </resources>

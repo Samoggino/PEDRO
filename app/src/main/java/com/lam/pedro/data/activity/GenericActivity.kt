@@ -183,4 +183,9 @@ sealed class GenericActivity(
         override val basicActivity: BasicActivity,
     ) : GenericActivity(activityEnum = ActivityEnum.LISTEN), StaticMetric
 
+    @Serializable
+    data class UnknownSession(
+        override val basicActivity: BasicActivity,
+    ) : GenericActivity(activityEnum = ActivityEnum.UNKNOWN), StaticMetric
+
 }

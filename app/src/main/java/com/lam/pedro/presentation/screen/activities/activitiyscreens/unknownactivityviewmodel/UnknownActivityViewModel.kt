@@ -1,42 +1,46 @@
-package com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels
+package com.lam.pedro.presentation.screen.activities.activitiyscreens.unknownactivityviewmodel
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.records.DistanceRecord
+import androidx.health.connect.client.records.ElevationGainedRecord
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
+import androidx.health.connect.client.units.Length
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.data.activity.GenericActivity.ListenSession
+import com.lam.pedro.data.activity.GenericActivity.UnknownSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.serialization.SessionCreator
 import java.time.ZonedDateTime
 
-class ListenSessionViewModel(private val healthConnectManager: HealthConnectManager) :
+class UnknownSessionViewModel(private val healthConnectManager: HealthConnectManager) :
     ActivitySessionViewModel(healthConnectManager), MutableState<ActivitySessionViewModel?> {
 
     //private val healthConnectCompatibleApps = healthConnectManager.healthConnectCompatibleApps
 
-    //override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_GUIDED_BREATHING
-    override lateinit var actualSession: ListenSession
+    //override val activityType: Int = ExerciseSessionRecord.EXERCISE_TYPE_SURFING
+    override lateinit var actualSession: UnknownSession
 
-    override val activityEnum = ActivityEnum.LISTEN
+    override val activityEnum = ActivityEnum.UNKNOWN
 
     /*Define here the required permissions for the Health Connect usage*/
     override val permissions = setOf(
 
         /*
-       * ExerciseSessionRecord
-       * */
+        * ExerciseSessionRecord
+        * */
         HealthPermission.getReadPermission(ExerciseSessionRecord::class),
         HealthPermission.getWritePermission(ExerciseSessionRecord::class),
 
         )
 
     override suspend fun saveSession(activitySession: GenericActivity) {
-        if (activitySession is ListenSession) {
+        if (activitySession is UnknownSession) {
             healthConnectManager.insertListenSession(
                 activityEnum.activityType,
                 activitySession.basicActivity.startTime,
@@ -64,7 +68,7 @@ class ListenSessionViewModel(private val healthConnectManager: HealthConnectMana
         distance: Double,
         exerciseRoute: List<ExerciseRoute.Location>
     ) {
-        this.actualSession = SessionCreator.createListenSession(
+        this.actualSession = SessionCreator.createUnknownSession(
             startTime = startTime.toInstant(),
             endTime = endTime.toInstant(),
             title = activityTitle,

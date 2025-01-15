@@ -61,19 +61,89 @@ fun ActivitiesScreen(
     navController: NavHostController
 ) {
     val staticActivities = listOf(
-        ActivityItem("Sleeping", painterResource(id = ActivityEnum.SLEEP.image), 90.dp, Screen.SleepSessions.route, ActivityEnum.SLEEP.color),
-        ActivityItem("Driving", painterResource(id = ActivityEnum.DRIVE.image), 100.dp, Screen.DriveSessionScreen.route, ActivityEnum.DRIVE.color),
-        ActivityItem("Sitting", painterResource(id = ActivityEnum.SIT.image), 90.dp, Screen.SitSessionScreen.route, ActivityEnum.SIT.color),
-        ActivityItem("Lifting", painterResource(id = ActivityEnum.LIFT.image), 90.dp, Screen.WeightScreen.route, ActivityEnum.LIFT.color),
-        ActivityItem("Listening", painterResource(id = ActivityEnum.LISTEN.image), 90.dp, Screen.ListenSessionScreen.route, ActivityEnum.LISTEN.color)
+        ActivityItem(
+            "Sleeping",
+            painterResource(id = ActivityEnum.SLEEP.image),
+            90.dp,
+            Screen.SleepSessions.route,
+            ActivityEnum.SLEEP.color
+        ),
+        ActivityItem(
+            "Driving",
+            painterResource(id = ActivityEnum.DRIVE.image),
+            100.dp,
+            Screen.DriveSessionScreen.route,
+            ActivityEnum.DRIVE.color
+        ),
+        ActivityItem(
+            "Sitting",
+            painterResource(id = ActivityEnum.SIT.image),
+            90.dp,
+            Screen.SitSessionScreen.route,
+            ActivityEnum.SIT.color
+        ),
+        ActivityItem(
+            "Lifting",
+            painterResource(id = ActivityEnum.LIFT.image),
+            90.dp,
+            Screen.WeightScreen.route,
+            ActivityEnum.LIFT.color
+        ),
+        ActivityItem(
+            "Listening",
+            painterResource(id = ActivityEnum.LISTEN.image),
+            90.dp,
+            Screen.ListenSessionScreen.route,
+            ActivityEnum.LISTEN.color
+        )
     )
 
     val dynamicActivities = listOf(
-        ActivityItem("Running", painterResource(id = ActivityEnum.RUN.image), 90.dp, Screen.RunSessionScreen.route, ActivityEnum.RUN.color),
-        ActivityItem("Walking", painterResource(id = ActivityEnum.WALK.image), 90.dp, Screen.WalkSessionScreen.route, ActivityEnum.WALK.color),
-        ActivityItem("Yoga", painterResource(id = ActivityEnum.YOGA.image), 90.dp, Screen.YogaSessionScreen.route, ActivityEnum.YOGA.color),
-        ActivityItem("Cycling", painterResource(id = ActivityEnum.CYCLING.image), 90.dp, Screen.CycleSessionScreen.route, ActivityEnum.CYCLING.color),
-        ActivityItem("Training", painterResource(id = ActivityEnum.TRAIN.image), 90.dp, Screen.TrainSessionScreen.route, ActivityEnum.TRAIN.color)
+        ActivityItem(
+            "Running",
+            painterResource(id = ActivityEnum.RUN.image),
+            90.dp,
+            Screen.RunSessionScreen.route,
+            ActivityEnum.RUN.color
+        ),
+        ActivityItem(
+            "Walking",
+            painterResource(id = ActivityEnum.WALK.image),
+            90.dp,
+            Screen.WalkSessionScreen.route,
+            ActivityEnum.WALK.color
+        ),
+        ActivityItem(
+            "Yoga",
+            painterResource(id = ActivityEnum.YOGA.image),
+            90.dp,
+            Screen.YogaSessionScreen.route,
+            ActivityEnum.YOGA.color
+        ),
+        ActivityItem(
+            "Cycling",
+            painterResource(id = ActivityEnum.CYCLING.image),
+            90.dp,
+            Screen.CycleSessionScreen.route,
+            ActivityEnum.CYCLING.color
+        ),
+        ActivityItem(
+            "Training",
+            painterResource(id = ActivityEnum.TRAIN.image),
+            90.dp,
+            Screen.TrainSessionScreen.route,
+            ActivityEnum.TRAIN.color
+        )
+    )
+
+    val unknownActivity = listOf(
+        ActivityItem(
+            "Unknown",
+            painterResource(id = ActivityEnum.UNKNOWN.image),
+            90.dp,
+            Screen.UnknownSessionScreen.route,
+            ActivityEnum.UNKNOWN.color
+        )
     )
 
     LazyColumn(
@@ -99,6 +169,15 @@ fun ActivitiesScreen(
             Spacer(modifier = Modifier.height(10.dp))
             ActivitiesGrid(navController, dynamicActivities)
             Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(30.dp))
+            Text(
+                text = "Unknown",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            ActivitiesGrid(navController, unknownActivity)
+            Spacer(modifier = Modifier.height(40.dp))
         }
     }
 

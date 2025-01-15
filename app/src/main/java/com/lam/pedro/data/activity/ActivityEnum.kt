@@ -76,11 +76,17 @@ enum class ActivityEnum(
     SLEEP(
         color = SleepColor,
         image = R.drawable.sleeping_icon,
-        activityType = ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT
+        activityType = ExerciseSessionRecord.EXERCISE_TYPE_WATER_POLO
     ),
     LISTEN(
         color = ListenColor,
         image = R.drawable.headphones_icon,
         activityType = ExerciseSessionRecord.EXERCISE_TYPE_GUIDED_BREATHING
+    ),
+    UNKNOWN(
+        color = Color.Black,
+        image = R.drawable.unknown_icon,
+        activityType = ExerciseSessionRecord.EXERCISE_TYPE_OTHER_WORKOUT
+
     )
 }

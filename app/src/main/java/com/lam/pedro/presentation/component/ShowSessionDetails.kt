@@ -172,6 +172,12 @@ fun ShowSessionDetails(session: GenericActivity, color: Color) {
             is SleepSession -> {
                 //nothing else to display
             }
+
+            is UnknownSession -> {
+                item {
+                    Text(text = "Questa è una sessione sconosciuta.")
+                }
+            }
         }
     }
 }

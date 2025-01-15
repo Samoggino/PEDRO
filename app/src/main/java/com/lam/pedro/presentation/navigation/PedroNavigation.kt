@@ -48,6 +48,7 @@ import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactiv
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.ListenSessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.SitSessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.SleepSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.unknownactivityviewmodel.UnknownSessionViewModel
 import com.lam.pedro.presentation.screen.activities.newActivity.NewActivityScreen
 import com.lam.pedro.presentation.screen.community.CommunityScreen
 import com.lam.pedro.presentation.screen.loginscreen.LoginScreen
@@ -525,6 +526,35 @@ fun PedroNavigation(
                 )
                 SetupSessionScreen(
                     screen = Screen.TrainSessionScreen,
+                    activityViewModel = activityViewModel,
+                    navController = navController,
+                    snackbarHostState = snackbarHostState,
+                    scope = scope,
+                    topBarTitle = topBarTitle,
+                    //enterTransition = enterTransition,
+                    //exitTransition = exitTransition,
+                    screenStack = screenStack,
+                    onSharedViewModelChange = { viewModel ->
+                        sharedViewModel = viewModel
+                    },
+                    onSharedTitleChange = { titleId ->
+                        sharedTitle = titleId
+                    }
+                )
+            }
+
+            composable(
+                Screen.UnknownSessionScreen.route,
+                enterTransition = enterTransition,
+                exitTransition = exitTransition
+            ) {
+                val activityViewModel: UnknownSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory(
+                        healthConnectManager = healthConnectManager
+                    )
+                )
+                SetupSessionScreen(
+                    screen = Screen.UnknownSessionScreen,
                     activityViewModel = activityViewModel,
                     navController = navController,
                     snackbarHostState = snackbarHostState,
