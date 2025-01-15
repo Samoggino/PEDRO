@@ -32,6 +32,8 @@ import com.lam.pedro.presentation.theme.PedroDarkGray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -82,4 +84,16 @@ fun Modifier.placeholder(
         shape = shape,
         highlight = highlight
     )
+}
+
+// Funzione per formattare l'Instant
+fun formatInstant(instant: Instant): String {
+    // Converte Instant in LocalDateTime utilizzando il fuso orario di sistema
+    val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+
+    // Crea un formatter per la data e l'ora
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yy|HH:mm")
+
+    // Restituisce la data formattata come stringaW
+    return localDateTime.format(formatter)
 }
