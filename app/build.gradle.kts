@@ -205,6 +205,7 @@ dependencies {
     implementation(libs.androidx.security.crypto)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.storage)
+    implementation(libs.androidx.core.splashscreen)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

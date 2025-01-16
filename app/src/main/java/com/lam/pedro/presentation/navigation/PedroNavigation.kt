@@ -57,6 +57,7 @@ import com.lam.pedro.presentation.screen.more.PrivacyPolicyScreen
 import com.lam.pedro.presentation.screen.more.settingsscreen.SettingsScreen
 import com.lam.pedro.presentation.screen.more.settingsscreen.UserActivityRecognitionScreen
 import com.lam.pedro.presentation.screen.profile.ProfileScreen
+import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.serialization.MyScreenRecords
 import com.lam.pedro.presentation.serialization.ViewModelRecordFactory
 import kotlinx.coroutines.launch
@@ -68,7 +69,8 @@ fun PedroNavigation(
     navController: NavHostController,
     healthConnectManager: HealthConnectManager,
     snackbarHostState: SnackbarHostState,
-    topBarTitle: Int
+    topBarTitle: Int,
+    profileViewModel: ProfileViewModel
 ) {
 
     val fadeInTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? =
@@ -173,7 +175,7 @@ fun PedroNavigation(
             ) {
                 screenStack.add(Screen.ProfileScreen.route)
                 logScreenStack()
-                ProfileScreen(navController, topBarTitle)
+                ProfileScreen(navController, topBarTitle, profileViewModel)
             }
             composable(
                 Screen.AboutScreen.route,

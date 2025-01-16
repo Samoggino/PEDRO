@@ -40,6 +40,7 @@ import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.R
 import com.lam.pedro.presentation.navigation.BottomBar
 import com.lam.pedro.presentation.navigation.PedroNavigation
+import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.theme.PedroTheme
 import com.lam.pedro.util.notification.NotificationsFunctionality
 
@@ -48,7 +49,7 @@ const val TAG = "Health Connect sample"
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
-fun PedroApp(healthConnectManager: HealthConnectManager) {
+fun PedroApp(healthConnectManager: HealthConnectManager, profileViewModel: ProfileViewModel) {
     PedroTheme {
         val snackbarHostState = remember { SnackbarHostState() }
         val navController = rememberNavController()
@@ -134,12 +135,13 @@ fun PedroApp(healthConnectManager: HealthConnectManager) {
                 }
             }
         ) {
-            Box(modifier = Modifier.padding(0.dp)) {
+            Box(modifier = Modifier.padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 60.dp)) {
                 PedroNavigation(
                     healthConnectManager = healthConnectManager,
                     navController = navController,
                     snackbarHostState = snackbarHostState,
-                    topBarTitle = titleId
+                    topBarTitle = titleId,
+                    profileViewModel = profileViewModel
                 )
             }
         }

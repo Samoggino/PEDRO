@@ -5,6 +5,7 @@ agp = "8.7.3"
 androidSdk = "11.6.1"
 concurrentFuturesKtx = "1.2.0"
 connectClient = "1.1.0-alpha09"
+coreSplashscreen = "1.0.1"
 desugar_jdk_libs = "2.1.2"
 accompanistPlaceholderMaterial = "0.19.0"
 coilCompose = "2.4.0"
@@ -43,6 +44,7 @@ workRuntimeKtx = "2.10.0"
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanistPlaceholderMaterial" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutinesPlayServices" }
 mapLibre = { module = "org.maplibre.gl:android-sdk", version.ref = "androidSdk" }
