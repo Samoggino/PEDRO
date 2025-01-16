@@ -42,11 +42,12 @@ import androidx.navigation.compose.rememberNavController
 import com.lam.pedro.presentation.navigation.BottomBar
 import com.lam.pedro.presentation.navigation.PedroNavigation
 import com.lam.pedro.presentation.navigation.Screen
+import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 
 const val TAG = "Health Connect sample"
 
 @Composable
-fun PedroApp() {
+fun PedroApp( profileViewModel: ProfileViewModel) {
 
     Log.i("PedroApp", "PedroApp reloaded")
     val snackbarHostState = remember { SnackbarHostState() }
@@ -121,7 +122,8 @@ fun PedroApp() {
         Box(modifier = Modifier.padding(rememberedPaddingValues)) {
             PedroNavigation(
                 navController = navController,
-                snackbarHostState = snackbarHostState
+                snackbarHostState = snackbarHostState,
+                profileViewModel = profileViewModel
             )
         }
     }

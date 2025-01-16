@@ -31,7 +31,11 @@ android {
             "SUPABASE_SERVICE_ROLE",
             "\"${properties.getProperty("SUPABASE_SERVICE_ROLE")}\""
         )
-        buildConfigField("String", "MAPLIBRE_ACCESS_TOKEN", "\"${properties.getProperty("MAPLIBRE_ACCESS_TOKEN")}\"")
+        buildConfigField(
+            "String",
+            "MAPLIBRE_ACCESS_TOKEN",
+            "\"${properties.getProperty("MAPLIBRE_ACCESS_TOKEN")}\""
+        )
 
     }
 
@@ -60,7 +64,6 @@ android {
 
 dependencies {
 
-    // Kotlin
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -79,6 +82,7 @@ dependencies {
     implementation(libs.androidx.security.crypto)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.storage)
+    implementation(libs.androidx.core.splashscreen)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -89,7 +93,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.material.icons.extended)
-
 
     implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.play.services)

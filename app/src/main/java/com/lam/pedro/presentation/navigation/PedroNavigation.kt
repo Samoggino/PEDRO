@@ -44,6 +44,7 @@ import com.lam.pedro.presentation.screen.more.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.RegisterScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.User
 import com.lam.pedro.presentation.screen.profile.ProfileScreen
+import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.serialization.MyScreenRecords
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,7 +52,11 @@ import kotlinx.coroutines.launch
 /** Provides the navigation in the app. */
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun PedroNavigation(navController: NavHostController, snackbarHostState: SnackbarHostState) {
+fun PedroNavigation(
+    navController: NavHostController,
+    snackbarHostState: SnackbarHostState,
+    profileViewModel: ProfileViewModel
+) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     // Mappa costruita dinamicamente dagli elementi dell'enum Screen
@@ -168,7 +173,8 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
                 logScreenStack()
                 ProfileScreen(
                     titleId = getTitleIdForRoute(currentRoute),
-                    onNavBack = { onNavBack() }
+                    onNavBack = { onNavBack() },
+                    profileViewModel = profileViewModel
                 )
             }
             composable(
