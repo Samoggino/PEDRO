@@ -1,6 +1,7 @@
 package com.lam.pedro.util.services
 
 import android.Manifest
+import android.app.ActivityManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -30,6 +31,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+
 class ActivityRecognitionService : Service() {
 
     private lateinit var manager: UserActivityTransitionManager
@@ -40,9 +42,11 @@ class ActivityRecognitionService : Service() {
     private var currentNotificationText: String = "Monitoring user activity...\nNo new data."
 
 
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate() {
         super.onCreate()
+        isServiceRunning = true
         manager = UserActivityTransitionManager(this)
 
         // Inizializza il Handler per aggiornare la notifica ogni 10 secondi
@@ -91,6 +95,17 @@ class ActivityRecognitionService : Service() {
         registerReceiver(receiver, intentFilter, Context.RECEIVER_NOT_EXPORTED)
     }
 
+    fun isServiceRunning(serviceClass: Class<out Service>): Boolean {
+        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val runningServices = manager.getRunningServices(Int.MAX_VALUE)
+
+        for (service in runningServices) {
+            if (service.service.className == serviceClass.name) {
+                return true
+            }
+        }
+        return false
+    }
 
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -159,6 +174,8 @@ class ActivityRecognitionService : Service() {
     override fun onDestroy() {
         super.onDestroy()
 
+        isServiceRunning = false
+
         handler.removeCallbacks(updateRunnable)
 
         unregisterReceiver(receiver)
@@ -181,5 +198,6 @@ class ActivityRecognitionService : Service() {
 
     companion object {
         const val NOTIFICATION_ID = 3
+        var isServiceRunning = false
     }
 }

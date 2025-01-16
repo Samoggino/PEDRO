@@ -9,7 +9,9 @@ import android.os.Build
 import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -33,6 +35,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavHostController
 import com.lam.pedro.data.datasource.activityRecognition.UserActivityTransitionManager
+import com.lam.pedro.presentation.component.ActivityRecognitionButton
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.CustomSnackbarHost
 import com.lam.pedro.presentation.component.PermissionBox
@@ -44,11 +47,8 @@ import kotlinx.coroutines.launch
 @SuppressLint("MissingPermission")
 @Composable
 fun UserActivityRecognitionScreen(navController: NavHostController, titleId: Int) {
-    val activityPermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+    val activityPermission =
         Manifest.permission.ACTIVITY_RECOGNITION
-    } else {
-        "com.google.android.gms.permission.ACTIVITY_RECOGNITION"
-    }
 
     PermissionBox(permissions = listOf(activityPermission)) {
         UserActivityRecognitionContent(navController, titleId)
@@ -118,38 +118,8 @@ fun UserActivityRecognitionContent(navController: NavHostController, titleId: In
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Button(
-                onClick = {
-                    if (ContextCompat.checkSelfPermission(
-                            context,
-                            Manifest.permission.ACTIVITY_RECOGNITION
-                        ) == PackageManager.PERMISSION_GRANTED
-                    ) {
-                        // Il permesso è già concesso: avvia il servizio
-                        context.startForegroundService(Intent(context, ActivityRecognitionService::class.java))
-                    } else {
-                        // Richiedi il permesso all'utente
-                        ActivityCompat.requestPermissions(
-                            context as Activity,
-                            arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
-                            1002
-                        )
-                    }
-                }
-            ) {
-                Text(text = "Start Activity Recognition Service")
-            }
-            Button(
-                onClick = {
-                    currentUserActivity = ""
-                    transitionHistory.clear()
 
-                    val stopServiceIntent = Intent(context, ActivityRecognitionService::class.java)
-                    context.stopService(stopServiceIntent)
-                },
-            ) {
-                Text(text = "Stop Monitoring Activity Transitions")
-            }
+            ActivityRecognitionButton(context)
 
             if (currentUserActivity.isNotBlank()) {
                 Text(
@@ -176,3 +146,4 @@ fun UserActivityRecognitionContent(navController: NavHostController, titleId: In
         }
     }
 }
+
