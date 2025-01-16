@@ -35,10 +35,6 @@ fun SetupSessionScreen(
             onPermissionsResult()
         }
 
-    // Aggiorna lo stack delle schermate
-//    screenStack.add(screen.route)
-//    Log.d("PedroNavigation", "Current screen stack: $screenStack")
-
     SessionScreen(
         permissions = permissions,
         permissionsGranted = permissionsGranted,

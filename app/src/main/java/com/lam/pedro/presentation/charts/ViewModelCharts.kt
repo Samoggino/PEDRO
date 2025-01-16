@@ -1,6 +1,5 @@
 package com.lam.pedro.presentation.charts
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -79,22 +78,6 @@ class ViewModelCharts(
 
 
     /**
-     * Cambia la metrica selezionata e aggiorna il grafico
-     */
-
-    fun changeMetric(newMetric: LabelMetrics, timePeriod: TimePeriod) {
-        if (chartState.value is ChartState.Loading) return // Avoid changing metric while loading
-
-        selectedMetric = newMetric
-        Log.d("Charts", "Cambio metrica: $selectedMetric")
-
-        // Update chartState with new data
-        _chartState.value =
-            ChartState.Success(buildBarsList(activities, selectedMetric, timePeriod))
-    }
-
-
-    /**
      * Calcola il valore della metrica selezionata.
      */
     private fun calculateMetricValue(
@@ -115,10 +98,6 @@ class ViewModelCharts(
 
             LabelMetrics.DURATION -> duration
         }
-    }
-
-    enum class TimePeriod {
-        DAILY, WEEKLY, MONTHLY
     }
 
 
@@ -180,16 +159,6 @@ class ViewModelCharts(
 
 }
 
-sealed class ChartError {
-    data class DataError(val message: String) : ChartError()
-    data object NoData : ChartError()
-}
-
-sealed class ChartState {
-    data object Loading : ChartState()
-    data class Success(val data: Map<String, Double>) : ChartState()
-    data class Error(val error: ChartError, val message: String) : ChartState()
-}
 
 fun getAvailableMetricsForActivity(activityEnum: ActivityEnum) =
     when {

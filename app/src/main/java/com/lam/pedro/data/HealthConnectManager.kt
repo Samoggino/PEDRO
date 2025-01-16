@@ -118,20 +118,20 @@ class HealthConnectManager(private val context: Context = getMyContext()) {
         healthConnectClient.permissionController.revokeAllPermissions()
     }
 
-    /*
+    /**
     /**
      * Obtains a list of [ExerciseSessionRecord]s in a specified time frame. An Exercise Session Record is a
      * period of time given to an activity, that would make sense to a user, e.g. "Afternoon run"
      * etc. It does not necessarily mean, however, that the user was *running* for that entire time,
      * more that conceptually, this was the activity being undertaken.
-     */
+    */
     suspend fun readExerciseSessions(start: Instant, end: Instant): List<ExerciseSessionRecord> {
-        val request = ReadRecordsRequest(
-            recordType = ExerciseSessionRecord::class,
-            timeRangeFilter = TimeRangeFilter.between(start, end)
-        )
-        val response = healthConnectClient.readRecords(request)
-        return response.records
+    val request = ReadRecordsRequest(
+    recordType = ExerciseSessionRecord::class,
+    timeRangeFilter = TimeRangeFilter.between(start, end)
+    )
+    val response = healthConnectClient.readRecords(request)
+    return response.records
     }
 
      */
@@ -706,7 +706,8 @@ class HealthConnectManager(private val context: Context = getMyContext()) {
         }
     }
 
-    /* Return a list of ExerciseSessionRecord for a given exercise type
+    /**
+     *  Return a list of ExerciseSessionRecord for a given exercise type
      * It will be used to retrive all the related records to build the appropiate ActivitySession
      */
     suspend fun fetchAndBuildActivitySession(

@@ -1,7 +1,5 @@
 package com.lam.pedro.presentation.component
 
-//import com.lam.pedro.data.ExerciseSession
-
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

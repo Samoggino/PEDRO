@@ -25,6 +25,7 @@ import ir.ehsannarmani.compose_charts.models.PopupProperties
 
 @Composable
 fun BarChart(
+    activityColor: Color,
     chartData: Map<String, Double>, // Mappa delle etichette e dei valori
     modifier: Modifier = Modifier
         .height(300.dp)
@@ -48,7 +49,7 @@ fun BarChart(
                     Bars.Data(
                         label = "Metric",
                         value = value,
-                        color = SolidColor(Color.Gray) // Colore statico o dinamico
+                        color = SolidColor(activityColor) // Colore statico o dinamico
                     )
                 )
             )

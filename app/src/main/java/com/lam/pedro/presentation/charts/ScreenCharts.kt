@@ -26,7 +26,8 @@ import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseSupabaseRe
 @Composable
 fun ActivityChart(
     chartData: Map<String, Double>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    activityColor: Color
 ) {
     Box(
         modifier = modifier
@@ -44,7 +45,8 @@ fun ActivityChart(
         } else {
             BarChart(
                 chartData = chartData,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                activityColor = activityColor
             )
         }
     }
@@ -56,7 +58,8 @@ fun StaticActivityChart(
     metric: LabelMetrics,
     activities: List<GenericActivity>,
     modifier: Modifier = Modifier,
-    timePeriod: ViewModelCharts.TimePeriod
+    timePeriod: TimePeriod,
+    activityEnum: ActivityEnum
 ) {
 
     val viewModel: ViewModelCharts = viewModel(
@@ -72,7 +75,8 @@ fun StaticActivityChart(
 
     ActivityChart(
         chartData = chartData,
-        modifier = modifier
+        modifier = modifier,
+        activityColor = activityEnum.color
     )
 }
 
@@ -86,7 +90,7 @@ fun FetchingActivityChart(
         )
     ),
     modifier: Modifier = Modifier,
-    timePeriod: ViewModelCharts.TimePeriod
+    timePeriod: TimePeriod
 ) {
     // Carica i dati al montaggio del Composable
     LaunchedEffect(activityEnum, metric) {
@@ -119,7 +123,8 @@ fun FetchingActivityChart(
                 val chartsData = (chartState as ChartState.Success).data
                 ActivityChart(
                     chartData = chartsData,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    activityColor = activityEnum.color
                 )
             }
 

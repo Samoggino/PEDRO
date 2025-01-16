@@ -195,17 +195,22 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
     }
 
     suspend fun fetchSessions() {
-        val start = Instant.EPOCH // 1st January 1970
-        val now = Instant.now()
+        uiState = UiState.Loading // Imposta lo stato su Loading
+        try {
+            val start = Instant.EPOCH // 1st January 1970
+            val now = Instant.now()
 
-        sessionsList.value =
-            healthConnectManager.fetchAndBuildActivitySession(start, now, activityEnum.activityType)
+            sessionsList.value = healthConnectManager.fetchAndBuildActivitySession(
+                start,
+                now,
+                activityEnum.activityType
+            )
 
-        Log.d("SESSION LIST", "${sessionsList.value}")
-    }
-
-    suspend fun filterSessionsByDay() {
-
+            Log.d("SESSION LIST", "${sessionsList.value}")
+            uiState = UiState.Done // Imposta lo stato su Done quando i dati sono stati recuperati
+        } catch (e: Exception) {
+            uiState = UiState.Error(e) // Gestione degli errori
+        }
     }
 
 
@@ -238,8 +243,9 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
     }
 
     sealed class UiState {
-        object Uninitialized : UiState()
-        object Done : UiState()
+        data object Uninitialized : UiState()
+        data object Done : UiState()
+        data object Loading : UiState()
 
         // A random UUID is used in each Error object to allow errors to be uniquely identified,
         // and recomposition won't result in multiple snackbars.
