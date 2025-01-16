@@ -13,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -46,7 +45,6 @@ import com.lam.pedro.presentation.screen.more.loginscreen.RegisterScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.User
 import com.lam.pedro.presentation.screen.profile.ProfileScreen
 import com.lam.pedro.presentation.serialization.MyScreenRecords
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -61,6 +59,7 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
 
     // Funzione per ottenere il titleId associato al route
     fun getTitleIdForRoute(currentRoute: String?): Int {
+        Log.d("Navigation", "getTitleIdForRoute $currentRoute")
         return routeToTitleMap[currentRoute] ?: R.string.app_name
     }
 
@@ -83,6 +82,7 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
         Log.d("Reload", "Ho cambiato pagina")
     }
 
+//    val context = LocalContext.current
 
     SharedTransitionLayout {
         NavHost(
@@ -227,11 +227,14 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
                 exitTransition = { NavigationTransitions.slideOutHorizontally() }
             ) {
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
-                HealthConnectLauncher(
-                    availability = availability,
+                HealthConnectScreen(
+                    healthConnectAvailability = availability,
+                    onResumeAvailabilityCheck = { healthConnectManager.checkAvailability() },
                     onNavBack = { onNavBack() },
                     titleId = getTitleIdForRoute(currentRoute),
-                    scope = scope
+                    revokeAllPermissions = {
+                        scope.launch(Dispatchers.IO) { healthConnectManager.revokeAllPermissions() }
+                    }
                 )
             }
             composable(
@@ -248,23 +251,24 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
 
 
             composable(
-                route = Screen.NewActivityScreen.route,
+                Screen.NewActivityScreen.route,
                 enterTransition = { NavigationTransitions.fadeIn() },
                 exitTransition = { NavigationTransitions.fadeOut() }
             ) {
-                logScreenStack() // Log dello stack dopo aver aperto la schermata
-                sharedViewModel?.let { it1 ->
-                    sharedColor.let { it2 ->
-                        sharedTitle?.let { it3 ->
+                logScreenStack()
+                sharedViewModel?.let { viewModel ->
+                    sharedColor.let {
+                        sharedTitle?.let { screenTitleId ->
                             NewActivityScreen(
                                 onNavBack = { onNavBack() },
-                                titleId = it3,
-                                viewModel = it1
+                                titleId = screenTitleId,
+                                viewModel = viewModel
                             )
                         }
                     }
                 }
             }
+
 
             composable(
                 Screen.RunSessionScreen.route,
@@ -481,24 +485,3 @@ fun PedroNavigation(navController: NavHostController, snackbarHostState: Snackba
     }
 }
 
-@Composable
-private fun HealthConnectLauncher(
-    availability: Int,
-    onNavBack: () -> Unit,
-    titleId: Int,
-    scope: CoroutineScope
-) {
-
-    val context = LocalContext.current
-    val healthConnectManager = remember { HealthConnectManager(context) }
-
-    HealthConnectScreen(
-        healthConnectAvailability = availability,
-        onResumeAvailabilityCheck = { healthConnectManager.checkAvailability() },
-        onNavBack = onNavBack,
-        titleId = titleId,
-        revokeAllPermissions = {
-            scope.launch(Dispatchers.IO) { healthConnectManager.revokeAllPermissions() }
-        }
-    )
-}

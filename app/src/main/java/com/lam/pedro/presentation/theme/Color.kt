@@ -3,9 +3,11 @@ package com.lam.pedro.presentation.theme
 import androidx.compose.ui.graphics.Color
 
 val PedroYellow = Color(0xFFF2AC00)
-val PedroBlack = Color(0xff0d1c47)
+val PedroLighterYellow = Color(0xFFE0DDD0)
+val PedroBlack = Color(0xFF000000)
 val PedroDark = Color.Black
 val PedroLight = Color(0xFFE7E7E7)
+val PedroBottomBar = Color(0xFF191919)
 
 val PedroDarkGray = Color(0xFF2D2D2D)
 val PedroLightGray = Color(0xFF606060)
@@ -23,3 +25,4 @@ val SleepColor = Color(0xff74c9c6)
 val WalkColor = Color(0xFFfaaf5a)
 val LiftColor = Color(0xFF7771C9)
 val ListenColor = Color(0xFF7199C9)
+val UnknownColor = Color(0xFF94A5A9)

@@ -1,8 +1,6 @@
 package com.lam.pedro.presentation.charts
 
 import android.util.Log
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,9 +11,20 @@ import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.toMonthNumber
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseSupabaseRepositoryImpl
-import ir.ehsannarmani.compose_charts.models.Bars
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.ZoneId
+import java.time.temporal.IsoFields
+
+
+fun Instant.toWeekOfYear(zoneId: ZoneId = ZoneId.of("UTC")): Int {
+    // Converte l'Instant in ZonedDateTime con il fuso orario specificato
+    val zonedDateTime = this.atZone(zoneId)
+
+    // Restituisce il numero della settimana dell'anno
+    return zonedDateTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
+}
 
 class ViewModelCharts(
     private val activityRepository: ActivitySupabaseSupabaseRepositoryImpl // Aggiungi il repository come dipendenza
@@ -36,7 +45,8 @@ class ViewModelCharts(
     fun loadActivityData(
         activityEnum: ActivityEnum,
         metric: LabelMetrics,
-        uuid: String = getUUID()!!
+        uuid: String = getUUID()!!,
+        timePeriod: TimePeriod
     ) {
         _chartState.value = ChartState.Loading
         viewModelScope.launch(Dispatchers.IO) {
@@ -50,7 +60,8 @@ class ViewModelCharts(
                         ChartState.Success(
                             buildBarsList(
                                 activities,
-                                metric // Usa la metrica passata come parametro
+                                metric,
+                                timePeriod
                             )
                         )
                     )
@@ -71,14 +82,15 @@ class ViewModelCharts(
      * Cambia la metrica selezionata e aggiorna il grafico
      */
 
-    fun changeMetric(newMetric: LabelMetrics) {
+    fun changeMetric(newMetric: LabelMetrics, timePeriod: TimePeriod) {
         if (chartState.value is ChartState.Loading) return // Avoid changing metric while loading
 
         selectedMetric = newMetric
         Log.d("Charts", "Cambio metrica: $selectedMetric")
 
         // Update chartState with new data
-        _chartState.value = ChartState.Success(buildBarsList(activities, selectedMetric))
+        _chartState.value =
+            ChartState.Success(buildBarsList(activities, selectedMetric, timePeriod))
     }
 
 
@@ -105,46 +117,66 @@ class ViewModelCharts(
         }
     }
 
+    enum class TimePeriod {
+        DAILY, WEEKLY, MONTHLY
+    }
+
+
     /**
      * Genera la lista delle barre mensili per le attività selezionate.
      */
     fun buildBarsList(
         activities: List<GenericActivity>,
-        selectedMetric: LabelMetrics
-    ): List<Bars> {
-        val monthlyData = mutableMapOf<Int, MutableList<Double>>()
+        selectedMetric: LabelMetrics,
+        timePeriod: TimePeriod
+    ): Map<String, Double> {
+        val timeData = mutableMapOf<String, MutableList<Double>>()
 
-        // Popola la mappa con i dati delle attività
+        // Popola la mappa con i dati delle attività, raggruppati per il periodo selezionato
         for (activity in activities) {
-            val month = activity.basicActivity.startTime.toMonthNumber()
-            val value = calculateMetricValue(
-                selectedMetric,
-                activity
-            )
-            monthlyData.getOrPut(month) { mutableListOf() }.add(value)
-        }
+            val value = calculateMetricValue(selectedMetric, activity)
+            val periodKey = when (timePeriod) {
 
-        // Crea la lista di Bars, aggiungendo un mese con valore zero se non esistono dati per quel mese
-        val allMonths = (1..12) // Considera tutti i mesi dell'anno
-        val completeMonthlyData = allMonths.map { month ->
-            val values =
-                monthlyData.getOrElse(month) { mutableListOf(0.0) } // Aggiungi zero se non ci sono dati
-            Bars(
-                label = month.toString(),
-                values = listOf(
-                    Bars.Data(
-                        label = selectedMetric.toString(),
-                        value = values.sum(),
-                        color = SolidColor(
-                            activities.getOrNull(0)?.activityEnum?.color ?: Color.Gray
-                        ) // Usa SolidColor invece di Brush.verticalGradient
+                TimePeriod.WEEKLY -> {
+                    val weekOfYear = activity.basicActivity.startTime.toWeekOfYear()
+                    "Week $weekOfYear"
+                }
+
+                TimePeriod.MONTHLY -> {
+                    val month = activity.basicActivity.startTime.toMonthNumber()
+                    val monthNames = listOf(
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "May",
+                        "Jun",
+                        "Jul",
+                        "Aug",
+                        "Sep",
+                        "Oct",
+                        "Nov",
+                        "Dec"
                     )
-                )
-            )
+                    monthNames[month - 1] // Ottieni il nome del mese
+                }
+
+                else -> {
+                    val day =
+                        activity.basicActivity.startTime.atZone(ZoneId.systemDefault()).dayOfMonth
+                    day.toString()
+                }
+            }
+
+
+            // Aggiungi il valore alla lista corrispondente al periodo
+            timeData.getOrPut(periodKey) { mutableListOf() }.add(value)
         }
 
-        return completeMonthlyData
+        // Restituisci una mappa con il periodo come chiave e il valore aggregato
+        return timeData.mapValues { entry -> entry.value.sum() }
     }
+
 
 }
 
@@ -155,7 +187,7 @@ sealed class ChartError {
 
 sealed class ChartState {
     data object Loading : ChartState()
-    data class Success(val data: List<Bars>) : ChartState()
+    data class Success(val data: Map<String, Double>) : ChartState()
     data class Error(val error: ChartError, val message: String) : ChartState()
 }
 

@@ -187,5 +187,14 @@
     <string name="register_screen">Register screen</string>
     <string name="community_user_details">user details</string>
     <string name="chat_screen">chat screen</string>
+    <string name="notification_permission_description">Pedro needs to send notification to show you when it\'s recording your activity</string>
+    <string name="notification_permission_title">Notification permission</string>
+    <string name="notification_permission_permanently_denied_description">Pedro needs to send notification to show you when it\\\'s recording your activity.\nSince you denied the permission twice, Android won’t show the request again. In that case, you’ll need to enable the permission manually in your device settings.</string>
+    <string name="activity_recognition_permission_permanently_denied_description">To track steps, the activity recognition permission is required. Without this permission, the feature will not be available.\nSince you denied the permission twice, Android won’t show the request again. In that case, you’ll need to enable the permission manually in your device settings.
+</string>
+    <string name="user_activity_recognition_screen">Settings > Activity recognition</string>
+    <string name="select_date">select date</string>
+    <string name="reset_sessions">reset session</string>
+    <string name="unknown_session_screen">Unknown</string>
 
 </resources>

@@ -3,7 +3,14 @@ package com.lam.pedro.presentation.component
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,18 +28,21 @@ import androidx.compose.ui.util.lerp
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.presentation.charts.LabelMetrics
 import com.lam.pedro.presentation.charts.StaticActivityChart
+import com.lam.pedro.presentation.charts.ViewModelCharts
 import kotlinx.coroutines.delay
 import kotlin.math.absoluteValue
+
 
 @Composable
 fun DisplayGraph(
     items: List<GenericActivity>,
-    availableMetrics: List<LabelMetrics>
+    availableMetrics: List<LabelMetrics>,
+    timePeriod: ViewModelCharts.TimePeriod
 ) {
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { availableMetrics.size })
 
     // Scorrimento automatico delle pagine
-    LaunchedEffect(pagerState) {
+    LaunchedEffect(pagerState, timePeriod) {
         while (true) {
             delay(6000)
             val nextPage = (pagerState.currentPage + 1) % pagerState.pageCount
@@ -93,7 +103,8 @@ fun DisplayGraph(
                             activities = items,
                             modifier = Modifier
                                 .fillMaxSize()
-                                .padding(8.dp)
+                                .padding(8.dp),
+                            timePeriod = timePeriod
                         )
                     }
                 }

@@ -21,12 +21,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseSupabaseRepositoryImpl
-import ir.ehsannarmani.compose_charts.models.Bars
 
 
 @Composable
 fun ActivityChart(
-    chartData: List<Bars>,
+    chartData: Map<String, Double>,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -56,7 +55,8 @@ fun ActivityChart(
 fun StaticActivityChart(
     metric: LabelMetrics,
     activities: List<GenericActivity>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    timePeriod: ViewModelCharts.TimePeriod
 ) {
 
     val viewModel: ViewModelCharts = viewModel(
@@ -67,7 +67,7 @@ fun StaticActivityChart(
 
     // Trasforma le attività in dati per il grafico
     val chartData = remember(activities, metric) {
-        viewModel.buildBarsList(activities, metric)
+        viewModel.buildBarsList(activities, metric, timePeriod)
     }
 
     ActivityChart(
@@ -85,12 +85,17 @@ fun FetchingActivityChart(
             activityRepository = ActivitySupabaseSupabaseRepositoryImpl()
         )
     ),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    timePeriod: ViewModelCharts.TimePeriod
 ) {
     // Carica i dati al montaggio del Composable
     LaunchedEffect(activityEnum, metric) {
         Log.i("FetchingActivityChart", "Loading data for $activityEnum with metric $metric")
-        viewModelCharts.loadActivityData(activityEnum, metric)
+        viewModelCharts.loadActivityData(
+            activityEnum = activityEnum,
+            metric = metric,
+            timePeriod = timePeriod
+        )
     }
 
     // Osserva lo stato dei dati dal ViewModel

@@ -6,14 +6,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 
 private val DarkColorPalette: ColorScheme = darkColorScheme(
     primary = PedroYellow,
     secondary = PedroBlack,
     primaryContainer = PedroDarkGray,
     secondaryContainer = PedroDark,
-    onSecondaryContainer = PedroLighterGray
+    onSecondaryContainer = PedroLighterGray,
+    onPrimary = PedroLighterYellow,
+    surfaceContainer = PedroBottomBar
 )
 
 private val LightColorPalette: ColorScheme = lightColorScheme(

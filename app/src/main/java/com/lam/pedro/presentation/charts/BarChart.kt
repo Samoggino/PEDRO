@@ -9,35 +9,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ir.ehsannarmani.compose_charts.ColumnChart
-import ir.ehsannarmani.compose_charts.models.AnimationMode
 import ir.ehsannarmani.compose_charts.models.BarProperties
 import ir.ehsannarmani.compose_charts.models.Bars
 import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.PopupProperties
-import kotlinx.datetime.Month
 
 @Composable
 fun BarChart(
-    chartData: List<Bars>,
+    chartData: Map<String, Double>, // Mappa delle etichette e dei valori
     modifier: Modifier = Modifier
         .height(300.dp)
         .padding(start = 10.dp, end = 10.dp, top = 20.dp, bottom = 20.dp)
 ) {
-
-    val monthLabels = remember {
-        (1..12).map { month ->
-            Month(month).name.substring(0, 3) // Get first 3 letters of month name
-        }
-    }
-
     val textStyle = remember {
         TextStyle(
             fontSize = 12.sp,
@@ -47,13 +39,20 @@ fun BarChart(
         )
     }
 
-    val animationVelocity = AnimationMode.Together {
-        it * 75L
-    }
-
     ColumnChart(
         modifier = modifier,
-        data = chartData,
+        data = chartData.map { (month, value) -> // Crea la lista di Bars dalla mappa
+            Bars(
+                label = month,
+                values = listOf(
+                    Bars.Data(
+                        label = "Metric",
+                        value = value,
+                        color = SolidColor(Color.Gray) // Colore statico o dinamico
+                    )
+                )
+            )
+        },
         barProperties = BarProperties(
             cornerRadius = Bars.Data.Radius.Rectangle(topRight = 6.dp, topLeft = 6.dp),
             spacing = 10.dp,
@@ -66,11 +65,10 @@ fun BarChart(
         labelProperties = LabelProperties(
             enabled = true,
             textStyle = textStyle,
-            padding = 10.dp, // spazio tra le etichette e il grafico
+            padding = 10.dp,
             rotation = LabelProperties.Rotation(degree = 0f),
-            labels = monthLabels,
+            labels = chartData.keys.toList(), // Usa le chiavi della mappa come etichette
         ),
-        animationMode = animationVelocity,
         popupProperties = PopupProperties(
             textStyle = textStyle,
         ),
@@ -84,8 +82,6 @@ fun BarChart(
         ),
         onBarLongClick = { barData ->
             Log.d("Charts", "Bar clicked: $barData")
-
         }
     )
-
 }
