@@ -20,6 +20,8 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
+import com.google.android.gms.common.ConnectionResult
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.ActivityTransitionResult
 import com.lam.pedro.R
 import com.lam.pedro.data.datasource.activityRecognition.UserActivityTransitionManager
@@ -41,10 +43,14 @@ class ActivityRecognitionService : Service() {
 
     private var currentNotificationText: String = "Monitoring user activity...\nNo new data."
 
-
-
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate() {
+        val status = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)
+        if (status != ConnectionResult.SUCCESS) {
+            Log.e("GooglePlayServices", "Google Play Services not available")
+        } else {
+            Log.d("GooglePlayServices", "Google Play Services available")
+        }
         super.onCreate()
         isServiceRunning = true
         manager = UserActivityTransitionManager(this)
@@ -56,7 +62,10 @@ class ActivityRecognitionService : Service() {
             Log.d("ActivityRecognitionService", "Nessun intent ricevuto. Aggiornamento notifica...")
             // Aggiorna la notifica utilizzando il testo corrente
             updateNotification(currentNotificationText)
-            handler.postDelayed(updateRunnable, 10000) // Riprogramma l'aggiornamento dopo 10 secondi
+            handler.postDelayed(
+                updateRunnable,
+                10000
+            ) // Riprogramma l'aggiornamento dopo 10 secondi
         }
 
         // Avvia il ciclo di aggiornamenti ogni 10 secondi
@@ -90,21 +99,32 @@ class ActivityRecognitionService : Service() {
 
                 // Aggiorna la notifica con l'attività corrente
                 updateNotification(transitionText)
-            }
-        }
-        registerReceiver(receiver, intentFilter, Context.RECEIVER_NOT_EXPORTED)
-    }
 
-    fun isServiceRunning(serviceClass: Class<out Service>): Boolean {
-        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        val runningServices = manager.getRunningServices(Int.MAX_VALUE)
 
-        for (service in runningServices) {
-            if (service.service.className == serviceClass.name) {
-                return true
+                val activityType = intent.getIntExtra("activityType", -1)
+                val transitionType = intent.getIntExtra("transitionType", -1)
+                val timestamp = intent.getLongExtra("timestamp", -1L)
+
+                if (activityType != -1 && transitionType != -1 && timestamp != -1L) {
+                    val activityName = UserActivityTransitionManager.getActivityType(activityType)
+                    val transitionName =
+                        UserActivityTransitionManager.getTransitionType(transitionType)
+
+                    Log.d(
+                        "ActivityRecognitionService", "Transizione simulata:\n" +
+                                "Attività: $activityName\nTransizione: $transitionName\nTimestamp: $timestamp"
+                    )
+
+                    // Aggiorna la notifica con l'attività corrente
+                    updateNotification("$activityName - $transitionName")
+                } else {
+                    Log.w("ActivityRecognitionService", "Intent non valido o incompleto.")
+                }
             }
+
+
         }
-        return false
+        registerReceiver(receiver, intentFilter, Context.RECEIVER_EXPORTED)
     }
 
 
@@ -122,6 +142,7 @@ class ActivityRecognitionService : Service() {
             NotificationManager.IMPORTANCE_HIGH
         )
         getSystemService(NotificationManager::class.java)?.createNotificationChannel(channel)
+
 
         // Intent per riaprire l'app
         val pendingIntent = PendingIntent.getActivity(
@@ -146,7 +167,11 @@ class ActivityRecognitionService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // Verifica del permesso ACTIVITY_RECOGNITION
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACTIVITY_RECOGNITION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
             // Avvia il monitoraggio delle transizioni
             CoroutineScope(Dispatchers.IO).launch {
                 try {
@@ -187,7 +212,8 @@ class ActivityRecognitionService : Service() {
 
     private fun updateNotification(contentText: String) {
         val timestamp = System.currentTimeMillis()
-        val timestampFormatted = SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(timestamp))
+        val timestampFormatted =
+            SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(Date(timestamp))
         val debugText = "$contentText Updated at: $timestampFormatted"
 
         Log.d("UPDATE_NOTIFICATION", debugText)

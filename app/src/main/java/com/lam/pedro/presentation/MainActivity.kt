@@ -1,5 +1,6 @@
 package com.lam.pedro.presentation
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -16,6 +17,7 @@ import com.lam.pedro.presentation.onboarding.OnboardingUtils
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModelFactory
 import com.lam.pedro.presentation.theme.PedroTheme
+import com.lam.pedro.util.createAndSendTestIntent
 import com.lam.pedro.util.notification.schedulePeriodicNotifications
 import kotlinx.coroutines.launch
 

@@ -40,6 +40,7 @@ import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.CustomSnackbarHost
 import com.lam.pedro.presentation.component.PermissionBox
 import com.lam.pedro.presentation.component.UserActivityBroadcastReceiver
+import com.lam.pedro.util.createAndSendTestIntent
 import com.lam.pedro.util.services.ActivityRecognitionService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -120,6 +121,10 @@ fun UserActivityRecognitionContent(navController: NavHostController, titleId: In
         ) {
 
             ActivityRecognitionButton(context)
+
+            Button(onClick = { createAndSendTestIntent(context) }) {
+                Text(text = "Test")
+            }
 
             if (currentUserActivity.isNotBlank()) {
                 Text(
