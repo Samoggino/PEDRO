@@ -159,7 +159,7 @@ private fun AccountItem(onNavigate: (String) -> Unit, loginState: LoginState) {
         is LoginState.LoggedIn -> {
             MenuItem(
                 iconId = R.drawable.user_icon,
-                label = "You are a Gringo!",
+                label = "You are a Hermano!",
                 onClick = { },
                 topHeight = 85,
                 extraIcon = {
@@ -175,7 +175,7 @@ private fun AccountItem(onNavigate: (String) -> Unit, loginState: LoginState) {
         is LoginState.NotLoggedIn -> {
             MenuItem(
                 iconId = R.drawable.user_icon,
-                label = "You're not a Gringo, yet",
+                label = "You're not a Hermano, yet",
                 onClick = { onNavigate(Screen.LoginScreen.route) },
                 topHeight = 85
             )
@@ -193,7 +193,7 @@ fun MenuItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     topHeight: Int = 16,
-    height: Int = 75,
+    height: Int = 85,
     extraIcon: @Composable (() -> Unit)? = null // Nuovo parametro per l'icona extra
 ) {
     Spacer(modifier = Modifier.height(topHeight.dp))

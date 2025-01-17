@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -33,6 +34,7 @@ class MainActivity : ComponentActivity() {
     private val isInitialized = mutableStateOf(false)
     private val onboardingUtils by lazy { OnboardingUtils(this) }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         super.onCreate(savedInstanceState)
@@ -49,7 +51,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             PedroTheme {
+                // if (qualcosa) { TODO
                 ShowOnboardingScreen()
+                // } else {
+                // PedroApp()
+                // }
             }
         }
     }
@@ -62,6 +68,7 @@ class MainActivity : ComponentActivity() {
         }.await()
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @Composable
     private fun ShowOnboardingScreen() {
 

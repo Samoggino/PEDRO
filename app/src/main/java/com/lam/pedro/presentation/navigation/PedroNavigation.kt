@@ -30,6 +30,7 @@ import com.lam.pedro.presentation.screen.MoreScreen
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.GeneralActivityViewModelFactory
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.RunSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.unknownactivityviewmodel.UnknownSessionViewModel
 import com.lam.pedro.presentation.screen.activities.newActivity.NewActivityScreen
 import com.lam.pedro.presentation.screen.community.CommunityScreen
 import com.lam.pedro.presentation.screen.community.CommunityScreenViewModelFactory
@@ -147,18 +148,7 @@ fun PedroNavigation(
                 Log.d("BackStack", "Stack: ${navController.currentBackStackEntry}")
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 MoreScreen(onNavigate = { route ->
-                    navController.navigate(route) {
-                        popUpTo(
-                            navController.graph.findStartDestination().id
-                        ) {
-                            saveState = true
-                        }
-                        // Avoid multiple copies of the same destination when
-                        // reselecting the same item
-                        launchSingleTop = true
-                        // Restore state when reselecting a previously selected item
-                        restoreState = true
-                    }
+                    navController.navigate(route)
                 })
             }
             composable(
@@ -270,7 +260,25 @@ fun PedroNavigation(
                 }
             }
 
-
+            composable(
+                Screen.UnknownSessionScreen.route,
+                enterTransition = { NavigationTransitions.fadeIn() },
+                exitTransition = { NavigationTransitions.fadeOut() }
+            ) {
+                val activityViewModel: UnknownSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory()
+                )
+                SetupSessionScreen(
+                    screen = Screen.UnknownSessionScreen,
+                    activityViewModel = activityViewModel,
+                    onNavigate = { route -> navController.navigate(route) },
+                    snackbarHostState = snackbarHostState,
+                    scope = scope,
+                    topBarTitle = getTitleIdForRoute(currentRoute),
+                    onSharedViewModelChange = { viewModel -> sharedViewModel = viewModel },
+                    onSharedTitleChange = { titleId -> sharedTitle = titleId }
+                )
+            }
 
             composable(
                 Screen.RunSessionScreen.route,

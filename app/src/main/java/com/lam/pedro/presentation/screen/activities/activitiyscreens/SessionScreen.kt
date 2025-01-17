@@ -74,10 +74,6 @@ fun SessionScreen(
 ) {
     val errorId = rememberSaveable { mutableStateOf(UUID.randomUUID()) }
     var sessionList by viewModel.sessionsList
-    val coroutineScope = rememberCoroutineScope()
-
-    var isDatePickerVisible by remember { mutableStateOf(false) } // Stato per il DatePickerModal
-    var selectedDate by remember { mutableStateOf<LocalDate?>(null) } // Stato per la data selezionata
 
     // Stato per il periodo del grafico
     var selectedPeriod by remember { mutableStateOf(TimePeriod.WEEKLY) }

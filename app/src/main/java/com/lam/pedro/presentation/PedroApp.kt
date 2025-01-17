@@ -100,17 +100,9 @@ fun PedroApp() {
                     )
                 }
             }
-        ) { paddingValues ->
-            var rememberedPaddingValues by remember { mutableStateOf(PaddingValues()) }
+        ) {
 
-            // Solo aggiorna se cambia il paddingValues
-            if (rememberedPaddingValues != paddingValues) {
-                rememberedPaddingValues = paddingValues
-            }
-
-            Log.i("PedroApp", "Scaffold reloaded")
-
-            Box(modifier = Modifier.padding(rememberedPaddingValues)) {
+            Box(modifier = Modifier.padding(start = 0.dp, end = 0.dp, top = 0.dp, bottom = 60.dp)) {
                 PedroNavigation(
                     navController = navController,
                     snackbarHostState = snackbarHostState,

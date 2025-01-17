@@ -54,7 +54,7 @@ fun MetricSelector(
                 .fillMaxWidth()
                 .padding(8.dp)
                 .then(Modifier.exposedDropdownSize())
-                .clip(RoundedCornerShape(10.dp))
+                .clip(RoundedCornerShape(26.dp))
         )
 
         // Menu a discesa con le opzioni del periodo
