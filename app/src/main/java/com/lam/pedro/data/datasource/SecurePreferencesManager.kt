@@ -17,7 +17,7 @@ object SecurePreferencesManager {
     private const val USERNAME = "USERNAME"
     private const val AVATAR_URL = "AVATAR_URL"
 
-    private const val DARKMODE = "DARKMODE"
+    private const val ONBOARDING = "ONBOARDING"
 
 
     private var encryptedPrefs: SharedPreferences? = null
@@ -146,6 +146,7 @@ object SecurePreferencesManager {
     // Metodi per salvare e recuperare le preferenze del profilo
     fun saveProfileData(preference: ProfilePreference, value: String) {
         checkInitialized()
+        saveOnboardingCompleted()
 
         CoroutineScope(Dispatchers.IO).launch {
             with(encryptedPrefs!!.edit()) {
@@ -161,15 +162,21 @@ object SecurePreferencesManager {
         return encryptedPrefs!!.getString(preference.key, defaultValue) ?: defaultValue
     }
 
-    fun saveDarkMode(darkMode: Boolean) {
+    private fun saveOnboardingCompleted() {
         checkInitialized()
 
         CoroutineScope(Dispatchers.IO).launch {
             with(encryptedPrefs!!.edit()) {
-                putBoolean(DARKMODE, darkMode)
+                putBoolean(ONBOARDING, true)
                 apply()
             }
         }
+    }
+
+    fun isOnboardingCompleted(): Boolean {
+        checkInitialized()
+
+        return encryptedPrefs!!.getBoolean(ONBOARDING, false)
     }
 }
 
