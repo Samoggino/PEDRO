@@ -292,7 +292,7 @@ object SessionCreator {
     private val energy: Energy = Energy.kilocalories(100.0)
     private val length: Length = Length.meters(500.0)
 
-    fun createYogaSession() = createYogaSession(
+    private fun createYogaSession() = createYogaSession(
         basicActivity = createBasicActivity("Yoga Title", "Yoga Notes"),
         totalEnergy = energy,
         activeEnergy = energy,
@@ -300,7 +300,7 @@ object SessionCreator {
         exerciseLap = exerciseLapList()
     )
 
-    fun createRunSession() = createRunSession(
+    private fun createRunSession() = createRunSession(
         basicActivity = createBasicActivity("Run Title", "Run Notes"),
         totalEnergy = energy,
         activeEnergy = energy,
@@ -310,11 +310,11 @@ object SessionCreator {
         exerciseRoute = exerciseRouteCreator()
     )
 
-    fun createListenSession() = createListenSession(
+    private fun createListenSession() = createListenSession(
         basicActivity = createBasicActivity("Listen Title", "Listen Notes")
     )
 
-    fun createLiftSession() = createLiftSession(
+    private fun createLiftSession() = createLiftSession(
         basicActivity = createBasicActivity("Lift Title", "Lift Notes"),
         totalEnergy = energy,
         activeEnergy = energy,
@@ -322,12 +322,12 @@ object SessionCreator {
         exerciseLap = exerciseLapList()
     )
 
-    fun createSitSession() = createSitSession(
+    private fun createSitSession() = createSitSession(
         basicActivity = createBasicActivity("Sit Title", "Sit Notes"),
         volume = Volume.liters(1.0)
     )
 
-    fun createCyclingSession() = createCyclingSession(
+    private fun createCyclingSession() = createCyclingSession(
         basicActivity = createBasicActivity("Cycling Title", "Cycling Notes"),
         totalEnergy = energy,
         activeEnergy = energy,
@@ -336,22 +336,22 @@ object SessionCreator {
         speedSamples = speedRecordSampleList()
     )
 
-    fun createDriveSession() = createDriveSession(
+    private fun createDriveSession() = createDriveSession(
         basicActivity = createBasicActivity("Drive Title", "Drive Notes"),
         distance = length,
         exerciseRoute = exerciseRouteCreator(),
         speedSamples = speedRecordSampleList()
     )
 
-    fun createSleepSession() = createSleepSession(
+    private fun createSleepSession() = createSleepSession(
         basicActivity = createBasicActivity("Sleep Title", "Sleep Notes")
     )
 
-    fun createUnknownSession() = createUnknownSession(
+    private fun createUnknownSession() = createUnknownSession(
         basicActivity = createBasicActivity("Unknown Title", "Unknown Notes")
     )
 
-    fun createWalkSession() = createWalkSession(
+    private fun createWalkSession() = createWalkSession(
         basicActivity = createBasicActivity("Walk Title", "Walk Notes"),
         totalEnergy = energy,
         activeEnergy = energy,
@@ -361,7 +361,7 @@ object SessionCreator {
         stepsCount = 1000
     )
 
-    fun createTrainSession() = createTrainSession(
+    private fun createTrainSession() = createTrainSession(
         basicActivity = createBasicActivity("Train Title", "Train Notes"),
         totalEnergy = energy,
         activeEnergy = energy,

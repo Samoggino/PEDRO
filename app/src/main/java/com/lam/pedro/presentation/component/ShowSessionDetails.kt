@@ -1,5 +1,9 @@
 package com.lam.pedro.presentation.component
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -7,6 +11,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +23,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.health.connect.client.records.ExerciseRoute
+import androidx.health.connect.client.records.ExerciseSegment
+import androidx.health.connect.client.records.SpeedRecord
+import androidx.health.connect.client.units.Energy
+import androidx.health.connect.client.units.Length
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.GenericActivity.CyclingSession
 import com.lam.pedro.data.activity.GenericActivity.DriveSession
@@ -32,147 +44,122 @@ import com.lam.pedro.util.calculateAverageSpeed
 import org.maplibre.android.geometry.LatLng
 import java.time.Duration
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun ShowSessionDetails(
-    session: GenericActivity,
-    color: Color = session.activityEnum.color
+    session: GenericActivity
 ) {
     LazyColumn(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            Text(
-                text = "Session details",
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-            Text(
-                text = session.basicActivity.title,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(
-                text = session.basicActivity.notes.ifEmpty { "There is no note" },
-                style = MaterialTheme.typography.headlineMedium
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(
-                text = "${
-                    session.basicActivity.startTime.atZone(ZoneId.systemDefault()).toLocalDate()
-                }"
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            val duration =
-                Duration.between(session.basicActivity.startTime, session.basicActivity.endTime)
-            val hours = duration.toHours()
-            val minutes = duration.toMinutes() % 60
-            val seconds = duration.seconds % 60
-            Text(text = "$hours:$minutes:$seconds", style = MaterialTheme.typography.headlineSmall)
-            Spacer(modifier = Modifier.height(10.dp))
-            val zonedDateStartTime = session.basicActivity.startTime.atZone(ZoneId.systemDefault())
-            val startHours = zonedDateStartTime.hour
-            val startMinutes = zonedDateStartTime.minute
-            val startSeconds = zonedDateStartTime.second
-            Text(text = "Start: $startHours:$startMinutes:$startSeconds")
-            val zonedDateEndTime = session.basicActivity.endTime.atZone(ZoneId.systemDefault())
-            val endHours = zonedDateEndTime.hour
-            val endMinutes = zonedDateEndTime.minute
-            val endSeconds = zonedDateEndTime.second
-            Text(text = "End: $endHours:$endMinutes:$endSeconds")
+            SessionHeader(session)
         }
-
+        val details = mutableListOf<Pair<String, String>>()
 
         when (session) {
             is CyclingSession -> {
                 item {
-                    Text(text = "Distanza: ${session.distance}")
-                    Text(text = "Velocità: ${session.speedSamples}")
-                    Text(text = "Energia totale: ${session.totalEnergy}")
-                    Text(text = "Energia attiva: ${session.activeEnergy}")
+                    DistanceAndSpeedPrinter(session.distance, session.speedSamples, details)
+                    EnergyPrinter(session.activeEnergy, session.totalEnergy, details)
+
+                    SessionDetailsSection(details = details)
+                    MapComponent(session.exerciseRoute, session.activityEnum.color)
                 }
             }
 
             is RunSession -> {
                 item {
-                    val positions =
-                        session.exerciseRoute.route.map { LatLng(it.latitude, it.longitude) }
 
-                    Text(text = "Average speed: ${calculateAverageSpeed(session.speedSamples)}")
-                    Text(text = "Steps: ${session.stepsCount}")
-                    Text(text = "Energia totale: ${session.totalEnergy}")
-                    Text(text = "Energia attiva: ${session.activeEnergy}")
-                    Text(text = "Distance: ${session.distance}")
-                    //Text(text = "Elevazione guadagnata: ${session.elevationGained}")
-                    MapComponent(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(300.dp)
-                            .clip(RoundedCornerShape(26.dp)),
-                        positions = positions,
-                        color = color
-                    )
+                    DistanceAndSpeedPrinter(session.distance, session.speedSamples, details)
+                    StepsPrinter(session.stepsCount, details)
+                    EnergyPrinter(session.activeEnergy, session.totalEnergy, details)
+
+
+
+                    SessionDetailsSection(details = details)
+                    MapComponent(session.exerciseRoute, session.activityEnum.color)
                 }
             }
 
             is TrainSession -> {
                 item {
-                    Text(text = "Energia totale: ${session.totalEnergy}")
-                    Text(text = "Energia attiva: ${session.activeEnergy}")
-                    Text(text = "Segmenti di esercizio: ${session.exerciseSegment}")
-                    Text(text = "Giri di esercizio: ${session.exerciseLap}")
+                    EnergyPrinter(session.activeEnergy, session.totalEnergy, details)
+                    ExerciseSegmentPrinter(session.exerciseSegment, details)
+                    SessionDetailsSection(details = details)
                 }
             }
 
             is WalkSession -> {
                 item {
-                    Text(text = "Distanza: ${session.distance}")
-                    Text(text = "Passi: ${session.stepsCount}")
-                    Text(text = "Velocità media: ${session.speedSamples}")
-                    Text(text = "Energia totale: ${session.totalEnergy}")
-                    Text(text = "Energia attiva: ${session.activeEnergy}")
+                    DistanceAndSpeedPrinter(session.distance, session.speedSamples, details)
+                    StepsPrinter(session.stepsCount, details)
+                    EnergyPrinter(session.activeEnergy, session.totalEnergy, details)
+
+
+                    SessionDetailsSection(details = details)
+                    MapComponent(session.exerciseRoute, session.activityEnum.color)
                 }
             }
 
             is YogaSession -> {
                 item {
-                    Text(text = "Energia totale: ${session.totalEnergy}")
-                    Text(text = "Energia attiva: ${session.activeEnergy}")
-                    Text(text = "Segmenti di esercizio: ${session.exerciseSegment}")
-                    Text(text = "Giri di esercizio: ${session.exerciseLap}")
+                    EnergyPrinter(session.activeEnergy, session.totalEnergy, details)
+                    ExerciseSegmentPrinter(session.exerciseSegment, details)
+                    SessionDetailsSection(details = details)
                 }
             }
 
             is DriveSession -> {
                 item {
-                    Text(text = "Distanza: ${session.distance}")
-                    Text(text = "Velocità media: ${session.speedSamples}")
+                    DistanceAndSpeedPrinter(session.distance, session.speedSamples, details)
+
+
+                    SessionDetailsSection(details = details)
+                    MapComponent(session.exerciseRoute, session.activityEnum.color)
                 }
             }
 
             is LiftSession -> {
                 item {
-                    Text(text = "Energia totale: ${session.totalEnergy}")
-                    Text(text = "Energia attiva: ${session.activeEnergy}")
-                    Text(text = "Segmenti di esercizio: ${session.exerciseSegment}")
-                    Text(text = "Giri di esercizio: ${session.exerciseLap}")
+                    EnergyPrinter(session.activeEnergy, session.totalEnergy, details)
+                    ExerciseSegmentPrinter(session.exerciseSegment, details)
+
+                    SessionDetailsSection(details = details)
                 }
             }
 
             is ListenSession -> {
                 item {
-                    Text(text = "Questa è una sessione di ascolto.")
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    ) {
+                        Text(
+                            text = "This is a listening session.",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
                 }
             }
 
             is SitSession -> {
                 item {
-                    Text(text = "Volume: ${session.volume}")
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    ) {
+                        Text(
+                            text = "Water: ${session.volume.inLiters}",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
                 }
             }
 
@@ -182,9 +169,187 @@ fun ShowSessionDetails(
 
             is UnknownSession -> {
                 item {
-                    Text(text = "Questa è una sessione sconosciuta.")
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    ) {
+                        Text(
+                            text = "This is an unknown session.",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
                 }
             }
         }
     }
+}
+
+@Composable
+private fun StepsPrinter(
+    steps: Long,
+    details: MutableList<Pair<String, String>>
+) {
+    if (steps > 0) details.add("Steps" to "$steps")
+}
+
+@SuppressLint("DefaultLocale")
+@Composable
+private fun DistanceAndSpeedPrinter(
+    distance: Length,
+    speedRecordSample: List<SpeedRecord.Sample>,
+    details: MutableList<Pair<String, String>>
+) {
+    if (distance.inKilometers > 0) details.add(
+        "Distance" to "${String.format("%.2f", distance.inKilometers)} km"
+    )
+
+    if (calculateAverageSpeed(speedRecordSample) > 0) details.add(
+        "Average speed" to "${String.format("%.2f", calculateAverageSpeed(speedRecordSample))} km/h"
+    )
+}
+
+@Composable
+private fun ExerciseSegmentPrinter(
+    exerciseSegment: List<ExerciseSegment>,
+    details: MutableList<Pair<String, String>>
+) {
+    if (exerciseSegment.sumOf { it.repetitions } > 0) {
+        details.add("Repetitions" to "${exerciseSegment.sumOf { it.repetitions }}")
+        exerciseSegment.forEachIndexed { index, segment ->
+            details.add("Segment $index (${segment.segmentType}) Repetitions" to "${segment.repetitions}")
+        }
+    }
+}
+
+@SuppressLint("DefaultLocale")
+@Composable
+private fun EnergyPrinter(
+    active: Energy,
+    total: Energy,
+    details: MutableList<Pair<String, String>>
+) {
+    if (active.inKilocalories > 0) {
+        details.add("Active Energy" to "${String.format("%.2f", active.inKilocalories)} kcal")
+        details.add("Total Energy" to "${String.format("%.2f", total.inKilocalories)} kcal")
+    } else details.add("Energy" to "${String.format("%.2f", total.inKilocalories)} kcal")
+}
+
+@Composable
+private fun MapComponent(
+    exerciseRoute: ExerciseRoute,
+    sessionColor: Color
+) {
+    val positions = exerciseRoute.route.map { LatLng(it.latitude, it.longitude) }
+
+    if (positions.isNotEmpty()) {
+        Spacer(modifier = Modifier.height(16.dp))
+        MapComponent(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp)
+                .clip(RoundedCornerShape(26.dp)),
+            positions = positions,
+            color = sessionColor
+        )
+    }
+}
+
+@Composable
+fun SessionHeader(session: GenericActivity) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Session details",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                color = session.activityEnum.color
+            )
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            Text(
+                text = session.basicActivity.title,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = session.basicActivity.notes.ifEmpty { "There is no note" },
+                style = MaterialTheme.typography.bodyMedium
+            )
+            val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+            Text(
+                text = session.basicActivity.startTime.atZone(ZoneId.systemDefault())
+                    .format(dateFormatter),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            val duration =
+                Duration.between(session.basicActivity.startTime, session.basicActivity.endTime)
+            val formattedDuration = formatDuration(duration)
+            Text(text = formattedDuration, style = MaterialTheme.typography.bodyLarge)
+
+            val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
+            Text(
+                text = "Start: ${
+                    session.basicActivity.startTime.atZone(ZoneId.systemDefault())
+                        .format(timeFormatter)
+                }",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = "End: ${
+                    session.basicActivity.endTime.atZone(ZoneId.systemDefault())
+                        .format(timeFormatter)
+                }",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+@Composable
+fun SessionDetailsSection(
+    details: List<Pair<String, Any>>
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            details.forEach { (label, value) ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = label,
+                        fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Text(
+                        text = value.toString(),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@SuppressLint("DefaultLocale")
+fun formatDuration(duration: Duration): String {
+    val hours = duration.toHours()
+    val minutes = duration.toMinutesPart()
+    val seconds = duration.toSecondsPart()
+    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
 }
