@@ -15,7 +15,7 @@ object LoginRegisterHelper {
             Log.e("Supabase", "ERRORE: checkCredentials: Email non valida")
             return false
         }
-        if (password.isEmpty() || password.length < 8) {
+        if (password.isEmpty() || password.length < 6) {
             Log.e("Supabase", "ERRORE: checkCredentials: Password non valida")
             return false
         }
