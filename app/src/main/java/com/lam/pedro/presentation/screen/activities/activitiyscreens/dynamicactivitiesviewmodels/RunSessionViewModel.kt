@@ -37,9 +37,7 @@ class RunSessionViewModel(private val healthConnectManager: HealthConnectManager
     /*Define here the required permissions for the Health Connect usage*/
     override val permissions = setOf(
 
-        /*
-        * ExerciseSessionRecord
-        * */
+
         HealthPermission.getReadPermission(ExerciseSessionRecord::class),
         HealthPermission.getWritePermission(ExerciseSessionRecord::class),
 

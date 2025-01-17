@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.lam.pedro.presentation.component.CustomSnackbarHost
 import com.lam.pedro.presentation.component.NewActivityControlButtons
 import com.lam.pedro.presentation.component.NewActivitySaveAlertDialog
@@ -61,7 +60,9 @@ fun NewActivityScreen(
     viewModel: ActivitySessionViewModel,
     profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModelFactory()),
     newActivityViewModel: NewActivityViewModel = viewModel(
-        factory = NewActivityViewModelFactory(LocalContext.current)
+        factory = NewActivityViewModelFactory(
+            LocalContext.current
+        )
     )
 ) {
 
@@ -78,16 +79,6 @@ fun NewActivityScreen(
     val sessionJob = remember { Job() }
     val sessionScope = remember { CoroutineScope(sessionJob + Dispatchers.Default) }
 
-    /*
-    // Crea la lista di funzionalità
-    val functionalities = listOf(GpsFunctionality(context), StepCounterFunctionality(context))
-
-    // Crea il contesto con le funzionalità
-    val screenContext = remember { ScreenContext(functionalities) }
-
-    // Esegui tutte le funzionalità
-    screenContext.ExecuteFunctionalities()
-     */
 
     newActivityViewModel.ExecuteFunctionalities()
 
@@ -95,7 +86,7 @@ fun NewActivityScreen(
         topBar = {
             NewActivityTopAppBar(
                 titleId = titleId,
-                onNavBack = onNavBack,
+                onNavBack = { onNavBack() }
             )
         },
         snackbarHost = { CustomSnackbarHost(newActivityViewModel.snackbarHostState) }
@@ -225,12 +216,11 @@ fun NewActivityScreen(
                         newActivityViewModel.updateTitle(it)
                         //newActivityViewModel.isTitleEmpty.value = newActivityViewModel.activityTitle.value.isBlank()
                     },
-                    isTitleEmpty = newActivityViewModel.isTitleEmpty.value,
+                    isTitleEmpty = newActivityViewModel.isTitleEmpty,
                     notes = newActivityViewModel.notes.value,
                     onNotesChange = { newActivityViewModel.notes.value = it },
                     onConfirm = {
                         coroutineScope.launch {
-                            if (newActivityViewModel.activityTitle.value.isNotBlank()) {
                             if (newActivityViewModel.activityTitle.value.isNotBlank()) {
                                 if (isStopAction) {
                                     context.stopService(
@@ -259,7 +249,6 @@ fun NewActivityScreen(
                                             startTime = startTime,
                                             endTime = endTime,
                                             profileViewModel = profileViewModel,
-                                            activitySessionViewModel = viewModel
                                             activitySessionViewModel = viewModel
                                         )
                                     }
@@ -298,16 +287,7 @@ fun NewActivityScreen(
                     }
 
                     sessionScope.launch {
-                        //newActivityViewModel.startStepCounter()
                         context.startService(serviceIntent)
-                    }
-
-                    sessionScope.launch {
-                        //newActivityViewModel.startSpeedTracking()
-                    }
-
-                    sessionScope.launch {
-                        //newActivityViewModel.startLocationTracking()
                     }
                 }
             }

@@ -4,7 +4,6 @@ import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.SpeedRecord
 import org.maplibre.android.geometry.LatLng

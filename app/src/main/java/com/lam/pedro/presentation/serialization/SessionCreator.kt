@@ -33,7 +33,6 @@ import com.lam.pedro.data.activity.GenericActivity.TrainSession
 import com.lam.pedro.data.activity.GenericActivity.UnknownSession
 import com.lam.pedro.data.activity.GenericActivity.WalkSession
 import com.lam.pedro.data.activity.GenericActivity.YogaSession
-import com.lam.pedro.data.activity.GenericActivity.UnknownSession
 import kotlinx.datetime.Month
 import java.time.Instant
 import java.time.LocalDate

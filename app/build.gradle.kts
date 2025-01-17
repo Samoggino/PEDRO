@@ -95,17 +95,14 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.play.services.location)
 
-<<<<<<< HEAD
     implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.play.services)
 
     implementation(libs.accompanist.permissions)
 
-=======
     implementation(libs.kotlinx.coroutines.play.services)
 
     implementation(libs.accompanist.permissions)
->>>>>>> Bug-fix
 
     // Supabase
     //noinspection UseTomlInstead

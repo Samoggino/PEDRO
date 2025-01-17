@@ -1,7 +1,6 @@
 package com.lam.pedro.presentation.navigation
 
 import android.util.Log
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -30,17 +29,7 @@ import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.MoreScreen
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.GeneralActivityViewModelFactory
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.CycleSessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.RunSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.TrainSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.WalkSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.YogaSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.DriveSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.LiftSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.ListenSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.SitSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.SleepSessionViewModel
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.unknownactivityviewmodel.UnknownSessionViewModel
 import com.lam.pedro.presentation.screen.activities.newActivity.NewActivityScreen
 import com.lam.pedro.presentation.screen.community.CommunityScreen
 import com.lam.pedro.presentation.screen.community.CommunityScreenViewModelFactory
@@ -49,17 +38,12 @@ import com.lam.pedro.presentation.screen.community.user.UserCommunityDetails
 import com.lam.pedro.presentation.screen.more.AboutScreen
 import com.lam.pedro.presentation.screen.more.HealthConnectScreen
 import com.lam.pedro.presentation.screen.more.PrivacyPolicyScreen
-import com.lam.pedro.presentation.screen.more.settingsscreen.GeofencingScreen
-import com.lam.pedro.presentation.screen.more.settingsscreen.SettingsScreen
-import com.lam.pedro.presentation.screen.more.settingsscreen.UserActivityRecognitionScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.RegisterScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.User
+import com.lam.pedro.presentation.screen.more.settingsscreen.SettingsScreen
 import com.lam.pedro.presentation.screen.profile.ProfileScreen
-import com.lam.pedro.presentation.screen.profile.ProfileViewModel
-import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.serialization.MyScreenRecords
-import com.lam.pedro.presentation.serialization.ViewModelRecordFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -92,7 +76,6 @@ fun PedroNavigation(
 //     Stack per tenere traccia delle schermate aperte
 
     var sharedViewModel: ActivitySessionViewModel? by remember { mutableStateOf(null) }
-    val sharedColor: Color = Color.Red
     var sharedTitle: Int? = 0
 
     //     Funzione per loggare le schermate attive
@@ -263,28 +246,30 @@ fun PedroNavigation(
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 SettingsScreen(
                     onNavBack = { onNavBack() },
-                    titleId = getTitleIdForRoute(currentRoute)
+                    titleId = getTitleIdForRoute(currentRoute),
+                    onNavigate = { route -> navController.navigate(route) }
                 )
             }
+
             composable(
                 Screen.NewActivityScreen.route,
                 enterTransition = { NavigationTransitions.fadeIn() },
                 exitTransition = { NavigationTransitions.fadeOut() }
             ) {
                 logScreenStack()
-                sharedViewModel?.let { viewModel ->
-                    sharedColor.let {
-                        sharedTitle?.let { screenTitleId ->
-                            NewActivityScreen(
-                                onNavBack = { onNavBack() },
-                                titleId = screenTitleId,
-                                viewModel = viewModel
-                            )
-                        }
-                    }
 
+                val viewModel = sharedViewModel
+                val screenTitleId = sharedTitle
+
+                if (viewModel != null && screenTitleId != null) {
+                    NewActivityScreen(
+                        onNavBack = { onNavBack() },
+                        titleId = screenTitleId,
+                        viewModel = viewModel
+                    )
                 }
             }
+
 
 
             composable(

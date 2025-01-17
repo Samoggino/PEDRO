@@ -107,13 +107,3 @@ class NewActivityViewModel(context: Context, repository: ActivityTrackingReposit
     }
 
 }
-
-class NewActivityViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(NewActivityViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return NewActivityViewModel(context, ActivityTrackingRepository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}

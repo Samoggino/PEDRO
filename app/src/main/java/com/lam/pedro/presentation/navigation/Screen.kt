@@ -1,18 +1,3 @@
-/*
- * Copyright 2022 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.lam.pedro.presentation.navigation
 
 import com.lam.pedro.R
@@ -66,17 +51,21 @@ enum class Screen(
     NewActivityScreen(route = "new_activity_screen", titleId = R.string.new_activity_screen),
     MyScreenRecords(route = "my_screen_records", titleId = R.string.my_screen_records),
     FollowScreen(route = "follow_screen", titleId = R.string.follow_screen),
-//    ChartsScreen(route = "charts_screen", titleId = R.string.charts_screen),
+
+    //    ChartsScreen(route = "charts_screen", titleId = R.string.charts_screen),
     RegisterScreen(route = "register_screen", titleId = R.string.register_screen),
-    CommunityUserDetails(route = "community_user_details", titleId = R.string.community_user_details),
+    CommunityUserDetails(
+        route = "community_user_details",
+        titleId = R.string.community_user_details
+    ),
     ChatScreen(route = "chat_screen", titleId = R.string.chat_screen),
-    UnknownSessionScreen(route = "unknown_session_screen",titleId = R.string.unknown_session_screen),
+    UnknownSessionScreen(
+        route = "unknown_session_screen",
+        titleId = R.string.unknown_session_screen
+    ),
     UserActivityRecognitionScreen(
         route = "user_activity_recognition_screen",
         titleId = R.string.user_activity_recognition_screen
     ),
-    GeofencingScreen(
-        route = "geofencing_screen",
-        titleId = R.string.geofencing_screen
-    ),
+    GeofencingScreen(route = "geofencing_screen", titleId = R.string.geofencing_screen),
 }

@@ -74,9 +74,9 @@ class UserActivityTransitionManager(context: Context) {
     private val pendingIntent by lazy {
         PendingIntent.getBroadcast(
             context,
-            1000,
+            1002,
             Intent("USER-ACTIVITY-DETECTION-INTENT-ACTION"),
-            PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
     }
 

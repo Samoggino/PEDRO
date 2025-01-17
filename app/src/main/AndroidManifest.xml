@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.health.READ_STEPS" />
     <uses-permission android:name="android.permission.health.WRITE_STEPS" />
 
@@ -97,10 +98,6 @@
             android:name=".util.services.ActivityTrackingService"
             android:enabled="true"
             android:foregroundServiceType="location|health" />
-<<<<<<< HEAD
-        <!-- android:exported="false" -->
-=======
-            <!-- android:exported="false" -->
 
         <service
             android:name=".util.services.ActivityRecognitionService"
@@ -110,7 +107,6 @@
                 <action android:name="USER-ACTIVITY-DETECTION-INTENT-ACTION" />
             </intent-filter>
         </service>
->>>>>>> Bug-fix
 
         <service
             android:name=".util.services.ActivityRecognitionService"

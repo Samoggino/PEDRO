@@ -15,7 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -45,7 +45,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.CustomSnackbarHost
 import com.lam.pedro.presentation.navigation.Screen
@@ -57,8 +56,9 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    navController: NavHostController,
-    titleId: Int
+    onNavBack: () -> Unit,
+    onNavigate: (String) -> Unit,
+    titleId: Int,
 ) {
     val scrollState = rememberScrollState()
     var isToggled by remember { mutableStateOf(false) }
@@ -100,9 +100,7 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.headlineSmall
                     )
                 },
-                navigationIcon = {
-                    BackButton(navController)
-                },
+                navigationIcon = { BackButton(onNavBack) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White.copy(alpha = 0f)
                 )
@@ -168,18 +166,7 @@ fun SettingsScreen(
                     .fillMaxWidth()
                     .height(85.dp)
                     .padding(horizontal = 10.dp)
-                    .clickable(onClick = {
-                        navController.navigate(Screen.UserActivityRecognitionScreen.route) {
-                            // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
-                            navController.graph.startDestinationRoute?.let { route ->
-                                popUpTo(route) {
-                                    saveState = true
-                                }
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        } // Cambia lo stato del click
-                    }),
+                    .clickable(onClick = { onNavigate(Screen.UserActivityRecognitionScreen.route) }),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -188,7 +175,7 @@ fun SettingsScreen(
                     modifier = Modifier.weight(1f)
                 )
                 Icon(
-                    Icons.Filled.ArrowForwardIos,
+                    Icons.AutoMirrored.Filled.ArrowForwardIos,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.size(25.dp)
@@ -200,18 +187,7 @@ fun SettingsScreen(
                     .fillMaxWidth()
                     .height(85.dp)
                     .padding(horizontal = 10.dp)
-                    .clickable(onClick = {
-                        navController.navigate(Screen.GeofencingScreen.route) {
-                            // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
-                            navController.graph.startDestinationRoute?.let { route ->
-                                popUpTo(route) {
-                                    saveState = true
-                                }
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        } // Cambia lo stato del click
-                    }),
+                    .clickable(onClick = { onNavigate(Screen.GeofencingScreen.route) }),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
@@ -220,7 +196,7 @@ fun SettingsScreen(
                     modifier = Modifier.weight(1f)
                 )
                 Icon(
-                    Icons.Filled.ArrowForwardIos,
+                    Icons.AutoMirrored.Filled.ArrowForwardIos,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.size(25.dp)
@@ -237,7 +213,8 @@ fun SettingsScreen(
                             value = notificationInterval.toString(),
                             onValueChange = { newValue ->
                                 if (newValue.isNotEmpty() && newValue.all { it.isDigit() }) {
-                                    notificationInterval = newValue.toLong() // Set the value directly without enforcing the limit yet
+                                    notificationInterval =
+                                        newValue.toLong() // Set the value directly without enforcing the limit yet
                                 }
                             },
                             label = { Text("Notification interval (minutes)") },
