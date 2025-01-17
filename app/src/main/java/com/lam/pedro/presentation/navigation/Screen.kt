@@ -163,4 +163,9 @@ enum class Screen(
         route = "user_activity_recognition_screen",
         titleId = R.string.user_activity_recognition_screen
     ),
+    GeofencingScreen(
+        route = "geofencing_screen",
+        titleId = R.string.geofencing_screen
+    ),
+
 }

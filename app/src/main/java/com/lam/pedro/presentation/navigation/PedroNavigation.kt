@@ -54,6 +54,7 @@ import com.lam.pedro.presentation.screen.community.CommunityScreen
 import com.lam.pedro.presentation.screen.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.more.AboutScreen
 import com.lam.pedro.presentation.screen.more.PrivacyPolicyScreen
+import com.lam.pedro.presentation.screen.more.settingsscreen.GeofencingScreen
 import com.lam.pedro.presentation.screen.more.settingsscreen.SettingsScreen
 import com.lam.pedro.presentation.screen.more.settingsscreen.UserActivityRecognitionScreen
 import com.lam.pedro.presentation.screen.profile.ProfileScreen
@@ -609,6 +610,17 @@ fun PedroNavigation(
                 UserActivityRecognitionScreen(
                     navController,
                     Screen.UserActivityRecognitionScreen.titleId
+                )
+            }
+
+            composable(
+                Screen.GeofencingScreen.route,
+                enterTransition = slideInH,
+                exitTransition = slideOutH
+            ) {
+                GeofencingScreen(
+                    navController,
+                    Screen.GeofencingScreen.titleId
                 )
             }
         }

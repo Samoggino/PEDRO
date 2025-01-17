@@ -195,6 +195,7 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
         Log.d("SESSION LIST", "${sessionsList.value}")
     }
 
+
     suspend fun filterSessionsByDay() {
 
     }

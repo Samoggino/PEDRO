@@ -1,7 +1,6 @@
 package com.lam.pedro.util.services
 
 import android.Manifest
-import android.app.ActivityManager
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -18,14 +17,20 @@ import android.os.IBinder
 import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.ActivityTransitionResult
+import com.google.android.gms.location.GeofenceStatusCodes
+import com.google.android.gms.location.GeofencingEvent
 import com.lam.pedro.R
 import com.lam.pedro.data.datasource.activityRecognition.UserActivityTransitionManager
 import com.lam.pedro.presentation.MainActivity
+import com.lam.pedro.presentation.TAG
+import com.lam.pedro.util.CUSTOM_INTENT_GEOFENCE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,24 +38,19 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-
-class ActivityRecognitionService : Service() {
+/*
+class GeofencingService(systemEvent: (userActivity: String) -> Unit) : Service() {
 
     private lateinit var manager: UserActivityTransitionManager
     private lateinit var receiver: BroadcastReceiver
     private lateinit var handler: Handler
     private lateinit var updateRunnable: Runnable
+    val currentSystemOnEvent by rememberUpdatedState(systemEvent)
 
-    private var currentNotificationText: String = "Monitoring user activity...\nNo new data."
+    private var currentNotificationText: String = "Geofencing service is running..."
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate() {
-        val status = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)
-        if (status != ConnectionResult.SUCCESS) {
-            Log.e("GooglePlayServices", "Google Play Services not available")
-        } else {
-            Log.d("GooglePlayServices", "Google Play Services available")
-        }
         super.onCreate()
         isServiceRunning = true
         manager = UserActivityTransitionManager(this)
@@ -72,39 +72,28 @@ class ActivityRecognitionService : Service() {
         handler.postDelayed(updateRunnable, 10000) // Prima esecuzione dopo 10 secondi
 
         // Configurazione del BroadcastReceiver per aggiornare la notifica
-        val intentFilter = IntentFilter("USER-ACTIVITY-DETECTION-INTENT-ACTION")
-        receiver = object : BroadcastReceiver() {
+        val intentFilter = IntentFilter(CUSTOM_INTENT_GEOFENCE)
+        val broadcast = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
-                // Log per indicare che è stato ricevuto un intent
-                Log.d("ActivityRecognitionService", "Intent ricevuto!")
+                val geofencingEvent = intent?.let { GeofencingEvent.fromIntent(it) } ?: return
 
-                if (intent == null) {
-                    Log.w("ActivityRecognitionService", "Intent ricevuto nullo.")
+                if (geofencingEvent.hasError()) {
+                    val errorMessage =
+                        GeofenceStatusCodes.getStatusCodeString(geofencingEvent.errorCode)
+                    Log.e(TAG, "onReceive: $errorMessage")
                     return
                 }
-
-                val result = ActivityTransitionResult.extractResult(intent)
-                if (result == null) {
-                    Log.w("ActivityRecognitionService", "ActivityTransitionResult nullo.")
-                    return
-                }
-
-                val transitionText = result.transitionEvents.joinToString("\n") { event ->
-                    "${UserActivityTransitionManager.getActivityType(event.activityType)} - " +
-                            UserActivityTransitionManager.getTransitionType(event.transitionType)
-                }
-
-                // Log delle attività rilevate
-                Log.d("ActivityRecognitionService", "Transizioni rilevate:\n$transitionText")
-
-                // Aggiorna la notifica con l'attività corrente
-                updateNotification(transitionText)
-
+                val alertString = "Geofence Alert :" +
+                        " Trigger ${geofencingEvent.triggeringGeofences}" +
+                        " Transition ${geofencingEvent.geofenceTransition}"
+                Log.d(
+                    TAG,
+                    alertString
+                )
+                currentSystemOnEvent(alertString)
             }
-
-
         }
-        registerReceiver(receiver, intentFilter, Context.RECEIVER_EXPORTED)
+        context.registerReceiver(broadcast, intentFilter, )
     }
 
 
@@ -207,3 +196,5 @@ class ActivityRecognitionService : Service() {
         var isServiceRunning = false
     }
 }
+
+ */

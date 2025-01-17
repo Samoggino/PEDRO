@@ -108,6 +108,15 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name=".util.services.ActivityRecognitionService"
+            android:foregroundServiceType="health"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="USER-ACTIVITY-DETECTION-INTENT-ACTION" />
+            </intent-filter>
+        </service>
+
 
     </application>
 

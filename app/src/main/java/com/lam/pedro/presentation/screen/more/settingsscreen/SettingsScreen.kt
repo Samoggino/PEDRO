@@ -195,6 +195,38 @@ fun SettingsScreen(
                 )
             }
 
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(85.dp)
+                    .padding(horizontal = 10.dp)
+                    .clickable(onClick = {
+                        navController.navigate(Screen.GeofencingScreen.route) {
+                            // See: https://developer.android.com/jetpack/compose/navigation#nav-to-composable
+                            navController.graph.startDestinationRoute?.let { route ->
+                                popUpTo(route) {
+                                    saveState = true
+                                }
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        } // Cambia lo stato del click
+                    }),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Geofencing",
+                    style = MaterialTheme.typography.bodyLarge, // Increased text size
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    Icons.Filled.ArrowForwardIos,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.size(25.dp)
+                )
+            }
+
             // Open dialog to set notification interval
             if (showDialog) {
                 AlertDialog(

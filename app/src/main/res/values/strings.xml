@@ -193,5 +193,6 @@
     <string name="select_date">select date</string>
     <string name="reset_sessions">reset session</string>
     <string name="unknown_session_screen">Unknown</string>
+    <string name="geofencing_screen"><![CDATA[Settings > Geofencing]]></string>
 
 </resources>
