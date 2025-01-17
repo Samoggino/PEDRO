@@ -54,12 +54,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.lam.pedro.R
+import com.lam.pedro.data.HealthConnectManager
+import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseSupabaseRepositoryImpl
+import com.lam.pedro.data.fetchFromHealthConnectForDB
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.CustomSnackbarHost
 import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.presentation.screen.MenuItem
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper.checkUserLoggedIn
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginState
+import com.lam.pedro.presentation.serialization.MyRecordsViewModel
 import com.lam.pedro.util.notification.areNotificationsActive
 import com.lam.pedro.util.notification.cancelPeriodicNotifications
 import com.lam.pedro.util.notification.schedulePeriodicNotifications
@@ -78,6 +82,8 @@ fun AccountScreen(
         val result = checkUserLoggedIn() // Chiama la funzione sospesa
         loginState.value = result
     }
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -129,41 +135,22 @@ fun AccountScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-
-            /**
-             * FIXME: eccezione per exerciseRoute = null
-             * coroutineScope.launch {
-             *     val allActivities = fetchFromHealthConnectForDB(healthConnectManager)
-             *     val viewModelRecords = ViewModelRecords()
-             *     viewModelRecords.insertActivitySession(allActivities)
-             * }
-             */
-            if (loginState.value is LoginState.LoggedIn) {
-                /**
-                         * FIXME: eccezione per exerciseRoute = null
-                         * coroutineScope.launch {
-                         *     val allActivities = fetchFromHealthConnectForDB(healthConnectManager)
-                         *     val viewModelRecords = ViewModelRecords()
-                         *     viewModelRecords.insertActivitySession(allActivities)
-                         * }
-                         */
                 MenuItem(
                     iconId = R.drawable.upload_on_db_icon,
                     label = "Update remote DB",
                     onClick = {
-                        /**
-                         * FIXME: eccezione per exerciseRoute = null
-                         * coroutineScope.launch {
-                         *     val allActivities = fetchFromHealthConnectForDB(healthConnectManager)
-                         *     val viewModelRecords = ViewModelRecords()
-                         *     viewModelRecords.insertActivitySession(allActivities)
-                         * }
-                         */
+                        coroutineScope.launch {
+                            val allActivities =
+                                fetchFromHealthConnectForDB(HealthConnectManager(context))
+                            val viewModelRecords =
+                                MyRecordsViewModel(ActivitySupabaseSupabaseRepositoryImpl())
+                            viewModelRecords.insertActivitySession(allActivities)
+                        }
                     },
                     height = 80,
                     finalIcon = Icons.Filled.TouchApp
                 )
-            }
+
 
             Spacer(modifier = Modifier.height(24.dp))
 

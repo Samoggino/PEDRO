@@ -49,7 +49,7 @@ class MyRecordsViewModel(private val activityRepository: IActivitySupabaseReposi
      * Inserisce una lista di sessioni di attività nel database.
      * @param genericActivities Lista di attività da inserire
      */
-    private fun insertActivitySession(genericActivities: List<GenericActivity>) {
+    fun insertActivitySession(genericActivities: List<GenericActivity>) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 activityRepository.insertActivitySession(genericActivities, getUUID()!!)
