@@ -197,5 +197,7 @@
     <string name="reset_sessions">reset session</string>
     <string name="unknown_session_screen">Unknown</string>
     <string name="geofencing_screen"><![CDATA[Settings > Geofencing]]></string>
+    <string name="account_screen">Account</string>
+    <string name="import_export_screen">Import/export</string>
 
 </resources>

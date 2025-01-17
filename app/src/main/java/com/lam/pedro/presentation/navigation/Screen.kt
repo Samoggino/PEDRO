@@ -68,4 +68,7 @@ enum class Screen(
         titleId = R.string.user_activity_recognition_screen
     ),
     GeofencingScreen(route = "geofencing_screen", titleId = R.string.geofencing_screen),
+    AccountScreen(route = "account_screen", titleId = R.string.account_screen),
+    ImportExportScreen(route = "import_export_screen", titleId = R.string.import_export_screen),
+
 }

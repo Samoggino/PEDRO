@@ -36,6 +36,7 @@ import com.lam.pedro.presentation.screen.community.CommunityScreenViewModelFacto
 import com.lam.pedro.presentation.screen.community.chat.ChatScreen
 import com.lam.pedro.presentation.screen.community.user.UserCommunityDetails
 import com.lam.pedro.presentation.screen.more.AboutScreen
+import com.lam.pedro.presentation.screen.more.AccountScreen
 import com.lam.pedro.presentation.screen.more.HealthConnectScreen
 import com.lam.pedro.presentation.screen.more.PrivacyPolicyScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginScreen
@@ -190,6 +191,32 @@ fun PedroNavigation(
                 RegisterScreen(
                     onNavBack = { onNavBack() },
                     onNavigate = { route -> navController.navigate(route) }
+                )
+            }
+
+            composable(
+                route = Screen.AccountScreen.route,
+                enterTransition = { NavigationTransitions.slideInHorizontally() },
+                exitTransition = { NavigationTransitions.slideOutHorizontally() }
+            ) {
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
+                AccountScreen(
+                    onNavBack = { onNavBack() },
+                    onNavigate = { route -> navController.navigate(route) },
+                    titleId = Screen.AccountScreen.titleId
+                )
+            }
+
+            composable(
+                route = Screen.ImportExportScreen.route,
+                enterTransition = { NavigationTransitions.slideInHorizontally() },
+                exitTransition = { NavigationTransitions.slideOutHorizontally() }
+            ) {
+                logScreenStack() // Log dello stack dopo aver aperto la schermata
+                AccountScreen(
+                    onNavBack = { onNavBack() },
+                    onNavigate = { route -> navController.navigate(route) },
+                    titleId = Screen.ImportExportScreen.titleId
                 )
             }
 

@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,30 +48,29 @@ fun MoreScreen(
     onNavigate: (String) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val loginState = remember { mutableStateOf<LoginState>(LoginState.Idle) }
 
-    Log.i("MoreScreen", "MoreScreen reloaded")
-    // Controllo login al montaggio del composable
+    val loginState = remember { mutableStateOf<LoginState>(LoginState.Idle) }
     LaunchedEffect(Unit) {
         loginState.value = LoginState.Loading
         val result = checkUserLoggedIn() // Chiama la funzione sospesa
         loginState.value = result
     }
-    // se l'utente è loggato c'è un bottone in più, quindi ogni elemento deve essere più piccolo
-    val itemHeight = if (loginState.value is LoginState.LoggedIn) 75 else 85
 
+    Log.i("MoreScreen", "MoreScreen reloaded")
+    // Controllo login al montaggio del composable
+
+    val itemHeight = 85
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 32.dp),
+            .padding(horizontal = 30.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
         // Mostra l'elemento account
         AccountItem(onNavigate, loginState.value)
 
-        // Bottoni principali
         MenuItem(
             iconId = R.drawable.health_connect_icon,
             label = "Health Connect",
@@ -83,7 +83,6 @@ fun MoreScreen(
             label = "Settings",
             onClick = { onNavigate(Screen.SettingScreen.route) },
             height = itemHeight
-
         )
 
         MenuItem(
@@ -100,54 +99,6 @@ fun MoreScreen(
             height = itemHeight
         )
 
-        /**
-         * FIXME: eccezione per exerciseRoute = null
-         * coroutineScope.launch {
-         *     val allActivities = fetchFromHealthConnectForDB(healthConnectManager)
-         *     val viewModelRecords = ViewModelRecords()
-         *     viewModelRecords.insertActivitySession(allActivities)
-         * }
-         */
-        if (loginState.value is LoginState.LoggedIn) {
-            MenuItem(
-                iconId = R.drawable.modify_icon,
-                label = "UPDATE DB",
-                onClick = {
-                    /**
-                     * FIXME: eccezione per exerciseRoute = null
-                     * coroutineScope.launch {
-                     *     val allActivities = fetchFromHealthConnectForDB(healthConnectManager)
-                     *     val viewModelRecords = ViewModelRecords()
-                     *     viewModelRecords.insertActivitySession(allActivities)
-                     * }
-                     */
-                },
-                height = itemHeight
-            )
-        }
-
-
-        // Bottone Logout (mostrato solo se l'utente è loggato)
-        if (loginState.value is LoginState.LoggedIn) {
-            MenuItem(
-                iconId = R.drawable.stop_icon,
-                label = "Logout",
-                onClick = {
-                    coroutineScope.launch {
-                        LoginRegisterHelper.logout()
-                        // Aggiorna lo stato del login
-                        loginState.value = checkUserLoggedIn()
-                    }
-                },
-                extraIcon = {
-                    Box(
-                        modifier = Modifier
-                            .size(12.dp)
-                            .background(Color.Red, shape = CircleShape)
-                    )
-                }
-            )
-        }
     }
 }
 
@@ -159,9 +110,10 @@ private fun AccountItem(onNavigate: (String) -> Unit, loginState: LoginState) {
         is LoginState.LoggedIn -> {
             MenuItem(
                 iconId = R.drawable.user_icon,
-                label = "You are a Hermano!",
-                onClick = { },
+                label = "Account",
+                onClick = { onNavigate(Screen.AccountScreen.route) },
                 topHeight = 85,
+                height = 80,
                 extraIcon = {
                     Box(
                         modifier = Modifier
@@ -175,9 +127,17 @@ private fun AccountItem(onNavigate: (String) -> Unit, loginState: LoginState) {
         is LoginState.NotLoggedIn -> {
             MenuItem(
                 iconId = R.drawable.user_icon,
-                label = "You're not a Hermano, yet",
+                label = "Account",
                 onClick = { onNavigate(Screen.LoginScreen.route) },
-                topHeight = 85
+                topHeight = 85,
+                height = 80,
+                extraIcon = {
+                    Box(
+                        modifier = Modifier
+                            .size(12.dp)
+                            .background(Color.Red, shape = CircleShape)
+                    )
+                }
             )
         }
 
@@ -193,8 +153,9 @@ fun MenuItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     topHeight: Int = 16,
-    height: Int = 85,
-    extraIcon: @Composable (() -> Unit)? = null // Nuovo parametro per l'icona extra
+    height: Int,
+    finalIcon: ImageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+    extraIcon: (@Composable () -> Unit)? = null
 ) {
     Spacer(modifier = Modifier.height(topHeight.dp))
 
@@ -223,11 +184,10 @@ fun MenuItem(
             modifier = Modifier.weight(1f)
         )
 
-        // Mostra l'icona extra se presente
         extraIcon?.invoke()
 
         Icon(
-            Icons.AutoMirrored.Filled.ArrowForwardIos,
+            finalIcon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.size(25.dp)
