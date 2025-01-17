@@ -1,115 +1,68 @@
 package com.lam.pedro.presentation.screen.profile
 
-import android.content.Context
-import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.lam.pedro.presentation.TAG
+import com.lam.pedro.data.datasource.SecurePreferencesManager.getProfileData
+import com.lam.pedro.data.datasource.SecurePreferencesManager.saveProfileData
+import com.lam.pedro.presentation.screen.profile.ProfilePreference.AGE
+import com.lam.pedro.presentation.screen.profile.ProfilePreference.FIRST_NAME
+import com.lam.pedro.presentation.screen.profile.ProfilePreference.HEIGHT
+import com.lam.pedro.presentation.screen.profile.ProfilePreference.LAST_NAME
+import com.lam.pedro.presentation.screen.profile.ProfilePreference.NATIONALITY
+import com.lam.pedro.presentation.screen.profile.ProfilePreference.SEX
+import com.lam.pedro.presentation.screen.profile.ProfilePreference.WEIGHT
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
-// ViewModel per centralizzare i dati del profilo
-class ProfileViewModel(context: Context) : ViewModel() {
+class ProfileViewModel : ViewModel() {
 
-    private val sharedPreferences =
-        context.getSharedPreferences("ProfileData", Context.MODE_PRIVATE)
-    private val editor = sharedPreferences.edit()
+    private val _firstName = MutableStateFlow("")
+    val firstName: StateFlow<String> = _firstName
 
-    // Stato centralizzato per i dati del profilo
-    var firstName by mutableStateOf(
-        sharedPreferences.getString("firstName", "FirstName") ?: "FirstName"
-    )
-        private set
-    var lastName by mutableStateOf(
-        sharedPreferences.getString("lastName", "SecondName") ?: "SecondName"
-    )
-        private set
-    var age by mutableStateOf(sharedPreferences.getString("age", "Age") ?: "Age")
-        private set
-    var sex by mutableStateOf(sharedPreferences.getString("sex", "Sex") ?: "Sex")
-        private set
-    var weight by mutableStateOf(sharedPreferences.getString("weight", "Weight") ?: "Weight")
-        private set
-    var height by mutableStateOf(sharedPreferences.getString("height", "Height") ?: "Height")
-        private set
-    var nationality by mutableStateOf(
-        sharedPreferences.getString("nationality", "Nationality") ?: "Nationality"
-    )
-        private set
+    private val _lastName = MutableStateFlow("")
+    val lastName: StateFlow<String> = _lastName
 
+    private val _age = MutableStateFlow("")
+    val age: StateFlow<String> = _age
 
-    // Funzioni per aggiornare i dati
-    fun updateFirstName(value: String) {
-        firstName = value
-        editor.putString("firstName", value).apply()
+    private val _sex = MutableStateFlow("")
+    val sex: StateFlow<String> = _sex
+
+    private val _weight = MutableStateFlow("")
+    val weight: StateFlow<String> = _weight
+
+    private val _height = MutableStateFlow("")
+    val height: StateFlow<String> = _height
+
+    private val _nationality = MutableStateFlow("")
+    val nationality: StateFlow<String> = _nationality
+
+    init {
+        loadProfileData()
     }
 
-    fun updateLastName(value: String) {
-        lastName = value
-        editor.putString("lastName", value).apply()
-    }
-
-    fun updateAge(value: String) {
-        age = value
-        editor.putString("age", value).apply()
-    }
-
-    fun updateSex(value: String) {
-        sex = value
-        editor.putString("sex", value).apply()
-    }
-
-    fun updateWeight(value: String) {
-        weight = value
-        editor.putString("weight", value).apply()
-    }
-
-    fun updateHeight(value: String) {
-        height = value
-        editor.putString("height", value).apply()
-    }
-
-    fun updateNationality(value: String) {
-        nationality = value
-        editor.putString("nationality", value).apply()
-    }
-
-
-    // Metodo per aggiornare i valori e salvarli in SharedPreferences
-    fun updateProfileField(key: String, value: String) {
-        when (key) {
-            "firstName" -> firstName = value
-            "lastName" -> lastName = value
-            "sex" -> sex = value
-            "age" -> age = value
-            "weight" -> weight = value
-            "height" -> height = value
-            "nationality" -> nationality = value
+    fun updateProfileField(field: ProfilePreference, value: String) {
+        when (field) {
+            FIRST_NAME -> _firstName.value = value
+            LAST_NAME -> _lastName.value = value
+            AGE -> _age.value = value
+            SEX -> _sex.value = value
+            WEIGHT -> _weight.value = value
+            HEIGHT -> _height.value = value
+            NATIONALITY -> _nationality.value = value
         }
-        saveToPreferences(key, value)
+        saveProfileData(field, value)
     }
 
-    private fun saveToPreferences(key: String, value: String) {
-        sharedPreferences.edit()
-            .putString(key, value)
-            .commit()
-    }
 
-    fun reloadProfileData() {
-        firstName = sharedPreferences.getString("firstName", "FirstName") ?: "FirstName"
-        Log.d(TAG, "reloadProfileData: $firstName")
-        lastName = sharedPreferences.getString("lastName", "SecondName") ?: "SecondName"
-        Log.d(TAG, "reloadProfileData: $lastName")
-        age = sharedPreferences.getString("age", "Age") ?: "Age"
-        Log.d(TAG, "reloadProfileData: $age")
-        sex = sharedPreferences.getString("sex", "Sex") ?: "Sex"
-        Log.d(TAG, "reloadProfileData: $sex")
-        weight = sharedPreferences.getString("weight", "Weight") ?: "Weight"
-        Log.d(TAG, "reloadProfileData: $weight")
-        height = sharedPreferences.getString("height", "Height") ?: "Height"
-        Log.d(TAG, "reloadProfileData: $height")
-        nationality = sharedPreferences.getString("nationality", "Nationality") ?: "Nationality"
-        Log.d(TAG, "reloadProfileData: $nationality")
+    // Metodo per caricare i dati del profilo da SecurePreferencesManager
+    private fun loadProfileData() {
+        _firstName.value = getProfileData(FIRST_NAME, "John")
+        _lastName.value = getProfileData(LAST_NAME, "Doe")
+        _age.value = getProfileData(AGE, "30")
+        _sex.value = getProfileData(SEX, "Male")
+        _weight.value = getProfileData(WEIGHT, "75")
+        _height.value = getProfileData(HEIGHT, "1.80")
+        _nationality.value = getProfileData(NATIONALITY, "USA")
     }
-
 }
+

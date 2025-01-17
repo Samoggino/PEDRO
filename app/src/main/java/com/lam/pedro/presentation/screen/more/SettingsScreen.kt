@@ -1,11 +1,13 @@
 package com.lam.pedro.presentation.screen.more
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -30,7 +32,9 @@ fun SettingsScreen(
     onNavBack: () -> Unit,
     titleId: Int
 ) {
+
     var isToggled by remember { mutableStateOf(false) }
+    var isDarkMode by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -54,6 +58,7 @@ fun SettingsScreen(
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
+            // Row for Switch
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -71,6 +76,21 @@ fun SettingsScreen(
                         isToggled = isChecked
                     }
                 )
+            }
+
+            // Button to toggle Dark Mode
+            Button(
+                onClick = {
+                    isDarkMode = !isDarkMode
+                    // Apply dark mode change using the theme
+                    // Usually, this would require re-composing or calling some theme change logic
+                    // You might need to use a custom theme provider or a state management solution.
+                },
+                modifier = Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(text = if (isDarkMode) "Switch to Light Mode" else "Switch to Dark Mode")
             }
         }
     }

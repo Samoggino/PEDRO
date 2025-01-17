@@ -54,8 +54,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PedroNavigation(
     navController: NavHostController,
-    snackbarHostState: SnackbarHostState,
-    profileViewModel: ProfileViewModel
+    snackbarHostState: SnackbarHostState
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -174,7 +173,6 @@ fun PedroNavigation(
                 ProfileScreen(
                     titleId = getTitleIdForRoute(currentRoute),
                     onNavBack = { onNavBack() },
-                    profileViewModel = profileViewModel
                 )
             }
             composable(

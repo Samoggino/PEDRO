@@ -80,10 +80,10 @@ class TrainSessionViewModel(private val healthConnectManager: HealthConnectManag
         exerciseRoute: List<ExerciseRoute.Location>,
     ) {
         val (totalCalories, activeCalories) = calculateTrainCalories(
-            profileViewModel.weight.toDouble(),
-            profileViewModel.height.toDouble(),
-            profileViewModel.age.toInt(),
-            profileViewModel.sex,
+            profileViewModel.weight.value.toDouble(),
+            profileViewModel.height.value.toDouble(),
+            profileViewModel.age.value.toInt(),
+            profileViewModel.sex.value,
             duration,
             trainIntensity
         )

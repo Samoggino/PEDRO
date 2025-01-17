@@ -13,14 +13,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lam.pedro.data.datasource.SecurePreferencesManager
 import com.lam.pedro.presentation.onboarding.OnboardingScreen
 import com.lam.pedro.presentation.onboarding.OnboardingUtils
-import com.lam.pedro.presentation.screen.profile.ProfileViewModel
-import com.lam.pedro.presentation.screen.profile.ProfileViewModelFactory
+import com.lam.pedro.presentation.theme.PedroTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -49,7 +46,9 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            ShowOnboardingScreen()
+            PedroTheme {
+                ShowOnboardingScreen()
+            }
         }
     }
 
@@ -66,13 +65,12 @@ class MainActivity : ComponentActivity() {
 
         if (isInitialized.value) {
             val scope = rememberCoroutineScope()
-            val profileViewModel: ProfileViewModel =
-                viewModel(factory = ProfileViewModelFactory(LocalContext.current))
-            OnboardingScreen(profileViewModel) {
+            OnboardingScreen {
                 onboardingUtils.setOnboardingCompleted()
+
                 scope.launch {
                     setContent {
-                        PedroApp(profileViewModel = profileViewModel)
+                        PedroApp()
                     }
                 }
             }

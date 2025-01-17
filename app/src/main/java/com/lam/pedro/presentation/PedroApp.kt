@@ -42,12 +42,12 @@ import androidx.navigation.compose.rememberNavController
 import com.lam.pedro.presentation.navigation.BottomBar
 import com.lam.pedro.presentation.navigation.PedroNavigation
 import com.lam.pedro.presentation.navigation.Screen
-import com.lam.pedro.presentation.screen.profile.ProfileViewModel
+import com.lam.pedro.presentation.theme.PedroTheme
 
 const val TAG = "Health Connect sample"
 
 @Composable
-fun PedroApp( profileViewModel: ProfileViewModel) {
+fun PedroApp() {
 
     Log.i("PedroApp", "PedroApp reloaded")
     val snackbarHostState = remember { SnackbarHostState() }
@@ -82,49 +82,50 @@ fun PedroApp( profileViewModel: ProfileViewModel) {
         }
     }
 
+    PedroTheme {
+        Scaffold(
+            floatingActionButton = {
+                if (currentRoute == Screen.ActivitiesScreen.route) {
+                    ExtendedFloatingActionButton(
+                        // TODO: da togliere, ovviamente
+                        onClick = { navController.navigate(Screen.MyScreenRecords.route) },
+                        icon = { Icon(Icons.Filled.Add, "Add Activity") },
+                        text = { Text(text = "New Activity") },
+                        shape = RoundedCornerShape(26.dp),
+                        contentColor = MaterialTheme.colorScheme.primary
+                    )
+                }
+            },
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+            bottomBar = {
+                // Mostra la BottomBar solo se `showBottomBar` è true
+                if (showBottomNotTop.value) {
+                    BottomBar(
+                        currentRoute = currentRoute,
+                        onNavigateToHome = { navController.navigate(Screen.HomeScreen.route) },
+                        onNavigateToActivities = { navController.navigate(Screen.ActivitiesScreen.route) },
+                        onNavigateToCommunity = { navController.navigate(Screen.CommunityScreen.route) },
+                        onNavigateToMore = { navController.navigate(Screen.MoreScreen.route) }
+                    )
+                }
+            }
+        ) { paddingValues ->
+            var rememberedPaddingValues by remember { mutableStateOf(PaddingValues()) }
 
-    Scaffold(
-        floatingActionButton = {
-            if (currentRoute == Screen.ActivitiesScreen.route) {
-                ExtendedFloatingActionButton(
-                    // TODO: da togliere, ovviamente
-                    onClick = { navController.navigate(Screen.MyScreenRecords.route) },
-                    icon = { Icon(Icons.Filled.Add, "Add Activity") },
-                    text = { Text(text = "New Activity") },
-                    shape = RoundedCornerShape(26.dp),
-                    contentColor = MaterialTheme.colorScheme.primary
+            // Solo aggiorna se cambia il paddingValues
+            if (rememberedPaddingValues != paddingValues) {
+                rememberedPaddingValues = paddingValues
+            }
+
+            Log.i("PedroApp", "Scaffold reloaded")
+
+            Box(modifier = Modifier.padding(rememberedPaddingValues)) {
+                PedroNavigation(
+                    navController = navController,
+                    snackbarHostState = snackbarHostState,
                 )
             }
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        bottomBar = {
-            // Mostra la BottomBar solo se `showBottomBar` è true
-            if (showBottomNotTop.value) {
-                BottomBar(
-                    currentRoute = currentRoute,
-                    onNavigateToHome = { navController.navigate(Screen.HomeScreen.route) },
-                    onNavigateToActivities = { navController.navigate(Screen.ActivitiesScreen.route) },
-                    onNavigateToCommunity = { navController.navigate(Screen.CommunityScreen.route) },
-                    onNavigateToMore = { navController.navigate(Screen.MoreScreen.route) }
-                )
-            }
-        }
-    ) { paddingValues ->
-        var rememberedPaddingValues by remember { mutableStateOf(PaddingValues()) }
-
-        // Solo aggiorna se cambia il paddingValues
-        if (rememberedPaddingValues != paddingValues) {
-            rememberedPaddingValues = paddingValues
         }
 
-        Log.i("PedroApp", "Scaffold reloaded")
-
-        Box(modifier = Modifier.padding(rememberedPaddingValues)) {
-            PedroNavigation(
-                navController = navController,
-                snackbarHostState = snackbarHostState,
-                profileViewModel = profileViewModel
-            )
-        }
     }
 }

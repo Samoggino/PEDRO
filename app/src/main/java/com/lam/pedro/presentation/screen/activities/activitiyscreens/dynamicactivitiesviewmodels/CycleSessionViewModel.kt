@@ -95,10 +95,10 @@ class CycleSessionViewModel(private val healthConnectManager: HealthConnectManag
     ) {
         val averageSpeed = calculateAverageSpeed(speedSamples)
         val (totalCalories, activeCalories) = calculateCyclingCalories(
-            profileViewModel.weight.toDouble(),
-            profileViewModel.height.toDouble(),
-            profileViewModel.age.toInt(),
-            profileViewModel.sex,
+            profileViewModel.weight.value.toDouble(),
+            profileViewModel.height.value.toDouble(),
+            profileViewModel.age.value.toInt(),
+            profileViewModel.sex.value,
             distance,
             duration,
             averageSpeed

@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.lam.pedro.presentation.screen.profile.ProfilePreference
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -15,6 +16,9 @@ object SecurePreferencesManager {
     private const val UUID = "UUID"
     private const val USERNAME = "USERNAME"
     private const val AVATAR_URL = "AVATAR_URL"
+
+    private const val DARKMODE = "DARKMODE"
+
 
     private var encryptedPrefs: SharedPreferences? = null
     private var appContext: Context? = null
@@ -137,4 +141,35 @@ object SecurePreferencesManager {
 
         return appContext!!
     }
+
+
+    // Metodi per salvare e recuperare le preferenze del profilo
+    fun saveProfileData(preference: ProfilePreference, value: String) {
+        checkInitialized()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            with(encryptedPrefs!!.edit()) {
+                putString(preference.key, value)
+                apply()
+            }
+        }
+    }
+
+    fun getProfileData(preference: ProfilePreference, defaultValue: String = "default"): String {
+        checkInitialized()
+
+        return encryptedPrefs!!.getString(preference.key, defaultValue) ?: defaultValue
+    }
+
+    fun saveDarkMode(darkMode: Boolean) {
+        checkInitialized()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            with(encryptedPrefs!!.edit()) {
+                putBoolean(DARKMODE, darkMode)
+                apply()
+            }
+        }
+    }
 }
+

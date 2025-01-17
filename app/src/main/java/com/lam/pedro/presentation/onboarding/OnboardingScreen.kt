@@ -1,5 +1,6 @@
 package com.lam.pedro.presentation.onboarding
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -42,91 +43,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.lam.pedro.presentation.screen.profile.ProfileViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.launch
 
-/*
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun OnboardingScreen(onFinished: () -> Unit) {
+fun OnboardingScreen(
+    onFinished: () -> Unit,
+) {
+    Log.i("OnboardingScreen", "OnboardingScreen reloaded")
 
-    val pages = listOf(
-        OnboardingModel.FirstPage, OnboardingModel.SecondPage, OnboardingModel.ThirdPage, OnboardingModel.FourthPage
-    )
-
-    val pagerState = rememberPagerState(initialPage = 0) {
-        pages.size
-    }
-    val buttonState = remember {
-        derivedStateOf {
-            when (pagerState.currentPage) {
-                0 -> listOf("", "Next")
-                1 -> listOf("Back", "Next")
-                2 -> listOf("Back", "Next")
-                3 -> listOf("Back", "Vamos!")
-                else -> listOf("", "")
-            }
-        }
-    }
-
-    val scope = rememberCoroutineScope()
-
-    Scaffold(bottomBar = {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp, 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Box(modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.CenterStart) { if (buttonState.value[0].isNotEmpty()) {
-                NextButtonUI (text = buttonState.value[0],
-                    backgroundColor = Color.Transparent,
-                    textColor = Color.White) {
-                    scope.launch {
-                        if (pagerState.currentPage > 0) {
-                            pagerState.animateScrollToPage(pagerState.currentPage - 1)
-                        }
-                    }
-                }
-            }
-            }
-            Box(modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.Center) {
-                IndicatorUI(pageSize = pages.size, currentPage = pagerState.currentPage)
-            }
-
-            Box(modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.CenterEnd) {
-                NextButtonUI (text = buttonState.value[1],
-                    backgroundColor = MaterialTheme.colorScheme.primary,
-                    textColor = MaterialTheme.colorScheme.onPrimary) {
-                    scope.launch {
-                        if (pagerState.currentPage < pages.size - 1) {
-                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                        } else {
-                            onFinished()
-                        }
-                    }
-                }
-            }
-
-        }
-    }, content = {
-        Column(Modifier.padding(it)) {
-            HorizontalPager(state = pagerState) { index ->
-                OnboardingGraphUI(onboardingModel = pages[index])
-            }
-        }
-    })
-}
-
- */
-
-@Composable
-fun OnboardingScreen(profileViewModel: ProfileViewModel, onFinished: () -> Unit) {
+    val viewModel: OnboardingViewModel = viewModel(factory = OnboardingViewModelFactory())
 
     val pages = listOf(
         OnboardingModel.FirstPage,
@@ -138,13 +64,14 @@ fun OnboardingScreen(profileViewModel: ProfileViewModel, onFinished: () -> Unit)
     val pagerState = rememberPagerState(initialPage = 0) {
         pages.size
     }
+
     val buttonState = remember {
         derivedStateOf {
             when (pagerState.currentPage) {
                 0 -> listOf("", "Next")
                 1 -> listOf("Back", "Next")
                 2 -> listOf("Back", "Next")
-                3 -> listOf("Back", "Vamos!")
+                3 -> listOf("Back", "Vamos")
                 else -> listOf("", "")
             }
         }
@@ -152,73 +79,32 @@ fun OnboardingScreen(profileViewModel: ProfileViewModel, onFinished: () -> Unit)
 
     val scope = rememberCoroutineScope()
 
-    // Stati per i campi della terza pagina
-    val firstName = remember { mutableStateOf("") }
-    val lastName = remember { mutableStateOf("") }
-    val age = remember { mutableStateOf("") }
-    val sex = remember { mutableStateOf("") }
-    val weight = remember { mutableStateOf("") }
-    val height = remember { mutableStateOf("") }
-    val nationality = remember { mutableStateOf("") }
-
-    // Validazione dei campi
-    val isThirdPageValid = remember {
-        derivedStateOf {
-            firstName.value.isNotEmpty() && firstName.value.length <= 15 &&
-                    lastName.value.isNotEmpty() && lastName.value.length <= 15 &&
-                    age.value.toIntOrNull()?.let { it in 1..120 } == true &&
-                    (sex.value == "male" || sex.value == "female") &&
-                    weight.value.toDoubleOrNull() != null &&
-                    height.value.toDoubleOrNull() != null &&
-                    nationality.value.isNotEmpty()
-        }
-    }
-
     Scaffold(bottomBar = {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp, 10.dp),
+                .padding(10.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Box(
                 modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.CenterStart
             ) {
                 if (buttonState.value[0].isNotEmpty()) {
+                    Log.d("OnboardingScreen", "Button text: ${buttonState.value[0]}")
+
                     NextButtonUI(
                         text = buttonState.value[0],
                         backgroundColor = Color.Transparent,
                         textColor = Color.White
                     ) {
+                        Log.d("OnboardingScreen", "Button clicked")
+
+                        // Scorri alla pagina successiva
                         scope.launch {
-                            if (pagerState.currentPage == 2) {
-                                if (!isThirdPageValid.value) {
-                                    // Mostra un messaggio di errore o notifica
-                                    return@launch
-                                }
-
-                                // Salva i dati nel ViewModel
-                                profileViewModel.updateProfileField("firstName", firstName.value)
-                                profileViewModel.updateProfileField("lastName", lastName.value)
-                                profileViewModel.updateProfileField("age", age.value)
-                                profileViewModel.updateProfileField("sex", sex.value)
-                                profileViewModel.updateProfileField("weight", weight.value)
-                                profileViewModel.updateProfileField("height", height.value)
-                                profileViewModel.updateProfileField(
-                                    "nationality",
-                                    nationality.value
-                                )
-
-
-                            }
-
                             if (pagerState.currentPage < pages.size - 1) {
                                 pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                            } else {
-                                onFinished()
                             }
                         }
                     }
@@ -241,12 +127,16 @@ fun OnboardingScreen(profileViewModel: ProfileViewModel, onFinished: () -> Unit)
                     textColor = MaterialTheme.colorScheme.onPrimary
                 ) {
                     scope.launch {
-                        if (pagerState.currentPage == 2 && !isThirdPageValid.value) {
-                            // Mostra un messaggio di errore o notifica
-                        } else if (pagerState.currentPage < pages.size - 1) {
-                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                        } else {
+                        if (pagerState.currentPage == pages.size - 1) {
+                            // Invia i dati quando siamo sull'ultima pagina
+                            Log.d("OnboardingScreen", "Sending data...")
+                            viewModel.areProfileFieldsValid()
+
+                            // Esegui la callback finale
                             onFinished()
+                        } else {
+                            // Scorri alla pagina successiva
+                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
                         }
                     }
                 }
@@ -258,13 +148,13 @@ fun OnboardingScreen(profileViewModel: ProfileViewModel, onFinished: () -> Unit)
                 if (index == 2) {
                     // Terza pagina con campi obbligatori
                     ThirdPageContent(
-                        firstName = firstName,
-                        lastName = lastName,
-                        age = age,
-                        sex = sex,
-                        weight = weight,
-                        height = height,
-                        nationality = nationality
+                        firstName = viewModel.firstName,
+                        lastName = viewModel.lastName,
+                        age = viewModel.age,
+                        sex = viewModel.sex,
+                        weight = viewModel.weight,
+                        height = viewModel.height,
+                        nationality = viewModel.nationality
                     )
                 } else {
                     OnboardingGraphUI(onboardingModel = pages[index])
@@ -288,7 +178,7 @@ fun ThirdPageContent(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        verticalArrangement = Arrangement.Top, // Imposta la disposizione verticale (puoi cambiare se necessario)
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(16.dp))
@@ -324,7 +214,6 @@ fun ThirdPageContent(
             modifier = Modifier.clip(RoundedCornerShape(26.dp)),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
-
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),

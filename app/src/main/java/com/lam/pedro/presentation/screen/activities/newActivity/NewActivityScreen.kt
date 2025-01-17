@@ -58,7 +58,7 @@ fun NewActivityScreen(
     onNavBack: () -> Unit,
     titleId: Int,
     viewModel: ActivitySessionViewModel,
-    profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModelFactory(LocalContext.current)),
+    profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModelFactory()),
     newActivityViewModel: NewActivityViewModel = viewModel(
         factory = NewActivityViewModelFactory(LocalContext.current)
     )

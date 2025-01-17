@@ -75,10 +75,10 @@ class YogaSessionViewModel(private val healthConnectManager: HealthConnectManage
     ) {
         val averageSpeed = calculateAverageSpeed(speedSamples)
         val (totalCalories, activeCalories) = calculateCalories(
-            profileViewModel.weight.toDouble(),
-            profileViewModel.height.toDouble(),
-            profileViewModel.age.toInt(),
-            profileViewModel.sex,
+            profileViewModel.weight.value.toDouble(),
+            profileViewModel.height.value.toDouble(),
+            profileViewModel.age.value.toInt(),
+            profileViewModel.sex.value,
             distance,
             steps.toInt(),
             duration,
