@@ -15,11 +15,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -30,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lam.pedro.R
 import com.lam.pedro.data.datasource.authRepository.AuthRepositoryImpl
+import com.lam.pedro.presentation.component.CustomSnackbarHost
 import com.lam.pedro.presentation.navigation.Screen
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -44,6 +47,21 @@ fun LoginScreen(
         )
     )
 ) {
+    val snackbarHostState = SnackbarHostState()
+
+    // Osserva lo stato di errore del login
+    val loginState by viewModel.loginState.collectAsState()
+
+    // Mostra lo snackbar se c'è un errore
+    LaunchedEffect(loginState) {
+        if (loginState is LoadingState.Error) {
+            val errorMessage = (loginState as LoadingState.Error).message
+            snackbarHostState.showSnackbar(errorMessage)
+        } else if (loginState is LoadingState.Success) {
+            snackbarHostState.showSnackbar("Login successful")
+            onNavigate(Screen.CommunityScreen.route)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -61,13 +79,13 @@ fun LoginScreen(
                             contentDescription = stringResource(R.string.back)
                         )
                     }
-
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White.copy(alpha = 0f)
                 )
             )
         },
+        snackbarHost = { CustomSnackbarHost(snackbarHostState) }
     ) {
         Column(
             modifier = Modifier
@@ -76,15 +94,13 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             val formData by viewModel.loginFormData.collectAsState()
             val isPasswordVisible by viewModel.isLoginPasswordVisible.collectAsState()
-            val showDialog by viewModel.showLoginDialog.collectAsState()
+            val showDialog by viewModel.showDialog.collectAsState()
 
             val email = formData.email
             val password = formData.password
-            val state by viewModel.state.collectAsState()
-
+            val state by viewModel.loginState.collectAsState()
 
             LoginRegisterDescriptor("\uD83C\uDF35Rejoin us Gringos!\uD83C\uDF2E")
 
@@ -94,7 +110,6 @@ fun LoginScreen(
                     .padding(top = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-
                 PersonalInfoField(
                     value = email,
                     onValueChange = { viewModel.updateLoginFormData(formData.copy(email = it)) },
@@ -132,9 +147,8 @@ fun LoginScreen(
                 showDialog = showDialog,
                 dialogState = state,
                 onDismiss = { viewModel.hideDialog() },
-                onNavigate = { onNavigate(Screen.HomeScreen.route) }
+                onNavigate = { onNavigate(Screen.CommunityScreen.route) }
             )
-
         }
     }
 }

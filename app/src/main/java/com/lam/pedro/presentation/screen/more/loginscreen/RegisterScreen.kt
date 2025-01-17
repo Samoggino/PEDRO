@@ -138,7 +138,7 @@ fun RegisterScreen(
                 showDialog = showDialog,
                 dialogState = signUpState, // Pass signUpState to the dialog
                 onDismiss = { viewModel.hideDialog() },
-                onNavigate = { onNavigate(Screen.HomeScreen.route) }
+                onNavigate = { onNavigate(Screen.CommunityScreen.route) }
             )
 
         }

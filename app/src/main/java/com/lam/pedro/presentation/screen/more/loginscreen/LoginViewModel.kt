@@ -12,13 +12,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-
 class LoginViewModel(private val authRepository: IAuthRepository) : ViewModel() {
 
     private val _loginFormData = MutableStateFlow(LoginFormData())
     val loginFormData: StateFlow<LoginFormData> = _loginFormData.asStateFlow()
 
-    // Funzione per aggiornare i dati del modulo di login
+
     fun updateLoginFormData(newFormData: LoginFormData) {
         _loginFormData.value = newFormData
     }
@@ -30,18 +29,15 @@ class LoginViewModel(private val authRepository: IAuthRepository) : ViewModel() 
         _isLoginPasswordVisible.value = !_isLoginPasswordVisible.value
     }
 
-    private val _showLoginDialog = MutableStateFlow(false)
-    val showLoginDialog: StateFlow<Boolean> = _showLoginDialog.asStateFlow()
-
-    fun hideDialog() {
-        _showLoginDialog.value = false
-    }
-
     private val _loginState = MutableStateFlow<LoadingState>(LoadingState.Idle)
-    val state: StateFlow<LoadingState> = _loginState.asStateFlow()
+    val loginState: StateFlow<LoadingState> = _loginState.asStateFlow()
 
     private val _showDialog = MutableStateFlow(false)
     val showDialog: StateFlow<Boolean> = _showDialog.asStateFlow()
+
+    fun hideDialog() {
+        _showDialog.value = false
+    }
 
     fun login() {
         _loginState.value = LoadingState.Loading
@@ -50,24 +46,27 @@ class LoginViewModel(private val authRepository: IAuthRepository) : ViewModel() 
             val email = loginFormData.value.email
             val password = loginFormData.value.password
 
+            if (email.isEmpty() || password.isEmpty()) {
+                _loginState.value = LoadingState.Error("Email or password cannot be empty")
+                return@launch
+            }
+
             if (!checkCredentials(email, password)) {
-                _loginState.value = LoadingState.Error("Credenziali non valide", true)
-                _showDialog.value = true
+                _loginState.value = LoadingState.Error("Invalid credentials")
                 return@launch
             }
 
             val session = authRepository.login(email, password)
             if (session != null) {
-                _loginState.value = LoadingState.Success("Login avvenuto con successo", true)
-                _showDialog.value = true
+                _loginState.value = LoadingState.Success("Login successful", true)
             } else {
-                _loginState.value = LoadingState.Error("Errore durante il login", true)
-                _showDialog.value = true
+                _loginState.value = LoadingState.Error("Login failed")
             }
-            _loginState.value = LoadingState.Idle
+            _showDialog.value = true
         }
     }
 }
+
 
 class LoginViewModelFactory(
     private val authRepository: IAuthRepository

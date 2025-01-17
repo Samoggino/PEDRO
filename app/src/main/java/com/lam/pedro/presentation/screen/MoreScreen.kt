@@ -26,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,16 +37,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lam.pedro.R
 import com.lam.pedro.presentation.navigation.Screen
-import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper.checkUserLoggedIn
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginState
-import kotlinx.coroutines.launch
 
 @Composable
 fun MoreScreen(
     onNavigate: (String) -> Unit,
 ) {
-    val coroutineScope = rememberCoroutineScope()
 
     val loginState = remember { mutableStateOf<LoginState>(LoginState.Idle) }
     LaunchedEffect(Unit) {
