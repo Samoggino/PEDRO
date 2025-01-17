@@ -61,6 +61,7 @@ import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.CustomSnackbarHost
 import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.presentation.screen.MenuItem
+import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginRegisterHelper.checkUserLoggedIn
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginState
 import com.lam.pedro.presentation.serialization.MyRecordsViewModel
@@ -166,7 +167,12 @@ fun AccountScreen(
             // Bottone rosso per il logout
             Button(
                 onClick = {
-                    // Logica di logout qui
+                    coroutineScope.launch {
+                        LoginRegisterHelper.logout()
+                        // Aggiorna lo stato del login
+                        loginState.value = checkUserLoggedIn()
+                        onNavBack()
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Red, // Sfondo rosso
