@@ -60,6 +60,12 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
 
     private val _sessionList = MutableLiveData<List<GenericActivity>>()
     val sessionList: LiveData<List<GenericActivity>> get() = _sessionList
+
+
+    private val _sessionListStateFlow = MutableStateFlow<List<GenericActivity>>(emptyList())
+    val sessionListStateFlow: StateFlow<List<GenericActivity>> get() = _sessionListStateFlow
+
+
     var sessionsList: MutableState<List<GenericActivity>> = mutableStateOf(listOf())
         private set
 
@@ -82,6 +88,7 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
             fetchSessions() // Recupera tutte le sessioni
             val filteredSessions = filterSessionsByDay(_sessionList.value.orEmpty(), selectedDate)
             _sessionList.value = filteredSessions
+            _sessionListStateFlow.value = filteredSessions
         }
     }
 
@@ -215,6 +222,9 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
                 now,
                 activityEnum.activityType
             )
+
+            _sessionListStateFlow.value = sessionsList.value
+            _sessionList.value = sessionsList.value
 
             Log.d("SESSION LIST", "${sessionsList.value}")
             uiState = UiState.Done // Imposta lo stato su Done quando i dati sono stati recuperati
