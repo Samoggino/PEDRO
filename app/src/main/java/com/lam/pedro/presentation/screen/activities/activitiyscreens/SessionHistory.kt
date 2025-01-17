@@ -26,7 +26,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -43,6 +45,7 @@ import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.presentation.component.DatePickerModal
 import com.lam.pedro.presentation.component.SessionHistoryRow
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
@@ -50,66 +53,15 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-
-/*
 @Composable
 fun SessionHistory(
     sessionList: List<GenericActivity>, activityEnum: ActivityEnum,
-    viewModel: ActivitySessionViewModel
-) {
-    LazyColumn(
-        modifier = Modifier
-            .clip(RoundedCornerShape(26.dp))
-            .height(350.dp)
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-    ) {
-        if (sessionList.isEmpty()) {
-            item {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = stringResource(R.string.empty_history),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-            }
-        } else {
-            items(
-                sessionList,
-            ) { session ->
-                Pair(session.basicActivity.startTime, session.basicActivity.endTime)
-                SessionHistoryRow(
-                    color = activityEnum.color,
-                    image = activityEnum.image,
-                    session = session,
-                    viewModel = viewModel
-                )
-                HorizontalDivider(
-                    thickness = 1.dp,
-                    color = Color(0xFF606060)
-                )
-            }
-        }
-    }
-}
-
- */
-
-@Composable
-fun SessionHistory(
-    sessionList: List<GenericActivity>, activityEnum: ActivityEnum,
-    viewModel: ActivitySessionViewModel
+    viewModel: ActivitySessionViewModel,
+    coroutineScope: CoroutineScope
 ) {
     var sessionLocalList by remember { mutableStateOf(sessionList) }
-    var isDatePickerVisible by remember { mutableStateOf(false) } // Stato per il DatePickerModal
-    var selectedDate by remember { mutableStateOf<LocalDate?>(null) } // Stato per la data selezionata
-    val coroutineScope = rememberCoroutineScope()
+    var isDatePickerVisible by remember { mutableStateOf(false) }
+    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -126,8 +78,6 @@ fun SessionHistory(
             )
 
             Box {
-
-
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(10.dp), // Spazio tra i bottoni
                     verticalAlignment = Alignment.CenterVertically // Allineamento verticale
@@ -140,7 +90,7 @@ fun SessionHistory(
                         ),
                         onClick = {
                             isDatePickerVisible = true
-                        } // Mostra il DatePickerModal
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.Default.CalendarToday, // Usa un'icona predefinita di calendario
@@ -179,7 +129,8 @@ fun SessionHistory(
                                 selectedDate = localDate
                                 coroutineScope.launch {
                                     viewModel.fetchSessions() // Avvia la coroutine per eseguire l'operazione
-                                    sessionLocalList = viewModel.filterSessionsByDay(sessionLocalList, localDate)
+                                    sessionLocalList =
+                                        viewModel.filterSessionsByDay(sessionLocalList, localDate)
                                 }
                             }
                             isDatePickerVisible = false
@@ -196,56 +147,66 @@ fun SessionHistory(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        LazyColumn(
-            modifier = Modifier
-                .clip(RoundedCornerShape(26.dp))
-                .height(350.dp)
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp), // Padding verticale per separare dal bordo
-                    contentAlignment = Alignment.Center
-                ) {
-                    // Se selectedDate è null, mostra "All", altrimenti mostra la data formattata
-                    val displayText = selectedDate?.format(
-                        DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH) // Imposta la lingua in inglese
-                    ) ?: "All" // Testo di default quando la data non è selezionata
-
-                    Text(
-                        text = displayText,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.White
-                    )
-                }
-
-            }
-            Log.d("TEST SESSION LIST", sessionLocalList.toString())
-            if (sessionLocalList.isEmpty()) {
+        key(sessionLocalList) {
+            LazyColumn(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(26.dp))
+                    .height(350.dp)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+            ) {
                 item {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp), // Padding verticale per separare dal bordo
+                        contentAlignment = Alignment.Center
                     ) {
+                        // Se selectedDate è null, mostra "All", altrimenti mostra la data formattata
+                        val displayText = selectedDate?.format(
+                            DateTimeFormatter.ofPattern(
+                                "dd MMMM yyyy",
+                                Locale.ENGLISH
+                            ) // Imposta la lingua in inglese
+                        ) ?: "All" // Testo di default quando la data non è selezionata
+
                         Text(
-                            text = stringResource(R.string.empty_history),
+                            text = displayText,
                             style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            modifier = Modifier.padding(16.dp)
+                            color = Color.White
                         )
                     }
+
                 }
-            } else {
-                items(sessionLocalList) { session ->
-                    SessionHistoryRow(viewModel.activityEnum.color, viewModel.activityEnum.image, session, viewModel)
-                    HorizontalDivider(
-                        thickness = 1.dp,
-                        color = Color(0xFF606060)
-                    )
+                Log.d("TEST SESSION LIST", sessionLocalList.toString())
+                if (sessionLocalList.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = stringResource(R.string.empty_history),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+                } else {
+                    items(sessionLocalList) { session ->
+                        SessionHistoryRow(
+                            viewModel.activityEnum.color,
+                            viewModel.activityEnum.image,
+                            session,
+                            viewModel
+                        )
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = Color(0xFF606060)
+                        )
+                    }
                 }
             }
         }

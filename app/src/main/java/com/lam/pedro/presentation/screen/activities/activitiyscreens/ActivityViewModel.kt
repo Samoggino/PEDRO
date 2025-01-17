@@ -58,6 +58,8 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
     var permissionsGranted = mutableStateOf(false)
         private set
 
+    private val _sessionList = MutableLiveData<List<GenericActivity>>()
+    val sessionList: LiveData<List<GenericActivity>> get() = _sessionList
     var sessionsList: MutableState<List<GenericActivity>> = mutableStateOf(listOf())
         private set
 
@@ -72,6 +74,14 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
                 session.basicActivity.startTime.atZone(ZoneId.systemDefault()).toLocalDate()
             // Confronta con il giorno dato in input
             sessionDate == day
+        }
+    }
+
+    fun onDateSelected(selectedDate: LocalDate) {
+        viewModelScope.launch {
+            fetchSessions() // Recupera tutte le sessioni
+            val filteredSessions = filterSessionsByDay(_sessionList.value.orEmpty(), selectedDate)
+            _sessionList.value = filteredSessions
         }
     }
 

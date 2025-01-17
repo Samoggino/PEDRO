@@ -73,7 +73,8 @@ fun SessionScreen(
     viewModel: ActivitySessionViewModel
 ) {
     val errorId = rememberSaveable { mutableStateOf(UUID.randomUUID()) }
-    var sessionList by viewModel.sessionsList
+    val sessionList by viewModel.sessionsList
+    val coroutineScope = rememberCoroutineScope()
 
     // Stato per il periodo del grafico
     var selectedPeriod by remember { mutableStateOf(TimePeriod.WEEKLY) }
@@ -142,12 +143,21 @@ fun SessionScreen(
 
                         item {
                             // Passa direttamente selectedPeriod e onPeriodSelected come parametro
-                            SessionScreenBody(
+                            SessionScreenGraph(
                                 selectedPeriod = selectedPeriod,
                                 onPeriodSelected = { selectedPeriod = it },
                                 viewModel = viewModel,
                                 sessionList = sessionList
                             )
+
+                            SessionHistory(
+                                sessionList = sessionList,
+                                activityEnum = viewModel.activityEnum,
+                                viewModel = viewModel,
+                                coroutineScope = coroutineScope
+                            )
+
+                            Spacer(modifier = Modifier.height(100.dp))
                         }
                     }
                 }
@@ -160,7 +170,7 @@ fun SessionScreen(
 
 
 @Composable
-private fun SessionScreenBody(
+private fun SessionScreenGraph(
     selectedPeriod: TimePeriod,
     viewModel: ActivitySessionViewModel,
     sessionList: List<GenericActivity>,
@@ -190,14 +200,6 @@ private fun SessionScreenBody(
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        // Usando il nuovo componente SessionHistory
-        SessionHistory(
-            sessionList = sessionList,
-            activityEnum = viewModel.activityEnum,
-            viewModel = viewModel
-        )
-
-        Spacer(modifier = Modifier.height(90.dp))
     }
 }
 
