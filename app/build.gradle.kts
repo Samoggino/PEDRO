@@ -93,12 +93,19 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.material.icons.extended)
+    implementation(libs.play.services.location)
 
+<<<<<<< HEAD
     implementation(libs.play.services.location)
     implementation(libs.kotlinx.coroutines.play.services)
 
     implementation(libs.accompanist.permissions)
 
+=======
+    implementation(libs.kotlinx.coroutines.play.services)
+
+    implementation(libs.accompanist.permissions)
+>>>>>>> Bug-fix
 
     // Supabase
     //noinspection UseTomlInstead
@@ -111,15 +118,10 @@ dependencies {
     implementation(libs.ktor.client.okhttp)
     implementation(libs.coil.compose)
 
+    implementation(libs.androidx.work.runtime.ktx)
 
     //noinspection UseTomlInstead
     implementation("androidx.health.connect:connect-client:1.1.0-alpha10")
-//    implementation(libs.androidx.compose.animation)
-
-//    implementation("androidx.compose.ui:ui:1.7.0-alpha07")
-//    implementation("androidx.compose.animation:animation:1.7.0-alpha07")
-
-//    implementation("com.airbnb.android:lottie-compose:4.2.0")
 
     implementation(libs.mapLibre)
     // AirBnB Lottie

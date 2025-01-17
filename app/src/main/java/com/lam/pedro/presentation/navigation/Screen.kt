@@ -70,5 +70,13 @@ enum class Screen(
     RegisterScreen(route = "register_screen", titleId = R.string.register_screen),
     CommunityUserDetails(route = "community_user_details", titleId = R.string.community_user_details),
     ChatScreen(route = "chat_screen", titleId = R.string.chat_screen),
-    UnknownSessionScreen(route = "unknown_session_screen",titleId = R.string.unknown_session_screen)
+    UnknownSessionScreen(route = "unknown_session_screen",titleId = R.string.unknown_session_screen),
+    UserActivityRecognitionScreen(
+        route = "user_activity_recognition_screen",
+        titleId = R.string.user_activity_recognition_screen
+    ),
+    GeofencingScreen(
+        route = "geofencing_screen",
+        titleId = R.string.geofencing_screen
+    ),
 }

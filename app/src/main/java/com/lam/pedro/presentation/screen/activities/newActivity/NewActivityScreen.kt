@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.lam.pedro.presentation.component.CustomSnackbarHost
 import com.lam.pedro.presentation.component.NewActivityControlButtons
 import com.lam.pedro.presentation.component.NewActivitySaveAlertDialog
@@ -230,6 +231,7 @@ fun NewActivityScreen(
                     onConfirm = {
                         coroutineScope.launch {
                             if (newActivityViewModel.activityTitle.value.isNotBlank()) {
+                            if (newActivityViewModel.activityTitle.value.isNotBlank()) {
                                 if (isStopAction) {
                                     context.stopService(
                                         Intent(
@@ -257,6 +259,7 @@ fun NewActivityScreen(
                                             startTime = startTime,
                                             endTime = endTime,
                                             profileViewModel = profileViewModel,
+                                            activitySessionViewModel = viewModel
                                             activitySessionViewModel = viewModel
                                         )
                                     }

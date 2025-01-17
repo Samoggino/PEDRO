@@ -10,23 +10,19 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.lam.pedro.R
-import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.averageSpeed
-import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.distance
-import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.exerciseRoute
 import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.positions
 import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.speedCounter
-import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.speedSamples
-import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.steps
 import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.totalSpeed
+import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.averageSpeed
+import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.speedSamples
+import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.exerciseRoute
+import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.distance
+import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository.steps
 import com.lam.pedro.util.LocationTracker
 import com.lam.pedro.util.SpeedTracker
 import com.lam.pedro.util.StepCounter
 import com.lam.pedro.util.updateDistance
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.maplibre.android.geometry.LatLng
 
 class ActivityTrackingService : Service() {
@@ -92,10 +88,7 @@ class ActivityTrackingService : Service() {
     private suspend fun startLocationTracking() {
         locationTracker.trackLocation().collect { location ->
             exerciseRoute.add(location)
-            Log.d(
-                com.lam.pedro.presentation.TAG,
-                "--------------------------------New location: $location"
-            )
+            Log.d(com.lam.pedro.presentation.TAG, "--------------------------------New location: $location")
             val newLatLng = LatLng(location.latitude, location.longitude)
             updateDistance(distance, positions, newLatLng)
             positions.add(newLatLng)

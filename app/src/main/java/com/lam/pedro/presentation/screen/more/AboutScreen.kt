@@ -62,7 +62,7 @@ fun AboutScreen(
                 modifier = Modifier
                     .weight(1f)
                     .size(90.dp),
-                painter = painterResource(id = R.drawable.mexican_hat_svgrepo_com),
+                painter = painterResource(id = R.drawable.pedro_icon),
                 contentDescription = stringResource(id = R.string.app_logo),
                 colorFilter = ColorFilter.tint(PedroYellow) // Applica il colore
             )

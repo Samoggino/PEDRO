@@ -91,7 +91,10 @@ enum class ActivityEnum(
         image = R.drawable.headphones_icon,
         activityType = ExerciseSessionRecord.EXERCISE_TYPE_GUIDED_BREATHING
     ),
+<<<<<<< HEAD
 
+=======
+>>>>>>> Bug-fix
     UNKNOWN(
         color = UnknownColor,
         image = R.drawable.unknown_icon,

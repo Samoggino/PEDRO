@@ -15,6 +15,9 @@
  */
 package com.lam.pedro.presentation
 
+import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,7 +31,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -36,6 +38,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -43,9 +46,12 @@ import com.lam.pedro.presentation.navigation.BottomBar
 import com.lam.pedro.presentation.navigation.PedroNavigation
 import com.lam.pedro.presentation.navigation.Screen
 import com.lam.pedro.presentation.theme.PedroTheme
+import com.lam.pedro.util.notification.NotificationsFunctionality
 
 const val TAG = "Health Connect sample"
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun PedroApp() {
 
@@ -70,11 +76,12 @@ fun PedroApp() {
                 Screen.WeightScreen.route,
                 Screen.ListenSessionScreen.route,
 
-                Screen.RunSessionScreen.route,
-                Screen.WalkSessionScreen.route,
-                Screen.YogaSessionScreen.route,
-                Screen.CycleSessionScreen.route,
-                Screen.TrainSessionScreen.route -> true
+            Screen.RunSessionScreen.route,
+            Screen.WalkSessionScreen.route,
+            Screen.YogaSessionScreen.route,
+            Screen.CycleSessionScreen.route,
+            Screen.TrainSessionScreen.route,
+            Screen.UnknownSessionScreen.route -> true
 
                 else -> false
             }

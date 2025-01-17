@@ -1,6 +1,7 @@
 package com.lam.pedro.presentation.navigation
 
 import android.util.Log
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -12,7 +13,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -30,7 +30,17 @@ import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.MoreScreen
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.GeneralActivityViewModelFactory
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.CycleSessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.RunSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.TrainSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.WalkSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.YogaSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.DriveSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.LiftSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.ListenSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.SitSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.SleepSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.unknownactivityviewmodel.UnknownSessionViewModel
 import com.lam.pedro.presentation.screen.activities.newActivity.NewActivityScreen
 import com.lam.pedro.presentation.screen.community.CommunityScreen
 import com.lam.pedro.presentation.screen.community.CommunityScreenViewModelFactory
@@ -39,13 +49,17 @@ import com.lam.pedro.presentation.screen.community.user.UserCommunityDetails
 import com.lam.pedro.presentation.screen.more.AboutScreen
 import com.lam.pedro.presentation.screen.more.HealthConnectScreen
 import com.lam.pedro.presentation.screen.more.PrivacyPolicyScreen
-import com.lam.pedro.presentation.screen.more.SettingsScreen
+import com.lam.pedro.presentation.screen.more.settingsscreen.GeofencingScreen
+import com.lam.pedro.presentation.screen.more.settingsscreen.SettingsScreen
+import com.lam.pedro.presentation.screen.more.settingsscreen.UserActivityRecognitionScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.RegisterScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.User
 import com.lam.pedro.presentation.screen.profile.ProfileScreen
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
+import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.serialization.MyScreenRecords
+import com.lam.pedro.presentation.serialization.ViewModelRecordFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -252,8 +266,6 @@ fun PedroNavigation(
                     titleId = getTitleIdForRoute(currentRoute)
                 )
             }
-
-
             composable(
                 Screen.NewActivityScreen.route,
                 enterTransition = { NavigationTransitions.fadeIn() },
@@ -270,6 +282,7 @@ fun PedroNavigation(
                             )
                         }
                     }
+
                 }
             }
 
@@ -293,7 +306,6 @@ fun PedroNavigation(
                     onSharedTitleChange = { titleId -> sharedTitle = titleId }
                 )
             }
-
             composable(
                 Screen.SleepSessions.route,
                 enterTransition = { NavigationTransitions.fadeIn() },

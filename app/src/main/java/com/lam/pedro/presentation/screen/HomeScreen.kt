@@ -38,8 +38,8 @@ fun HomeScreen(onProfileClick: () -> Unit) {
         verticalArrangement = Arrangement.Top
     ) {
         item {
-            Spacer(modifier = Modifier.height(30.dp))
-            Row {
+            Spacer(modifier = Modifier.height(40.dp))
+            Row() {
                 Text(
                     text = "Welcome back!",
                     style = MaterialTheme.typography.headlineMedium,

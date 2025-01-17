@@ -214,6 +214,11 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
     }
 
 
+    suspend fun filterSessionsByDay() {
+
+    }
+
+
     /**
      * Provides permission check and error handling for Health Connect suspend function calls.
      *
