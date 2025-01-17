@@ -101,14 +101,18 @@ fun OnboardingScreen(
                     ) {
                         Log.d("OnboardingScreen", "Button clicked")
 
-                        // Scorri alla pagina successiva
                         scope.launch {
-                            if (pagerState.currentPage < pages.size - 1) {
+                            if (buttonState.value[0] == "Back" && pagerState.currentPage > 0) {
+                                // Scorri alla pagina precedente
+                                pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                            } else if (pagerState.currentPage < pages.size - 1) {
+                                // Scorri alla pagina successiva
                                 pagerState.animateScrollToPage(pagerState.currentPage + 1)
                             }
                         }
                     }
                 }
+
             }
             Box(
                 modifier = Modifier.weight(1f),
@@ -123,23 +127,38 @@ fun OnboardingScreen(
             ) {
                 NextButtonUI(
                     text = buttonState.value[1],
-                    backgroundColor = MaterialTheme.colorScheme.primary,
-                    textColor = MaterialTheme.colorScheme.onPrimary
+                    backgroundColor = if (pagerState.currentPage == 2 && !viewModel.areProfileFieldsValid()) {
+                        Color.Gray // Colore grigio per stato non valido
+                    } else {
+                        MaterialTheme.colorScheme.primary // Colore standard
+                    },
+                    textColor = if (pagerState.currentPage == 2 && !viewModel.areProfileFieldsValid()) {
+                        Color.LightGray // Testo disabilitato
+                    } else {
+                        MaterialTheme.colorScheme.onPrimary // Testo standard
+                    },
+                    isEnabled = !(pagerState.currentPage == 2 && !viewModel.areProfileFieldsValid()) // Disabilita il bottone se i dati non sono validi
                 ) {
                     scope.launch {
                         if (pagerState.currentPage == pages.size - 1) {
-                            // Invia i dati quando siamo sull'ultima pagina
                             Log.d("OnboardingScreen", "Sending data...")
                             viewModel.areProfileFieldsValid()
-
-                            // Esegui la callback finale
-                            onFinished()
+                            onFinished() // Conclude l'onboarding
+                        } else if (pagerState.currentPage == 2) {
+                            // Valida i dati della terza pagina
+                            if (viewModel.areProfileFieldsValid()) {
+                                Log.d("OnboardingScreen", "Profile fields are valid!")
+                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            } else {
+                                Log.d("OnboardingScreen", "Profile fields are invalid!")
+                            }
                         } else {
-                            // Scorri alla pagina successiva
                             pagerState.animateScrollToPage(pagerState.currentPage + 1)
                         }
                     }
                 }
+
+
             }
         }
     }, content = {
@@ -154,7 +173,7 @@ fun OnboardingScreen(
                         sex = viewModel.sex,
                         weight = viewModel.weight,
                         height = viewModel.height,
-                        nationality = viewModel.nationality
+                        nationality = viewModel.nationality,
                     )
                 } else {
                     OnboardingGraphUI(onboardingModel = pages[index])
@@ -172,8 +191,10 @@ fun ThirdPageContent(
     sex: MutableState<String>,
     weight: MutableState<String>,
     height: MutableState<String>,
-    nationality: MutableState<String>
+    nationality: MutableState<String>,
 ) {
+    val showErrors by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -189,32 +210,52 @@ fun ThirdPageContent(
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "I will use info such age, height, etc due to a more accurate calories analysis",
+            text = "I will use info such as age, height, etc for a more accurate calorie analysis",
             fontSize = 16.sp
         )
         Spacer(modifier = Modifier.height(20.dp))
+
+        // First Name
         TextField(
             value = firstName.value,
             onValueChange = { if (it.length <= 15) firstName.value = it },
             label = { Text("First Name") },
-            modifier = Modifier.clip(RoundedCornerShape(26.dp))
+            modifier = Modifier.clip(RoundedCornerShape(26.dp)),
+            isError = showErrors && firstName.value.isBlank()
         )
+        if (showErrors && firstName.value.isBlank()) {
+            Text("First name is required", color = Color.Red, fontSize = 12.sp)
+        }
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Last Name
         TextField(
             value = lastName.value,
             onValueChange = { if (it.length <= 15) lastName.value = it },
             label = { Text("Last Name") },
-            modifier = Modifier.clip(RoundedCornerShape(26.dp))
+            modifier = Modifier.clip(RoundedCornerShape(26.dp)),
+            isError = showErrors && lastName.value.isBlank()
         )
+        if (showErrors && lastName.value.isBlank()) {
+            Text("Last name is required", color = Color.Red, fontSize = 12.sp)
+        }
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Age
         TextField(
             value = age.value,
             onValueChange = { age.value = it.filter { char -> char.isDigit() } },
             label = { Text("Age") },
             modifier = Modifier.clip(RoundedCornerShape(26.dp)),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            isError = showErrors && age.value.isBlank()
         )
+        if (showErrors && age.value.isBlank()) {
+            Text("Age is required", color = Color.Red, fontSize = 12.sp)
+        }
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Sex
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -240,24 +281,45 @@ fun ThirdPageContent(
                 Text(text = "Female")
             }
         }
+        if (showErrors && sex.value.isBlank()) {
+            Text("Sex is required", color = Color.Red, fontSize = 12.sp)
+        }
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Weight
         TextField(
             value = weight.value,
             onValueChange = { weight.value = it },
             label = { Text("Weight (kg)") },
             modifier = Modifier.clip(RoundedCornerShape(26.dp)),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            isError = showErrors && weight.value.isBlank()
         )
+        if (showErrors && weight.value.isBlank()) {
+            Text("Weight is required", color = Color.Red, fontSize = 12.sp)
+        }
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Height
         TextField(
             value = height.value,
             onValueChange = { height.value = it },
             label = { Text("Height (cm)") },
             modifier = Modifier.clip(RoundedCornerShape(26.dp)),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            isError = showErrors && height.value.isBlank()
         )
+        if (showErrors && height.value.isBlank()) {
+            Text("Height is required", color = Color.Red, fontSize = 12.sp)
+        }
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Nationality
         NationalitySelector(nationality = nationality)
+        if (showErrors && nationality.value.isBlank()) {
+            Text("Nationality is required", color = Color.Red, fontSize = 12.sp)
+        }
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 

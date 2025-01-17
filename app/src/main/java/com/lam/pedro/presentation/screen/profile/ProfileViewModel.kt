@@ -1,10 +1,5 @@
 package com.lam.pedro.presentation.screen.profile
 
-import android.content.Context
-import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getProfileData
 import com.lam.pedro.data.datasource.SecurePreferencesManager.saveProfileData
@@ -61,14 +56,12 @@ class ProfileViewModel : ViewModel() {
 
     // Metodo per caricare i dati del profilo da SecurePreferencesManager
     private fun loadProfileData() {
-        _firstName.value = getProfileData(FIRST_NAME, "John")
-        _lastName.value = getProfileData(LAST_NAME, "Doe")
-        _age.value = getProfileData(AGE, "30")
-        _sex.value = getProfileData(SEX, "Male")
-        _weight.value = getProfileData(WEIGHT, "75")
-        _height.value = getProfileData(HEIGHT, "1.80")
-        _nationality.value = getProfileData(NATIONALITY, "USA")
+        _firstName.value = getProfileData(FIRST_NAME)
+        _lastName.value = getProfileData(LAST_NAME)
+        _age.value = getProfileData(AGE)
+        _sex.value = getProfileData(SEX)
+        _weight.value = getProfileData(WEIGHT)
+        _height.value = getProfileData(HEIGHT)
+        _nationality.value = getProfileData(NATIONALITY)
     }
-
 }
-

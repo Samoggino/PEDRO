@@ -18,12 +18,17 @@ fun NextButtonUI(
     textColor: Color = MaterialTheme.colorScheme.onPrimary,
     textStyle: TextStyle = MaterialTheme.typography.titleMedium,
     fontSize: Int = 14,
-    onClick: () -> Unit
+    isEnabled: Boolean = true,
+    onClick: () -> Unit,
 ) {
     Button(
-        onClick = onClick, colors = ButtonDefaults.buttonColors(
-            containerColor = backgroundColor, contentColor = textColor
-        ), shape = RoundedCornerShape(26.dp)
+        onClick = onClick,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (isEnabled) backgroundColor else Color.Gray, // Cambia il colore di sfondo se disabilitato
+            contentColor = if (isEnabled) textColor else Color.LightGray // Cambia il colore del testo se disabilitato
+        ),
+        shape = RoundedCornerShape(26.dp),
+        enabled = isEnabled // Disabilita il bottone se `isEnabled` è false
     ) {
         Text(
             text = text, fontSize = fontSize.sp, style = textStyle

@@ -6,6 +6,8 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -42,7 +44,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             PedroTheme {
-                if (isInitialized.value)
+                if (isInitialized.value) {
                     if (isOnboardingCompleted()) {
                         setContent {
                             PedroApp()
@@ -50,6 +52,10 @@ class MainActivity : ComponentActivity() {
                     } else {
                         ShowOnboardingScreen()
                     }
+                } else {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                }
+
             }
         }
     }

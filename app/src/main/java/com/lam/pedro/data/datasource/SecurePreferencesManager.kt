@@ -156,10 +156,10 @@ object SecurePreferencesManager {
         }
     }
 
-    fun getProfileData(preference: ProfilePreference, defaultValue: String = "default"): String {
+    fun getProfileData(preference: ProfilePreference): String {
         checkInitialized()
 
-        return encryptedPrefs!!.getString(preference.key, defaultValue) ?: defaultValue
+        return encryptedPrefs!!.getString(preference.key, "")!!
     }
 
     private fun saveOnboardingCompleted() {
