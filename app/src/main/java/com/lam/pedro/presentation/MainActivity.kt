@@ -11,6 +11,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.lifecycleScope
 import com.lam.pedro.data.datasource.SecurePreferencesManager
 import com.lam.pedro.data.datasource.SecurePreferencesManager.isOnboardingCompleted
@@ -21,6 +22,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * The entry point
@@ -37,10 +39,8 @@ class MainActivity : ComponentActivity() {
 
         val context = this
 
-        lifecycleScope.launch {
-            initializeSingleton(context)
-            isInitialized.value = true
-        }
+        SecurePreferencesManager.initialize(this)
+        isInitialized.value = true
 
         setContent {
             PedroTheme {
@@ -78,9 +78,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+/*
 private suspend fun initializeSingleton(context: MainActivity) {
     // Inizializza il SecurePreferencesManager
     CoroutineScope(Dispatchers.IO).async {
         SecurePreferencesManager.initialize(context)
     }.await()
 }
+
+ */

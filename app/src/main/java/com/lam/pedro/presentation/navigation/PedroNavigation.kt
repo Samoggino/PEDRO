@@ -1,6 +1,8 @@
 package com.lam.pedro.presentation.navigation
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -28,7 +30,16 @@ import com.lam.pedro.presentation.screen.HomeScreen
 import com.lam.pedro.presentation.screen.MoreScreen
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.GeneralActivityViewModelFactory
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.CycleSessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.RunSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.TrainSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.WalkSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.dynamicactivitiesviewmodels.YogaSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.DriveSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.LiftSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.ListenSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.SitSessionViewModel
+import com.lam.pedro.presentation.screen.activities.activitiyscreens.staticactivitiesviewmodels.SleepSessionViewModel
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.unknownactivityviewmodel.UnknownSessionViewModel
 import com.lam.pedro.presentation.screen.activities.newActivity.NewActivityScreen
 import com.lam.pedro.presentation.screen.community.CommunityScreen
@@ -42,13 +53,16 @@ import com.lam.pedro.presentation.screen.more.PrivacyPolicyScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.LoginScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.RegisterScreen
 import com.lam.pedro.presentation.screen.more.loginscreen.User
+import com.lam.pedro.presentation.screen.more.settingsscreen.GeofencingScreen
 import com.lam.pedro.presentation.screen.more.settingsscreen.SettingsScreen
+import com.lam.pedro.presentation.screen.more.settingsscreen.UserActivityRecognitionScreen
 import com.lam.pedro.presentation.screen.profile.ProfileScreen
 import com.lam.pedro.presentation.serialization.MyScreenRecords
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /** Provides the navigation in the app. */
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun PedroNavigation(
@@ -330,9 +344,12 @@ fun PedroNavigation(
                 enterTransition = { NavigationTransitions.fadeIn() },
                 exitTransition = { NavigationTransitions.fadeOut() }
             ) {
+                val activityViewModel: SleepSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory()
+                )
                 SetupSessionScreen(
                     screen = Screen.SleepSessions,
-                    activityViewModel = viewModel(factory = GeneralActivityViewModelFactory()),
+                    activityViewModel = activityViewModel,
                     onNavigate = { route -> navController.navigate(route) },
                     snackbarHostState = snackbarHostState,
                     scope = scope,
@@ -347,9 +364,12 @@ fun PedroNavigation(
                 enterTransition = { NavigationTransitions.fadeIn() },
                 exitTransition = { NavigationTransitions.fadeOut() }
             ) {
+                val activityViewModel: WalkSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory()
+                )
                 SetupSessionScreen(
                     screen = Screen.WalkSessionScreen,
-                    activityViewModel = viewModel(factory = GeneralActivityViewModelFactory()),
+                    activityViewModel = activityViewModel,
                     onNavigate = { route -> navController.navigate(route) },
                     snackbarHostState = snackbarHostState,
                     scope = scope,
@@ -364,9 +384,12 @@ fun PedroNavigation(
                 enterTransition = { NavigationTransitions.fadeIn() },
                 exitTransition = { NavigationTransitions.fadeOut() }
             ) {
+                val activityViewModel: DriveSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory()
+                )
                 SetupSessionScreen(
                     screen = Screen.DriveSessionScreen,
-                    activityViewModel = viewModel(factory = GeneralActivityViewModelFactory()),
+                    activityViewModel = activityViewModel,
                     onNavigate = { route -> navController.navigate(route) },
                     snackbarHostState = snackbarHostState,
                     scope = scope,
@@ -381,9 +404,12 @@ fun PedroNavigation(
                 enterTransition = { NavigationTransitions.fadeIn() },
                 exitTransition = { NavigationTransitions.fadeOut() }
             ) {
+                val activityViewModel: SitSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory()
+                )
                 SetupSessionScreen(
                     screen = Screen.SitSessionScreen,
-                    activityViewModel = viewModel(factory = GeneralActivityViewModelFactory()),
+                    activityViewModel = activityViewModel,
                     onNavigate = { route -> navController.navigate(route) },
                     snackbarHostState = snackbarHostState,
                     scope = scope,
@@ -398,9 +424,12 @@ fun PedroNavigation(
                 enterTransition = { NavigationTransitions.fadeIn() },
                 exitTransition = { NavigationTransitions.fadeOut() }
             ) {
+                val activityViewModel: ListenSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory()
+                )
                 SetupSessionScreen(
                     screen = Screen.ListenSessionScreen,
-                    activityViewModel = viewModel(factory = GeneralActivityViewModelFactory()),
+                    activityViewModel = activityViewModel,
                     onNavigate = { route -> navController.navigate(route) },
                     snackbarHostState = snackbarHostState,
                     scope = scope,
@@ -415,9 +444,12 @@ fun PedroNavigation(
                 enterTransition = { NavigationTransitions.fadeIn() },
                 exitTransition = { NavigationTransitions.fadeOut() }
             ) {
+                val activityViewModel: LiftSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory()
+                )
                 SetupSessionScreen(
                     screen = Screen.WeightScreen,
-                    activityViewModel = viewModel(factory = GeneralActivityViewModelFactory()),
+                    activityViewModel = activityViewModel,
                     onNavigate = { route -> navController.navigate(route) },
                     snackbarHostState = snackbarHostState,
                     scope = scope,
@@ -432,9 +464,12 @@ fun PedroNavigation(
                 enterTransition = { NavigationTransitions.fadeIn() },
                 exitTransition = { NavigationTransitions.fadeOut() }
             ) {
+                val activityViewModel: YogaSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory()
+                )
                 SetupSessionScreen(
                     screen = Screen.YogaSessionScreen,
-                    activityViewModel = viewModel(factory = GeneralActivityViewModelFactory()),
+                    activityViewModel = activityViewModel,
                     onNavigate = { route -> navController.navigate(route) },
                     snackbarHostState = snackbarHostState,
                     scope = scope,
@@ -449,9 +484,12 @@ fun PedroNavigation(
                 enterTransition = { NavigationTransitions.fadeIn() },
                 exitTransition = { NavigationTransitions.fadeOut() }
             ) {
+                val activityViewModel: CycleSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory()
+                )
                 SetupSessionScreen(
                     screen = Screen.CycleSessionScreen,
-                    activityViewModel = viewModel(factory = GeneralActivityViewModelFactory()),
+                    activityViewModel = activityViewModel,
                     onNavigate = { route -> navController.navigate(route) },
                     snackbarHostState = snackbarHostState,
                     scope = scope,
@@ -466,9 +504,12 @@ fun PedroNavigation(
                 enterTransition = { NavigationTransitions.fadeIn() },
                 exitTransition = { NavigationTransitions.fadeOut() }
             ) {
+                val activityViewModel: TrainSessionViewModel = viewModel(
+                    factory = GeneralActivityViewModelFactory()
+                )
                 SetupSessionScreen(
                     screen = Screen.TrainSessionScreen,
-                    activityViewModel = viewModel(factory = GeneralActivityViewModelFactory()),
+                    activityViewModel = activityViewModel,
                     onNavigate = { route -> navController.navigate(route) },
                     snackbarHostState = snackbarHostState,
                     scope = scope,
@@ -514,6 +555,28 @@ fun PedroNavigation(
                 if (user != null) {
                     ChatScreen(selectedUser = user) { onNavBack() }
                 }
+            }
+
+            composable(
+                Screen.UserActivityRecognitionScreen.route,
+                enterTransition = { NavigationTransitions.slideInHorizontally() },
+                exitTransition = { NavigationTransitions.slideOutHorizontally() }
+            ) {
+                UserActivityRecognitionScreen(
+                    onNavBack = { onNavBack() },
+                    titleId = Screen.UserActivityRecognitionScreen.titleId
+                )
+            }
+
+            composable(
+                Screen.GeofencingScreen.route,
+                enterTransition = { NavigationTransitions.slideInHorizontally() },
+                exitTransition = { NavigationTransitions.slideOutHorizontally() }
+            ) {
+                GeofencingScreen(
+                    onNavBack = { onNavBack() },
+                    titleId = Screen.GeofencingScreen.titleId
+                )
             }
 
         }

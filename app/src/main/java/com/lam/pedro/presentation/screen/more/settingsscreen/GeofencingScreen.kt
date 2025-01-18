@@ -56,7 +56,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GeofencingScreen(navController: NavHostController, titleId: Int) {
+fun GeofencingScreen(onNavBack: () -> Unit, titleId: Int) {
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -85,7 +85,7 @@ fun GeofencingScreen(navController: NavHostController, titleId: Int) {
                     )
                 },
                 navigationIcon = {
-                    BackButton(navController)
+                        BackButton(onNavBack)
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White.copy(alpha = 0f)

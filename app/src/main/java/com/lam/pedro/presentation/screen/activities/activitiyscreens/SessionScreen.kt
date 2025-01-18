@@ -1,6 +1,7 @@
 package com.lam.pedro.presentation.screen.activities.activitiyscreens
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
+import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.charts.LabelMetrics
 import com.lam.pedro.presentation.charts.MetricSelector
 import com.lam.pedro.presentation.charts.TimePeriod
@@ -55,6 +57,8 @@ fun SessionScreen(
     titleId: Int,
     viewModel: ActivitySessionViewModel
 ) {
+    Log.d(TAG, "TEST: $viewModel")
+    Log.d(TAG, "TEST: ${viewModel.activityEnum.activityType}")
     val errorId = rememberSaveable { mutableStateOf(UUID.randomUUID()) }
     val sessionList by viewModel.sessionsList
     val coroutineScope = rememberCoroutineScope()

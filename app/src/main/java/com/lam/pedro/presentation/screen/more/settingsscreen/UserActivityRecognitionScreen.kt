@@ -47,12 +47,12 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("MissingPermission")
 @Composable
-fun UserActivityRecognitionScreen(navController: NavHostController, titleId: Int) {
+fun UserActivityRecognitionScreen(onNavBack: () -> Unit, titleId: Int) {
     val activityPermission =
         Manifest.permission.ACTIVITY_RECOGNITION
 
     PermissionBox(permissions = listOf(activityPermission)) {
-        UserActivityRecognitionContent(navController, titleId)
+        UserActivityRecognitionContent({onNavBack()}, titleId)
     }
 }
 
@@ -65,7 +65,7 @@ fun UserActivityRecognitionScreen(navController: NavHostController, titleId: Int
     ],
 )
 @Composable
-fun UserActivityRecognitionContent(navController: NavHostController, titleId: Int) {
+fun UserActivityRecognitionContent(onNavBack: () -> Unit, titleId: Int) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val manager = remember {
@@ -103,7 +103,7 @@ fun UserActivityRecognitionContent(navController: NavHostController, titleId: In
                     )
                 },
                 navigationIcon = {
-                    BackButton(navController)
+                    BackButton(onNavBack)
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.White.copy(alpha = 0f)
