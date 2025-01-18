@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -23,7 +25,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.BottomSheetDefaults
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -52,6 +53,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.lam.pedro.R
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseSupabaseRepositoryImpl
@@ -70,18 +72,56 @@ fun UserCommunityDetails(
     selectedUser: String,
     selectedUsername: String,
     onNavBack: () -> Unit,
+    viewModel: UserCommunityDetailsViewModel = viewModel(
+        factory = UserCommunityDetailsViewModelFactory(
+            selectedUser,
+            ActivitySupabaseSupabaseRepositoryImpl() // Passaggio del repository al ViewModel
+        )
+    )
 ) {
 
     Log.i("Community", "Fetching details for $selectedUser")
 
+    val isDataAvailable by viewModel.isDataAvailable.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "User Details - $selectedUsername") },
+                title = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+
+                        Text(text = "User Details - $selectedUsername")
+
+                        if (isDataAvailable) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                IconButton(
+                                    onClick = { viewModel.togglePieChart() },
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.piechart_icon),
+                                        contentDescription = "Show chart",
+                                        modifier = Modifier
+                                            .size(30.dp)
+                                            .offset(y = (1.5).dp),
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            }
+                        }
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = { onNavBack() }) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
                     }
+
+
                 }
             )
         }
@@ -96,6 +136,7 @@ fun UserCommunityDetails(
     }
 }
 
+
 @Composable
 fun CommunityUserDetailsContent(
     userUUID: String,
@@ -106,8 +147,7 @@ fun CommunityUserDetailsContent(
             userUUID,
             ActivitySupabaseSupabaseRepositoryImpl() // Passaggio del repository al ViewModel
         )
-    )
-
+    ),
 ) {
     val activityMap by viewModel.activityMap.collectAsState(emptyMap())
     ActivityHistoryPopup(activityMap, userUUID, paddingValues, selectedUsername, viewModel)
@@ -130,7 +170,6 @@ fun ActivityHistoryPopup(
     val isLoading by viewModel.isLoading.collectAsState() // Osserva lo stato di caricamento
     var showDialog by remember { mutableStateOf(false) }
     var selectedActivityType: ActivityEnum? by remember { mutableStateOf(null) }
-    var showChartDialog by remember { mutableStateOf(false) } // Stato per il ModalBottomSheet del grafico
     val realMap by viewModel.activityMap.collectAsState()
 
     // Evita fetch multipli
@@ -182,17 +221,7 @@ fun ActivityHistoryPopup(
                         .align(Alignment.CenterHorizontally)
                 )
 
-                // Bottone per lanciare il grafico in ModalBottomSheet
-                Button(
-                    onClick = { showChartDialog = true },
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                ) {
-                    Text(
-                        text = "Show Activity Chart",
-                        color = MaterialTheme.colorScheme.primaryContainer
-                    )
-                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 LazyVerticalGrid(
@@ -200,7 +229,7 @@ fun ActivityHistoryPopup(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .weight(1f),
-//                    contentPadding = PaddingValues(vertical = 8.dp)
+                    contentPadding = PaddingValues(vertical = 8.dp)
                 ) {
                     items(activityMap.keys.filter { activityType ->
                         // Mostra solo attività con record disponibili
@@ -266,10 +295,12 @@ fun ActivityHistoryPopup(
 
             }
 
+            val showChartDialog by viewModel.showPieChart.collectAsState()
+
             // ModalBottomSheet per il grafico
             if (showChartDialog) {
                 ModalBottomSheet(
-                    onDismissRequest = { showChartDialog = false },
+                    onDismissRequest = { viewModel.togglePieChart() },
                     sheetState = rememberModalBottomSheetState(
                         skipPartiallyExpanded = true
                     )
@@ -283,7 +314,7 @@ fun ActivityHistoryPopup(
                         verticalArrangement = Arrangement.Center // Centra il contenuto verticalmente
                     ) {
                         Text(
-                            text = "Activity Chart",
+                            text = "Activity By Time",
                             style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )

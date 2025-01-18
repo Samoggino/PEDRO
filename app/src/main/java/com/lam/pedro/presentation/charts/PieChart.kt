@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
 import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseSupabaseRepositoryImpl
 import com.lam.pedro.presentation.screen.community.user.UserCommunityDetailsViewModel
 import com.lam.pedro.presentation.screen.community.user.UserCommunityDetailsViewModelFactory
@@ -149,7 +148,7 @@ fun MyPieChart(
 
 @Composable
 fun MyPieChartButton(
-    selectedUser: String = getUUID()!!,
+    selectedUser: String,
     selectedUsername: String,
     chartBackgroundColor: Color
 ) {

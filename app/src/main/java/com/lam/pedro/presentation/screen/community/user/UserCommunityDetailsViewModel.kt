@@ -9,6 +9,7 @@ import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.datasource.activitySupabase.IActivitySupabaseRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class UserCommunityDetailsViewModel(
@@ -19,6 +20,9 @@ class UserCommunityDetailsViewModel(
     val activityMap = MutableStateFlow<Map<ActivityEnum, List<GenericActivity>>>(emptyMap())
     val isLoading = MutableStateFlow(false) // Stato di caricamento
 
+    // se fetchActivityMap() ritorna una mappe vuota, allora devo impostare uno stato a false per non mostrare delle cose
+    val isDataAvailable = MutableStateFlow(false)
+
     init {
         fetchActivityMap()
     }
@@ -28,6 +32,12 @@ class UserCommunityDetailsViewModel(
             try {
                 isLoading.value = true // Avvia il caricamento
                 activityMap.value = getActivityMap(userUUID = userUUID) // Chiama il repository
+
+                if (activityMap.value.any { it.value.isNotEmpty() }) {
+                    isDataAvailable.value = true // Se ci sono voci non vuote, attiva il bottone
+                }
+
+
             } catch (e: Exception) {
                 Log.e("Community", "Errore nel fetch dei dati: ${e.message}")
             } finally {
@@ -44,6 +54,13 @@ class UserCommunityDetailsViewModel(
             map[activityEnum] = activityRepository.getActivitySession(activityEnum, userUUID)
         }
         return map
+    }
+
+    private val _showPieChart = MutableStateFlow(false)
+    val showPieChart: StateFlow<Boolean> = _showPieChart
+
+    fun togglePieChart() {
+        _showPieChart.value = !_showPieChart.value
     }
 }
 
