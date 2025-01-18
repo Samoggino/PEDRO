@@ -202,7 +202,6 @@ fun PedroNavigation(
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 AccountScreen(
                     onNavBack = { onNavBack() },
-                    onNavigate = { route -> navController.navigate(route) },
                     titleId = Screen.AccountScreen.titleId
                 )
             }
@@ -215,7 +214,6 @@ fun PedroNavigation(
                 logScreenStack() // Log dello stack dopo aver aperto la schermata
                 AccountScreen(
                     onNavBack = { onNavBack() },
-                    onNavigate = { route -> navController.navigate(route) },
                     titleId = Screen.ImportExportScreen.titleId
                 )
             }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -44,10 +45,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.lam.pedro.presentation.screen.community.AnimationDuration
+import com.lam.pedro.data.datasource.SecurePreferencesManager.getAvatarUrl
 import com.lam.pedro.presentation.screen.more.loginscreen.User
 import com.lam.pedro.util.placeholder
 
+const val ANIMATION_TIME = 1000
 val ICON_SIZE = 70.dp
 val FOLLOW_BUTTON_SIZE = ICON_SIZE * 0.45f
 val NameHeight = 24.dp
@@ -99,13 +101,21 @@ fun UserCommunityCard(
                 )
             }
 
-            ActivitiesButton(onActivityButton)
+            Row(
+                modifier = Modifier
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ActivitiesButton(onActivityButton)
 
-            // Follow Button
-            MessageButton(user) {
-                onChatClick()
+                // Follow Button
+                MessageButton(user) {
+                    onChatClick()
+                }
+
+                FollowButton(isFollowing, onFollowClick)
             }
-            FollowButton(isFollowing, onFollowClick)
         }
     }
 }
@@ -127,7 +137,7 @@ private fun ActivitiesButton(onActivityButtonClick: () -> Unit) {
 
 @Composable
 fun Avatar(
-    avatarUrl: String?,
+    avatarUrl: String? = getAvatarUrl(),
     size: Dp = ICON_SIZE,
     tint: Color = MaterialTheme.colorScheme.onSurfaceVariant
 ) {
@@ -164,8 +174,8 @@ fun Avatar(
 @Composable
 fun FollowButton(isFollowing: Boolean, onClick: () -> Unit) {
     val iconColor by animateColorAsState(
-        targetValue = if (isFollowing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
-        animationSpec = tween(durationMillis = AnimationDuration), label = ""
+        targetValue = if (isFollowing) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+        animationSpec = tween(durationMillis = ANIMATION_TIME), label = ""
     )
 
     val scale by animateFloatAsState(
@@ -180,11 +190,13 @@ fun FollowButton(isFollowing: Boolean, onClick: () -> Unit) {
         modifier = Modifier
             .size(FOLLOW_BUTTON_SIZE)
             .scale(scale)
-            .clickable { onClick() }
-            .padding(4.dp)
+            .clip(CircleShape) // Limita la forma dell'icona
+            .clickable(onClick = onClick) // Cliccabile solo sull'icona
+            .padding(4.dp) // Padding per mantenere l'area dell'icona
             .animateContentSize()
     )
 }
+
 
 @Composable
 fun MessageButton(user: User, onClick: (User) -> Unit) {

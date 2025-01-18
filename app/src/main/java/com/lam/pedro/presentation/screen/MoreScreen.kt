@@ -151,7 +151,8 @@ fun MenuItem(
     topHeight: Int = 16,
     height: Int,
     finalIcon: ImageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-    extraIcon: (@Composable () -> Unit)? = null
+    extraIcon: (@Composable () -> Unit)? = null,
+    enabled: Boolean = true
 ) {
     Spacer(modifier = Modifier.height(topHeight.dp))
 
@@ -161,7 +162,11 @@ fun MenuItem(
             .height(height.dp)
             .clip(RoundedCornerShape(26.dp))
             .background(MaterialTheme.colorScheme.primaryContainer)
-            .clickable(onClick = onClick)
+            .clickable(onClick = {
+                if (enabled) {
+                    onClick()
+                }
+            })
             .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

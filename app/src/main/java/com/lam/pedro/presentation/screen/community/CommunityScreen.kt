@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
@@ -39,9 +41,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
-const val AnimationDuration = 2500
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommunityScreen(
@@ -53,13 +52,10 @@ fun CommunityScreen(
 ) {
     Log.i("Community", "CommunityScreen reloaded")
 
-    // Usa remember per gli stati
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val userIsLogged by viewModel.userIsLoggedIn.collectAsState()
 
     val followingOnlyState = remember { mutableStateOf(false) }
-
-
 
     Scaffold(
         topBar = {
@@ -88,6 +84,7 @@ fun CommunityScreen(
                 val isInitialLoad by viewModel.isInitialLoad.collectAsState()
                 val userFollowMap by viewModel.userFollowMap.collectAsState()
 
+                // Se l'utente è loggato, mostra la lista di utenti, altrimenti mostra un messaggio
                 if (userIsLogged) {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
@@ -106,7 +103,6 @@ fun CommunityScreen(
                         )
                     }
                 } else {
-                    // Mostra un messaggio se l'utente non è loggato
                     NotInTheCommunity(onLoginClick)
                 }
             }
@@ -139,10 +135,10 @@ fun UserFollowList(
         map.filter { it.value || !followingOnly }
     }
 
-    LazyColumn(modifier = Modifier.padding(4.dp)) {
+    LazyColumn(modifier = Modifier.padding(5.dp, 25.dp)) {
         if (isInitialLoad) {
             // Mostra 5 placeholders mentre i dati sono in fase di caricamento
-            items(5) {
+            items(6) {
                 UserPlaceholder(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -192,6 +188,8 @@ fun UserFollowList(
                     )
                 }
             }
+
+            item { Spacer(modifier = Modifier.height(16.dp)) }
         }
     }
 }

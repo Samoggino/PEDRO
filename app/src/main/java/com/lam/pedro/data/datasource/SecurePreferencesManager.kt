@@ -100,7 +100,7 @@ object SecurePreferencesManager {
         checkInitialized()
 
         CoroutineScope(Dispatchers.IO).launch {
-            val loginKeys = listOf(ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, UUID)
+            val loginKeys = listOf(ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, UUID, USERNAME, AVATAR_URL)
 
             with(encryptedPrefs!!.edit()) {
                 loginKeys.forEach { remove(it) } // Rimuovi solo le chiavi specificate
@@ -129,6 +129,22 @@ object SecurePreferencesManager {
         checkInitialized()
 
         return encryptedPrefs!!.getString(AVATAR_URL, null)
+    }
+
+    fun updateAvatarUrl(avatarUrl: String?) {
+        checkInitialized()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            with(encryptedPrefs!!.edit()) {
+
+                if (avatarUrl == null) {
+                    remove(AVATAR_URL)
+                } else {
+                    putString(AVATAR_URL, avatarUrl)
+                }
+                apply()
+            }
+        }
     }
 
 

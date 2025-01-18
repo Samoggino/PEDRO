@@ -14,52 +14,42 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.lam.pedro.data.datasource.SecurePreferencesManager
+import com.lam.pedro.data.datasource.SecurePreferencesManager.getMyContext
 import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
+import com.lam.pedro.data.datasource.SecurePreferencesManager.updateAvatarUrl
 import com.lam.pedro.data.datasource.SupabaseClient.supabase
+import com.lam.pedro.presentation.screen.more.loginscreen.User
+import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.storage.storage
 import io.ktor.http.ContentType
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
 fun UploadAvatarButton(viewModel: UploadAvatarViewModel = viewModel(factory = UploadAvatarViewModelFactory())) {
-
-    // Launcher per aprire il file picker
     val pickFileLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
-        uri?.let { selectedFileUri ->
-            Log.i("Community", "FileUploadButton")
-            viewModel.uploadFileToSupabase(selectedFileUri)
-        }
+        uri?.let { viewModel.uploadFileToSupabase(it) }
     }
 
-    // Bottone per attivare il file picker
     Button(
         onClick = { pickFileLauncher.launch("image/*") },
         modifier = Modifier.padding(16.dp)
-    ) { Text("Carica avatar") }
+    ) {
+        Text("Carica avatar")
+    }
 }
 
 class UploadAvatarViewModel : ViewModel() {
 
-    /**
-     * Metodo che carica un file nel bucket di Supabase.
-     * @param fileUri l'uri del file da caricare
-     */
     fun uploadFileToSupabase(fileUri: Uri) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
-                val inputStream =
-                    SecurePreferencesManager.getMyContext().contentResolver.openInputStream(fileUri)
-                        ?: throw Exception("Impossibile leggere il file, URI non valido.")
+                val inputStream = getMyContext().contentResolver.openInputStream(fileUri)
+                    ?: throw Exception("Impossibile leggere il file, URI non valido.")
 
                 val fileBytes = inputStream.readBytes()
-                withContext(Dispatchers.IO) {
-                    inputStream.close()
-                }
+                inputStream.close()
 
                 val bucket = supabase().storage.from("avatars")
                 val fileName = getUUID().toString()
@@ -71,14 +61,30 @@ class UploadAvatarViewModel : ViewModel() {
                     contentType = ContentType.Image.JPEG
                 }
 
-                Log.i("Supabase", "File caricato con successo: $result")
+                Log.d("Supabase", "Risultato caricamento: $result")
+
+                val newAvatarUrl =
+                    "https://tfgeogkbrvekrzsgpllc.supabase.co/storage/v1/object/public/avatars/$fileName"
+
+                updateAvatarUrlInDatabase(newAvatarUrl)
+
             } catch (e: Exception) {
                 Log.e("Supabase", "Errore durante il caricamento: ${e.message}", e)
             }
         }
     }
 
+    private suspend fun updateAvatarUrlInDatabase(newAvatarUrl: String) {
+        val user = supabase().from("users").update({ set("avatar", newAvatarUrl) }) {
+            select()
+            filter { eq("id", getUUID()!!) }
+        }.decodeSingle<User>()
+
+        updateAvatarUrl(user.avatarUrl)
+        Log.d("Supabase", "Avatar aggiornato anche in sharedPreferences")
+    }
 }
+
 
 class UploadAvatarViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
