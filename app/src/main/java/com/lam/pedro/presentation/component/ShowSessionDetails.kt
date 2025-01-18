@@ -241,7 +241,10 @@ private fun MapComponent(
 ) {
     val positions = exerciseRoute.route.map { LatLng(it.latitude, it.longitude) }
 
-    if (positions.isNotEmpty()) {
+    // positions: [LatLng [latitude=0.0, longitude=0.0, altitude=0.0], LatLng [latitude=0.0, longitude=0.0, altitude=0.0]]
+    // se è tutto 0.0 non mostrare la mappa
+
+    if (positions.isNotEmpty() && positions.any { it.latitude != 0.0 && it.longitude != 0.0 }) {
         Spacer(modifier = Modifier.height(16.dp))
         MapComponent(
             modifier = Modifier

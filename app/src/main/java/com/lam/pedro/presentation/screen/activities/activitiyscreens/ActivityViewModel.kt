@@ -58,16 +58,23 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
     var permissionsGranted = mutableStateOf(false)
         private set
 
-    private val _sessionList = MutableLiveData<List<GenericActivity>>()
-    val sessionList: LiveData<List<GenericActivity>> get() = _sessionList
-
+    private var _selectedDate = MutableStateFlow<LocalDate?>(null)
+    val selectedDate: StateFlow<LocalDate?> = _selectedDate
 
     private val _sessionListStateFlow = MutableStateFlow<List<GenericActivity>>(emptyList())
     val sessionListStateFlow: StateFlow<List<GenericActivity>> get() = _sessionListStateFlow
 
+    fun resetSelectedDate() {
+        _selectedDate.value = null
+        viewModelScope.launch { fetchSessions() }
+    }
 
-    var sessionsList: MutableState<List<GenericActivity>> = mutableStateOf(listOf())
-        private set
+    fun updateSelectedDate(selectedDate: LocalDate?) {
+        _selectedDate.value = selectedDate
+        onDateSelected(selectedDate)
+    }
+
+    private var sessionsList: MutableState<List<GenericActivity>> = mutableStateOf(listOf())
 
     fun filterSessionsByDay(
         sessionsList: List<GenericActivity>,
@@ -83,12 +90,14 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
         }
     }
 
-    fun onDateSelected(selectedDate: LocalDate) {
+    private fun onDateSelected(selectedDate: LocalDate?) {
         viewModelScope.launch {
-            fetchSessions() // Recupera tutte le sessioni
-            val filteredSessions = filterSessionsByDay(_sessionList.value.orEmpty(), selectedDate)
-            _sessionList.value = filteredSessions
-            _sessionListStateFlow.value = filteredSessions
+            fetchSessions()
+            if (selectedDate != null) {
+                val filteredSessions =
+                    filterSessionsByDay(_sessionListStateFlow.value, selectedDate)
+                _sessionListStateFlow.value = filteredSessions
+            }
         }
     }
 
@@ -224,7 +233,6 @@ abstract class ActivitySessionViewModel(private val healthConnectManager: Health
             )
 
             _sessionListStateFlow.value = sessionsList.value
-            _sessionList.value = sessionsList.value
 
             Log.d("SESSION LIST", "${sessionsList.value}")
             uiState = UiState.Done // Imposta lo stato su Done quando i dati sono stati recuperati

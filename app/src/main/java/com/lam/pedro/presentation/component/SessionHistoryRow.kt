@@ -32,7 +32,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.lam.pedro.data.activity.GenericActivity
-import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.util.formatInstant
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,15 +39,13 @@ import com.lam.pedro.util.formatInstant
 fun SessionHistoryRow(
     color: Color,
     image: Int,
-    session: GenericActivity,
-    viewModel: ActivitySessionViewModel
+    session: GenericActivity
 ) {
 
     val sheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.clickable {
-        viewModel.selectSession(session) // Seleziona la sessione
         showBottomSheet = true
     }) {
         Row(

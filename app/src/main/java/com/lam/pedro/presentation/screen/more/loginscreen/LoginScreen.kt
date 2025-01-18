@@ -147,7 +147,8 @@ fun LoginScreen(
                 showDialog = showDialog,
                 dialogState = state,
                 onDismiss = { viewModel.hideDialog() },
-                onNavigate = { onNavigate(Screen.CommunityScreen.route) }
+                onNavigate = { onNavigate(Screen.CommunityScreen.route) },
+                message = "\uD83C\uDF89¡Qué bueno verte de nuevo!\uD83C\uDF89"
             )
         }
     }

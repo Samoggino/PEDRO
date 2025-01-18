@@ -138,7 +138,8 @@ fun RegisterScreen(
                 showDialog = showDialog,
                 dialogState = signUpState, // Pass signUpState to the dialog
                 onDismiss = { viewModel.hideDialog() },
-                onNavigate = { onNavigate(Screen.CommunityScreen.route) }
+                onNavigate = { onNavigate(Screen.CommunityScreen.route) },
+                message = "\uD83C\uDF36\uFE0F¡Bienvenido a bordo!\uD83E\uDD20"
             )
 
         }
@@ -150,7 +151,8 @@ fun WelcomeDialog(
     showDialog: Boolean,
     dialogState: LoadingState,
     onDismiss: () -> Unit,
-    onNavigate: () -> Unit // Aggiungi il callback di navigazione
+    onNavigate: () -> Unit,
+    message: String = "Welcome!"
 ) {
     if (showDialog) {
         AlertDialog(
@@ -162,7 +164,7 @@ fun WelcomeDialog(
             },
             title = {
                 when (dialogState) {
-                    is LoadingState.Success -> Text("Benvenuto!")
+                    is LoadingState.Success -> Text(message)
                     is LoadingState.Error -> Text("Errore")
                     else -> {}
                 }

@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -56,7 +57,8 @@ fun SessionScreen(
     viewModel: ActivitySessionViewModel
 ) {
     val errorId = rememberSaveable { mutableStateOf(UUID.randomUUID()) }
-    val sessionList by viewModel.sessionsList
+    val sessionList by viewModel.sessionListStateFlow.collectAsState()
+
     val coroutineScope = rememberCoroutineScope()
 
     // Stato per il periodo del grafico

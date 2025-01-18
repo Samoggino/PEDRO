@@ -179,7 +179,9 @@ fun UserFollowList(
                                 onNavigateToChat(user.toEncodedString())  // Usa la funzione passata
                             }
                         },
-                        onLongPress = {
+                        onActivityButton = {
+
+                            Log.i("CommunityScreen", "Long Press on ${user.username}")
                             debounceClick {
                                 onNavigateToUserDetails(user.id)  // Usa la funzione passata
                             }

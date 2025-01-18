@@ -384,14 +384,25 @@ object SessionCreator {
         return createBasicActivity(title, notes, startTime, endTime)
     }
 
-    private fun exerciseSegmentList() = listOf(
-        ExerciseSegment(
-            startTime = Instant.now(),
-            endTime = Instant.now(),
-            segmentType = 0,
-            repetitions = 1
+    private fun exerciseSegmentList(): List<ExerciseSegment> {
+        val randomMonth = Month.entries[Random.nextInt(Month.entries.size)]
+        val randomDay = Random.nextInt(1, randomMonth.length(false) + 1)
+        val startTime = LocalDate
+            .of(2024, randomMonth, randomDay)
+            .atStartOfDay(ZoneId.systemDefault())
+            .toInstant()
+
+        // durata random ma non troppo lunga per evitare problemi con Instant
+        val endTime = startTime.plusSeconds(3600 * 1 / Random.nextLong(1, 5))
+        return listOf(
+            ExerciseSegment(
+                startTime = startTime,
+                endTime = endTime,
+                segmentType = 0,
+                repetitions = 1
+            )
         )
-    )
+    }
 
     private fun speedRecordSampleList() = listOf(
         SpeedRecord.Sample(
@@ -428,7 +439,7 @@ object SessionCreator {
     private fun exerciseLapList() = listOf(
         ExerciseLap(
             startTime = Instant.now(),
-            endTime = Instant.now(),
+            endTime = Instant.now().plusSeconds(3000),
             length = length
         )
     )

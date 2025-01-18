@@ -1,5 +1,6 @@
 package com.lam.pedro.presentation.screen.activities.activitiyscreens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,14 +12,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -38,12 +37,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.lam.pedro.R
 import com.lam.pedro.presentation.component.DatePickerModal
-import com.lam.pedro.presentation.component.SessionHistoryRow
+import com.lam.pedro.presentation.screen.community.user.SessionHistoryGroup
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -53,9 +50,9 @@ fun SessionHistory(
     viewModel: ActivitySessionViewModel,
     coroutineScope: CoroutineScope
 ) {
-    // Osserva la lista delle sessioni direttamente dal ViewModel
     val sessionList by viewModel.sessionListStateFlow.collectAsState()
-    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
+    val selectedDate by viewModel.selectedDate.collectAsState()
+
 
     Column(modifier = Modifier.fillMaxSize()) {
         Row(
@@ -66,20 +63,28 @@ fun SessionHistory(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = stringResource(R.string.activity_history),
+                text = "Activity History", // Usa il testo direttamente
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
 
-            // Passa il callback per il reset e l'aggiornamento della data
             FilterComponent(
                 viewModel = viewModel,
                 coroutineScope = coroutineScope,
-                selectedDate = selectedDate,
                 onReset = {
-                    coroutineScope.launch(Dispatchers.IO) {
-                        viewModel.fetchSessions() // Ripristina le sessioni
-                        selectedDate = null // Resetta la data selezionata
+                    coroutineScope.launch {
+                        viewModel.resetSelectedDate()
+                    }
+                },
+                onDateSelected = { timestamp ->
+                    if (timestamp != null) {
+                        viewModel.updateSelectedDate(
+                            Instant.ofEpochMilli(timestamp)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate()
+                        )
+
+                        Log.d("SessionHistory", "Timestamp: $timestamp SelectedDate: $selectedDate")
                     }
                 }
             )
@@ -87,7 +92,6 @@ fun SessionHistory(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        // Usa la lista di sessioni osservata per aggiornare dinamicamente la UI
         key(sessionList) {
             LazyColumn(
                 modifier = Modifier
@@ -104,14 +108,12 @@ fun SessionHistory(
                             .padding(vertical = 8.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        // Visualizza la data selezionata o "All"
+
+
+                        Log.d("SessionHistory", "SelectedDate: $selectedDate")
                         val displayText = selectedDate?.format(
-                            DateTimeFormatter.ofPattern(
-                                "dd MMMM yyyy",
-                                Locale.ENGLISH
-                            )
-                        )
-                            ?: "All"
+                            DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ENGLISH)
+                        ) ?: "All"
                         Text(
                             text = displayText,
                             style = MaterialTheme.typography.bodyLarge,
@@ -120,31 +122,23 @@ fun SessionHistory(
                     }
                 }
 
-                if (sessionList.isEmpty()) {
-                    item {
+                item {
+                    if (sessionList.isEmpty()) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
-                                text = stringResource(R.string.empty_history),
+                                text = "No sessions", // Usa il testo direttamente
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                                 modifier = Modifier.padding(16.dp)
                             )
                         }
-                    }
-                } else {
-                    items(sessionList) { session ->
-                        SessionHistoryRow(
-                            color = viewModel.activityEnum.color,
-                            image = viewModel.activityEnum.image,
-                            session = session,
-                            viewModel = viewModel
-                        )
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = Color(0xFF606060)
+                    } else {
+                        SessionHistoryGroup(
+                            sessions = sessionList,
+                            selectedActivityType = viewModel.activityEnum,
                         )
                     }
                 }
@@ -153,13 +147,12 @@ fun SessionHistory(
     }
 }
 
-
 @Composable
 private fun FilterComponent(
     viewModel: ActivitySessionViewModel,
     coroutineScope: CoroutineScope,
-    selectedDate: LocalDate?,
-    onReset: () -> Unit
+    onReset: () -> Unit,
+    onDateSelected: (Long?) -> Unit
 ) {
     var isDatePickerVisible by remember { mutableStateOf(false) }
 
@@ -204,14 +197,8 @@ private fun FilterComponent(
         // Mostra il DatePicker se visibile
         if (isDatePickerVisible) {
             DatePickerModal(
-                onDateSelected = { timestamp ->
-                    if (timestamp != null) {
-                        val localDate = Instant.ofEpochMilli(timestamp)
-                            .atZone(ZoneId.systemDefault())
-                            .toLocalDate()
-                        // Chiamata alla funzione del ViewModel per aggiornare la lista
-                        viewModel.onDateSelected(localDate) // Funzione del ViewModel
-                    }
+                onDateSelected = {
+                    onDateSelected(it)
                     isDatePickerVisible = false
                 },
                 onDismiss = { isDatePickerVisible = false },
@@ -220,3 +207,5 @@ private fun FilterComponent(
         }
     }
 }
+
+

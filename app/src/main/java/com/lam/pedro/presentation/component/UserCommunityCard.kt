@@ -7,7 +7,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,6 +23,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Mail
+import androidx.compose.material.icons.filled.SpaceDashboard
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -32,16 +32,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -61,33 +57,15 @@ fun UserCommunityCard(
     user: User,
     isFollowing: Boolean,
     onFollowClick: () -> Unit,
-    onLongPress: @Composable () -> Unit = {},
+    onActivityButton: () -> Unit,
     onChatClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
     val roundedCornerSize = 16.dp
-    var showLongPressContent by remember { mutableStateOf(false) } // Stato per mostrare il contenuto
-
-
-    if (showLongPressContent) {
-        onLongPress()
-    }
 
     Card(
         modifier = modifier
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onLongPress = {
-                        // Esegui l'azione per il long press
-                        showLongPressContent = true
-                    },
-                    onTap = {
-                        // Esegui l'azione per il click
-                        onFollowClick()
-                    }
-                )
-            }
             .then(
                 if (isFollowing) Modifier.border(
                     width = 1.dp,
@@ -121,6 +99,8 @@ fun UserCommunityCard(
                 )
             }
 
+            ActivitiesButton(onActivityButton)
+
             // Follow Button
             MessageButton(user) {
                 onChatClick()
@@ -130,9 +110,27 @@ fun UserCommunityCard(
     }
 }
 
+@Composable
+private fun ActivitiesButton(onActivityButtonClick: () -> Unit) {
+    IconButton(onClick = {
+        onActivityButtonClick()
+    }, modifier = Modifier.size(24.dp)) {
+        Icon(
+            imageVector = Icons.Default.SpaceDashboard,
+            contentDescription = "User Activity",
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(24.dp)
+        )
+    }
+}
+
 
 @Composable
-fun Avatar(avatarUrl: String?, size: Dp = ICON_SIZE, tint : Color = MaterialTheme.colorScheme.onSurfaceVariant) {
+fun Avatar(
+    avatarUrl: String?,
+    size: Dp = ICON_SIZE,
+    tint: Color = MaterialTheme.colorScheme.onSurfaceVariant
+) {
     if (!avatarUrl.isNullOrBlank()) {
         Image(
             painter = rememberAsyncImagePainter(
@@ -258,5 +256,3 @@ fun UserPlaceholder(animation: Float, modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.width(16.dp))
     }
 }
-
-
