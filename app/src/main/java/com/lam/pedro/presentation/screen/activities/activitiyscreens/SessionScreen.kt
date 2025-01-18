@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -83,7 +84,11 @@ fun SessionScreen(
                     text = { Text("Start Session") },
                     shape = RoundedCornerShape(26.dp),
                     containerColor = viewModel.activityEnum.color,
-                    contentColor = Color.White
+                    contentColor = Color.White,
+                    modifier = Modifier.offset(
+                        y = (-20.5).dp,
+                        x = (2.5).dp
+                    )
                 )
             }
         }
@@ -136,12 +141,8 @@ fun SessionScreen(
                             )
 
                             SessionHistory(
-//                                sessionList = sessionList,
                                 viewModel = viewModel,
                                 coroutineScope = coroutineScope,
-//                                onSessionListFiltered = { sessionList ->
-//                                    viewModel.sessionsList.value = sessionList
-//                                }
                             )
 
                             Spacer(modifier = Modifier.height(100.dp))
