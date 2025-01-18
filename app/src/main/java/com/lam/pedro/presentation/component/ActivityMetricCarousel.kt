@@ -29,6 +29,7 @@ import androidx.compose.ui.util.lerp
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.presentation.charts.LabelMetrics
+import com.lam.pedro.presentation.charts.MyLineChart
 import com.lam.pedro.presentation.charts.StaticActivityChart
 import com.lam.pedro.presentation.charts.TimePeriod
 import kotlinx.coroutines.delay
@@ -122,22 +123,41 @@ private fun MetricCarouselItem(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+
+                val displayText = when (metric) {
+                    LabelMetrics.DURATION -> "Duration"
+                    LabelMetrics.DISTANCE -> "Distance"
+                    LabelMetrics.ACTIVE_CALORIES -> "Active Calories"
+                    LabelMetrics.TOTAL_CALORIES -> "Total Calories"
+                }
+
                 Text(
-                    text = "Metric: ${metric.name}",
+                    text = displayText,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = 8.dp, top = 15.dp)
                 )
-                StaticActivityChart(
-                    metric = metric,
-                    activities = activities,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp),
-                    timePeriod = timePeriod,
-                    activityEnum = activityEnum
 
-                )
+                if (activities.isEmpty()) {
+                    Text(
+                        text = "No data available",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.padding(15.dp)
+                    )
+                    return
+                }
+
+                if (metric == LabelMetrics.DURATION) {
+                    MyLineChart(activities, activityEnum)
+                } else {
+                    StaticActivityChart(
+                        metric = metric,
+                        activities = activities,
+                        timePeriod = timePeriod,
+                        activityEnum = activityEnum
+                    )
+                }
             }
         }
     }

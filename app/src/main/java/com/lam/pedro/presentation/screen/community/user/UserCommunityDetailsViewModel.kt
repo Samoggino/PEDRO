@@ -27,8 +27,7 @@ class UserCommunityDetailsViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 isLoading.value = true // Avvia il caricamento
-                activityMap.value =
-                    getActivityMap(userUUID = userUUID) // Chiama direttamente il repository
+                activityMap.value = getActivityMap(userUUID = userUUID) // Chiama il repository
             } catch (e: Exception) {
                 Log.e("Community", "Errore nel fetch dei dati: ${e.message}")
             } finally {
@@ -41,8 +40,8 @@ class UserCommunityDetailsViewModel(
     private suspend fun getActivityMap(userUUID: String): Map<ActivityEnum, List<GenericActivity>> {
         val map = mutableMapOf<ActivityEnum, List<GenericActivity>>()
         ActivityEnum.entries.forEach { activityEnum ->
-            map[activityEnum] =
-                activityRepository.getActivitySession(activityEnum, userUUID) // Usa il repository
+            // Usa il repository
+            map[activityEnum] = activityRepository.getActivitySession(activityEnum, userUUID)
         }
         return map
     }

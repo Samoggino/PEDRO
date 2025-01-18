@@ -4,14 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.toMonthNumber
-import com.lam.pedro.data.datasource.SecurePreferencesManager.getUUID
-import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseSupabaseRepositoryImpl
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
 import java.time.temporal.IsoFields
@@ -25,56 +20,10 @@ fun Instant.toWeekOfYear(zoneId: ZoneId = ZoneId.of("UTC")): Int {
     return zonedDateTime.get(IsoFields.WEEK_OF_WEEK_BASED_YEAR)
 }
 
-class ViewModelCharts(
-    private val activityRepository: ActivitySupabaseSupabaseRepositoryImpl // Aggiungi il repository come dipendenza
-) : ViewModel() {
-
-    private val _chartState = MutableLiveData<ChartState>(ChartState.Loading)
-    val chartState: LiveData<ChartState> = _chartState
+class ViewModelCharts : ViewModel() {
 
     private val _error = MutableLiveData<ChartError?>()
     val error: LiveData<ChartError?> = _error
-
-    private var selectedMetric: LabelMetrics = LabelMetrics.DURATION
-    private var activities: List<GenericActivity> = emptyList()
-
-    /**
-     * Carica i dati iniziali e salva la lista di attività in cache
-     */
-    fun loadActivityData(
-        activityEnum: ActivityEnum,
-        metric: LabelMetrics,
-        uuid: String = getUUID()!!,
-        timePeriod: TimePeriod
-    ) {
-        _chartState.value = ChartState.Loading
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                activities = activityRepository.getActivitySession(activityEnum, uuid)
-
-                if (activities.isEmpty()) {
-                    _chartState.postValue(ChartState.Error(ChartError.NoData, "No data available"))
-                } else {
-                    _chartState.postValue(
-                        ChartState.Success(
-                            buildBarsList(
-                                activities,
-                                metric,
-                                timePeriod
-                            )
-                        )
-                    )
-                }
-            } catch (e: Exception) {
-                _chartState.postValue(
-                    ChartState.Error(
-                        ChartError.DataError("Error loading data: ${e.message}"),
-                        e.message ?: "Unknown error"
-                    )
-                )
-            }
-        }
-    }
 
 
     /**
@@ -156,9 +105,7 @@ class ViewModelCharts(
         return timeData.mapValues { entry -> entry.value.sum() }
     }
 
-
 }
-
 
 fun getAvailableMetricsForActivity(activityEnum: ActivityEnum) =
     when {
@@ -168,13 +115,12 @@ fun getAvailableMetricsForActivity(activityEnum: ActivityEnum) =
         else -> LabelMetrics.entries.filter { it == LabelMetrics.DURATION }
     }
 
-class ChartsViewModelFactory(
-    private val activityRepository: ActivitySupabaseSupabaseRepositoryImpl
-) : ViewModelProvider.Factory {
+
+class ChartsViewModelFactory : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ViewModelCharts::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return ViewModelCharts(activityRepository) as T
+            return ViewModelCharts() as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

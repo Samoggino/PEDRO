@@ -22,6 +22,8 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -53,6 +55,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.datasource.activitySupabase.ActivitySupabaseSupabaseRepositoryImpl
+import com.lam.pedro.presentation.charts.LabelMetrics
+import com.lam.pedro.presentation.charts.MyPieChartButton
+import com.lam.pedro.presentation.charts.StaticActivityChart
+import com.lam.pedro.presentation.charts.TimePeriod
 import com.lam.pedro.presentation.component.SessionHistoryRow
 
 const val LAST_ACTIVITIES_COUNT = 5
@@ -62,6 +68,7 @@ const val LAST_ACTIVITIES_COUNT = 5
 @Composable
 fun UserCommunityDetails(
     selectedUser: String,
+    selectedUsername: String,
     onNavBack: () -> Unit,
 ) {
 
@@ -70,7 +77,7 @@ fun UserCommunityDetails(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "User Details") },
+                title = { Text(text = "User Details - $selectedUsername") },
                 navigationIcon = {
                     IconButton(onClick = { onNavBack() }) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Back")
@@ -83,6 +90,7 @@ fun UserCommunityDetails(
         // Pass paddingValues se usi Material3 correttamente
         CommunityUserDetailsContent(
             userUUID = selectedUser,
+            selectedUsername = selectedUsername,
             paddingValues = paddingValues,
         )
     }
@@ -91,6 +99,7 @@ fun UserCommunityDetails(
 @Composable
 fun CommunityUserDetailsContent(
     userUUID: String,
+    selectedUsername: String,
     paddingValues: PaddingValues,
     viewModel: UserCommunityDetailsViewModel = viewModel(
         factory = UserCommunityDetailsViewModelFactory(
@@ -101,7 +110,7 @@ fun CommunityUserDetailsContent(
 
 ) {
     val activityMap by viewModel.activityMap.collectAsState(emptyMap())
-    ActivityHistoryPopup(activityMap, userUUID, paddingValues, viewModel)
+    ActivityHistoryPopup(activityMap, userUUID, paddingValues, selectedUsername, viewModel)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,6 +119,7 @@ fun ActivityHistoryPopup(
     activityMap: Map<ActivityEnum, List<GenericActivity>>,
     userUUID: String,
     paddingValues: PaddingValues,
+    selectedUsername: String,
     viewModel: UserCommunityDetailsViewModel = viewModel(
         factory = UserCommunityDetailsViewModelFactory(
             userUUID,
@@ -120,6 +130,8 @@ fun ActivityHistoryPopup(
     val isLoading by viewModel.isLoading.collectAsState() // Osserva lo stato di caricamento
     var showDialog by remember { mutableStateOf(false) }
     var selectedActivityType: ActivityEnum? by remember { mutableStateOf(null) }
+    var showChartDialog by remember { mutableStateOf(false) } // Stato per il ModalBottomSheet del grafico
+    val realMap by viewModel.activityMap.collectAsState()
 
     // Evita fetch multipli
     LaunchedEffect(key1 = userUUID) {
@@ -170,12 +182,25 @@ fun ActivityHistoryPopup(
                         .align(Alignment.CenterHorizontally)
                 )
 
+                // Bottone per lanciare il grafico in ModalBottomSheet
+                Button(
+                    onClick = { showChartDialog = true },
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                ) {
+                    Text(
+                        text = "Show Activity Chart",
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .weight(1f),
-                    contentPadding = PaddingValues(vertical = 8.dp)
+//                    contentPadding = PaddingValues(vertical = 8.dp)
                 ) {
                     items(activityMap.keys.filter { activityType ->
                         // Mostra solo attività con record disponibili
@@ -193,6 +218,7 @@ fun ActivityHistoryPopup(
                             LAST_ACTIVITIES_COUNT
                         ) ?: emptyList()
 
+                        // ModalBottomSheet per l'activity history
                         item {
                             ModalBottomSheet(
                                 onDismissRequest = { showDialog = false },
@@ -201,13 +227,78 @@ fun ActivityHistoryPopup(
                                 ),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
+                                Text(
+                                    text = "Last $LAST_ACTIVITIES_COUNT sessions",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(16.dp)
+                                )
                                 SessionHistoryGroup(sessions, selectedActivityType!!)
+
+                                if (sessions.isNotEmpty()) {
+                                    Column(
+                                        modifier = Modifier.fillMaxSize(),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
+                                        val metric = LabelMetrics.DURATION
+
+                                        Text(
+                                            text = "Activity Overview: ${selectedActivityType!!.name}",
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            modifier = Modifier.padding(bottom = 8.dp, top = 15.dp)
+                                        )
+
+                                        StaticActivityChart(
+                                            metric = metric,
+                                            activities = realMap[selectedActivityType]!!,
+                                            timePeriod = TimePeriod.MONTHLY,
+                                            activityEnum = selectedActivityType!!
+                                        )
+                                    }
+                                }
                             }
                         }
-                    }
 
+                    }
+                }
+
+            }
+
+            // ModalBottomSheet per il grafico
+            if (showChartDialog) {
+                ModalBottomSheet(
+                    onDismissRequest = { showChartDialog = false },
+                    sheetState = rememberModalBottomSheetState(
+                        skipPartiallyExpanded = true
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp) // Limita l'altezza del modal
+                            .padding(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center // Centra il contenuto verticalmente
+                    ) {
+                        Text(
+                            text = "Activity Chart",
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        // Lancia il grafico delle attività
+                        MyPieChartButton(
+                            selectedUser = userUUID,
+                            selectedUsername = selectedUsername,
+                            chartBackgroundColor = BottomSheetDefaults.ContainerColor
+                        )
+                    }
                 }
             }
+
+
         }
     }
 }
@@ -247,7 +338,7 @@ private fun ActivityCard(
             ) {
                 onCardClick()
             },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),

@@ -108,8 +108,8 @@ fun PedroNavigation(
                     onNavigateToChat = { userId ->
                         navController.navigate(Screen.ChatScreen.route + "/$userId")
                     },
-                    onNavigateToUserDetails = { userId ->
-                        navController.navigate(Screen.CommunityUserDetails.route + "/$userId")
+                    onNavigateToUserDetails = { userId, username ->
+                        navController.navigate(Screen.CommunityUserDetails.route + "/$userId/$username")
                     },
                     onNavBack = { onNavBack() },
                     onLoginClick = { navController.navigate(Screen.LoginScreen.route) },
@@ -484,13 +484,18 @@ fun PedroNavigation(
 
 
             composable(
-                route = Screen.CommunityUserDetails.route + "/{userId}",
-                arguments = listOf(navArgument("userId") { type = NavType.StringType })
+                route = Screen.CommunityUserDetails.route + "/{userId}/{username}",
+                arguments = listOf(
+                    navArgument("userId") { type = NavType.StringType },
+                    navArgument("username") { type = NavType.StringType }
+                )
             ) { backStackEntry ->
                 val userId = backStackEntry.arguments?.getString("userId")
-                if (userId != null) {
+                val username = backStackEntry.arguments?.getString("username")
+                if (userId != null && username != null) {
                     UserCommunityDetails(
                         selectedUser = userId,
+                        selectedUsername = username,
                         onNavBack = { onNavBack() })
                 }
             }

@@ -45,7 +45,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun CommunityScreen(
     onNavigateToChat: (String) -> Unit,
-    onNavigateToUserDetails: (String) -> Unit,
+    onNavigateToUserDetails: (String, String) -> Unit,
     onNavBack: () -> Unit,
     onLoginClick: () -> Unit,
     viewModel: CommunityScreenViewModel = viewModel(factory = CommunityScreenViewModelFactory())
@@ -99,7 +99,9 @@ fun CommunityScreen(
                             isRefreshing = isRefreshing,
                             isInitialLoad = isInitialLoad,
                             onNavigateToChat = onNavigateToChat,
-                            onNavigateToUserDetails = onNavigateToUserDetails
+                            onNavigateToUserDetails = { id, username ->
+                                onNavigateToUserDetails(id, username)
+                            }
                         )
                     }
                 } else {
@@ -118,7 +120,7 @@ fun UserFollowList(
     isRefreshing: Boolean,
     isInitialLoad: Boolean,
     onNavigateToChat: (String) -> Unit,
-    onNavigateToUserDetails: (String) -> Unit
+    onNavigateToUserDetails: (String, String) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val debounceJob = remember { mutableStateOf<Job?>(null) }
@@ -179,7 +181,7 @@ fun UserFollowList(
 
                             Log.i("CommunityScreen", "Long Press on ${user.username}")
                             debounceClick {
-                                onNavigateToUserDetails(user.id)  // Usa la funzione passata
+                                onNavigateToUserDetails(user.id, user.username)  // Usa la funzione passata
                             }
                         },
                         modifier = Modifier

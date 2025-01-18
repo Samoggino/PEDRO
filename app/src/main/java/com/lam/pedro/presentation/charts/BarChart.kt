@@ -1,6 +1,5 @@
 package com.lam.pedro.presentation.charts
 
-import android.util.Log
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.height
@@ -29,7 +28,8 @@ fun BarChart(
     chartData: Map<String, Double>, // Mappa delle etichette e dei valori
     modifier: Modifier = Modifier
         .height(300.dp)
-        .padding(start = 10.dp, end = 10.dp, top = 20.dp, bottom = 20.dp)
+        .padding(15.dp),
+    metric: LabelMetrics
 ) {
     val textStyle = remember {
         TextStyle(
@@ -47,7 +47,7 @@ fun BarChart(
                 label = month,
                 values = listOf(
                     Bars.Data(
-                        label = "Metric",
+                        label = metric.name,
                         value = value,
                         color = SolidColor(activityColor) // Colore statico o dinamico
                     )
@@ -78,11 +78,9 @@ fun BarChart(
             padding = 10.dp,
         ),
         labelHelperProperties = LabelHelperProperties(
-            enabled = true,
+            enabled = false,
             textStyle = textStyle,
         ),
-        onBarLongClick = { barData ->
-            Log.d("Charts", "Bar clicked: $barData")
-        }
     )
 }
+

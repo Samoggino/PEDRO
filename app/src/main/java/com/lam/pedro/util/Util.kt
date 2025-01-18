@@ -1,4 +1,3 @@
-
 package com.lam.pedro.util
 
 import android.content.Context
@@ -85,7 +84,7 @@ fun formatInstant(instant: Instant): String {
     val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
 
     // Crea un formatter per la data e l'ora
-    val formatter = DateTimeFormatter.ofPattern("dd/MM/yy|HH:mm")
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yy - HH:mm")
 
     // Restituisce la data formattata come stringaW
     return localDateTime.format(formatter)
@@ -103,13 +102,3 @@ fun vibrateOnClick(context: Context = getMyContext()) {
     }
 }
 
-fun vibrateOnLongPress(context: Context = getMyContext()) {
-    val vibrator = ContextCompat.getSystemService(context, Vibrator::class.java)
-    vibrator?.let {
-        if (it.hasVibrator()) {
-            val effect = VibrationEffect.createOneShot(100L,VibrationEffect.EFFECT_HEAVY_CLICK)
-            it.vibrate(effect)
-            Log.d("Vibrating", "Vibrating phone with heavy click effect")
-        }
-    }
-}
