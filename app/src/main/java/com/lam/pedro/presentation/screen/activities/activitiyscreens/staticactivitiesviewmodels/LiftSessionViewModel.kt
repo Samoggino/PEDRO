@@ -7,12 +7,15 @@ import androidx.health.connect.client.records.ExerciseRoute
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
+import androidx.health.connect.client.units.Energy
 import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.GenericActivity.LiftSession
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
+import com.lam.pedro.presentation.serialization.SessionCreator
+import com.lam.pedro.util.calculateTrainCalories
 import java.time.ZonedDateTime
 
 class LiftSessionViewModel(private val healthConnectManager: HealthConnectManager) :
@@ -88,9 +91,26 @@ class LiftSessionViewModel(private val healthConnectManager: HealthConnectManage
         yogaStyle: String,
         profileViewModel: ProfileViewModel,
         distance: Double,
-        exerciseRoute: List<ExerciseRoute.Location>
+        exerciseRoute: List<ExerciseRoute.Location>,
     ) {
-        TODO("Not yet implemented")
+        val (totalCalories, activeCalories) = calculateTrainCalories(
+            profileViewModel.weight.value.toDouble(),
+            profileViewModel.height.value.toDouble(),
+            profileViewModel.age.value.toInt(),
+            profileViewModel.sex.value,
+            duration,
+            trainIntensity
+        )
+        this.actualSession = SessionCreator.createLiftSession(
+            startTime = startTime.toInstant(),
+            endTime = endTime.toInstant(),
+            title = activityTitle,
+            notes = notes,
+            totalEnergy = Energy.calories(totalCalories),
+            activeEnergy = Energy.calories(activeCalories),
+            exerciseSegment = listOf(),//TODO
+            exerciseLap = listOf()//TODO
+        )
     }
 
     override var value: ActivitySessionViewModel?

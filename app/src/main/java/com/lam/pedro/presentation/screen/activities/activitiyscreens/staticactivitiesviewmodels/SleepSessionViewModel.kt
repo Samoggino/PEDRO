@@ -35,8 +35,11 @@ class SleepSessionViewModel(private val healthConnectManager: HealthConnectManag
         /*
         * SleepSessionRecord
         * */
+        /*
         HealthPermission.getReadPermission(SleepSessionRecord::class),
         HealthPermission.getWritePermission(SleepSessionRecord::class)
+
+         */
 
     )
 

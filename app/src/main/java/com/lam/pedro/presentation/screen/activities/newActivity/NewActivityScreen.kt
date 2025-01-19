@@ -179,11 +179,14 @@ fun NewActivityScreen(
                             )
                         }
 
+                        /*
                         ExerciseSessionRecord.EXERCISE_TYPE_WHEELCHAIR -> {
                             WaterGlass(hydrationVolume = newActivityViewModel.hydrationVolume.doubleValue) { addedVolume ->
                                 newActivityViewModel.hydrationVolume.value += addedVolume
                             }
                         }
+
+                         */
                     }
                 }
             }

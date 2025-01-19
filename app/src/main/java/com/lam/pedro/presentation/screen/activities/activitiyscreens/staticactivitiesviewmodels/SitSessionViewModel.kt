@@ -36,8 +36,11 @@ class SitSessionViewModel(private val healthConnectManager: HealthConnectManager
         /*
         * HydrationRecord
         * */
+        /*
         HealthPermission.getReadPermission(HydrationRecord::class),
         HealthPermission.getWritePermission(HydrationRecord::class),
+
+         */
 
         )
 

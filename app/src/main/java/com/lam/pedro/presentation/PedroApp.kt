@@ -77,18 +77,20 @@ fun PedroApp() {
 
     PedroTheme {
         Scaffold(
+            /*
             floatingActionButton = {
                 if (currentRoute == Screen.ActivitiesScreen.route) {
                     ExtendedFloatingActionButton(
                         // TODO: da togliere, ovviamente
                         onClick = { navController.navigate(Screen.MyScreenRecords.route) },
                         icon = { Icon(Icons.Filled.Add, "Add Activity") },
-                        text = { Text(text = "New Activity") },
+                        text = { Text(text = "db debug") },
                         shape = RoundedCornerShape(26.dp),
                         contentColor = MaterialTheme.colorScheme.primary
                     )
                 }
             },
+             */
             snackbarHost = { SnackbarHost(snackbarHostState) },
             bottomBar = {
                 // Mostra la BottomBar solo se `showBottomBar` è true
