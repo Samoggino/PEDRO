@@ -69,6 +69,7 @@ class SleepSessionViewModel(private val healthConnectManager: HealthConnectManag
     override suspend fun saveSession(activitySession: GenericActivity) {
         if (activitySession is SleepSession) {
             healthConnectManager.insertSleepSession(
+                activityEnum.activityType,
                 activitySession.basicActivity.startTime,
                 activitySession.basicActivity.endTime,
                 activitySession.basicActivity.title,

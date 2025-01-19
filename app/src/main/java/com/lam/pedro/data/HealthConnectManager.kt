@@ -655,12 +655,14 @@ class HealthConnectManager(private val context: Context = getMyContext()) {
     }
 
     suspend fun insertSleepSession(
+        activityType: Int,
         startTime: Instant,
         endTime: Instant,
         title: String = "My Run #${Random.nextInt(0, Int.MAX_VALUE)}",
         notes: String
     ) {
 
+        /*
         val sleepSessionRecord = SleepSessionRecord(
             startTime = startTime,
             startZoneOffset = ZoneOffset.UTC,
@@ -670,11 +672,23 @@ class HealthConnectManager(private val context: Context = getMyContext()) {
             notes = notes
         )
 
+         */
+
+        val exerciseSessionRecord = ExerciseSessionRecord(
+            startTime = startTime,
+            startZoneOffset = ZoneOffset.UTC,
+            endTime = endTime,
+            endZoneOffset = ZoneOffset.UTC,
+            exerciseType = activityType,
+            title = title,
+            notes = notes
+        )
+
         // Insert the records into Health Connect
         try {
             healthConnectClient.insertRecords(
                 listOf(
-                    sleepSessionRecord
+                    exerciseSessionRecord
                 )
             )
             println("Exercise session with route recorded successfully!")
