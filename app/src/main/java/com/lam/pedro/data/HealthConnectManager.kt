@@ -479,7 +479,13 @@ class HealthConnectManager(private val context: Context = getMyContext()) {
         exerciseRoute: ExerciseRoute
     ) {
 
-        // Create the ExerciseSessionRecord
+        // Filtro necessario per evitare eccezione timestamp diversi tra exerciseroute e exerciseSessionRecord
+        val filteredLocations = exerciseRoute.route.filter { location ->
+            location.time in startTime..endTime
+        }
+
+        val filteredExerciseRoute = ExerciseRoute(filteredLocations)
+
         val exerciseSessionRecord = ExerciseSessionRecord(
             startTime = startTime,
             startZoneOffset = ZoneOffset.UTC,
@@ -488,7 +494,7 @@ class HealthConnectManager(private val context: Context = getMyContext()) {
             exerciseType = activityType,
             title = title,
             notes = notes,
-            exerciseRoute = exerciseRoute
+            exerciseRoute = filteredExerciseRoute // Passa la route filtrata
         )
         val distanceRecord = DistanceRecord(
             startTime = startTime,
