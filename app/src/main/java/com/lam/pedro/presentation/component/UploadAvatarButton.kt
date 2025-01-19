@@ -78,7 +78,13 @@ class UploadAvatarViewModel : ViewModel() {
         val user = supabase().from("users").update({ set("avatar", newAvatarUrl) }) {
             select()
             filter { eq("id", getUUID()!!) }
-        }.decodeSingle<User>()
+        }.decodeSingleOrNull<User>()
+
+
+        if (user == null) {
+            Log.e("Supabase", "Errore durante l'aggiornamento dell'avatar")
+            return
+        }
 
         updateAvatarUrl(user.avatarUrl)
         Log.d("Supabase", "Avatar aggiornato anche in sharedPreferences")
