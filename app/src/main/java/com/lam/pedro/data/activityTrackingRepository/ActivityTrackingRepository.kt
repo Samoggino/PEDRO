@@ -10,7 +10,7 @@ import org.maplibre.android.geometry.LatLng
 
 object ActivityTrackingRepository {
     // Stati osservabili
-    var steps = mutableFloatStateOf(0f)
+    var steps = mutableFloatStateOf(1f)
     var averageSpeed = mutableDoubleStateOf(0.0)
     val distance = mutableDoubleStateOf(0.0)
 

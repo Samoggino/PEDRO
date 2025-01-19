@@ -136,6 +136,15 @@ fun centerMapOnRoute(map: MapLibreMap, positions: List<LatLng>) {
         return
     }
 
+    if (positions.size == 1) {
+        // Caso di una sola posizione
+        val singlePosition = positions.first()
+        val cameraUpdate = CameraUpdateFactory.newLatLngZoom(singlePosition, 15.0) // Livello di zoom arbitrario
+        map.moveCamera(cameraUpdate)
+        Log.d("MapComponent", "Mappa centrata su un unico punto")
+        return
+    }
+
     val boundsBuilder = LatLngBounds.Builder()
     positions.forEach { position ->
         boundsBuilder.include(position)
