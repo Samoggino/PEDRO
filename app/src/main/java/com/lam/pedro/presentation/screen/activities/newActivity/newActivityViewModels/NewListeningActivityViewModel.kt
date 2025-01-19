@@ -5,7 +5,6 @@ import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository
 import com.lam.pedro.presentation.screen.activities.newActivity.NewActivityViewModel
 import com.lam.pedro.presentation.screen.activities.newActivity.strategyForNewScreen.GpsFunctionality
 import com.lam.pedro.presentation.screen.activities.newActivity.strategyForNewScreen.ScreenFunctionality
-import com.lam.pedro.presentation.screen.activities.newActivity.strategyForNewScreen.StepCounterFunctionality
 
 class NewListeningActivityViewModel(
     context: Context,
