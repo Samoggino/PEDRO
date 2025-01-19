@@ -243,7 +243,7 @@ fun NewActivityScreen(
 
                                     val endTime = ZonedDateTime.now()
                                     val duration = Duration.between(startTime, endTime).toMinutes()
-                                    if (duration < 0) {
+                                    if (duration < 1) {
                                         showConfirmDialog = false
                                         coroutineScope.launch {
                                             val snackbarJob = launch {
