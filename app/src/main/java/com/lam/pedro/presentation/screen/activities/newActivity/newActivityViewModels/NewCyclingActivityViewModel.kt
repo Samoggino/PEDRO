@@ -3,8 +3,8 @@ package com.lam.pedro.presentation.screen.activities.newActivity.newActivityView
 import android.content.Context
 import com.lam.pedro.data.activityTrackingRepository.ActivityTrackingRepository
 import com.lam.pedro.presentation.screen.activities.newActivity.NewActivityViewModel
+import com.lam.pedro.presentation.screen.activities.newActivity.strategyForNewScreen.ActivityRecognitionFunctionality
 import com.lam.pedro.presentation.screen.activities.newActivity.strategyForNewScreen.GpsFunctionality
-import com.lam.pedro.presentation.screen.activities.newActivity.strategyForNewScreen.StepCounterFunctionality
 
 class NewCyclingActivityViewModel(
     context: Context,
@@ -13,7 +13,8 @@ class NewCyclingActivityViewModel(
 
     // Funzionalità specifiche per il cycling
     override val functionalities = listOf(
-        GpsFunctionality(context)
+        GpsFunctionality(context),
+        ActivityRecognitionFunctionality(context)
     )
 
 }

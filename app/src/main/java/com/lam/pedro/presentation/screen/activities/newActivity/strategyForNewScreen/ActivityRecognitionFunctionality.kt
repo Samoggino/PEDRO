@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.app.ActivityCompat
@@ -27,7 +26,7 @@ import com.lam.pedro.R
 import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.component.DeniedPermissionDialog
 
-class StepCounterFunctionality(private val context: Context) : ScreenFunctionality {
+class ActivityRecognitionFunctionality(private val context: Context) : ScreenFunctionality {
 
     private var hasActivityRecognitionPermission by mutableStateOf(false)
     private var showActivityRecognitionPermissionDialog by mutableStateOf(false)
