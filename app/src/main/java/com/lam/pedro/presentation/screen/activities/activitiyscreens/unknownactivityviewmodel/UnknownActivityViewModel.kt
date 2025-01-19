@@ -1,5 +1,6 @@
 package com.lam.pedro.presentation.screen.activities.activitiyscreens.unknownactivityviewmodel
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ExerciseRoute
@@ -9,6 +10,7 @@ import com.lam.pedro.data.HealthConnectManager
 import com.lam.pedro.data.activity.ActivityEnum
 import com.lam.pedro.data.activity.GenericActivity
 import com.lam.pedro.data.activity.GenericActivity.UnknownSession
+import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.screen.activities.activitiyscreens.ActivitySessionViewModel
 import com.lam.pedro.presentation.screen.profile.ProfileViewModel
 import com.lam.pedro.presentation.serialization.SessionCreator
@@ -37,7 +39,7 @@ class UnknownSessionViewModel(private val healthConnectManager: HealthConnectMan
                 activitySession.basicActivity.notes
             )
         } else {
-            throw IllegalArgumentException("Invalid session type for ListenSessionViewModel")
+            throw IllegalArgumentException("Invalid session type for UnknownSessionViewModel")
         }
     }
 
@@ -56,12 +58,14 @@ class UnknownSessionViewModel(private val healthConnectManager: HealthConnectMan
         distance: Double,
         exerciseRoute: List<ExerciseRoute.Location>
     ) {
+        Log.d(TAG, "CREATING UNKNOWN SESSION")
         this.actualSession = SessionCreator.createUnknownSession(
             startTime = startTime.toInstant(),
             endTime = endTime.toInstant(),
             title = activityTitle,
             notes = notes
         )
+        Log.d(TAG, "UNKNOWN SESSION CREATED")
     }
 
     override var value: ActivitySessionViewModel?

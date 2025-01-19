@@ -12,6 +12,7 @@ object ActivitySessionFactoryFromHealthConnectProvider {
         ExerciseSessionRecord.EXERCISE_TYPE_SURFING to DriveSessionFactory(),
         ExerciseSessionRecord.EXERCISE_TYPE_GUIDED_BREATHING to ListenSessionFactory(),
         ExerciseSessionRecord.EXERCISE_TYPE_WHEELCHAIR to SitSessionFactory(),
+        ExerciseSessionRecord.EXERCISE_TYPE_WEIGHTLIFTING to LiftSessionFactory(),
         ExerciseSessionRecord.EXERCISE_TYPE_WATER_POLO to SleepSessionFactory(),
         ExerciseSessionRecord.EXERCISE_TYPE_EXERCISE_CLASS to TrainSessionFactory(),
         ExerciseSessionRecord.EXERCISE_TYPE_YOGA to YogaSessionFactory(),
