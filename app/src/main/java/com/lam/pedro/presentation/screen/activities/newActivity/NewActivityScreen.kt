@@ -314,7 +314,6 @@ fun NewActivityScreen(
                 }
             }
 
-
         }
     }
 

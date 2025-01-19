@@ -20,7 +20,7 @@ import com.google.android.gms.location.GeofencingEvent
 fun GeofenceBroadcastReceiver(
     systemAction: String,
     systemEvent: (userActivity: String) -> Unit,
-) {
+)  {
     val TAG = "GeofenceReceiver"
     val context = LocalContext.current
     val currentSystemOnEvent by rememberUpdatedState(systemEvent)
