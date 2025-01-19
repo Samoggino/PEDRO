@@ -1,5 +1,6 @@
 package com.lam.pedro.presentation.screen.more
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -133,6 +134,7 @@ fun AccountScreen(
                         val viewModelRecords =
                             MyRecordsViewModel(ActivitySupabaseSupabaseRepositoryImpl())
                         viewModelRecords.insertActivitySession(allActivities)
+                        Toast.makeText(context, "DB updated", Toast.LENGTH_SHORT).show()
                     }
                 },
                 height = 80,
