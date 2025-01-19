@@ -109,7 +109,13 @@
             </intent-filter>
         </service>
 
-        <receiver android:name=".util.services.GeofenceBroadcastReceiver"/>
+        <receiver android:name=".util.geofence.GeofencingBroadcastReceiver"/>
+
+        <service
+            android:name=".util.geofence.GeofencingService"
+            android:foregroundServiceType="location"
+            android:exported="false">
+        </service>
 
 
     </application>

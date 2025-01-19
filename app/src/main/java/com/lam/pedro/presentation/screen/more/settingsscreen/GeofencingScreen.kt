@@ -1,17 +1,31 @@
 package com.lam.pedro.presentation.screen.more.settingsscreen
 
+import android.annotation.SuppressLint
+import android.app.PendingIntent
+import android.content.ComponentName
+import android.content.Intent
+import android.content.ServiceConnection
+import android.location.Location
+import android.os.IBinder
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -26,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,239 +48,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.location.Geofence
+import com.google.android.gms.location.GeofencingClient
+import com.google.android.gms.location.LocationServices
 import com.lam.pedro.data.datasource.geofencing.GeofenceManager
 import com.lam.pedro.presentation.component.BackButton
 import com.lam.pedro.presentation.component.CustomSnackbarHost
-import android.location.Location
-import android.util.Log
-import androidx.compose.foundation.layout.width
-
-/*
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun GeofencingScreen(onNavBack: () -> Unit, titleId: Int) {
-
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    val permissions = listOf(
-        Manifest.permission.ACCESS_COARSE_LOCATION,
-        Manifest.permission.ACCESS_FINE_LOCATION,
-    )
-
-    // Stato per i luoghi salvati
-    val savedLocations = remember { mutableStateOf<List<Pair<String, Location>>>(emptyList()) }
-
-    // Logica per caricare i luoghi salvati
-    val context = LocalContext.current
-    val geofenceManager = remember { GeofenceManager(context) }
-    LaunchedEffect(Unit) {
-        savedLocations.value = geofenceManager.getSavedLocations()
-    }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(titleId),
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                },
-                navigationIcon = {
-                        BackButton(onNavBack)
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.White.copy(alpha = 0f)
-                )
-            )
-        },
-        snackbarHost = { CustomSnackbarHost(snackbarHostState) }
-    ) {
-
-        // Requires at least coarse permission
-        PermissionBox(
-            permissions = permissions,
-            requiredPermissions = listOf(permissions.first()),
-        ) {
-            // For Android 10 onwards, we need background permission
-            PermissionBox(
-                permissions = listOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
-            ) {
-                // UI del geofencing
-                GeofencingControls(geofenceManager)
-
-                // UI dei luoghi salvati
-                if (savedLocations.value.isEmpty()) {
-                    Text(
-                        text = "Nessun luogo salvato",
-                        modifier = Modifier.align(Alignment.Center),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                } else {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(savedLocations.value) { (key, location) ->
-                            LocationItem(key = key, location = location)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun GeofencingControls(geofenceManager: GeofenceManager) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    var geofenceTransitionEventInfo by remember { mutableStateOf("") }
-
-    DisposableEffect(LocalLifecycleOwner.current) {
-        onDispose {
-            scope.launch(Dispatchers.IO) {
-                geofenceManager.deregisterGeofence()
-            }
-        }
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .animateContentSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        GeofenceList(geofenceManager)
-        Button(
-            onClick = {
-                if (geofenceManager.geofenceList.isNotEmpty()) {
-                    geofenceManager.registerGeofence()
-                } else {
-                    Toast.makeText(
-                        context,
-                        "Please add at least one geofence to monitor",
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                }
-            },
-        ) {
-            Text(text = "Register Geofences")
-        }
-
-        Button(
-            onClick = {
-                scope.launch(Dispatchers.IO) {
-                    geofenceManager.deregisterGeofence()
-                }
-            },
-        ) {
-            Text(text = "Deregister Geofences")
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(text = geofenceTransitionEventInfo)
-    }
-}
-
-@Composable
-fun GeofenceList(geofenceManager: GeofenceManager) {
-    val checkedGeoFence1 = remember { mutableStateOf(false) }
-    val checkedGeoFence2 = remember { mutableStateOf(false) }
-    val checkedGeoFence3 = remember { mutableStateOf(false) }
-
-    Text(text = "Available Geofence")
-    Row(
-        Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Checkbox(
-            checked = checkedGeoFence1.value,
-            onCheckedChange = { checked ->
-                if (checked) {
-                    geofenceManager.addGeofence(
-                        "statue_of_liberty",
-                        location = Location("").apply {
-                            latitude = 40.689403968838015
-                            longitude = -74.04453795094359
-                        },
-                    )
-                } else {
-                    geofenceManager.removeGeofence("statue_of_libery")
-                }
-                checkedGeoFence1.value = checked
-            },
-        )
-        Text(text = "Statue of Liberty")
-    }
-    Row(
-        Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Checkbox(
-            checked = checkedGeoFence2.value,
-            onCheckedChange = { checked ->
-                if (checked) {
-                    geofenceManager.addGeofence(
-                        "eiffel_tower",
-                        location = Location("").apply {
-                            latitude = 48.85850
-                            longitude = 2.29455
-                        },
-                    )
-                } else {
-                    geofenceManager.removeGeofence("eiffel_tower")
-                }
-                checkedGeoFence2.value = checked
-            },
-        )
-        Text(text = "Eiffel Tower")
-    }
-    Row(
-        Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Checkbox(
-            checked = checkedGeoFence3.value,
-            onCheckedChange = { checked ->
-                if (checked) {
-                    geofenceManager.addGeofence(
-                        "vatican_city",
-                        location = Location("").apply {
-                            latitude = 41.90238
-                            longitude = 12.45398
-                        },
-                    )
-                } else {
-                    geofenceManager.removeGeofence("vatican_city")
-                }
-                checkedGeoFence3.value = checked
-            },
-        )
-        Text(text = "Vatican City")
-    }
-}
-
-@Composable
-fun LocationItem(key: String, location: Location) {
-    // Componente per visualizzare ogni luogo in una card
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "Nome: $key", style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Latitudine: ${location.latitude}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Longitudine: ${location.longitude}", style = MaterialTheme.typography.bodyMedium)
-        }
-    }
-}
-
- */
-
+import com.lam.pedro.util.geofence.GeofenceLocationCallback
+import com.lam.pedro.util.geofence.GeofencingBroadcastReceiver
+import com.lam.pedro.util.geofence.GeofencingService
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -286,6 +86,97 @@ fun GeofencingScreen(onNavBack: () -> Unit, titleId: Int) {
     // Lista delle geofence create
     val geofences by viewModel.geofences
 
+    val REQUIRED_PERMISSIONS = mutableListOf(
+        android.Manifest.permission.ACCESS_FINE_LOCATION,
+        android.Manifest.permission.ACCESS_COARSE_LOCATION
+    ).apply {
+        add(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+    }.toTypedArray()
+
+    var geofencingService: GeofencingService? = null
+    var isServiceBound by remember { mutableStateOf(false) }
+
+    val serviceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            val binder = service as GeofencingService.LocalBinder
+            geofencingService = binder.getService()
+            val locationCallback = object : GeofenceLocationCallback {
+                override fun onLocationUpdated(latitude: Double, longitude: Double) {
+                    // Logica per gestire l'aggiornamento della posizione
+                    Log.d("Geofence", "Location updated: Lat=$latitude, Lng=$longitude")
+                }
+            }
+            geofencingService?.setLocationCallback(locationCallback)
+
+            isServiceBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            geofencingService = null
+            isServiceBound = false
+        }
+    }
+
+    val requestBackgroundPermission =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                viewModel.getLocation(context, serviceConnection)
+            } else {
+                Toast.makeText(context, "Missing permission", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    @SuppressLint("MissingPermission")
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { isGranted ->
+        Log.i("isGranted", isGranted.toString())
+        if (isGranted.containsValue(false)) {
+            Toast.makeText(context, "Missing permission(s)", Toast.LENGTH_SHORT).show()
+        } else {
+            requestBackgroundPermission.launch(android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+        }
+    }
+
+
+
+
+
+    lateinit var geofencingClient: GeofencingClient
+
+    val geofencePendingIntent: PendingIntent by lazy {
+        val intent = Intent(context, GeofencingBroadcastReceiver::class.java)
+        PendingIntent.getBroadcast(
+            context, 0, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+        )
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = object : DefaultLifecycleObserver {
+            override fun onCreate(owner: LifecycleOwner) {
+                super.onCreate(owner)
+                geofencingClient = LocationServices.getGeofencingClient(context)
+            }
+
+            override fun onDestroy(owner: LifecycleOwner) {
+                geofencingClient.removeGeofences(geofencePendingIntent).run {
+                    addOnCompleteListener {
+
+                    }
+                }
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -305,15 +196,27 @@ fun GeofencingScreen(onNavBack: () -> Unit, titleId: Int) {
         },
         snackbarHost = { CustomSnackbarHost(snackbarHostState) },
         floatingActionButton = {
-            FloatingActionButton(onClick = { isDialogOpen = true }) {
-                Icon(Icons.Default.Add, contentDescription = "Add Geofence")
-            }
+            // Creiamo un MultiFloatingActionButton con due FAB
+            MultiFloatingActionButton(
+                onClickPrimary = {
+                    Toast.makeText(context, "Please wait 10 seconds...", Toast.LENGTH_SHORT).show()
+                    // Avvia il servizio quando il primo bottone viene cliccato
+                    val intent = Intent(context, GeofencingService::class.java).apply {
+                        action = GeofencingService.ACTION_START
+                    }
+                    context.startService(intent)
+                },
+                onClickSecondary = {
+                    // Logica per il secondo FAB, ad esempio aprire un dialog
+                    isDialogOpen = true
+                }
+            )
         }
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .padding(paddingValues)
-                .fillMaxWidth(),
+                .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Spacer(modifier = Modifier.height(16.dp))
@@ -322,13 +225,8 @@ fun GeofencingScreen(onNavBack: () -> Unit, titleId: Int) {
                     text = "No geofences yet",
                     style = MaterialTheme.typography.headlineSmall
                 )
-            } else {
-                Text(
-                    text = "Geofences",
-                    style = MaterialTheme.typography.bodyMedium
-                )
             }
-            LazyColumn {
+            LazyColumn() {
                 items(geofences) { (name, geofence) ->  // Decomponi la coppia in name e geofence
                     GeofenceItem(
                         name = name,              // Passa il nome
@@ -343,7 +241,7 @@ fun GeofencingScreen(onNavBack: () -> Unit, titleId: Int) {
         if (isDialogOpen) {
             AddGeofenceDialog(
                 onDismiss = { isDialogOpen = false },
-                onConfirm = {name, latitude, longitude, radius ->
+                onConfirm = { name, latitude, longitude, radius ->
                     isDialogOpen = false
 
                     // Inizializza Location con un provider (ad esempio, "GPS")
@@ -355,6 +253,8 @@ fun GeofencingScreen(onNavBack: () -> Unit, titleId: Int) {
                     val data = "${location.latitude},${location.longitude},${radius}"
 
                     viewModel.addGeofence(name, data.hashCode().toString(), location, radius)
+
+                    viewModel.registerGeofence()
                 },
                 snackbarHostState = snackbarHostState
             )
@@ -362,7 +262,6 @@ fun GeofencingScreen(onNavBack: () -> Unit, titleId: Int) {
 
     }
 }
-
 
 
 @Composable
@@ -500,7 +399,9 @@ fun AddGeofenceDialog(
 
 @Composable
 fun GeofenceItem(name: String, geofence: Geofence, onRemove: (String) -> Unit) {
-    Card(modifier = Modifier.width(350.dp).padding(8.dp)) {
+    Card(modifier = Modifier
+        .width(350.dp)
+        .padding(8.dp)) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Name: $name")
             Text("ID: ${geofence.requestId}")
@@ -514,3 +415,26 @@ fun GeofenceItem(name: String, geofence: Geofence, onRemove: (String) -> Unit) {
     }
 }
 
+@Composable
+fun MultiFloatingActionButton(onClickPrimary: () -> Unit, onClickSecondary: () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        // Secondo FAB (secondario)
+        FloatingActionButton(
+            onClick = onClickSecondary,
+            modifier = Modifier.padding(bottom = 80.dp, end = 16.dp)
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Add Geofence")
+        }
+
+        // Primo FAB (primario)
+        FloatingActionButton(
+            onClick = onClickPrimary,
+            modifier = Modifier.padding(bottom = 16.dp, end = 16.dp)
+        ) {
+            Icon(Icons.Default.PlayArrow, contentDescription = "Start Service")
+        }
+    }
+}

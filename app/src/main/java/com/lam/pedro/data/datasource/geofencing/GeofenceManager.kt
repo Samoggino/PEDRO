@@ -19,7 +19,8 @@ import kotlinx.coroutines.tasks.await
 class GeofenceManager(context: Context) {
     private val TAG = "GeofenceManager"
     private val client = LocationServices.getGeofencingClient(context)
-    private val sharedPreferences = context.getSharedPreferences("GeofencePreferences", Context.MODE_PRIVATE)
+    private val sharedPreferences =
+        context.getSharedPreferences("GeofencePreferences", Context.MODE_PRIVATE)
     val geofenceList = mutableMapOf<String, Geofence>()
 
     private val geofencingPendingIntent by lazy {
@@ -41,16 +42,22 @@ class GeofenceManager(context: Context) {
         key: String,
         location: Location,
         radiusInMeters: Float = 100.0f,
-        expirationTimeInMillis: Long = 30 * 60 * 1000,
     ) {
         saveGeofenceName(key, name)  // Salva la coppia key -> name prima di aggiungere la geofence
-        geofenceList[key] = createGeofence(key, location, radiusInMeters, expirationTimeInMillis)
+        geofenceList[key] = createGeofence(key, location, radiusInMeters)
+        val geofencingRequest = geofenceList[key]?.let {
+            GeofencingRequest.Builder()
+                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                .addGeofence(it)
+                .build()
+        }
         saveGeofencesToPreferences()  // Salva dopo aver aggiunto una geofence
     }
 
     // Rimuovi una geofence
     fun removeGeofence(key: String) {
         geofenceList.remove(key)
+        deregisterGeofenceForKey(key)
         saveGeofencesToPreferences()  // Salva dopo aver rimosso una geofence
     }
 
@@ -72,6 +79,16 @@ class GeofenceManager(context: Context) {
         saveGeofencesToPreferences()  // Salva dopo aver deregisitrato tutte le geofence
     }
 
+    fun deregisterGeofenceForKey(key: String) {
+        client.removeGeofences(listOf(key))
+            .addOnSuccessListener {
+                Log.d(TAG, "Geofence for key $key deregistered")
+            }
+            .addOnFailureListener { exception ->
+                Log.d(TAG, "Error deregistering geofence for key $key: $exception")
+            }
+    }
+
     // Crea una richiesta di geofence
     private fun createGeofencingRequest(): GeofencingRequest {
         return GeofencingRequest.Builder().apply {
@@ -84,14 +101,13 @@ class GeofenceManager(context: Context) {
     private fun createGeofence(
         key: String,
         location: Location,
-        radiusInMeters: Float,
-        expirationTimeInMillis: Long,
-    ) : Geofence {
+        radiusInMeters: Float
+    ): Geofence {
 
         return Geofence.Builder()
             .setRequestId(key) // Usa il key calcolato come requestId
             .setCircularRegion(location.latitude, location.longitude, radiusInMeters)
-            .setExpirationDuration(expirationTimeInMillis)
+            .setExpirationDuration(Geofence.NEVER_EXPIRE)
             .setTransitionTypes(GEOFENCE_TRANSITION_ENTER or GEOFENCE_TRANSITION_EXIT)
             .build()
     }
@@ -142,7 +158,10 @@ class GeofenceManager(context: Context) {
             "${key}:${geofence.latitude}:${geofence.longitude}:${geofence.radius}"
         }
 
-        Log.d(TAG, "Geofences to save: $geofenceData")  // Aggiungi un log per vedere cosa stai cercando di salvare
+        Log.d(
+            TAG,
+            "Geofences to save: $geofenceData"
+        )  // Aggiungi un log per vedere cosa stai cercando di salvare
 
         editor.putString("geofences", geofenceData)
         val success = editor.commit()
@@ -169,7 +188,10 @@ class GeofenceManager(context: Context) {
 
                     if (latitude != null && longitude != null && radius != null) {
                         // Log per verificare i dati di ciascuna geofence
-                        Log.d(TAG, "Parsing geofence: Key = $key, Latitude = $latitude, Longitude = $longitude, Radius = $radius")
+                        Log.d(
+                            TAG,
+                            "Parsing geofence: Key = $key, Latitude = $latitude, Longitude = $longitude, Radius = $radius"
+                        )
 
                         val location = Location("").apply {
                             this.latitude = latitude
@@ -177,7 +199,7 @@ class GeofenceManager(context: Context) {
                         }
 
                         // Crea la geofence
-                        key to createGeofence(key, location, radius, Geofence.NEVER_EXPIRE)
+                        key to createGeofence(key, location, radius)
                     } else {
                         Log.e(TAG, "Invalid location or radius data for key: $key")
                         null

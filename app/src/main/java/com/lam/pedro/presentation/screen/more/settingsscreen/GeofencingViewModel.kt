@@ -1,14 +1,22 @@
 package com.lam.pedro.presentation.screen.more.settingsscreen
 
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.location.Location
+import android.location.LocationManager
+import android.widget.Toast
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingClient
 import com.lam.pedro.data.datasource.geofencing.GeofenceManager
+import com.lam.pedro.util.geofence.GeofencingService
 import kotlinx.coroutines.launch
 
 /*
@@ -71,8 +79,8 @@ class GeofencingViewModel(
     }
 
     // Salva una nuova geofence
-    fun addGeofence(name: String, key: String, location: Location, radiusInMeters: Float = 100.0f, expirationTimeInMillis: Long = 30 * 60 * 1000) {
-        geofenceManager.addGeofence(name, key, location, radiusInMeters, expirationTimeInMillis)
+    fun addGeofence(name: String, key: String, location: Location, radiusInMeters: Float = 100.0f) {
+        geofenceManager.addGeofence(name, key, location, radiusInMeters)
         _geofences.value = geofenceManager.getSavedLocations()
     }
 
@@ -97,6 +105,32 @@ class GeofencingViewModel(
     fun deregisterGeofence() {
         viewModelScope.launch {
             geofenceManager.deregisterGeofence()
+        }
+    }
+
+    fun deregisterGeofenceForKey(key: String) {
+        viewModelScope.launch {
+            geofenceManager.deregisterGeofenceForKey(key)
+        }
+    }
+
+    fun getLocation(context: Context, serviceConnection: ServiceConnection) {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val isEnabled =
+            locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
+                LocationManager.NETWORK_PROVIDER
+            )
+        if (isEnabled) {
+            val serviceIntent = Intent(context, GeofencingService::class.java).apply {
+                action = GeofencingService.ACTION_START
+            }
+            context.startService(serviceIntent)
+            context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+        } else {
+            val intent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+            context.startActivity(intent)
+            Toast.makeText(context, "Please enable location services", Toast.LENGTH_SHORT).show()
+
         }
     }
 }
