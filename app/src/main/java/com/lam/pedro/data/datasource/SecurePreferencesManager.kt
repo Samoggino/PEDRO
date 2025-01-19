@@ -28,31 +28,6 @@ object SecurePreferencesManager {
      *
      * @param context Il contesto dell'applicazione.
      */
-    /*
-    fun initialize(context: Context) {
-        if (appContext != null) {
-            return
-        }
-
-
-        // Esegui l'inizializzazione delle SharedPreferences in una coroutine
-        CoroutineScope(Dispatchers.IO).launch {
-            appContext = context.applicationContext
-
-            val masterKey = MasterKey.Builder(appContext!!)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build()
-
-            encryptedPrefs = EncryptedSharedPreferences.create(
-                appContext!!,
-                PREFS_NAME,
-                masterKey,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-        }
-    }
-    */
     fun initialize(context: Context) {
         if (appContext != null) {
             return
