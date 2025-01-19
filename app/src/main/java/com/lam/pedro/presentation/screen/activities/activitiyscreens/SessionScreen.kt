@@ -143,7 +143,7 @@ fun SessionScreen(
                                 viewModel = viewModel,
                                 sessionList = sessionList
                             )
-
+                            Log.e(TAG, "NUMERO: ${viewModel.activityEnum.activityType}")
                             SessionHistory(
                                 viewModel = viewModel,
                                 coroutineScope = coroutineScope,

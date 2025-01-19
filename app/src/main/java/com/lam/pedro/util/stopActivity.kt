@@ -61,6 +61,8 @@ suspend fun stopActivity(
         exerciseRoute,
     )
 
+    Log.d("STOP_ACTIVITY", "------------Session created: ${viewModel.actualSession}")
+
     viewModel.saveSession(viewModel.actualSession)
 
     viewModel.fetchSessions()

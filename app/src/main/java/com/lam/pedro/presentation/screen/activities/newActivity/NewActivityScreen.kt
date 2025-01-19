@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.component.CustomSnackbarHost
 import com.lam.pedro.presentation.component.NewActivityControlButtons
 import com.lam.pedro.presentation.component.NewActivitySaveAlertDialog
@@ -267,6 +268,7 @@ fun NewActivityScreen(
                                             onNavBack()
                                         }
                                     } else {
+                                        Log.e(TAG, "NUMERO: ${viewModel.activityEnum.activityType}")
                                         newActivityViewModel.saveActivity(
                                             elapsedTime = elapsedTime,
                                             timerResults = timerResults,

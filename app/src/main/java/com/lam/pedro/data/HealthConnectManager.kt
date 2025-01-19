@@ -629,6 +629,7 @@ class HealthConnectManager(private val context: Context = getMyContext()) {
             title = title,
             notes = notes
         )
+        /*
         val hydrationRecord = HydrationRecord(
             startTime = startTime,
             startZoneOffset = ZoneOffset.UTC,
@@ -637,12 +638,14 @@ class HealthConnectManager(private val context: Context = getMyContext()) {
             volume = volume
         )
 
+         */
+
         // Insert the records into Health Connect
         try {
             healthConnectClient.insertRecords(
                 listOf(
                     exerciseSessionRecord,
-                    hydrationRecord
+                    //hydrationRecord
                 )
             )
             println("Exercise session with route recorded successfully!")

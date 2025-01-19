@@ -36,6 +36,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.lam.pedro.R
+import com.lam.pedro.presentation.TAG
 import com.lam.pedro.presentation.component.DatePickerModal
 import com.lam.pedro.presentation.screen.community.user.SessionHistoryGroup
 import kotlinx.coroutines.CoroutineScope
@@ -136,6 +137,7 @@ fun SessionHistory(
                             )
                         }
                     } else {
+
                         SessionHistoryGroup(
                             sessions = sessionList,
                             selectedActivityType = viewModel.activityEnum,
