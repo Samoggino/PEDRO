@@ -47,7 +47,11 @@ class AuthRepositoryImpl : IAuthRepository {
         }
     }
 
-    override suspend fun register(email: String, password: String): SignUpResult {
+    override suspend fun register(
+        email: String,
+        password: String,
+        username: String
+    ): SignUpResult {
         try {
             supabase().auth.signUpWith(Email) {
                 this.email = email
@@ -59,7 +63,24 @@ class AuthRepositoryImpl : IAuthRepository {
                 refreshToken = session?.refreshToken ?: "",
                 id = session?.user?.id
             )
-            updateUserInfo(session?.user?.id)
+
+            Log.d("Supabase", "username $username")
+
+            if (username.isNotEmpty()) {
+
+                val user = supabase().from("users").update(
+                    { set("username", username) }
+                ) {
+                    select()
+                    filter {
+                        eq("id", session?.user?.id!!)
+                    }
+                }.decodeSingle<User>()
+
+                saveProfileInfo(username = user.username, avatarUrl = user.avatarUrl)
+            } else {
+                updateUserInfo(session?.user?.id)
+            }
 
             return SignUpResult.Success(session)
         } catch (e: AuthRestException) {

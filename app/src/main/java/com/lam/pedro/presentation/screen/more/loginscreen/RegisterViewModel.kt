@@ -42,6 +42,7 @@ class RegisterViewModel(private val authRepository: IAuthRepository) : ViewModel
     fun signUp() {
         val email = formData.value.email
         val password = formData.value.password
+        val username = formData.value.username
         val confirmPassword = formData.value.confirmPassword
 
         if (password != confirmPassword) {
@@ -52,7 +53,7 @@ class RegisterViewModel(private val authRepository: IAuthRepository) : ViewModel
         _state.value = LoadingState.Loading
 
         viewModelScope.launch(Dispatchers.IO) {
-            when (val result = authRepository.register(email, password)) {
+            when (val result = authRepository.register(email, password, username)) {
                 is SignUpResult.Success -> {
                     _state.value = LoadingState.Success("Benvenuto!", true)
                 }
