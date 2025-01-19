@@ -1,7 +1,10 @@
 package com.lam.pedro.presentation.component
 
+import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -28,9 +31,13 @@ fun RadioButtonSelector(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(
                     selected = selectedOption == option,
-                    onClick = { onOptionChange(option) },
+                    onClick = {
+                        onOptionChange(option)
+                        Log.d("YogaStyle", "Selected option: $option") // Aggiungi un log per il debug
+                    },
                     colors = RadioButtonDefaults.colors(
-                        selectedColor = color
+                        selectedColor = color,
+                        unselectedColor = color.copy(alpha = 0.5f) // Opzionale: colore per le opzioni non selezionate
                     )
                 )
                 Text(option, modifier = Modifier.padding(start = 8.dp))

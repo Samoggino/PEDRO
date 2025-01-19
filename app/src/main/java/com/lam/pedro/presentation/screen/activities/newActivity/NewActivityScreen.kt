@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -61,10 +62,16 @@ fun NewActivityScreen(
     profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModelFactory()),
     newActivityViewModel: NewActivityViewModel = viewModel(
         factory = NewActivityViewModelFactory(
-            LocalContext.current
+            LocalContext.current,
+            viewModel.activityEnum
         )
     )
 ) {
+
+    Log.d(
+        "TIPO DEL NEW ACTIVITY VIEW MODEL",
+        "---- TIPO DEL NEW ACTIVITY VIEW MODEL: $newActivityViewModel"
+    )
 
     Log.d(
         "TIPO DEL NEW ACTIVITY SCREEN",
@@ -154,7 +161,7 @@ fun NewActivityScreen(
 
                         ExerciseSessionRecord.EXERCISE_TYPE_YOGA -> {
                             YogaStyleSelector(
-                                yogaStyle = newActivityViewModel.yogaStyle.toString(),
+                                yogaStyle = newActivityViewModel.yogaStyle.value,
                                 onYogaStyleChange = { newStyle ->
                                     newActivityViewModel.yogaStyle.value = newStyle
                                 },
@@ -164,7 +171,7 @@ fun NewActivityScreen(
 
                         ExerciseSessionRecord.EXERCISE_TYPE_EXERCISE_CLASS -> {
                             TrainIntensitySelector(
-                                trainIntensity = newActivityViewModel.trainIntensity.toString(),
+                                trainIntensity = newActivityViewModel.trainIntensity.value,
                                 onTrainIntensityChange = { newStyle ->
                                     newActivityViewModel.trainIntensity.value = newStyle
                                 },
@@ -235,11 +242,26 @@ fun NewActivityScreen(
                                     if (duration < 1) {
                                         showConfirmDialog = false
                                         coroutineScope.launch {
-                                            newActivityViewModel.snackbarHostState.showSnackbar(
-                                                message = "Activity must be at least 1 minute",
-                                                actionLabel = "OK",
-                                                duration = SnackbarDuration.Long // Short, Long o Indefinite
-                                            )
+                                            val snackbarJob = launch {
+                                                newActivityViewModel.snackbarHostState.showSnackbar(
+                                                    message = "Activity must be at least 1 minute",
+                                                    actionLabel = "OK",
+                                                    duration = SnackbarDuration.Indefinite
+                                                )
+                                            }
+
+                                            // Aspetta 1.5 secondi (durata personalizzata)
+                                            delay(1500L)
+
+                                            // Cancella manualmente lo Snackbar dopo il ritardo
+                                            newActivityViewModel.snackbarHostState.currentSnackbarData?.dismiss()
+
+                                            // Interrompi il Job dello Snackbar
+                                            snackbarJob.cancel()
+
+                                            // Naviga indietro e annulla il lavoro di sessione
+                                            sessionJob.cancelAndJoin()
+                                            onNavBack()
                                         }
                                     } else {
                                         newActivityViewModel.saveActivity(
@@ -251,11 +273,9 @@ fun NewActivityScreen(
                                             profileViewModel = profileViewModel,
                                             activitySessionViewModel = viewModel
                                         )
+                                        sessionJob.cancelAndJoin()
+                                        onNavBack()
                                     }
-
-                                    sessionJob.cancelAndJoin()
-
-                                    onNavBack()
 
                                 } else {
                                     visible = !visible
@@ -275,19 +295,21 @@ fun NewActivityScreen(
 
             if (timerRunning && !isPaused) {
                 LaunchedEffect(Unit) {
-                    val serviceIntent = Intent(context, ActivityTrackingService::class.java)
-
                     startTime = ZonedDateTime.now()
 
                     sessionScope.launch {
-                        while (timerRunning) {
+                        while (timerRunning && !isPaused) {
                             delay(10)
                             elapsedTime += 10
                         }
                     }
 
+                    // Avvia il servizio di tracking solo se necessario
                     sessionScope.launch {
-                        context.startService(serviceIntent)
+                        val serviceIntent = newActivityViewModel.startTrackingServiceIfNeeded(context)
+                        if (serviceIntent != null) {
+                            context.startService(serviceIntent)
+                        }
                     }
                 }
             }

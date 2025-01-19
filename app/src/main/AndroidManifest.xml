@@ -98,6 +98,7 @@
             android:name=".util.services.ActivityTrackingService"
             android:enabled="true"
             android:foregroundServiceType="location|health" />
+        <!-- android:exported="false" -->
 
         <service
             android:name=".util.services.ActivityRecognitionService"
@@ -108,13 +109,12 @@
             </intent-filter>
         </service>
 
+        <receiver android:name=".util.geofence.GeofencingBroadcastReceiver"/>
+
         <service
-            android:name=".util.services.ActivityRecognitionService"
-            android:foregroundServiceType="health"
+            android:name=".util.geofence.GeofencingService"
+            android:foregroundServiceType="location"
             android:exported="false">
-            <intent-filter>
-                <action android:name="USER-ACTIVITY-DETECTION-INTENT-ACTION" />
-            </intent-filter>
         </service>
 
 
