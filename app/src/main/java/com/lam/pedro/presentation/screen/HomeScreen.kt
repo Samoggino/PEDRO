@@ -25,6 +25,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.lam.pedro.R
+import com.lam.pedro.presentation.navigation.Screen
 
 @Composable
 fun HomeScreen(onProfileClick: () -> Unit) {
@@ -35,10 +36,11 @@ fun HomeScreen(onProfileClick: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.Top
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         item {
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(50.dp))
             Row() {
                 Text(
                     text = "Welcome back!",
@@ -63,54 +65,12 @@ fun HomeScreen(onProfileClick: () -> Unit) {
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(30.dp))
-            Text(
-                text = "Statistics",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
+            Spacer(modifier = Modifier.height(50.dp))
+            Image(
+                painter = painterResource(id = R.drawable.pedro_home),
+                contentDescription = "Pedro Image",
+                modifier = Modifier.fillMaxWidth().size(400.dp)
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(26.dp))
-                    .height(180.dp)
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-            ) {
-                // TODO: graph
-            }
-            Spacer(modifier = Modifier.height(30.dp))
-            Text(
-                text = "Something else",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(26.dp))
-                    .height(180.dp)
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-            ) {
-                // TODO: graph
-            }
-            Spacer(modifier = Modifier.height(30.dp))
-            Text(
-                text = "Booooooooh",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(26.dp))
-                    .height(180.dp)
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-            ) {
-                // TODO: graph
-            }
             Spacer(modifier = Modifier.height(30.dp))
         }
     }
